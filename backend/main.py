@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import geopandas as gpd
 import json
@@ -53,6 +53,8 @@ from operators.zoning.aggregators import (
 
 # --- Imports for Map Algebra Engine ---
 from h3_engine import rasterize_geojson_to_h3 
+from llm_agent import UrbanTraceCopilot
+from tool import COPILOT_FRONTEND_TOOLS
 
 # ==========================================
 # 1. APP SETUP & CONSTANTS
@@ -71,6 +73,7 @@ app.add_middleware(
 
 # Directory pointing to the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+_COPILOT_AGENT: UrbanTraceCopilot | None = None
 
 # Operator Registries for Formal Integration
 ALLOCATION_REGISTRY = {
@@ -199,6 +202,23 @@ class CopilotSourceVariable(BaseModel):
 class CopilotRecommendRequest(BaseModel):
     target_zoning: CopilotTargetZoning
     source_variables: List[CopilotSourceVariable]
+class CopilotChatRequest(BaseModel):
+    """Payload for UrbanTrace LLM copilot chat with live dashboard graph context."""
+    message: str
+    nodes: list[dict[str, Any]] = Field(default_factory=list)
+    edges: list[dict[str, Any]] = Field(default_factory=list)
+    system_prompt: str = "You are a helpful assistant for UrbanTrace."
+    model: str | None = None
+    thinking_budget_tokens: int | None = None
+    log_stream: bool = True
+
+
+def get_copilot_agent() -> UrbanTraceCopilot:
+    """Lazy singleton so missing API keys do not crash app startup."""
+    global _COPILOT_AGENT
+    if _COPILOT_AGENT is None:
+        _COPILOT_AGENT = UrbanTraceCopilot()
+    return _COPILOT_AGENT
 
 
 class HotspotVariableRequest(BaseModel):
@@ -1327,3 +1347,95 @@ async def run_operation(request: OperationRequest):
 #         raise HTTPException(status_code=400, detail=str(ve))
 #     except Exception as e:
 #         raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
+
+
+@app.get("/api/operators")
+async def get_available_operators():
+    """
+    Returns all available operators and geometry constraints for the frontend.
+    Enables dynamic operator selection UI.
+    """
+    return {
+        "allocation": list(ALLOCATION_REGISTRY.keys()),
+        "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
+        "zoning_mapping": list(ZONING_MAPPING_REGISTRY.keys()),
+        "zoning_aggregation": list(ZONING_AGGREGATION_REGISTRY.keys()),
+        "geometry_constraints": GEOMETRY_CONSTRAINTS
+    }
+
+
+# ==========================================
+# 7. LLM COPILOT ENDPOINTS
+# ==========================================
+
+@app.post("/api/copilot/chat")
+async def copilot_chat(request: CopilotChatRequest):
+    """
+    Chat endpoint for dashboard-aware copilot.
+    Frontend should send current ReactFlow `nodes` and `edges`.
+    """
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail="`message` cannot be empty")
+
+    try:
+        copilot = get_copilot_agent()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to initialize copilot: {str(e)}")
+
+    try:
+        copilot_result = copilot.run_copilot_turn(
+            user_message=request.message,
+            system_prompt=request.system_prompt,
+            model=request.model,
+            thinking_budget_tokens=request.thinking_budget_tokens,
+            dashboard_nodes=request.nodes,
+            dashboard_edges=request.edges,
+            tools=COPILOT_FRONTEND_TOOLS,
+            max_tool_rounds=3,
+        )
+        response_text = copilot_result.get("message", "")
+        initial_response_text = copilot_result.get("assistant_initial_response", "")
+        tool_calls = copilot_result.get("tool_calls", [])
+        tool_responses = copilot_result.get("tool_responses", [])
+        actions = copilot_result.get("actions", [])
+        rounds_executed = copilot_result.get("rounds_executed", 0)
+        tool_round_limit_reached = copilot_result.get("tool_round_limit_reached", False)
+
+        if request.log_stream:
+            print("\n=== COPILOT RESPONSE START ===", flush=True)
+            print(f"rounds_executed={rounds_executed}", flush=True)
+            print(f"tool_round_limit_reached={tool_round_limit_reached}", flush=True)
+            print(f"assistant_initial_response={initial_response_text}", flush=True)
+            if tool_calls:
+                print(f"tool_call_count={len(tool_calls)}", flush=True)
+                for idx, tool_call in enumerate(tool_calls, start=1):
+                    print(
+                        f"tool_call_{idx}={json.dumps(tool_call, ensure_ascii=True)}",
+                        flush=True,
+                    )
+            else:
+                print("tool_call_count=0", flush=True)
+            print(f"tool_calls={json.dumps(tool_calls, ensure_ascii=True)}", flush=True)
+            print(f"tool_responses={json.dumps(tool_responses, ensure_ascii=True)}", flush=True)
+            print(f"actions={json.dumps(actions, ensure_ascii=True)}", flush=True)
+            print(f"assistant_final_response={response_text}", flush=True)
+            print("=== COPILOT RESPONSE END ===", flush=True)
+
+        return {
+            "status": "success",
+            "message": response_text,
+            "tool_calls": tool_calls,
+            "tool_responses": tool_responses,
+            "actions": actions,
+            "rounds_executed": rounds_executed,
+            "tool_round_limit_reached": tool_round_limit_reached,
+            "node_count": len(request.nodes),
+            "edge_count": len(request.edges),
+            "log_stream": request.log_stream,  # now used as debug-print flag
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Copilot chat failed: {str(e)}")

@@ -13,6 +13,7 @@ import IntegrationNode from './nodes/IntegrationNode'; // <--- NEW Import
 import DatasetDetailsModal from '../catalog/DatasetDetailsModal'; 
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
 import CompareMapNode from './nodes/CompareMapNode';
+import FloatingCopilotInput from '../copilot/FloatingCopilotInput';
 
 const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => {
   const [nodes, setNodes] = useState([]);
@@ -30,8 +31,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   });
   const [hoveredCompareFeatureId, setHoveredCompareFeatureId] = useState(null);
   const [hoveredCompareFeatureType, setHoveredCompareFeatureType] = useState(null);
+  const [availableDatasets, setAvailableDatasets] = useState([]);
 
-  const { screenToFlowPosition, getNode, getNodes, getEdges, fitView } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   
   // SIDEBAR RESIZE FIX: Trigger React Flow resize recalculation after sidebar transition
   useEffect(() => {
@@ -41,6 +43,79 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }, 320);
     return () => clearTimeout(timer);
   }, [sidebarCollapsed]);
+
+  const normalizeDatasetId = useCallback((value) => {
+    if (typeof value !== 'string') return '';
+    let normalized = value.trim();
+    if (normalized.endsWith('.geojson')) {
+      normalized = normalized.slice(0, -8);
+    }
+    if (normalized.endsWith('_metadata')) {
+      normalized = normalized.slice(0, -9);
+    }
+    return normalized;
+  }, []);
+
+  const isNumericColumn = useCallback((column) => {
+    if (!column || typeof column !== 'object') return false;
+    return (
+      ['Integer', 'Float', 'http://schema.org/Integer', 'http://schema.org/Float'].includes(column.structural_type)
+      || column.mean !== undefined
+    );
+  }, []);
+
+  const fetchAvailableDatasets = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:8000/datasets');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch datasets: HTTP ${response.status}`);
+      }
+      const payload = await response.json();
+      const datasets = Array.isArray(payload?.datasets) ? payload.datasets : [];
+      setAvailableDatasets(datasets);
+      return datasets;
+    } catch (error) {
+      console.error('Failed to load datasets for copilot validation:', error);
+      return [];
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAvailableDatasets();
+  }, [fetchAvailableDatasets]);
+
+  const findDatasetById = useCallback((datasetId, datasets = availableDatasets) => {
+    const normalizedTarget = normalizeDatasetId(datasetId);
+    if (!normalizedTarget) return null;
+
+    return (
+      datasets.find((dataset) => {
+        const candidates = [
+          dataset?.id,
+          dataset?.filename,
+          dataset?.metadata?.name,
+          dataset?.name,
+        ]
+          .map(normalizeDatasetId)
+          .filter(Boolean);
+        return candidates.includes(normalizedTarget);
+      }) || null
+    );
+  }, [availableDatasets, normalizeDatasetId]);
+
+  const resolveValidColorByForDataset = useCallback((dataset, requestedColorBy) => {
+    if (typeof requestedColorBy !== 'string') return '';
+    const normalizedRequested = requestedColorBy.trim();
+    if (!normalizedRequested) return '';
+
+    const columns = Array.isArray(dataset?.metadata?.columns) ? dataset.metadata.columns : [];
+    const numericColumns = columns.filter(isNumericColumn);
+    const match = numericColumns.find((column) => {
+      const columnName = typeof column?.name === 'string' ? column.name : '';
+      return columnName.toLowerCase() === normalizedRequested.toLowerCase();
+    });
+    return match?.name || '';
+  }, [isNumericColumn]);
 
   // 2. Register the custom node types
   const nodeTypes = useMemo(() => ({
@@ -381,7 +456,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       
       // CONTEXTUAL STATE INHERITANCE:
       // Pass upstream node's selected column to pre-populate Variable Card
-      const inheritedColumn = sourceNode.data.selectedColumn || '';
+      const inheritedColumn = sourceNode.data.selectedColumn || sourceNode.data.colorBy || '';
       
       const newDataset = {
         id: `var_${Date.now()}`,
@@ -414,51 +489,153 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setViewingDataset(nodeData); 
   }, []);
 
-  // CONTEXTUAL STATE INHERITANCE:
-  // Factory to create column-select callback for each DatasetNode
-  // Also propagates changes to any connected downstream IntegrationNodes
-  const createColumnSelectHandler = useCallback((nodeId) => {
-    return (selectedColumn) => {
-      // Get current edges to find downstream connections
-      const currentEdges = getEdges();
-      const downstreamEdges = currentEdges.filter(e => e.source === nodeId);
-      
-      setNodes((nds) => {
-        return nds.map((node) => {
-          // Update the source DatasetNode
-          if (node.id === nodeId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                selectedColumn: selectedColumn
-              }
-            };
-          }
-          
-          // Propagate to downstream IntegrationNodes
-          const edgeToThis = downstreamEdges.find(e => e.target === node.id);
-          if (edgeToThis && node.type === 'integrationNode' && node.data.connectedDatasets) {
-            const updatedDatasets = node.data.connectedDatasets.map(d => {
-              if (d.nodeId === nodeId) {
-                return { ...d, inheritedColumn: selectedColumn };
-              }
-              return d;
-            });
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                connectedDatasets: updatedDatasets
-              }
-            };
-          }
-          
+  const handleDatasetColumnChange = useCallback((nodeId, nextColumn) => {
+    if (!nodeId) return;
+    const selectedColumn = typeof nextColumn === 'string' ? nextColumn : '';
+    const downstreamNodeIds = new Set(
+      getEdges()
+        .filter((edge) => edge.source === nodeId)
+        .map((edge) => edge.target)
+    );
+
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (!node) return node;
+
+        if (node.id === nodeId && node.type === 'datasetNode') {
+          const nodeData = (node.data && typeof node.data === 'object') ? node.data : {};
+          return {
+            ...node,
+            data: {
+              ...nodeData,
+              selectedColumn,
+              colorBy: selectedColumn,
+            },
+          };
+        }
+
+        if (
+          !downstreamNodeIds.has(node.id)
+          || node.type !== 'integrationNode'
+          || !Array.isArray(node.data?.connectedDatasets)
+        ) {
           return node;
+        }
+
+        let changed = false;
+        const updatedDatasets = node.data.connectedDatasets.map((dataset) => {
+          if (dataset.nodeId !== nodeId || dataset.inheritedColumn === selectedColumn) {
+            return dataset;
+          }
+          changed = true;
+          return { ...dataset, inheritedColumn: selectedColumn };
         });
+
+        if (!changed) {
+          return node;
+        }
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            connectedDatasets: updatedDatasets,
+          },
+        };
+      })
+    );
+  }, [getEdges]);
+
+  const addDatasetNodeById = useCallback(async (datasetId, colorBy) => {
+    const normalizedId = normalizeDatasetId(datasetId);
+    if (!normalizedId) {
+      console.warn(`[Copilot] add_dataset_node ignored: invalid dataset_id='${datasetId}'`);
+      return;
+    }
+
+    let dataset = findDatasetById(normalizedId);
+    if (!dataset) {
+      const refreshedDatasets = await fetchAvailableDatasets();
+      dataset = findDatasetById(normalizedId, refreshedDatasets);
+    }
+
+    if (!dataset) {
+      console.warn(`[Copilot] add_dataset_node ignored: unknown dataset_id='${datasetId}'`);
+      return;
+    }
+
+    const resolvedColorBy = resolveValidColorByForDataset(dataset, colorBy);
+    if (typeof colorBy === 'string' && colorBy.trim() && !resolvedColorBy) {
+      console.warn(
+        `[Copilot] add_dataset_node ignored invalid colorBy='${colorBy}' for dataset_id='${datasetId}'`
+      );
+    }
+
+    setNodes((nds) => {
+      const existingIndex = nds.findIndex((node) => {
+        if (!node || node.type !== 'datasetNode') return false;
+        const nodeData = (node.data && typeof node.data === 'object') ? node.data : {};
+        const existingId = normalizeDatasetId(
+          nodeData.id || nodeData.filename || nodeData.metadata?.name || nodeData.name
+        );
+        return existingId === normalizedId;
       });
-    };
-  }, [setNodes, getEdges]);
+      if (existingIndex >= 0) {
+        if (!resolvedColorBy) return nds;
+        return nds.map((node, idx) => {
+          if (idx !== existingIndex) return node;
+          const nodeData = (node.data && typeof node.data === 'object') ? node.data : {};
+          return {
+            ...node,
+            data: {
+              ...nodeData,
+              selectedColumn: resolvedColorBy,
+              colorBy: resolvedColorBy,
+              onColumnChange: handleDatasetColumnChange,
+            },
+          };
+        });
+      }
+
+      const datasetNodeCount = nds.filter((node) => node?.type === 'datasetNode').length;
+      const newNode = {
+        id: `node_dataset_${normalizedId}_${Date.now()}`,
+        type: 'datasetNode',
+        position: {
+          x: 120 + (datasetNodeCount % 3) * 280,
+          y: 100 + Math.floor(datasetNodeCount / 3) * 240,
+        },
+        data: {
+          ...dataset,
+          onShowInfo: handleShowInfo,
+          onColumnChange: handleDatasetColumnChange,
+          ...(resolvedColorBy ? { selectedColumn: resolvedColorBy, colorBy: resolvedColorBy } : {}),
+        },
+      };
+
+      return nds.concat(newNode);
+    });
+  }, [
+    fetchAvailableDatasets,
+    findDatasetById,
+    handleDatasetColumnChange,
+    handleShowInfo,
+    normalizeDatasetId,
+    resolveValidColorByForDataset,
+  ]);
+
+  const handleCopilotActions = useCallback(async (actions) => {
+    if (!Array.isArray(actions) || actions.length === 0) {
+      return;
+    }
+
+    for (const action of actions) {
+      if (!action || typeof action !== 'object') continue;
+      if (action.type === 'add_dataset_node') {
+        await addDatasetNodeById(action.datasetId, action.colorBy);
+      }
+    }
+  }, [addDatasetNodeById]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -498,7 +675,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           // DatasetNode: inject column select callback for state inheritance
           // Also include sync props for viewport linking
           newNodeData.onShowInfo = handleShowInfo;
-          newNodeData.onColumnSelect = createColumnSelectHandler(nodeId);
+          newNodeData.onColumnChange = handleDatasetColumnChange;
           newNodeData.isMapSyncEnabled = isMapSyncEnabled;
           newNodeData.globalViewState = globalViewState;
           newNodeData.onGlobalViewStateChange = setGlobalViewState;
@@ -512,9 +689,22 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         data: newNodeData,
       };
 
+      console.log('Adding new node:', newNode);
+
       setNodes((nds) => nds.concat(newNode));
     },
-    [screenToFlowPosition, handleShowInfo, handleIntegrationComplete, createColumnSelectHandler, handleCompareHover, handleDeleteNode, isMapSyncEnabled, globalViewState]
+    [
+      globalViewState,
+      handleDatasetColumnChange,
+      handleIntegrationComplete,
+      handleShowInfo,
+      isMapSyncEnabled,
+      onLogActivity,
+      screenToFlowPosition,
+      createColumnSelectHandler,
+      handleCompareHover,
+      handleDeleteNode,
+    ]
   );
 
   return (
@@ -562,6 +752,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           <Controls />
         </ReactFlow>
       </div>
+
+      <FloatingCopilotInput nodes={nodes} edges={edges} onCopilotActions={handleCopilotActions} />
 
       {viewingDataset && (
         <DatasetDetailsModal
