@@ -2,19 +2,26 @@ import pandas as pd
 import geopandas as gpd
 from .base import AllocationOperator
 
+
+METRIC_CRS = "EPSG:3857"
+
 class ProportionalAreaWeighted(AllocationOperator):
     @property
     def supported_geometries(self): return ['Polygon', 'MultiPolygon']
     
     def calculate_weights(self, source_gdf, grid_gdf):
-        # Pre-calculate original area to preserve mass
-        source_gdf['orig_area'] = source_gdf.geometry.area
-        
-        # Intersect polygons with the grid
+        source_gdf = source_gdf.copy()
+
+        # Pre-calculate original area in a projected CRS to preserve mass correctly.
+        source_metric = source_gdf.to_crs(METRIC_CRS)
+        source_gdf['orig_area'] = source_metric.geometry.area.values
+
+        # Intersect polygons with the grid in the common WGS84 support.
         intersection = gpd.overlay(source_gdf, grid_gdf, how='intersection')
-        
-        # Calculate weight: intersection area / original area
-        intersection['weight'] = intersection.geometry.area / intersection['orig_area']
+
+        # Calculate intersection area in projected CRS for accurate weights.
+        intersection_metric = intersection.to_crs(METRIC_CRS)
+        intersection['weight'] = intersection_metric.geometry.area.values / intersection['orig_area']
         
         return intersection[['source_id', 'cell_id', 'weight']]
 
@@ -23,13 +30,20 @@ class ProportionalLengthWeighted(AllocationOperator):
     def supported_geometries(self): return ['LineString', 'MultiLineString']
     
     def calculate_weights(self, source_gdf, grid_gdf):
-        # Pre-calculate original length
-        source_gdf['orig_length'] = source_gdf.geometry.length
-        
-        # Intersect lines with the grid
+        source_gdf = source_gdf.copy()
+
+        # Pre-calculate original length in a projected CRS.
+        source_metric = source_gdf.to_crs(METRIC_CRS)
+        source_gdf['orig_length'] = source_metric.geometry.length.values
+
+        # Intersect lines with the common WGS84 grid.
         intersection = gpd.overlay(source_gdf, grid_gdf, how='intersection')
-        
-        # Calculate weight: intersected segment length / original line length
-        intersection['weight'] = intersection.geometry.length / intersection['orig_length']
+
+        if intersection.empty:
+            return intersection[['source_id', 'cell_id']].assign(weight=pd.Series(dtype=float))
+
+        # Calculate segment lengths in projected CRS for accurate weights.
+        intersection_metric = intersection.to_crs(METRIC_CRS)
+        intersection['weight'] = intersection_metric.geometry.length.values / intersection['orig_length']
         
         return intersection[['source_id', 'cell_id', 'weight']]

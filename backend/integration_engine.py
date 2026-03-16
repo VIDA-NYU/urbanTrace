@@ -11,6 +11,22 @@ from operators.aggregation.base import AggregationOperator
 from operators.zoning.base import ZoningMappingOperator, ZoningAggregationOperator
 
 
+TARGET_CRS = "EPSG:4326"
+
+
+def _ensure_wgs84(gdf: gpd.GeoDataFrame, label: str) -> gpd.GeoDataFrame:
+    """
+    Normalize geometries to WGS84 so they align with the H3 grid support.
+    Raises if CRS is missing because overlays/joins would be ambiguous.
+    """
+    if gdf.crs is None:
+        raise ValueError(f"{label} has no CRS defined. Please set a valid CRS before integration.")
+
+    if str(gdf.crs) != TARGET_CRS:
+        return gdf.to_crs(TARGET_CRS)
+    return gdf.copy()
+
+
 @dataclass
 class VariableTrackConfig:
     """Configuration for a single variable's processing track."""
@@ -41,6 +57,8 @@ class IntegrationPipeline:
         if 'source_id' not in source_gdf.columns:
             source_gdf = source_gdf.copy()
             source_gdf['source_id'] = source_gdf.index.astype(str)
+
+        source_gdf = _ensure_wgs84(source_gdf, "Source dataset")
 
         # 1. Enforce Geometry Constraints (\mathcal{R}^{(k)})
         # This will raise an error if a user tries an invalid operation (e.g., Length on Polygons)
@@ -133,6 +151,9 @@ class ZonedIntegrationPipeline:
             zones_gdf = zones_gdf.copy()
             zones_gdf['zone_id'] = zones_gdf.index.astype(str)
 
+        source_gdf = _ensure_wgs84(source_gdf, "Source dataset")
+        zones_gdf = _ensure_wgs84(zones_gdf, "Zones dataset")
+
         # 1. Validate geometry constraints for R^(k)
         self.allocator.validate_geometry(source_gdf)
         
@@ -202,6 +223,9 @@ class ZonedIntegrationPipeline:
         if 'zone_id' not in zones_gdf.columns:
             zones_gdf = zones_gdf.copy()
             zones_gdf['zone_id'] = zones_gdf.index.astype(str)
+
+        source_gdf = _ensure_wgs84(source_gdf, "Source dataset")
+        zones_gdf = _ensure_wgs84(zones_gdf, "Zones dataset")
 
         # 1. Validate geometry constraints
         self.allocator.validate_geometry(source_gdf)
@@ -278,6 +302,8 @@ class ZonedIntegrationPipeline:
         if 'source_id' not in source_gdf.columns:
             source_gdf = source_gdf.copy()
             source_gdf['source_id'] = source_gdf.index.astype(str)
+
+        source_gdf = _ensure_wgs84(source_gdf, "Source dataset")
 
         self.allocator.validate_geometry(source_gdf)
         
@@ -408,6 +434,24 @@ class MultivariateIntegrationPipeline:
         """
         if not tracks:
             raise ValueError("At least one variable track is required")
+
+        normalized_tracks: List[VariableTrackConfig] = []
+        for track in tracks:
+            normalized_tracks.append(
+                VariableTrackConfig(
+                    source_gdf=_ensure_wgs84(track.source_gdf, f"Source dataset for '{track.output_name}'"),
+                    target_column=track.target_column,
+                    output_name=track.output_name,
+                    allocator=track.allocator,
+                    grid_aggregator=track.grid_aggregator,
+                    zoning_mapper=track.zoning_mapper,
+                    zoning_aggregator=track.zoning_aggregator,
+                )
+            )
+        tracks = normalized_tracks
+
+        if zones_gdf is not None:
+            zones_gdf = _ensure_wgs84(zones_gdf, "Zones dataset")
         
         # Compute combined bounds from all source datasets
         all_bounds = []

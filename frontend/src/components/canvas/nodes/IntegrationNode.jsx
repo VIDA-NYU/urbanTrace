@@ -27,7 +27,8 @@ const AGGREGATION_OPS = [
 
 const ZONING_MAPPING_OPS = [
   "CentroidZoning",
-  "AreaWeightedZoning"
+  "AreaWeightedZoning",
+  "LengthWeightedZoning"
 ];
 
 const ZONING_AGGREGATION_OPS = [
