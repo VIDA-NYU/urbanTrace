@@ -32,6 +32,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const [hoveredCompareFeatureId, setHoveredCompareFeatureId] = useState(null);
   const [hoveredCompareFeatureType, setHoveredCompareFeatureType] = useState(null);
   const [availableDatasets, setAvailableDatasets] = useState([]);
+  const [copilotSuggestions, setCopilotSuggestions] = useState([]);
+  const [autoSuggestRequest, setAutoSuggestRequest] = useState(null);
 
   const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   
@@ -116,6 +118,108 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     });
     return match?.name || '';
   }, [isNumericColumn]);
+
+  const getSuggestionKey = useCallback((suggestion) => {
+    if (!suggestion || typeof suggestion !== 'object') return '';
+
+    const explicitId = typeof suggestion.id === 'string' ? suggestion.id.trim() : '';
+    if (explicitId) return explicitId;
+
+    const action = (suggestion.action && typeof suggestion.action === 'object')
+      ? suggestion.action
+      : {};
+    const suggestionType = (
+      typeof suggestion.type === 'string' && suggestion.type.trim()
+        ? suggestion.type.trim()
+        : (typeof action.type === 'string' ? action.type.trim() : 'suggestion')
+    );
+    const datasetId = normalizeDatasetId(suggestion.datasetId || action.datasetId);
+    const colorByValue = suggestion.colorBy || action.colorBy;
+    const colorBy = typeof colorByValue === 'string' ? colorByValue.trim() : '';
+
+    return `${suggestionType}:${datasetId}:${colorBy || 'default'}`;
+  }, [normalizeDatasetId]);
+
+  const normalizeCopilotSuggestion = useCallback((rawSuggestion) => {
+    if (!rawSuggestion || typeof rawSuggestion !== 'object') return null;
+
+    const rawAction = (rawSuggestion.action && typeof rawSuggestion.action === 'object')
+      ? rawSuggestion.action
+      : {};
+    const actionType = (
+      typeof rawAction.type === 'string' && rawAction.type.trim()
+        ? rawAction.type.trim()
+        : (typeof rawSuggestion.type === 'string' ? rawSuggestion.type.trim() : '')
+    );
+
+    if (actionType !== 'add_dataset_node') {
+      return null;
+    }
+
+    const datasetId = normalizeDatasetId(rawSuggestion.datasetId || rawAction.datasetId);
+    if (!datasetId) {
+      return null;
+    }
+
+    const colorByValue = rawSuggestion.colorBy || rawAction.colorBy;
+    const colorBy = typeof colorByValue === 'string' ? colorByValue.trim() : '';
+    const reason = typeof rawSuggestion.reason === 'string' ? rawSuggestion.reason.trim() : '';
+    const dataset = findDatasetById(datasetId);
+    const metadata = (dataset?.metadata && typeof dataset.metadata === 'object') ? dataset.metadata : {};
+    const displayName = metadata?.name || dataset?.name || datasetId;
+
+    const suggestion = {
+      ...rawSuggestion,
+      id: getSuggestionKey(rawSuggestion),
+      type: 'add_dataset_node',
+      status: typeof rawSuggestion.status === 'string' && rawSuggestion.status.trim()
+        ? rawSuggestion.status.trim()
+        : 'pending',
+      title: typeof rawSuggestion.title === 'string' && rawSuggestion.title.trim()
+        ? rawSuggestion.title.trim()
+        : `Add ${displayName}`,
+      datasetId,
+      displayName,
+      geometryType: metadata?.geometricType || '',
+      rowCount: metadata?.nb_rows,
+      action: {
+        type: 'add_dataset_node',
+        datasetId,
+        ...(colorBy ? { colorBy } : {}),
+      },
+    };
+
+    if (colorBy) {
+      suggestion.colorBy = colorBy;
+    }
+    if (reason) {
+      suggestion.reason = reason;
+    }
+
+    return suggestion;
+  }, [findDatasetById, getSuggestionKey, normalizeDatasetId]);
+
+  const queueAutoSuggestRequest = useCallback((dataset) => {
+    if (!dataset || typeof dataset !== 'object') {
+      return;
+    }
+
+    const datasetId = normalizeDatasetId(
+      dataset.id || dataset.filename || dataset.metadata?.name || dataset.name
+    );
+    if (!datasetId) {
+      return;
+    }
+
+    const displayName = dataset.metadata?.name || dataset.name || datasetId;
+    setAutoSuggestRequest({
+      id: `auto_suggest_${datasetId}_${Date.now()}`,
+      datasetId,
+      displayName,
+      trigger: 'manual_dataset_add',
+      timestamp: Date.now(),
+    });
+  }, [normalizeDatasetId]);
 
   // 2. Register the custom node types
   const nodeTypes = useMemo(() => ({
@@ -550,7 +654,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     const normalizedId = normalizeDatasetId(datasetId);
     if (!normalizedId) {
       console.warn(`[Copilot] add_dataset_node ignored: invalid dataset_id='${datasetId}'`);
-      return;
+      return false;
     }
 
     let dataset = findDatasetById(normalizedId);
@@ -561,7 +665,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
     if (!dataset) {
       console.warn(`[Copilot] add_dataset_node ignored: unknown dataset_id='${datasetId}'`);
-      return;
+      return false;
     }
 
     const resolvedColorBy = resolveValidColorByForDataset(dataset, colorBy);
@@ -615,6 +719,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
       return nds.concat(newNode);
     });
+
+    return true;
   }, [
     fetchAvailableDatasets,
     findDatasetById,
@@ -624,18 +730,74 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     resolveValidColorByForDataset,
   ]);
 
-  const handleCopilotActions = useCallback(async (actions) => {
-    if (!Array.isArray(actions) || actions.length === 0) {
+  const handleCopilotSuggestions = useCallback((incomingSuggestions) => {
+    if (!Array.isArray(incomingSuggestions) || incomingSuggestions.length === 0) {
       return;
     }
 
-    for (const action of actions) {
-      if (!action || typeof action !== 'object') continue;
-      if (action.type === 'add_dataset_node') {
-        await addDatasetNodeById(action.datasetId, action.colorBy);
+    setCopilotSuggestions((prev) => {
+      const seen = new Set(prev.map(getSuggestionKey).filter(Boolean));
+      const nextSuggestions = [];
+
+      for (const rawSuggestion of incomingSuggestions) {
+        const suggestion = normalizeCopilotSuggestion(rawSuggestion);
+        if (!suggestion) continue;
+
+        const suggestionKey = getSuggestionKey(suggestion);
+        if (!suggestionKey || seen.has(suggestionKey)) continue;
+
+        seen.add(suggestionKey);
+        nextSuggestions.push(suggestion);
       }
+
+      return nextSuggestions.length > 0 ? nextSuggestions.concat(prev) : prev;
+    });
+  }, [getSuggestionKey, normalizeCopilotSuggestion]);
+
+  const removeCopilotSuggestion = useCallback((targetSuggestion) => {
+    const targetKey = getSuggestionKey(targetSuggestion);
+    if (!targetKey) return;
+
+    setCopilotSuggestions((prev) => {
+      const next = prev.filter((suggestion) => getSuggestionKey(suggestion) !== targetKey);
+      return next.length !== prev.length ? next : prev;
+    });
+  }, [getSuggestionKey]);
+
+  const handleAcceptSuggestion = useCallback(async (suggestion) => {
+    if (!suggestion || typeof suggestion !== 'object') {
+      return false;
     }
-  }, [addDatasetNodeById]);
+
+    const action = (suggestion.action && typeof suggestion.action === 'object')
+      ? suggestion.action
+      : suggestion;
+
+    if (action.type !== 'add_dataset_node') {
+      return false;
+    }
+
+    const wasApplied = await addDatasetNodeById(action.datasetId, action.colorBy);
+    if (wasApplied) {
+      removeCopilotSuggestion(suggestion);
+    }
+    return wasApplied;
+  }, [addDatasetNodeById, removeCopilotSuggestion]);
+
+  const handleRejectSuggestion = useCallback((suggestion) => {
+    const suggestionKey = getSuggestionKey(suggestion);
+    if (!suggestionKey) {
+      return false;
+    }
+
+    const exists = copilotSuggestions.some(
+      (candidate) => getSuggestionKey(candidate) === suggestionKey
+    );
+    if (exists) {
+      removeCopilotSuggestion(suggestion);
+    }
+    return exists;
+  }, [copilotSuggestions, getSuggestionKey, removeCopilotSuggestion]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -692,6 +854,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       console.log('Adding new node:', newNode);
 
       setNodes((nds) => nds.concat(newNode));
+      if (newNodeType === 'datasetNode') {
+        queueAutoSuggestRequest(dataItem);
+      }
     },
     [
       globalViewState,
@@ -704,6 +869,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       createColumnSelectHandler,
       handleCompareHover,
       handleDeleteNode,
+      queueAutoSuggestRequest,
     ]
   );
 
@@ -753,7 +919,15 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         </ReactFlow>
       </div>
 
-      <FloatingCopilotInput nodes={nodes} edges={edges} onCopilotActions={handleCopilotActions} />
+      <FloatingCopilotInput
+        nodes={nodes}
+        edges={edges}
+        suggestions={copilotSuggestions}
+        autoSuggestRequest={autoSuggestRequest}
+        onCopilotSuggestions={handleCopilotSuggestions}
+        onAcceptSuggestion={handleAcceptSuggestion}
+        onRejectSuggestion={handleRejectSuggestion}
+      />
 
       {viewingDataset && (
         <DatasetDetailsModal

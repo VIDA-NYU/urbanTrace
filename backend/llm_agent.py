@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 from portkey_ai import Portkey
 from tool import (
-    build_frontend_actions_from_tool_calls,
+    build_suggestions_from_tool_calls,
     build_tool_responses_from_tool_calls,
     get_dashboard_snapshot_json,
 )
@@ -239,9 +239,12 @@ class UrbanTraceCopilot:
                             "type": "text",
                             "text": (
                                 "When a user asks to add or place a dataset on the canvas, "
-                                "call add_dataset_node with dataset_id;"
-                                "and try to include a color_by column if you find a suitable one in the metadata based on the current dashboard coloring and dataset columns."
-                                "Use ids/column names from dataset context and avoid guessing."
+                                "call suggest_add_dataset_node with dataset_id; "
+                                "and try to include a color_by column if you find a suitable one in the metadata based on the current dashboard coloring and dataset columns. "
+                                "Include a short reason when it is helpful. "
+                                "Use ids/column names from dataset context and avoid guessing. "
+                                "This creates a pending suggestion that the user may accept or reject. "
+                                "Do not claim the dataset was added unless the user accepted it. "
                                 "After any tool call, also provide a short natural-language explanation to the user."
                             ),
                         }
@@ -406,10 +409,11 @@ class UrbanTraceCopilot:
         }
         followup_user_message = (
             f"Original user request:\n{original_user_message}\n\n"
-            "The tool calls and tool responses were already executed as follows:\n"
+            "The tool calls and tool responses were already processed into pending suggestions as follows:\n"
             f"{json.dumps(tool_trace, ensure_ascii=True)}\n\n"
             "Now provide the final reply to the user in 1-3 concise sentences. "
-            "Explain what was done and why. Do not emit tool calls."
+            "Explain what you are suggesting and why. Do not claim anything was already added. "
+            "Do not emit tool calls."
         )
 
         messages = self._build_messages(
@@ -458,8 +462,8 @@ class UrbanTraceCopilot:
         effective_round_limit = max(1, max_tool_rounds)
         all_tool_calls: list[dict[str, Any]] = []
         all_tool_responses: list[dict[str, Any]] = []
-        all_actions: list[dict[str, Any]] = []
-        seen_action_keys: set[str] = set()
+        all_suggestions: list[dict[str, Any]] = []
+        seen_suggestion_keys: set[str] = set()
 
         assistant_initial_response = ""
         assistant_final_response = ""
@@ -491,13 +495,13 @@ class UrbanTraceCopilot:
             round_tool_responses = build_tool_responses_from_tool_calls(round_tool_calls)
             all_tool_responses.extend(round_tool_responses)
 
-            round_actions = build_frontend_actions_from_tool_calls(round_tool_calls)
-            for action in round_actions:
-                dedupe_key = json.dumps(action, sort_keys=True, ensure_ascii=True)
-                if dedupe_key in seen_action_keys:
+            round_suggestions = build_suggestions_from_tool_calls(round_tool_calls)
+            for suggestion in round_suggestions:
+                dedupe_key = json.dumps(suggestion, sort_keys=True, ensure_ascii=True)
+                if dedupe_key in seen_suggestion_keys:
                     continue
-                seen_action_keys.add(dedupe_key)
-                all_actions.append(action)
+                seen_suggestion_keys.add(dedupe_key)
+                all_suggestions.append(suggestion)
 
             if round_index >= effective_round_limit:
                 tool_round_limit_reached = True
@@ -518,10 +522,10 @@ class UrbanTraceCopilot:
             )
 
         if not assistant_final_response:
-            if all_actions:
-                action_count = len(all_actions)
-                noun = "action" if action_count == 1 else "actions"
-                assistant_final_response = f"Queued {action_count} frontend {noun}."
+            if all_suggestions:
+                suggestion_count = len(all_suggestions)
+                noun = "suggestion" if suggestion_count == 1 else "suggestions"
+                assistant_final_response = f"Prepared {suggestion_count} {noun} for your review."
             else:
                 assistant_final_response = "I reviewed your request and I am ready for the next step."
 
@@ -530,7 +534,7 @@ class UrbanTraceCopilot:
             "assistant_initial_response": assistant_initial_response,
             "tool_calls": all_tool_calls,
             "tool_responses": all_tool_responses,
-            "actions": all_actions,
+            "suggestions": all_suggestions,
             "rounds_executed": rounds_executed,
             "tool_round_limit_reached": tool_round_limit_reached,
         }

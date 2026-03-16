@@ -5,13 +5,14 @@ from __future__ import annotations
 import json
 from typing import Any
 
-ADD_DATASET_NODE_TOOL = {
+SUGGEST_ADD_DATASET_NODE_TOOL = {
     "type": "function",
     "function": {
-        "name": "add_dataset_node",
+        "name": "suggest_add_dataset_node",
         "description": (
-            "Request the frontend canvas to add a dataset node by dataset id. "
-            "Pass dataset_id and optionally color_by. The frontend validates both."
+            "Suggest adding a dataset node to the frontend canvas by dataset id. "
+            "Pass dataset_id, optionally color_by, and optionally a short reason. "
+            "The frontend will let the user accept or reject the suggestion."
         ),
         "parameters": {
             "type": "object",
@@ -29,6 +30,13 @@ ADD_DATASET_NODE_TOOL = {
                         "Optional numeric column name to use as the default "
                         "colorBy field for the added dataset node."
                     ),
+                },
+                "reason": {
+                    "type": "string",
+                    "description": (
+                        "Optional short explanation for why this dataset should be added "
+                        "to the canvas right now."
+                    ),
                 }
             },
             "required": ["dataset_id"],
@@ -37,7 +45,12 @@ ADD_DATASET_NODE_TOOL = {
     },
 }
 
-COPILOT_FRONTEND_TOOLS = [ADD_DATASET_NODE_TOOL]
+COPILOT_FRONTEND_TOOLS = [SUGGEST_ADD_DATASET_NODE_TOOL]
+
+SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES = {
+    "suggest_add_dataset_node",
+    "add_dataset_node",
+}
 
 
 def _normalize_dataset_id(name: str | None) -> str:
@@ -208,6 +221,47 @@ def get_dashboard_snapshot_json(
     return json.dumps(snapshot, ensure_ascii=True)
 
 
+def _build_suggestion_action(dataset_id: str, color_by: str = "") -> dict[str, Any]:
+    action: dict[str, Any] = {
+        "type": "add_dataset_node",
+        "datasetId": dataset_id,
+    }
+    normalized_color_by = color_by.strip() if isinstance(color_by, str) else ""
+    if normalized_color_by:
+        action["colorBy"] = normalized_color_by
+    return action
+
+
+def _build_dataset_suggestion(
+    call_id: str,
+    tool_name: str,
+    dataset_id: str,
+    color_by: str = "",
+    reason: str = "",
+) -> dict[str, Any]:
+    normalized_color_by = color_by.strip() if isinstance(color_by, str) else ""
+    normalized_reason = reason.strip() if isinstance(reason, str) else ""
+    suggestion_id = (
+        f"suggestion:add_dataset_node:{dataset_id}:{normalized_color_by or 'default'}"
+    )
+
+    suggestion: dict[str, Any] = {
+        "id": suggestion_id,
+        "type": "add_dataset_node",
+        "status": "pending",
+        "title": f"Add dataset: {dataset_id}",
+        "datasetId": dataset_id,
+        "action": _build_suggestion_action(dataset_id, normalized_color_by),
+        "sourceToolCallId": call_id,
+        "sourceToolName": tool_name,
+    }
+    if normalized_color_by:
+        suggestion["colorBy"] = normalized_color_by
+    if normalized_reason:
+        suggestion["reason"] = normalized_reason
+    return suggestion
+
+
 def build_tool_responses_from_tool_calls(tool_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Convert model tool calls into tool response payloads (1:1 with calls).
@@ -225,7 +279,7 @@ def build_tool_responses_from_tool_calls(tool_calls: list[dict[str, Any]]) -> li
         if not isinstance(args, dict):
             args = {}
 
-        if name != "add_dataset_node":
+        if name not in SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES:
             response_payload: dict[str, Any] = {
                 "status": "ignored",
                 "error": f"Unsupported tool: {name}",
@@ -238,14 +292,20 @@ def build_tool_responses_from_tool_calls(tool_calls: list[dict[str, Any]]) -> li
                     "error": "Invalid dataset_id",
                 }
             else:
-                response_payload = {
-                    "type": "add_dataset_node",
-                    "datasetId": dataset_id,
-                }
                 color_by = args.get("color_by")
                 normalized_color_by = color_by.strip() if isinstance(color_by, str) else ""
+                reason = args.get("reason")
+                normalized_reason = reason.strip() if isinstance(reason, str) else ""
+                response_payload = {
+                    "type": "suggest_add_dataset_node",
+                    "status": "pending_user_decision",
+                    "datasetId": dataset_id,
+                    "action": _build_suggestion_action(dataset_id, normalized_color_by),
+                }
                 if normalized_color_by:
                     response_payload["colorBy"] = normalized_color_by
+                if normalized_reason:
+                    response_payload["reason"] = normalized_reason
 
         tool_responses.append(
             {
@@ -258,39 +318,52 @@ def build_tool_responses_from_tool_calls(tool_calls: list[dict[str, Any]]) -> li
     return tool_responses
 
 
-def build_frontend_actions_from_tool_calls(tool_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def build_suggestions_from_tool_calls(tool_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
-    Convert model tool calls into frontend actions.
+    Convert model tool calls into pending frontend suggestions.
     """
-    actions: list[dict[str, Any]] = []
-    seen: set[tuple[str, str, str]] = set()
+    suggestions: list[dict[str, Any]] = []
+    seen: set[str] = set()
 
-    for item in build_tool_responses_from_tool_calls(tool_calls):
-        if not isinstance(item, dict):
+    for call in tool_calls:
+        if not isinstance(call, dict):
             continue
-        response = item.get("response", {})
-        if not isinstance(response, dict):
+        name = call.get("name", "")
+        if name not in SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES:
             continue
-        if response.get("type") != "add_dataset_node":
+        args = call.get("arguments", {})
+        if not isinstance(args, dict):
+            args = {}
+
+        dataset_id = _normalize_dataset_id(args.get("dataset_id"))
+        if not dataset_id:
             continue
 
-        dataset_id = response.get("datasetId")
-        if not isinstance(dataset_id, str) or not dataset_id:
-            continue
-
-        color_by = response.get("colorBy")
-        normalized_color_by = color_by.strip() if isinstance(color_by, str) else ""
-        dedupe_key = ("add_dataset_node", dataset_id, normalized_color_by)
+        color_by = args.get("color_by")
+        reason = args.get("reason")
+        suggestion = _build_dataset_suggestion(
+            call_id=call.get("id", ""),
+            tool_name=name,
+            dataset_id=dataset_id,
+            color_by=color_by if isinstance(color_by, str) else "",
+            reason=reason if isinstance(reason, str) else "",
+        )
+        dedupe_key = suggestion.get("id", "")
         if dedupe_key in seen:
             continue
         seen.add(dedupe_key)
+        suggestions.append(suggestion)
 
-        action: dict[str, Any] = {
-            "type": "add_dataset_node",
-            "datasetId": dataset_id,
-        }
-        if normalized_color_by:
-            action["colorBy"] = normalized_color_by
-        actions.append(action)
+    return suggestions
 
+
+def build_frontend_actions_from_tool_calls(tool_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Backwards-compatible helper that extracts executable actions from suggestions.
+    """
+    actions: list[dict[str, Any]] = []
+    for suggestion in build_suggestions_from_tool_calls(tool_calls):
+        action = suggestion.get("action", {})
+        if isinstance(action, dict) and action.get("type"):
+            actions.append(action)
     return actions

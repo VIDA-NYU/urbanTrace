@@ -1401,7 +1401,7 @@ async def copilot_chat(request: CopilotChatRequest):
         initial_response_text = copilot_result.get("assistant_initial_response", "")
         tool_calls = copilot_result.get("tool_calls", [])
         tool_responses = copilot_result.get("tool_responses", [])
-        actions = copilot_result.get("actions", [])
+        suggestions = copilot_result.get("suggestions", [])
         rounds_executed = copilot_result.get("rounds_executed", 0)
         tool_round_limit_reached = copilot_result.get("tool_round_limit_reached", False)
 
@@ -1421,7 +1421,7 @@ async def copilot_chat(request: CopilotChatRequest):
                 print("tool_call_count=0", flush=True)
             print(f"tool_calls={json.dumps(tool_calls, ensure_ascii=True)}", flush=True)
             print(f"tool_responses={json.dumps(tool_responses, ensure_ascii=True)}", flush=True)
-            print(f"actions={json.dumps(actions, ensure_ascii=True)}", flush=True)
+            print(f"suggestions={json.dumps(suggestions, ensure_ascii=True)}", flush=True)
             print(f"assistant_final_response={response_text}", flush=True)
             print("=== COPILOT RESPONSE END ===", flush=True)
 
@@ -1430,7 +1430,7 @@ async def copilot_chat(request: CopilotChatRequest):
             "message": response_text,
             "tool_calls": tool_calls,
             "tool_responses": tool_responses,
-            "actions": actions,
+            "suggestions": suggestions,
             "rounds_executed": rounds_executed,
             "tool_round_limit_reached": tool_round_limit_reached,
             "node_count": len(request.nodes),
