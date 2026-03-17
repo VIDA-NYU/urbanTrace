@@ -75,6 +75,45 @@ app.add_middleware(
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 _COPILOT_AGENT: UrbanTraceCopilot | None = None
 
+
+def _strip_dataset_suffixes(name: str | None) -> str:
+    if not isinstance(name, str):
+        return ""
+
+    dataset_id = os.path.basename(name.strip())
+
+    for suffix in (".geojson", ".json"):
+        if dataset_id.endswith(suffix):
+            dataset_id = dataset_id[: -len(suffix)]
+            break
+
+    if dataset_id.endswith("_metadata"):
+        dataset_id = dataset_id[:-9]
+
+    return dataset_id
+
+
+def _geojson_filename(name: str | None) -> str:
+    dataset_id = _strip_dataset_suffixes(name)
+    if not dataset_id:
+        return ""
+    return f"{dataset_id}.geojson"
+
+
+def _normalize_dataset_stem(dataset_name: str | None) -> str:
+    return _strip_dataset_suffixes(dataset_name)
+
+
+def _metadata_path_for_dataset(dataset_name: str | None) -> str:
+    stem = _normalize_dataset_stem(dataset_name)
+    preferred = os.path.join(DATA_DIR, "metadata", f"{stem}_metadata.json")
+    legacy = os.path.join(DATA_DIR, "metadata", f"{stem}.json")
+
+    if os.path.exists(preferred) or not os.path.exists(legacy):
+        return preferred
+
+    return legacy
+
 # Operator Registries for Formal Integration
 ALLOCATION_REGISTRY = {
     "BinaryContainment": BinaryContainment,
@@ -239,7 +278,6 @@ class HotspotSynthesisRequest(BaseModel):
 async def list_datasets():
     """Lists available datasets and their metadata for the frontend Node Library."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
-    metadata_dir = os.path.join(DATA_DIR, "metadata")
     
     datasets = []
     
@@ -249,7 +287,7 @@ async def list_datasets():
     for f in os.listdir(geojson_dir):
         if f.endswith(".geojson"):
             base_name = f.replace(".geojson", "")
-            meta_path = os.path.join(metadata_dir, f"{base_name}_metadata.json")
+            meta_path = _metadata_path_for_dataset(base_name)
             
             dataset_info = {
                 "id": base_name,
@@ -271,7 +309,8 @@ async def get_geojson(filename: str, simplify: bool = False):
     print(f"Requesting dataset: {filename} (simplify={simplify})")
     """Serves raw or simplified GeoJSON data to the frontend."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
-    path = os.path.join(geojson_dir, filename)
+    resolved_filename = _geojson_filename(filename)
+    path = os.path.join(geojson_dir, resolved_filename)
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     
@@ -320,7 +359,11 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
                 raise HTTPException(status_code=400, detail=f"Unknown grid aggregation operator: {var.grid_aggregation_operator}")
             
             # Load source dataset
-            source_path = os.path.join(DATA_DIR, "geojson", var.dataset_path)
+            source_path = os.path.join(
+                DATA_DIR,
+                "geojson",
+                _geojson_filename(var.dataset_path),
+            )
             try:
                 source_gdf = gpd.read_file(source_path)
             except Exception as e:
@@ -369,7 +412,11 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
         # Load zones if provided
         zones_gdf = None
         if request.zones_path:
-            zones_path = os.path.join(DATA_DIR, "geojson", request.zones_path)
+            zones_path = os.path.join(
+                DATA_DIR,
+                "geojson",
+                _geojson_filename(request.zones_path),
+            )
             try:
                 zones_gdf = gpd.read_file(zones_path)
             except Exception as e:
@@ -482,20 +529,6 @@ Return ONLY a valid JSON array with one object per source variable, each contain
 dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
 Never invent operators not present in provided arrays.
 """.strip()
-
-
-def _normalize_dataset_stem(dataset_name: str) -> str:
-    base = os.path.basename(dataset_name or "")
-    if base.endswith(".geojson"):
-        return base[:-8]
-    return base
-
-
-def _metadata_path_for_dataset(dataset_name: str) -> str:
-    stem = _normalize_dataset_stem(dataset_name)
-    return os.path.join(DATA_DIR, "metadata", f"{stem}_metadata.json")
-
-
 def _extract_sample_values(sample_csv: Optional[str], target_column: str, max_rows: int = 20) -> List[Any]:
     if not sample_csv:
         return []
@@ -1047,13 +1080,14 @@ async def run_operation(request: OperationRequest):
 
     try:
         for dataset_id in request.datasetIds:
-            filepath = os.path.join(DATA_DIR, "geojson", f"{dataset_id}.geojson")
+            canonical_id = _strip_dataset_suffixes(dataset_id)
+            filepath = os.path.join(DATA_DIR, "geojson", _geojson_filename(dataset_id))
             if not os.path.exists(filepath):
                 raise HTTPException(status_code=404, detail=f"Dataset not found at {filepath}")
             
-            print(f"Rasterizing {dataset_id}...")
+            print(f"Rasterizing {canonical_id}...")
             hex_data = rasterize_geojson_to_h3(filepath, request.resolution)
-            all_hex_maps.append({"id": dataset_id, "data": hex_data})
+            all_hex_maps.append({"id": canonical_id, "data": hex_data})
 
         final_hex_data = {}
 
@@ -1125,8 +1159,8 @@ async def run_operation(request: OperationRequest):
 #     try:
 #         # Extract dataset id from dataset_path
 #         # Example: "NYC_pedestrian_counts.geojson" -> "NYC_pedestrian_counts"
-#         dataset_id = Path(request.dataset_path).stem
-
+#         dataset_id = _strip_dataset_suffixes(Path(request.dataset_path).stem)
+#
 #         # Build equivalent request for /run-operation
 #         operation_request = OperationRequest(
 #             operationType="preview",
@@ -1158,7 +1192,11 @@ async def run_operation(request: OperationRequest):
 #         grid = H3GridSystem()
 
 #         # Build path to the requested dataset
-#         dataset_full_path = os.path.join(DATA_DIR, "geojson", request.dataset_path)
+#         dataset_full_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.dataset_path),
+#         )
         
 #         try:
 #             source_gdf = gpd.read_file(dataset_full_path)
@@ -1256,14 +1294,22 @@ async def run_operation(request: OperationRequest):
 #         grid = H3GridSystem()
 
 #         # Load source dataset
-#         source_path = os.path.join(DATA_DIR, "geojson", request.dataset_path)
+#         source_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.dataset_path),
+#         )
 #         try:
 #             source_gdf = gpd.read_file(source_path)
 #         except Exception as e:
 #             raise HTTPException(status_code=404, detail=f"Could not load source dataset: {str(e)}")
 
 #         # Load zones dataset  
-#         zones_path = os.path.join(DATA_DIR, "geojson", request.zones_path)
+#         zones_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.zones_path),
+#         )
 #         try:
 #             zones_gdf = gpd.read_file(zones_path)
 #         except Exception as e:

@@ -56,11 +56,14 @@ SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES = {
 def _normalize_dataset_id(name: str | None) -> str:
     if not isinstance(name, str):
         return ""
+
     dataset_id = name.strip()
-    if dataset_id.endswith(".geojson"):
-        dataset_id = dataset_id[: -len(".geojson")]
-    if dataset_id.endswith("_metadata"):
-        dataset_id = dataset_id[: -len("_metadata")]
+
+    for suffix in (".geojson", ".json"):
+        if dataset_id.endswith(suffix):
+            dataset_id = dataset_id[: -len(suffix)]
+            break
+
     return dataset_id
 
 

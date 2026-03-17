@@ -52,9 +52,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     if (normalized.endsWith('.geojson')) {
       normalized = normalized.slice(0, -8);
     }
-    if (normalized.endsWith('_metadata')) {
-      normalized = normalized.slice(0, -9);
-    }
     return normalized;
   }, []);
 

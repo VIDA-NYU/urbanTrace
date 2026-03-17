@@ -61,10 +61,12 @@ class UrbanTraceCopilot:
     @staticmethod
     def _normalize_dataset_id(name: str) -> str:
         dataset_id = name.strip()
-        if dataset_id.endswith(".geojson"):
-            dataset_id = dataset_id[: -len(".geojson")]
-        if dataset_id.endswith("_metadata"):
-            dataset_id = dataset_id[: -len("_metadata")]
+
+        for suffix in (".geojson", ".json"):
+            if dataset_id.endswith(suffix):
+                dataset_id = dataset_id[: -len(suffix)]
+                break
+
         return dataset_id
 
     def _load_descriptions(self) -> dict[str, str]:
@@ -104,7 +106,7 @@ class UrbanTraceCopilot:
         if not self.metadata_dir.exists():
             return metadata
 
-        for path in sorted(self.metadata_dir.glob("*_metadata.json")):
+        for path in sorted(self.metadata_dir.glob("*.json")):
             dataset_id = self._normalize_dataset_id(path.stem)
             try:
                 with path.open("r", encoding="utf-8") as metadata_file:
