@@ -201,6 +201,16 @@ class CopilotRecommendRequest(BaseModel):
     source_variables: List[CopilotSourceVariable]
 
 
+class HotspotVariableRequest(BaseModel):
+    dataset_name: str
+    column_name: str
+
+
+class HotspotSynthesisRequest(BaseModel):
+    source_variables: List[HotspotVariableRequest]
+    goal: Optional[str] = None  # User-defined priority goal (e.g. "pedestrian safety risk")
+
+
 # ==========================================
 # 3. DATASET MANAGEMENT ENDPOINTS
 # ==========================================
@@ -579,6 +589,241 @@ def _heuristic_recommendations(llm_payload: Dict[str, Any]) -> List[Dict[str, An
         })
 
     return results
+
+
+def _infer_hotspot_direction(dataset_name: str, column_name: str, sample_data: List[Any]) -> str:
+    label = f"{dataset_name} {column_name}".lower()
+
+    inverted_keywords = [
+        "income", "wealth", "salary", "resource", "access", "coverage",
+        "bike lane", "bike lanes", "infrastructure", "service", "capacity",
+        "safety score", "score", "rating", "index (good)", "quality"
+    ]
+    normal_keywords = [
+        "injury", "injuries", "crash", "collision", "fatal", "poverty",
+        "unemployment", "pollution", "hvi", "vulnerability", "risk", "danger",
+        "complaint", "exposure", "burden"
+    ]
+
+    if any(k in label for k in normal_keywords):
+        return "normal"
+    if any(k in label for k in inverted_keywords):
+        return "inverted"
+
+    # Light statistical fallback: if values are mostly very high percentages/scores, assume beneficial metric.
+    nums = [v for v in sample_data if isinstance(v, (int, float))]
+    if nums:
+        avg = sum(nums) / len(nums)
+        if avg >= 85 and any(k in label for k in ["score", "rate", "index"]):
+            return "inverted"
+
+    return "normal"
+
+
+def _hotspot_reasoning(direction: str, dataset_name: str, column_name: str) -> str:
+    if direction == "inverted":
+        return f"Lower values in {column_name} ({dataset_name}) indicate higher unmet need, so scale is inverted for hotspot priority."
+    return f"Higher values in {column_name} ({dataset_name}) directly indicate higher risk/need, so scale is used as-is."
+
+
+HOTSPOT_SYSTEM_PROMPT = """
+You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
+
+The payload may include an optional "goal" field describing what "Priority" means in this context
+(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
+If present, use it to inform both direction and relative weight for each variable.
+If absent, infer the most semantically coherent goal from the variable names and metadata.
+
+For each source variable, infer:
+- direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)
+- reasoning: short justification referencing the goal, dataset context, column metadata, and sample values
+- weight: relative importance in [0,1]; variables more directly tied to the goal should receive higher weight
+
+Use semantic cues from dataset_name and column_name, and validate with sample_data statistics.
+Examples (goal-agnostic defaults):
+- crashes/injuries/poverty/pollution -> normal
+- income/coverage/infrastructure/safety score -> inverted
+
+Return ONLY JSON array of objects with fields:
+dataset_name, column_name, direction, reasoning, weight.
+Do not return markdown.
+""".strip()
+
+
+def _call_portkey_hotspot_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+    api_key = os.getenv("PORTKEY_API_KEY")
+    if not api_key:
+        return None
+
+    base_url = os.getenv("PORTKEY_BASE_URL", "https://ai-gateway.apps.cloud.rt.nyu.edu/v1")
+    model = os.getenv("PORTKEY_MODEL", "@vertexai/anthropic.claude-opus-4-6")
+
+    body = {
+        "model": model,
+        "temperature": 0.1,
+        "max_tokens": int(os.getenv("PORTKEY_MAX_TOKENS", "1024")),
+        "messages": [
+            {"role": "system", "content": HOTSPOT_SYSTEM_PROMPT},
+            {"role": "user", "content": json.dumps(llm_payload)}
+        ]
+    }
+
+    req = urllib.request.Request(
+        f"{base_url.rstrip('/')}/chat/completions",
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+            content = payload["choices"][0]["message"]["content"].strip()
+
+            if content.startswith("```json"):
+                content = content.split("```json", 1)[1].rsplit("```", 1)[0].strip()
+            elif content.startswith("```"):
+                content = content.split("```", 1)[1].rsplit("```", 1)[0].strip()
+
+            parsed = json.loads(content)
+            if isinstance(parsed, list):
+                for item in parsed:
+                    item["engine"] = "llm"
+                return parsed
+            return None
+    except Exception:
+        return None
+
+
+@app.post("/api/v1/copilot/synthesize-hotspot")
+async def synthesize_hotspot(request: HotspotSynthesisRequest):
+    """
+    Produces semantic variable audit for hotspot synthesis.
+    Returns per-variable direction (normal/inverted), weight, and reasoning.
+    """
+    if not request.source_variables:
+        raise HTTPException(status_code=400, detail="source_variables cannot be empty")
+
+    source_payload: List[Dict[str, Any]] = []
+
+    for item in request.source_variables:
+        metadata_path = _metadata_path_for_dataset(item.dataset_name)
+        if not os.path.exists(metadata_path):
+            raise HTTPException(status_code=404, detail=f"Metadata not found for dataset: {item.dataset_name}")
+
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+
+        column_meta = next((c for c in metadata.get("columns", []) if c.get("name") == item.column_name), None)
+        if not column_meta:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Column '{item.column_name}' not found in metadata for dataset '{item.dataset_name}'"
+            )
+
+        sample_values = _extract_sample_values(metadata.get("sample"), item.column_name, max_rows=20)
+        source_payload.append({
+            "dataset_name": _normalize_dataset_stem(item.dataset_name),
+            "column_name": item.column_name,
+            "column_metadata": {
+                "structural_type": column_meta.get("structural_type"),
+                "num_distinct_values": column_meta.get("num_distinct_values"),
+                "mean": column_meta.get("mean"),
+                "stddev": column_meta.get("stddev"),
+                "coverage": column_meta.get("coverage", [])
+            },
+            "sample_data": sample_values
+        })
+
+    llm_payload: Dict[str, Any] = {
+        "task": "Synthesize hotspot priority polarity and weights.",
+        "source_variables": source_payload,
+        "score_range": [0.0, 1.0]
+    }
+    if request.goal and request.goal.strip():
+        llm_payload["goal"] = request.goal.strip()
+
+    requested_pairs = {
+        (_normalize_dataset_stem(v.dataset_name), v.column_name)
+        for v in request.source_variables
+    }
+
+    audits = await asyncio.to_thread(_call_portkey_hotspot_structured, llm_payload)
+    if not audits:
+        audits = []
+        for var in source_payload:
+            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
+            audits.append({
+                "dataset_name": var["dataset_name"],
+                "column_name": var["column_name"],
+                "direction": direction,
+                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
+                "weight": 1.0,
+                "engine": "heuristic"
+            })
+
+    normalized_audits: List[Dict[str, Any]] = []
+    for audit in audits:
+        ds = _normalize_dataset_stem(str(audit.get("dataset_name", "")))
+        col = str(audit.get("column_name", ""))
+        if (ds, col) not in requested_pairs:
+            continue
+
+        direction_raw = str(audit.get("direction", "normal")).lower()
+        direction = "inverted" if direction_raw == "inverted" else "normal"
+        weight = audit.get("weight", 0.0)
+        try:
+            weight = float(weight)
+        except Exception:
+            weight = 0.0
+        if weight < 0:
+            weight = 0.0
+
+        normalized_audits.append({
+            "dataset_name": ds,
+            "column_name": col,
+            "direction": direction,
+            "reasoning": str(audit.get("reasoning", "")) or _hotspot_reasoning(direction, ds, col),
+            "weight": weight,
+            "engine": audit.get("engine", "llm")
+        })
+
+    if not normalized_audits:
+        normalized_audits = []
+        for var in source_payload:
+            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
+            normalized_audits.append({
+                "dataset_name": var["dataset_name"],
+                "column_name": var["column_name"],
+                "direction": direction,
+                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
+                "weight": 1.0,
+                "engine": "heuristic"
+            })
+
+    # Normalize weights to sum to 1
+    total_w = sum(max(0.0, float(a.get("weight", 0.0))) for a in normalized_audits)
+    if total_w <= 0:
+        n = len(normalized_audits)
+        for a in normalized_audits:
+            a["weight"] = round(1.0 / n, 4) if n else 0.0
+    else:
+        for a in normalized_audits:
+            a["weight"] = round(max(0.0, float(a.get("weight", 0.0))) / total_w, 4)
+
+    # Explicit one-line debug signal for quick engine-path checks per request
+    engine_used = "llm" if any(str(a.get("engine", "")).lower() == "llm" for a in normalized_audits) else "heuristic"
+    print(f"HOTSPOT_ENGINE={engine_used}")
+
+    return {
+        "analysisType": "hotspot_priority",
+        "scoreRange": [0.0, 1.0],
+        "variables": normalized_audits,
+        "summary": "Priority score is synthesized as a weighted normalized blend where 1.0 always means highest need."
+    }
 
 
 def _call_portkey_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:

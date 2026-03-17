@@ -8,6 +8,8 @@ const H3PreviewDeckGL = ({
   hexData, 
   geojsonData, 
   color = [236, 72, 153], 
+  useHotspotPalette = false,
+  hotspotPalette = null,  // { low: [r,g,b], high: [r,g,b] } – overrides default fire palette
   showHex = true, 
   showZones = false,
   // GLOBAL VIEWPORT SYNC: Props for linked camera
@@ -151,6 +153,15 @@ const H3PreviewDeckGL = ({
           getHexagon: d => d.hex,
           getFillColor: d => {
             const intensity = maxCount > 1 ? (d.count / maxCount) : 1;
+            if (useHotspotPalette) {
+              const low  = hotspotPalette?.low  ?? [253, 224,  71];  // default: yellow
+              const high = hotspotPalette?.high ?? [153,  27,  27];  // default: deep red
+              const r = Math.round(low[0] + (high[0] - low[0]) * intensity);
+              const g = Math.round(low[1] + (high[1] - low[1]) * intensity);
+              const b = Math.round(low[2] + (high[2] - low[2]) * intensity);
+              const alpha = is3D ? 210 : Math.floor(100 + (140 * intensity));
+              return [r, g, b, alpha];
+            }
             const alpha = is3D ? 200 : Math.floor(80 + (175 * intensity));
             return [color[0], color[1], color[2], alpha];
           },
@@ -176,6 +187,17 @@ const H3PreviewDeckGL = ({
           lineWidthMinPixels: 1,
           getFillColor: f => {
             const props = f.properties || {};
+            if (useHotspotPalette) {
+              const score = typeof props.hotspot_score === 'number' ? props.hotspot_score : 0;
+              const intensity = Math.max(0, Math.min(1, score));
+              const low  = hotspotPalette?.low  ?? [253, 224,  71];
+              const high = hotspotPalette?.high ?? [153,  27,  27];
+              const r = Math.round(low[0] + (high[0] - low[0]) * intensity);
+              const g = Math.round(low[1] + (high[1] - low[1]) * intensity);
+              const b = Math.round(low[2] + (high[2] - low[2]) * intensity);
+              const alpha = is3D ? 200 : Math.floor(90 + (140 * intensity));
+              return [r, g, b, alpha];
+            }
             // Sum all variable values for intensity
             let totalVal = props.zone_value || 0;
             if (!props.zone_value) {
@@ -210,7 +232,7 @@ const H3PreviewDeckGL = ({
     }
 
     return result;
-  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, is3D, color]);
+  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, is3D, color, useHotspotPalette]);
 
   // Auto-fit to zone bounds if showing zones
   useEffect(() => {

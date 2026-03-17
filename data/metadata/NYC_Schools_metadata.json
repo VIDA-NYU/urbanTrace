@@ -156,7 +156,7 @@
       "num_distinct_values": 1
     },
     {
-      "name": "capacity",
+      "name": "student",
       "structural_type": "http://schema.org/Integer",
       "semantic_types": [],
       "unclean_values_ratio": 0.0,
@@ -1058,7 +1058,7 @@
     "overagency",
     "overabbrev",
     "overlevel",
-    "capacity",
+    "student",
     "captype",
     "boro",
     "bin",
