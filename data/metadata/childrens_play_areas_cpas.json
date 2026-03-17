@@ -1,0 +1,376 @@
+{
+  "geometricType": "Point",
+  "name": "childrens_play_areas_cpas",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 1888,
+  "nb_profiled_rows": 1040,
+  "nb_columns": 13,
+  "columns": [
+    {
+      "name": "gispropnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 790
+    },
+    {
+      "name": "omppropid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 928
+    },
+    {
+      "name": "accessibility",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "accessibilitylevel",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "additionallocationinfo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8314774632453918,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "additionalnameinfo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.9644230769230769,
+      "num_distinct_values": 7
+    },
+    {
+      "name": "grp",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.01730769230769231,
+      "num_distinct_values": 2,
+      "mean": 1.0173076923076922,
+      "stddev": 0.13041524487066103,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "location",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9142012000083923,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 902
+    },
+    {
+      "name": "parkdistrict",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 74
+    },
+    {
+      "name": "point",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9609730839729309,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "rules",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "system",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 944
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_categorical_columns": 3,
+  "nb_numerical_columns": 1,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "point"
+      ],
+      "column_indexes": [
+        10
+      ],
+      "geohashes4": [
+        {
+          "hash": "121130231331",
+          "number": 64
+        },
+        {
+          "hash": "121130231333",
+          "number": 32
+        },
+        {
+          "hash": "121130231332",
+          "number": 48
+        },
+        {
+          "hash": "121130231330",
+          "number": 105
+        },
+        {
+          "hash": "121130231321",
+          "number": 87
+        },
+        {
+          "hash": "121130231320",
+          "number": 28
+        },
+        {
+          "hash": "121130231322",
+          "number": 14
+        },
+        {
+          "hash": "121130231323",
+          "number": 59
+        },
+        {
+          "hash": "121130231302",
+          "number": 34
+        },
+        {
+          "hash": "121130231300",
+          "number": 15
+        },
+        {
+          "hash": "121130231303",
+          "number": 6
+        },
+        {
+          "hash": "121130231312",
+          "number": 7
+        },
+        {
+          "hash": "121130231313",
+          "number": 2
+        },
+        {
+          "hash": "121130231213",
+          "number": 8
+        },
+        {
+          "hash": "121130231211",
+          "number": 4
+        },
+        {
+          "hash": "121130231210",
+          "number": 3
+        },
+        {
+          "hash": "121130231231",
+          "number": 36
+        },
+        {
+          "hash": "121130231233",
+          "number": 1
+        },
+        {
+          "hash": "121130231032",
+          "number": 6
+        },
+        {
+          "hash": "121130231033",
+          "number": 1
+        },
+        {
+          "hash": "121130231023",
+          "number": 3
+        },
+        {
+          "hash": "121130233111",
+          "number": 38
+        },
+        {
+          "hash": "121130233110",
+          "number": 38
+        },
+        {
+          "hash": "121130233113",
+          "number": 10
+        },
+        {
+          "hash": "121130233112",
+          "number": 8
+        },
+        {
+          "hash": "121130233101",
+          "number": 29
+        },
+        {
+          "hash": "121130233103",
+          "number": 5
+        },
+        {
+          "hash": "121130233100",
+          "number": 2
+        },
+        {
+          "hash": "121130233011",
+          "number": 22
+        },
+        {
+          "hash": "121130320223",
+          "number": 84
+        },
+        {
+          "hash": "121130320220",
+          "number": 99
+        },
+        {
+          "hash": "121130320222",
+          "number": 38
+        },
+        {
+          "hash": "121130320221",
+          "number": 42
+        },
+        {
+          "hash": "121130320232",
+          "number": 40
+        },
+        {
+          "hash": "121130320230",
+          "number": 10
+        },
+        {
+          "hash": "121130322000",
+          "number": 8
+        },
+        {
+          "hash": "121130322001",
+          "number": 4
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.14652329775527,
+                40.731519988643186
+              ],
+              [
+                -73.90654102676316,
+                40.574436122674975
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.97186832544391,
+                40.88188214016469
+              ],
+              [
+                -73.85026050769055,
+                40.761289809153546
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.89117989655625,
+                40.77612870815889
+              ],
+              [
+                -73.73432377464022,
+                40.59320124670523
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 1040
+    }
+  ],
+  "attribute_keywords": [
+    "gispropnum",
+    "omppropid",
+    "accessibility",
+    "accessibilitylevel",
+    "additionallocationinfo",
+    "additionalnameinfo",
+    "grp",
+    "location",
+    "name",
+    "parkdistrict",
+    "point",
+    "rules",
+    "system"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.005710570025257766,
+      "2_geo_batch_predict": 0.011197486019227654,
+      "3_process_columns": 0.14476431196089834,
+      "4_latlong_pairing": 2.3934990167617798e-05,
+      "5_spatial_coverage": 0.012747690954711288,
+      "6_temporal_coverage": 3.6390265449881554e-06
+    },
+    "total": 1.444774214993231
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/j55h-3upk.csv"
+}

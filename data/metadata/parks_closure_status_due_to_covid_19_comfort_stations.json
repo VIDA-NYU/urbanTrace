@@ -1,0 +1,284 @@
+{
+  "geometricType": "Polygon",
+  "name": "parks_closure_status_due_to_covid_19_comfort_stations",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 672,
+  "nb_profiled_rows": 672,
+  "nb_columns": 13,
+  "columns": [
+    {
+      "name": "approx_date_closed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.3586309523809524,
+      "num_distinct_values": 424
+    },
+    {
+      "name": "approx_date_reopened",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.375,
+      "num_distinct_values": 84
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.03125,
+      "num_distinct_values": 651,
+      "mean": 3059164.420890937,
+      "stddev": 1325567.5949821132,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1040069.0,
+            "lte": 2127485.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3007377.0,
+            "lte": 3424878.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4061565.0,
+            "lte": 5156178.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "closuretype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.5342261904761905,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "doittid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.041666666666666664,
+      "num_distinct_values": 645,
+      "mean": 761509.1770186336,
+      "stddev": 407259.64087727544,
+      "coverage": [
+        {
+          "range": {
+            "gte": 38172.0,
+            "lte": 502359.0
+          }
+        },
+        {
+          "range": {
+            "gte": 560992.0,
+            "lte": 976420.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1036540.0,
+            "lte": 1283788.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "editdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 106
+    },
+    {
+      "name": "gispropnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 528
+    },
+    {
+      "name": "omppropid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.00744047619047619,
+      "num_distinct_values": 648
+    },
+    {
+      "name": "parkdistrict",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.001488095238095238,
+      "num_distinct_values": 86
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "system",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 672
+    },
+    {
+      "name": "polygon",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "polygon",
+        "confidence": 0.8484207391738892,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_temporal_columns": 3,
+  "nb_categorical_columns": 3,
+  "nb_numerical_columns": 2,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_closed"
+      ],
+      "column_indexes": [
+        0
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1589293824.0,
+            "lte": 1589294592.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_reopened"
+      ],
+      "column_indexes": [
+        1
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1592574080.0,
+            "lte": 1592758656.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1592784000.0,
+            "lte": 1593090944.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "editdate"
+      ],
+      "column_indexes": [
+        6
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1597269376.0,
+            "lte": 1597269376.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1597269504.0,
+            "lte": 1597269504.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    }
+  ],
+  "attribute_keywords": [
+    "approx_date_closed",
+    "approx",
+    "date",
+    "closed",
+    "approx_date_reopened",
+    "approx",
+    "date",
+    "reopened",
+    "bin",
+    "borough",
+    "closuretype",
+    "doittid",
+    "editdate",
+    "gispropnum",
+    "omppropid",
+    "parkdistrict",
+    "status",
+    "system",
+    "polygon"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0034609310096129775,
+      "2_geo_batch_predict": 0.013939787982963026,
+      "3_process_columns": 0.17593946598935872,
+      "4_latlong_pairing": 2.3562985006719828e-05,
+      "5_spatial_coverage": 6.016984116286039e-06,
+      "6_temporal_coverage": 0.013193560997024179
+    },
+    "total": 1.4937875189934857
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/i5n2-q8ck.csv"
+}

@@ -1,6 +1,6 @@
 {
   "geometricType": "Point",
-  "name": null,
+  "name": "NYC_vehicle_collisions_crashes",
   "crs": null,
   "nb_rows": 8605,
   "nb_profiled_rows": 8605,

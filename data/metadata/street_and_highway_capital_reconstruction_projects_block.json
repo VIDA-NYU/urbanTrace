@@ -1,0 +1,486 @@
+{
+  "geometricType": "MultiLineString",
+  "name": "street_and_highway_capital_reconstruction_projects_block",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 19959,
+  "nb_profiled_rows": 499,
+  "nb_columns": 25,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-line",
+        "confidence": 0.9189198613166809,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "projectid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1005,
+      "mean": 26627.623246492985,
+      "stddev": 32016.34207009665,
+      "coverage": [
+        {
+          "range": {
+            "gte": 499.0,
+            "lte": 3375.0
+          }
+        },
+        {
+          "range": {
+            "gte": 60663.0,
+            "lte": 66000.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "projtitle",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8279687762260437,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "fmsid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1004
+    },
+    {
+      "name": "fmsagencyi",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 7,
+      "mean": 833.9498997995992,
+      "stddev": 38.231070145090655,
+      "coverage": [
+        {
+          "range": {
+            "gte": 826.0,
+            "lte": 826.0
+          }
+        },
+        {
+          "range": {
+            "gte": 841.0,
+            "lte": 841.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "leadagency",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.002004008016032064,
+      "num_distinct_values": 7
+    },
+    {
+      "name": "managingag",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 7,
+      "mean": 3.220440881763527,
+      "stddev": 4.605858320416257,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 3.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "projectdes",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8120965957641602,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "projecttyp",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.018036072144288578,
+      "num_distinct_values": 13
+    },
+    {
+      "name": "projectt_1",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.018036072144288578,
+      "num_distinct_values": 13
+    },
+    {
+      "name": "projectsta",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 19
+    },
+    {
+      "name": "constructi",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 32,
+      "mean": 2012.060120240481,
+      "stddev": 90.42773215264279,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2001.0,
+            "lte": 2013.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2014.0,
+            "lte": 2028.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "designstar",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.7274549098196392,
+      "num_distinct_values": 255
+    },
+    {
+      "name": "construc_1",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.6432865731462926,
+      "num_distinct_values": 327
+    },
+    {
+      "name": "currentfun",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 797,
+      "mean": 13610166.967935871,
+      "stddev": 24265295.02270556,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 12451611.0
+          }
+        },
+        {
+          "range": {
+            "gte": 17131001.0,
+            "lte": 53300942.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "projectcos",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 825,
+      "mean": 15203980.843687374,
+      "stddev": 25322426.698737267,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 20119530.0
+          }
+        },
+        {
+          "range": {
+            "gte": 24487675.0,
+            "lte": 62433000.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "overallsco",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.32064128256513025,
+      "num_distinct_values": 15
+    },
+    {
+      "name": "otherscope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.37675350701402804,
+      "num_distinct_values": 119
+    },
+    {
+      "name": "projectjus",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.6072144288577155
+    },
+    {
+      "name": "onstreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8102392554283142,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "fromstreet",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9019001126289368,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "tostreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8956589102745056,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "boroughnam",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "oftcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 15775,
+      "mean": 3.7339517783541146e+17,
+      "stddev": 1.1378854626667722e+17,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.1346012419013078e+17,
+            "lte": 2.3842025242027686e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 2.6862021952027805e+17,
+            "lte": 3.867303206803468e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 4.08090444790454e+17,
+            "lte": 5.528505314105331e+17
+          }
+        }
+      ]
+    },
+    {
+      "name": "location_1",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 430.7140430864605,
+      "stddev": 403.57747710179655,
+      "coverage": [
+        {
+          "range": {
+            "gte": 88.5537076097,
+            "lte": 494.263193822
+          }
+        },
+        {
+          "range": {
+            "gte": 551.905344192,
+            "lte": 1317.60829456
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 6,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 6,
+  "nb_numerical_columns": 8,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "designstar"
+      ],
+      "column_indexes": [
+        12
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 961372800.0,
+            "lte": 1281398400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1310428800.0,
+            "lte": 1546387200.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1585872000.0,
+            "lte": 1761955200.0
+          }
+        }
+      ],
+      "temporal_resolution": "week"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "construc_1"
+      ],
+      "column_indexes": [
+        13
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1357171200.0,
+            "lte": 1534896000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1576627200.0,
+            "lte": 1747958400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1820880000.0,
+            "lte": 1991433600.0
+          }
+        }
+      ],
+      "temporal_resolution": "week"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "projectid",
+    "projtitle",
+    "fmsid",
+    "fmsagencyi",
+    "leadagency",
+    "managingag",
+    "projectdes",
+    "projecttyp",
+    "projectt_1",
+    "projectt",
+    "1",
+    "projectsta",
+    "constructi",
+    "designstar",
+    "construc_1",
+    "construc",
+    "1",
+    "currentfun",
+    "projectcos",
+    "overallsco",
+    "otherscope",
+    "projectjus",
+    "onstreetna",
+    "fromstreet",
+    "tostreetna",
+    "boroughnam",
+    "oftcode",
+    "location_1",
+    "location",
+    "1"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0553812519647181,
+      "2_geo_batch_predict": 0.02450100699206814,
+      "3_process_columns": 0.1759766680188477,
+      "4_latlong_pairing": 3.9211008697748184e-05,
+      "5_spatial_coverage": 7.095979526638985e-06,
+      "6_temporal_coverage": 0.003689914010465145
+    },
+    "total": 1.5508812440093607
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/jvk9-k4re.csv"
+}

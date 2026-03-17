@@ -1,6 +1,6 @@
 {
   "geometricType": "Point",
-  "name": null,
+  "name": "NYPD_arrests_data",
   "crs": null,
   "nb_rows": 14649,
   "nb_profiled_rows": 14649,

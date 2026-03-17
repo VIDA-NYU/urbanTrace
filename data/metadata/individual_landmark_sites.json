@@ -1,0 +1,326 @@
+{
+  "geometricType": "MultiPolygon",
+  "name": "individual_landmark_sites",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 1528,
+  "nb_profiled_rows": 514,
+  "nb_columns": 17,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-polygon",
+        "confidence": 0.8977540731430054,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "objectid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1391,
+      "mean": 797.8735408560311,
+      "stddev": 1644.5285066850965,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 1312.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.005836575875486381,
+      "num_distinct_values": 6
+    },
+    {
+      "name": "block",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 859,
+      "mean": 1676.157587548638,
+      "stddev": 2066.579369004669,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 1927.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2296.0,
+            "lte": 5530.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lot",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 156,
+      "mean": 350.26459143968873,
+      "stddev": 1512.8519013825044,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 63.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "address",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9540390968322754,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1305,
+      "mean": 1656162373.5953307,
+      "stddev": 1351833839.59637,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 1019190053.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2025180014.0,
+            "lte": 3071230064.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4007550080.0,
+            "lte": 5078570001.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lpc_name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8370621204376221,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "lpc_lpnumb",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1458
+    },
+    {
+      "name": "lpc_sitede",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.0019455252918287938
+    },
+    {
+      "name": "lpc_sitest",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 6
+    },
+    {
+      "name": "lpc_altern",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.7237354085603113
+    },
+    {
+      "name": "desdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 444
+    },
+    {
+      "name": "landmarkty",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "url_report",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/URL"
+      ],
+      "num_distinct_values": 1458
+    },
+    {
+      "name": "shape_leng",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 715.3210106537784,
+      "stddev": 2145.9552719792223,
+      "coverage": [
+        {
+          "range": {
+            "gte": 93.2007748061,
+            "lte": 1312.10994292
+          }
+        }
+      ]
+    },
+    {
+      "name": "shape_area",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 43471.70558853548,
+      "stddev": 323750.5952893529,
+      "coverage": [
+        {
+          "range": {
+            "gte": 541.854763424,
+            "lte": 84671.7872898
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_temporal_columns": 1,
+  "nb_categorical_columns": 3,
+  "nb_numerical_columns": 6,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "desdate"
+      ],
+      "column_indexes": [
+        12
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": -127180800.0,
+            "lte": 392342400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 483062400.0,
+            "lte": 988070400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1056412800.0,
+            "lte": 1624320000.0
+          }
+        }
+      ],
+      "temporal_resolution": "week"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "objectid",
+    "borough",
+    "block",
+    "lot",
+    "address",
+    "bbl",
+    "lpc_name",
+    "lpc",
+    "name",
+    "lpc_lpnumb",
+    "lpc",
+    "lpnumb",
+    "lpc_sitede",
+    "lpc",
+    "sitede",
+    "lpc_sitest",
+    "lpc",
+    "sitest",
+    "lpc_altern",
+    "lpc",
+    "altern",
+    "desdate",
+    "landmarkty",
+    "url_report",
+    "url",
+    "report",
+    "shape_leng",
+    "shape",
+    "leng",
+    "shape_area",
+    "shape",
+    "area"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.008476549992337823,
+      "2_geo_batch_predict": 0.017112328961957246,
+      "3_process_columns": 0.16042827599449083,
+      "4_latlong_pairing": 3.268499858677387e-05,
+      "5_spatial_coverage": 6.099988240748644e-06,
+      "6_temporal_coverage": 0.0043664450058713555
+    },
+    "total": 1.5165279349894263
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/buis-pvji.csv"
+}

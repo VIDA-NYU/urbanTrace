@@ -1,0 +1,663 @@
+{
+  "geometricType": "Point",
+  "name": "2018_central_park_squirrel_census_squirrel_data",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 3023,
+  "nb_profiled_rows": 504,
+  "nb_columns": 31,
+  "columns": [
+    {
+      "name": "x",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "longitude",
+        "confidence": 0.9375994205474854,
+        "source": "ml+validated"
+      },
+      "mean": -73.96713877493879,
+      "stddev": 0.007866111697460145,
+      "coverage": [
+        {
+          "range": {
+            "gte": -73.9808247660048,
+            "lte": -73.9726381234747
+          }
+        },
+        {
+          "range": {
+            "gte": -73.9716414586381,
+            "lte": -73.9636482556874
+          }
+        },
+        {
+          "range": {
+            "gte": -73.9618213644671,
+            "lte": -73.9523001834395
+          }
+        }
+      ]
+    },
+    {
+      "name": "y",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.78076522280983,
+      "stddev": 0.010539485892136047,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.7664413570796,
+            "lte": 40.7743979416812
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7754674678574,
+            "lte": 40.7844651946415
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7886373772305,
+            "lte": 40.799035789744
+          }
+        }
+      ]
+    },
+    {
+      "name": "unique_squirrel_id",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3018
+    },
+    {
+      "name": "hectare",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 339
+    },
+    {
+      "name": "shift",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "date",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 11,
+      "mean": 10120847.365079366,
+      "stddev": 41771.51867735654,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10062018.0,
+            "lte": 10082018.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10102018.0,
+            "lte": 10142018.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10172018.0,
+            "lte": 10202018.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "hectare_squirrel_number",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 23,
+      "mean": 4.240079365079365,
+      "stddev": 3.2163861205148967,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 9.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "age",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.03968253968253968,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "primary_fur_color",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.017857142857142856,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "highlight_fur_color",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.3611111111111111,
+      "num_distinct_values": 11
+    },
+    {
+      "name": "combination_of_primary_and",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 22
+    },
+    {
+      "name": "color_notes",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.9603174603174603
+    },
+    {
+      "name": "location",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.017857142857142856,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "above_ground_sighter",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.03373015873015873,
+      "num_distinct_values": 42
+    },
+    {
+      "name": "specific_location",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.8571428571428571,
+      "num_distinct_values": 305
+    },
+    {
+      "name": "running",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "chasing",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "climbing",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "eating",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "foraging",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "other_activities",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.8551587301587301,
+      "num_distinct_values": 308
+    },
+    {
+      "name": "kuks",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "quaas",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "moans",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "tail_flags",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "tail_twitches",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "approaches",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "indifferent",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "runs_from",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "other_interactions",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.9404761904761905
+    },
+    {
+      "name": "geocoded_column",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9550856351852417,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_categorical_columns": 20,
+  "nb_numerical_columns": 4,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "geocoded_column"
+      ],
+      "column_indexes": [
+        30
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302313311211",
+          "number": 31
+        },
+        {
+          "hash": "1211302313311213",
+          "number": 21
+        },
+        {
+          "hash": "1211302313311212",
+          "number": 25
+        },
+        {
+          "hash": "1211302313311210",
+          "number": 9
+        },
+        {
+          "hash": "1211302313311231",
+          "number": 16
+        },
+        {
+          "hash": "1211302313311303",
+          "number": 28
+        },
+        {
+          "hash": "1211302313311302",
+          "number": 19
+        },
+        {
+          "hash": "1211302313311300",
+          "number": 11
+        },
+        {
+          "hash": "1211302313311301",
+          "number": 7
+        },
+        {
+          "hash": "1211302313311321",
+          "number": 19
+        },
+        {
+          "hash": "1211302313311320",
+          "number": 22
+        },
+        {
+          "hash": "1211302313311331",
+          "number": 19
+        },
+        {
+          "hash": "1211302313311330",
+          "number": 34
+        },
+        {
+          "hash": "1211302313311333",
+          "number": 10
+        },
+        {
+          "hash": "1211302313311332",
+          "number": 6
+        },
+        {
+          "hash": "1211302313311312",
+          "number": 14
+        },
+        {
+          "hash": "1211302313311313",
+          "number": 6
+        },
+        {
+          "hash": "1211303202202110",
+          "number": 21
+        },
+        {
+          "hash": "1211303202202112",
+          "number": 5
+        },
+        {
+          "hash": "1211303202202101",
+          "number": 27
+        },
+        {
+          "hash": "1211303202202102",
+          "number": 14
+        },
+        {
+          "hash": "1211303202202100",
+          "number": 19
+        },
+        {
+          "hash": "1211303202202103",
+          "number": 10
+        },
+        {
+          "hash": "1211303202202011",
+          "number": 16
+        },
+        {
+          "hash": "1211303202202010",
+          "number": 8
+        },
+        {
+          "hash": "1211303202202013",
+          "number": 3
+        },
+        {
+          "hash": "1211303202202001",
+          "number": 2
+        },
+        {
+          "hash": "1211303202200222",
+          "number": 10
+        },
+        {
+          "hash": "1211303202200221",
+          "number": 9
+        },
+        {
+          "hash": "1211303202200220",
+          "number": 15
+        },
+        {
+          "hash": "1211303202200233",
+          "number": 12
+        },
+        {
+          "hash": "1211303202200230",
+          "number": 5
+        },
+        {
+          "hash": "1211303202200232",
+          "number": 4
+        },
+        {
+          "hash": "1211303202200202",
+          "number": 1
+        },
+        {
+          "hash": "1211303202200322",
+          "number": 21
+        },
+        {
+          "hash": "1211303202200323",
+          "number": 5
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9802831706033,
+                40.774621784862
+              ],
+              [
+                -73.9696274291417,
+                40.7664413570796
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9727230609785,
+                40.7846350692923
+              ],
+              [
+                -73.9636234953334,
+                40.7742131587983
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9630097276366,
+                40.799035789744
+              ],
+              [
+                -73.9523001834395,
+                40.7889851896334
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 504
+    }
+  ],
+  "attribute_keywords": [
+    "x",
+    "y",
+    "unique_squirrel_id",
+    "unique",
+    "squirrel",
+    "id",
+    "hectare",
+    "shift",
+    "date",
+    "hectare_squirrel_number",
+    "hectare",
+    "squirrel",
+    "number",
+    "age",
+    "primary_fur_color",
+    "primary",
+    "fur",
+    "color",
+    "highlight_fur_color",
+    "highlight",
+    "fur",
+    "color",
+    "combination_of_primary_and",
+    "combination",
+    "of",
+    "primary",
+    "and",
+    "color_notes",
+    "color",
+    "notes",
+    "location",
+    "above_ground_sighter",
+    "above",
+    "ground",
+    "sighter",
+    "specific_location",
+    "specific",
+    "location",
+    "running",
+    "chasing",
+    "climbing",
+    "eating",
+    "foraging",
+    "other_activities",
+    "other",
+    "activities",
+    "kuks",
+    "quaas",
+    "moans",
+    "tail_flags",
+    "tail",
+    "flags",
+    "tail_twitches",
+    "tail",
+    "twitches",
+    "approaches",
+    "indifferent",
+    "runs_from",
+    "runs",
+    "from",
+    "other_interactions",
+    "other",
+    "interactions",
+    "geocoded_column",
+    "geocoded",
+    "column"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.01768912299303338,
+      "2_geo_batch_predict": 0.02517562301363796,
+      "3_process_columns": 0.15743247099453583,
+      "4_latlong_pairing": 0.00013812800170853734,
+      "5_spatial_coverage": 0.007346005004364997,
+      "6_temporal_coverage": 4.434026777744293e-06
+    },
+    "total": 1.5196834400412627
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/vfnx-vebw.csv"
+}
