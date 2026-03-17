@@ -1,0 +1,1515 @@
+{
+  "geometricType": "Point",
+  "name": "NYC_libraries",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 253,
+  "nb_profiled_rows": 253,
+  "nb_columns": 39,
+  "columns": [
+    {
+      "name": "facname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 252
+    },
+    {
+      "name": "addressnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.18181818181818182,
+      "num_distinct_values": 190
+    },
+    {
+      "name": "streetname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.18181818181818182,
+      "num_distinct_values": 174
+    },
+    {
+      "name": "address",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.13438735177865613,
+      "num_distinct_values": 214
+    },
+    {
+      "name": "city",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 41
+    },
+    {
+      "name": "zipcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 154,
+      "mean": 10789.91699604743,
+      "stddev": 575.061925714776,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10002.0,
+            "lte": 10075.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10302.0,
+            "lte": 10473.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11105.0,
+            "lte": 11436.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "factype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "facsubgrp",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "facgroup",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "facdomain",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "servarea",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "opname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 31
+    },
+    {
+      "name": "opabbrev",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "optype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "overagency",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "overabbrev",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "overlevel",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "capacity",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1,
+      "mean": 0.0,
+      "stddev": 0.0,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "captype",
+      "structural_type": "https://metadata.datadrivendiscovery.org/types/MissingData",
+      "semantic_types": []
+    },
+    {
+      "name": "boro",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 237,
+      "mean": 2780491.652173913,
+      "stddev": 1401540.6182350612,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 2097466.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3018376.0,
+            "lte": 3416544.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4029693.0,
+            "lte": 5083401.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 238,
+      "mean": 2712368856.1225295,
+      "stddev": 1334675475.4512227,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 1020770026.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2027220063.0,
+            "lte": 3078680039.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4005400030.0,
+            "lte": 5044700001.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "latitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/latitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.72479928199173,
+      "stddev": 0.0822157881281852,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.5524320334,
+            "lte": 40.6776658422
+          }
+        },
+        {
+          "range": {
+            "gte": 40.6861307275,
+            "lte": 40.7742042109
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7919924955,
+            "lte": 40.8911059186
+          }
+        }
+      ]
+    },
+    {
+      "name": "longitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/longitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": -73.92366606783992,
+      "stddev": 0.09153384388450007,
+      "coverage": [
+        {
+          "range": {
+            "gte": -74.1511120698,
+            "lte": -73.9681108345
+          }
+        },
+        {
+          "range": {
+            "gte": -73.9604005,
+            "lte": -73.8628905385
+          }
+        },
+        {
+          "range": {
+            "gte": -73.8501808487,
+            "lte": -73.7318305949
+          }
+        }
+      ]
+    },
+    {
+      "name": "xcoord",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 1005397.8941314624,
+      "stddev": 25383.286130910437,
+      "coverage": [
+        {
+          "range": {
+            "gte": 942256.795726,
+            "lte": 993095.93495
+          }
+        },
+        {
+          "range": {
+            "gte": 995242.384841,
+            "lte": 1022490.60958
+          }
+        },
+        {
+          "range": {
+            "gte": 1026689.52919,
+            "lte": 1058542.0295
+          }
+        }
+      ]
+    },
+    {
+      "name": "ycoord",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 203363.11286847037,
+      "stddev": 29952.204569149384,
+      "coverage": [
+        {
+          "range": {
+            "gte": 140578.610614,
+            "lte": 186168.616832
+          }
+        },
+        {
+          "range": {
+            "gte": 189252.398404,
+            "lte": 221340.669148
+          }
+        },
+        {
+          "range": {
+            "gte": 227824.761279,
+            "lte": 263963.033373
+          }
+        }
+      ]
+    },
+    {
+      "name": "cd",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 60,
+      "mean": 278.70355731225294,
+      "stddev": 127.19504748976124,
+      "coverage": [
+        {
+          "range": {
+            "gte": 101.0,
+            "lte": 111.0
+          }
+        },
+        {
+          "range": {
+            "gte": 204.0,
+            "lte": 317.0
+          }
+        },
+        {
+          "range": {
+            "gte": 401.0,
+            "lte": 503.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nta2010",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 156
+    },
+    {
+      "name": "nta2020",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 167
+    },
+    {
+      "name": "council",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 51,
+      "mean": 23.727272727272727,
+      "stddev": 15.385710456065162,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 15.0
+          }
+        },
+        {
+          "range": {
+            "gte": 18.0,
+            "lte": 35.0
+          }
+        },
+        {
+          "range": {
+            "gte": 36.0,
+            "lte": 51.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ct2010",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 220,
+      "mean": 39068.802371541504,
+      "stddev": 37002.40910072459,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1900.0,
+            "lte": 27900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 33402.0,
+            "lte": 73900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 80301.0,
+            "lte": 152901.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ct2020",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 220,
+      "mean": 39068.96837944664,
+      "stddev": 37002.42920034134,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1901.0,
+            "lte": 27900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 33404.0,
+            "lte": 73900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 80301.0,
+            "lte": 152901.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "borocode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5,
+      "mean": 2.707509881422925,
+      "stddev": 1.267339392300993,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "schooldist",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 32,
+      "mean": 16.063241106719367,
+      "stddev": 10.25851389245969,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 8.0
+          }
+        },
+        {
+          "range": {
+            "gte": 9.0,
+            "lte": 20.0
+          }
+        },
+        {
+          "range": {
+            "gte": 21.0,
+            "lte": 31.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "policeprct",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 77,
+      "mean": 66.81422924901186,
+      "stddev": 37.3976742938349,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 32.0
+          }
+        },
+        {
+          "range": {
+            "gte": 43.0,
+            "lte": 83.0
+          }
+        },
+        {
+          "range": {
+            "gte": 90.0,
+            "lte": 122.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "datasource",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "uid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 253
+    },
+    {
+      "name": "count",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "geometry",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "point_format": "long,lat",
+      "unclean_values_ratio": 0.0
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_categorical_columns": 11,
+  "nb_numerical_columns": 14,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "latlong",
+      "column_names": [
+        "latitude",
+        "longitude"
+      ],
+      "column_indexes": [
+        22,
+        23
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302312112",
+          "number": 1
+        },
+        {
+          "hash": "1211302312110",
+          "number": 1
+        },
+        {
+          "hash": "1211302312113",
+          "number": 1
+        },
+        {
+          "hash": "1211302312131",
+          "number": 1
+        },
+        {
+          "hash": "1211302312101",
+          "number": 1
+        },
+        {
+          "hash": "1211302312311",
+          "number": 3
+        },
+        {
+          "hash": "1211302312313",
+          "number": 3
+        },
+        {
+          "hash": "1211302312310",
+          "number": 2
+        },
+        {
+          "hash": "1211302312332",
+          "number": 1
+        },
+        {
+          "hash": "1211302313310",
+          "number": 14
+        },
+        {
+          "hash": "1211302313312",
+          "number": 4
+        },
+        {
+          "hash": "1211302313311",
+          "number": 12
+        },
+        {
+          "hash": "1211302313313",
+          "number": 6
+        },
+        {
+          "hash": "1211302313302",
+          "number": 4
+        },
+        {
+          "hash": "1211302313300",
+          "number": 8
+        },
+        {
+          "hash": "1211302313301",
+          "number": 7
+        },
+        {
+          "hash": "1211302313303",
+          "number": 1
+        },
+        {
+          "hash": "1211302313320",
+          "number": 4
+        },
+        {
+          "hash": "1211302313321",
+          "number": 1
+        },
+        {
+          "hash": "1211302313322",
+          "number": 3
+        },
+        {
+          "hash": "1211302313323",
+          "number": 3
+        },
+        {
+          "hash": "1211302313332",
+          "number": 4
+        },
+        {
+          "hash": "1211302313330",
+          "number": 3
+        },
+        {
+          "hash": "1211302313331",
+          "number": 2
+        },
+        {
+          "hash": "1211302313201",
+          "number": 4
+        },
+        {
+          "hash": "1211302313203",
+          "number": 3
+        },
+        {
+          "hash": "1211302313202",
+          "number": 3
+        },
+        {
+          "hash": "1211302313200",
+          "number": 5
+        },
+        {
+          "hash": "1211302313230",
+          "number": 5
+        },
+        {
+          "hash": "1211302313231",
+          "number": 4
+        },
+        {
+          "hash": "1211302313233",
+          "number": 1
+        },
+        {
+          "hash": "1211302313232",
+          "number": 1
+        },
+        {
+          "hash": "1211302313212",
+          "number": 5
+        },
+        {
+          "hash": "1211302313211",
+          "number": 6
+        },
+        {
+          "hash": "1211302313213",
+          "number": 5
+        },
+        {
+          "hash": "1211302313210",
+          "number": 1
+        },
+        {
+          "hash": "1211302313221",
+          "number": 2
+        },
+        {
+          "hash": "1211302313122",
+          "number": 3
+        },
+        {
+          "hash": "1211302313123",
+          "number": 3
+        },
+        {
+          "hash": "1211302313132",
+          "number": 1
+        },
+        {
+          "hash": "1211302313003",
+          "number": 2
+        },
+        {
+          "hash": "1211302313001",
+          "number": 1
+        },
+        {
+          "hash": "1211302313000",
+          "number": 1
+        },
+        {
+          "hash": "1211302313021",
+          "number": 1
+        },
+        {
+          "hash": "1211302313020",
+          "number": 1
+        },
+        {
+          "hash": "1211302313022",
+          "number": 2
+        },
+        {
+          "hash": "1211302313023",
+          "number": 3
+        },
+        {
+          "hash": "1211302313033",
+          "number": 1
+        },
+        {
+          "hash": "1211302310322",
+          "number": 1
+        },
+        {
+          "hash": "1211302310320",
+          "number": 1
+        },
+        {
+          "hash": "1211302310231",
+          "number": 1
+        },
+        {
+          "hash": "1211302331111",
+          "number": 2
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331110",
+          "number": 2
+        },
+        {
+          "hash": "1211302331113",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100",
+          "number": 6
+        },
+        {
+          "hash": "1211302331101",
+          "number": 3
+        },
+        {
+          "hash": "1211302331103",
+          "number": 3
+        },
+        {
+          "hash": "1211302331102",
+          "number": 2
+        },
+        {
+          "hash": "1211302331130",
+          "number": 2
+        },
+        {
+          "hash": "1211302331131",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331013",
+          "number": 3
+        },
+        {
+          "hash": "1211302331011",
+          "number": 3
+        },
+        {
+          "hash": "1211302330111",
+          "number": 2
+        },
+        {
+          "hash": "1211302330113",
+          "number": 3
+        },
+        {
+          "hash": "1211303202221",
+          "number": 2
+        },
+        {
+          "hash": "1211303202223",
+          "number": 1
+        },
+        {
+          "hash": "1211303202222",
+          "number": 1
+        },
+        {
+          "hash": "1211303202230",
+          "number": 5
+        },
+        {
+          "hash": "1211303202233",
+          "number": 3
+        },
+        {
+          "hash": "1211303202232",
+          "number": 3
+        },
+        {
+          "hash": "1211303202231",
+          "number": 4
+        },
+        {
+          "hash": "1211303202212",
+          "number": 5
+        },
+        {
+          "hash": "1211303202213",
+          "number": 3
+        },
+        {
+          "hash": "1211303202203",
+          "number": 5
+        },
+        {
+          "hash": "1211303202202",
+          "number": 7
+        },
+        {
+          "hash": "1211303202201",
+          "number": 2
+        },
+        {
+          "hash": "1211303202200",
+          "number": 2
+        },
+        {
+          "hash": "1211303202322",
+          "number": 4
+        },
+        {
+          "hash": "1211303202320",
+          "number": 5
+        },
+        {
+          "hash": "1211303202323",
+          "number": 1
+        },
+        {
+          "hash": "1211303202321",
+          "number": 1
+        },
+        {
+          "hash": "1211303220001",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        },
+        {
+          "hash": "1211303220010",
+          "number": 1
+        },
+        {
+          "hash": "1211303220011",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.1484992097,
+                40.741394365
+              ],
+              [
+                -73.914939804,
+                40.5719398183
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9827257926,
+                40.8862807253
+              ],
+              [
+                -73.840834064,
+                40.7492984206
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.8861478,
+                40.7711334798
+              ],
+              [
+                -73.7382355256,
+                40.6007401106
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 253
+    },
+    {
+      "type": "point",
+      "column_names": [
+        "geometry"
+      ],
+      "column_indexes": [
+        38
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302312112",
+          "number": 1
+        },
+        {
+          "hash": "1211302312110",
+          "number": 1
+        },
+        {
+          "hash": "1211302312113",
+          "number": 1
+        },
+        {
+          "hash": "1211302312131",
+          "number": 1
+        },
+        {
+          "hash": "1211302312101",
+          "number": 1
+        },
+        {
+          "hash": "1211302312311",
+          "number": 3
+        },
+        {
+          "hash": "1211302312313",
+          "number": 3
+        },
+        {
+          "hash": "1211302312310",
+          "number": 2
+        },
+        {
+          "hash": "1211302312332",
+          "number": 1
+        },
+        {
+          "hash": "1211302313310",
+          "number": 14
+        },
+        {
+          "hash": "1211302313312",
+          "number": 4
+        },
+        {
+          "hash": "1211302313311",
+          "number": 12
+        },
+        {
+          "hash": "1211302313313",
+          "number": 6
+        },
+        {
+          "hash": "1211302313302",
+          "number": 4
+        },
+        {
+          "hash": "1211302313300",
+          "number": 8
+        },
+        {
+          "hash": "1211302313301",
+          "number": 7
+        },
+        {
+          "hash": "1211302313303",
+          "number": 1
+        },
+        {
+          "hash": "1211302313320",
+          "number": 4
+        },
+        {
+          "hash": "1211302313321",
+          "number": 1
+        },
+        {
+          "hash": "1211302313322",
+          "number": 3
+        },
+        {
+          "hash": "1211302313323",
+          "number": 3
+        },
+        {
+          "hash": "1211302313332",
+          "number": 4
+        },
+        {
+          "hash": "1211302313330",
+          "number": 3
+        },
+        {
+          "hash": "1211302313331",
+          "number": 2
+        },
+        {
+          "hash": "1211302313201",
+          "number": 4
+        },
+        {
+          "hash": "1211302313203",
+          "number": 3
+        },
+        {
+          "hash": "1211302313202",
+          "number": 3
+        },
+        {
+          "hash": "1211302313200",
+          "number": 5
+        },
+        {
+          "hash": "1211302313230",
+          "number": 5
+        },
+        {
+          "hash": "1211302313231",
+          "number": 4
+        },
+        {
+          "hash": "1211302313233",
+          "number": 1
+        },
+        {
+          "hash": "1211302313232",
+          "number": 1
+        },
+        {
+          "hash": "1211302313212",
+          "number": 5
+        },
+        {
+          "hash": "1211302313211",
+          "number": 6
+        },
+        {
+          "hash": "1211302313213",
+          "number": 5
+        },
+        {
+          "hash": "1211302313210",
+          "number": 1
+        },
+        {
+          "hash": "1211302313221",
+          "number": 2
+        },
+        {
+          "hash": "1211302313122",
+          "number": 3
+        },
+        {
+          "hash": "1211302313123",
+          "number": 3
+        },
+        {
+          "hash": "1211302313132",
+          "number": 1
+        },
+        {
+          "hash": "1211302313003",
+          "number": 2
+        },
+        {
+          "hash": "1211302313001",
+          "number": 1
+        },
+        {
+          "hash": "1211302313000",
+          "number": 1
+        },
+        {
+          "hash": "1211302313021",
+          "number": 1
+        },
+        {
+          "hash": "1211302313020",
+          "number": 1
+        },
+        {
+          "hash": "1211302313022",
+          "number": 2
+        },
+        {
+          "hash": "1211302313023",
+          "number": 3
+        },
+        {
+          "hash": "1211302313033",
+          "number": 1
+        },
+        {
+          "hash": "1211302310322",
+          "number": 1
+        },
+        {
+          "hash": "1211302310320",
+          "number": 1
+        },
+        {
+          "hash": "1211302310231",
+          "number": 1
+        },
+        {
+          "hash": "1211302331111",
+          "number": 2
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331110",
+          "number": 2
+        },
+        {
+          "hash": "1211302331113",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100",
+          "number": 6
+        },
+        {
+          "hash": "1211302331101",
+          "number": 3
+        },
+        {
+          "hash": "1211302331103",
+          "number": 3
+        },
+        {
+          "hash": "1211302331102",
+          "number": 2
+        },
+        {
+          "hash": "1211302331130",
+          "number": 2
+        },
+        {
+          "hash": "1211302331131",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331013",
+          "number": 3
+        },
+        {
+          "hash": "1211302331011",
+          "number": 3
+        },
+        {
+          "hash": "1211302330111",
+          "number": 2
+        },
+        {
+          "hash": "1211302330113",
+          "number": 3
+        },
+        {
+          "hash": "1211303202221",
+          "number": 2
+        },
+        {
+          "hash": "1211303202223",
+          "number": 1
+        },
+        {
+          "hash": "1211303202222",
+          "number": 1
+        },
+        {
+          "hash": "1211303202230",
+          "number": 5
+        },
+        {
+          "hash": "1211303202233",
+          "number": 3
+        },
+        {
+          "hash": "1211303202232",
+          "number": 3
+        },
+        {
+          "hash": "1211303202231",
+          "number": 4
+        },
+        {
+          "hash": "1211303202212",
+          "number": 5
+        },
+        {
+          "hash": "1211303202213",
+          "number": 3
+        },
+        {
+          "hash": "1211303202203",
+          "number": 5
+        },
+        {
+          "hash": "1211303202202",
+          "number": 7
+        },
+        {
+          "hash": "1211303202201",
+          "number": 2
+        },
+        {
+          "hash": "1211303202200",
+          "number": 2
+        },
+        {
+          "hash": "1211303202322",
+          "number": 4
+        },
+        {
+          "hash": "1211303202320",
+          "number": 5
+        },
+        {
+          "hash": "1211303202323",
+          "number": 1
+        },
+        {
+          "hash": "1211303202321",
+          "number": 1
+        },
+        {
+          "hash": "1211303220001",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        },
+        {
+          "hash": "1211303220010",
+          "number": 1
+        },
+        {
+          "hash": "1211303220011",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.148499,
+                40.741394
+              ],
+              [
+                -73.91494,
+                40.57194
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.982726,
+                40.886281
+              ],
+              [
+                -73.840834,
+                40.749298
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.886148,
+                40.771133
+              ],
+              [
+                -73.738236,
+                40.60074
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 253
+    }
+  ],
+  "attribute_keywords": [
+    "facname",
+    "addressnum",
+    "streetname",
+    "address",
+    "city",
+    "zipcode",
+    "factype",
+    "facsubgrp",
+    "facgroup",
+    "facdomain",
+    "servarea",
+    "opname",
+    "opabbrev",
+    "optype",
+    "overagency",
+    "overabbrev",
+    "overlevel",
+    "capacity",
+    "captype",
+    "boro",
+    "bin",
+    "bbl",
+    "latitude",
+    "longitude",
+    "xcoord",
+    "ycoord",
+    "cd",
+    "nta2010",
+    "nta",
+    "2010",
+    "nta2020",
+    "nta",
+    "2020",
+    "council",
+    "ct2010",
+    "ct",
+    "2010",
+    "ct2020",
+    "ct",
+    "2020",
+    "borocode",
+    "schooldist",
+    "policeprct",
+    "datasource",
+    "uid",
+    "count",
+    "geometry"
+  ],
+  "sample": "facname,addressnum,streetname,address,city,zipcode,factype,facsubgrp,facgroup,facdomain,servarea,opname,opabbrev,optype,overagency,overabbrev,overlevel,capacity,captype,boro,bin,bbl,latitude,longitude,xcoord,ycoord,cd,nta2010,nta2020,council,ct2010,ct2020,borocode,schooldist,policeprct,datasource,uid,count,geometry\r\nCYBER CENTER,89-11,MERRICK BOULEVARD,89-11 MERRICK BOULEVARD,JAMAICA,11432,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4209635,4097980006,40.7078052723,-73.7946441704,1041184.51576,197215.769568,412,QN61,QN1201,27,046000,046000,4,28,103,qpl_libraries,595aa79bb5aaf70a62be300520255c41,1,POINT (-73.794644 40.707805)\r\nWEST NEW BRIGHTON LIBRARY,976,CASTLETON AVENUE,976 CASTLETON AVENUE,STATEN ISLAND,10310,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,New York Public Library,NYPL,Public,New York Public Library,NYPL,City,0,,STATEN ISLAND,5004936,5001780115,40.6345164124,-74.1148186532,952381.726513,170468.701354,501,SI35,SI0104,49,010500,010500,5,31,120,nypl_libraries,1eb372bf506d6952df43b15aec920e7c,1,POINT (-74.114819 40.634516)\r\nMARINERS HARBOR LIBRARY,206,SOUTH AVENUE,206 SOUTH AVENUE,STATEN ISLAND,10303,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,New York Public Library,NYPL,Public,New York Public Library,NYPL,City,0,,STATEN ISLAND,5109138,5012660064,40.6346879217,-74.1666104137,938006.896141,170554.278378,501,SI12,SI0107,49,032300,032300,5,31,121,nypl_libraries,2232149c08d35cccc85205d8cecf9db5,1,POINT (-74.16661 40.634688)\r\nMELROSE LIBRARY,910,MORRIS AVENUE,910 MORRIS AVENUE,BRONX,10451,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,New York Public Library,NYPL,Public,New York Public Library,NYPL,City,0,,BRONX,2001950,2024220001,40.8265945209,-73.9175815519,1007059.65639,240438.630274,204,BX14,BX0401,16,017300,017300,2,09,44,nypl_libraries,3a55e205bd4a9e7992c2f308ff9b68c3,1,POINT (-73.917582 40.826595)\r\nOTTENDORFER LIBRARY,135,SECOND AVENUE,135 SECOND AVENUE,NEW YORK,10003,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,New York Public Library,NYPL,Public,New York Public Library,NYPL,City,0,,MANHATTAN,1079841,1004640039,40.7289238078,-73.9877835862,987635.907717,204843.398375,103,MN22,MN0303,2,003800,003800,1,01,9,nypl_libraries,3d3f893e57902717aab9d240ae69bcc2,1,POINT (-73.987784 40.728924)\r\nTHE NEW YORK PUBLIC LIBRARY FOR THE PERFORMING ARTS,,,,NEW YORK,10023,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,New York Public Library,NYPL,Public,New York Public Library,NYPL,City,0,,MANHATTAN,1081022,1011340001,40.7731553,-73.9849449,988419.909829,220958.48094,107,MN14,MN0701,6,014900,014900,1,03,20,nypl_libraries,413023d0776169213c20e63d58c3ff35,1,POINT (-73.984945 40.773155)\r\nMILL BASIN LIBRARY,,,\"2385 RALPH AVE (NEAR AVE N) BROOKLYN, NY 11234\",BROOKLYN,11234,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3235910,3083630009,40.6199454,-73.9169226,1007313.42801,165150.144419,318,BK45,BK1802,46,069602,069602,3,22,63,bpl_libraries,4338ee51fde1761931f08e858ee74bf7,1,POINT (-73.916923 40.619945)\r\nPUERTO RICAN CULTURAL HER. LIBRARY,1,EAST 104 STREET,1 EAST 104 STREET,NEW YORK,10029,SPECIAL LIBRARIES,ACADEMIC AND SPECIAL LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Regional,Puerto Rican Cultural Her. Library,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,MANHATTAN,1051499,1016100001,40.7931021387,-73.9513671713,997716.118311,228229.17241,111,MN33,MN1101,8,016800,016800,1,04,23,nysed_activeinstitutions,44799470b8a9cd3eb12adc68a31f51d5,1,POINT (-73.951367 40.793102)\r\nWOODHAVEN,85-41,FOREST PARKWAY,85-41 FOREST PARKWAY,WOODHAVEN,11421,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4181578,4088560085,40.6945535275,-73.8614418098,1022672.65237,192351.41554,409,QN53,QN0905,32,001200,001200,4,27,102,qpl_libraries,7b272648053ea3c1909ca583f566b12e,1,POINT (-73.861442 40.694554)\r\nCENTRAL LIBRARY,10,GRAND ARMY PLAZA,10 GRAND ARMY PLAZA,BROOKLYN,11238,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3029665,3011830002,40.6722468777,-73.9681108345,993095.93495,184195.678878,355,BK99,BK5591,35,017700,017700,3,17,78,bpl_libraries,872745ce5af27bff5092e18d688a2bf6,1,POINT (-73.968111 40.672247)\r\nJACKSON HEIGHTS,35-51,81 STREET,35-51 81 STREET,JACKSON HEIGHTS,11372,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4029693,4012810048,40.7502099137,-73.8850699833,1016093.88007,212619.254995,403,QN28,QN0301,25,028300,028300,4,30,115,qpl_libraries,8ebeb659e8115a18c000f19e1d0ad58a,1,POINT (-73.88507 40.75021)\r\nCLINTON HILL LIBRARY,,,,BROOKLYN,11205,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,0,0,40.6885489,-73.9629896,994514.036732,190135.534012,302,BK69,BK0204,35,019300,019300,3,13,88,bpl_libraries,9638d471f87d1bd3017a0e89e4cc9b59,1,POINT (-73.96299 40.688549)\r\nMAPLETON LIBRARY,1702,60 STREET,1702 60 STREET,BROOKLYN,11204,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3132091,3055180004,40.6230710774,-73.9894435491,987180.479058,166278.151135,312,BK88,BK1204,44,024400,024400,3,20,66,bpl_libraries,a1558174abe8c63000565f347512a460,1,POINT (-73.989444 40.623071)\r\nKINGS HIGHWAY LIBRARY,2115,OCEAN AVENUE,2115 OCEAN AVENUE,BROOKLYN,11229,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3182576,3067830068,40.6102600375,-73.9531124404,997268.521016,161614.060855,315,BK44,BK1502,48,055000,055000,3,22,61,bpl_libraries,a4620153fce12890e463935e4884a34c,1,POINT (-73.953112 40.61026)\r\nRED HOOK INTERIM LIBRARY,362,VAN BRUNT STREET,362 VAN BRUNT STREET,BROOKLYN,11231,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,0,3005657501,40.6776658422,-74.01292115,980666.012598,186168.616832,306,BK33,BK0601,38,005300,005301,3,15,76,bpl_libraries,a903d17656f774e0cce4e753f6f19633,1,POINT (-74.012921 40.677666)\r\nHILLCREST,187-05,UNION TURNPIKE,187-05 UNION TURNPIKE,FRESH MEADOWS,11366,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4155032,4072040040,40.7292611568,-73.7819066512,1044696.49954,205041.31679,408,QN41,QN0803,24,133300,133300,4,26,107,qpl_libraries,b71608ae8ac2e2af3f1bb090cd86362e,1,POINT (-73.781907 40.729261)\r\nDYKER LIBRARY,8202,13 AVENUE,8202 13 AVENUE,BROOKLYN,11228,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3164019,3063020036,40.6163154589,-74.0119900831,980921.206642,163816.952597,310,BK30,BK1002,50,014800,014800,3,20,68,bpl_libraries,ba80fc9f70021d8ed6584ace9bb73f8a,1,POINT (-74.01199 40.616315)\r\nBEDFORD LIBRARY,496,FRANKLIN AVENUE,496 FRANKLIN AVENUE,BROOKLYN,11238,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Brooklyn Public Library,BPL,Public,Brooklyn Public Library,BPL,City,0,,BROOKLYN,3057384,3019970032,40.6818255657,-73.9561679472,996407.10066,187686.901254,303,BK69,BK0301,36,022700,022700,3,13,79,bpl_libraries,bd6537ca26c02f845fb659dc6d6a8c53,1,POINT (-73.956168 40.681826)\r\nSOUTH HOLLIS,204-01,HOLLIS AVENUE,204-01 HOLLIS AVENUE,SAINT ALBANS,11412,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4442263,4109070030,40.7070198089,-73.7537969644,1052510.10342,196958.792104,412,QN07,QN1206,27,050800,050800,4,29,103,qpl_libraries,d322aa826a4b8e816e0594aa606b1bea,1,POINT (-73.753797 40.70702)\r\nFLUSHING,41-17,MAIN STREET,41-17 MAIN STREET,FLUSHING,11355,PUBLIC LIBRARY,PUBLIC LIBRARIES,LIBRARIES,LIBRARIES AND CULTURAL PROGRAMS,Local,Queens Public Library,Public,Public,Queens Public Library,QPL,City,0,,QUEENS,4114282,4050430011,40.7577906006,-73.828877909,1031657.71391,215406.560733,407,QN22,QN0707,20,085300,085300,4,25,109,qpl_libraries,dbb5f624009aa7f2a05acef2057f63cd,1,POINT (-73.828878 40.757791)\r\n"
+}
