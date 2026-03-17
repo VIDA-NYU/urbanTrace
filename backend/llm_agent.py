@@ -238,14 +238,16 @@ class UrbanTraceCopilot:
                         {
                             "type": "text",
                             "text": (
-                                "When a user asks to add or place a dataset on the canvas, "
-                                "call suggest_add_dataset_node with dataset_id; "
-                                "and try to include a color_by column if you find a suitable one in the metadata based on the current dashboard coloring and dataset columns. "
-                                "Include a short reason when it is helpful. "
-                                "Use ids/column names from dataset context and avoid guessing. "
-                                "This creates a pending suggestion that the user may accept or reject. "
-                                "Do not claim the dataset was added unless the user accepted it. "
-                                "After any tool call, also provide a short natural-language explanation to the user."
+                                "Copilot rules:\n"
+                                "1. Use suggest_add_dataset_node when the user asks to add a dataset, "
+                                "place a dataset, or asks which datasets are relevant or good starting points.\n"
+                                "2. Suggest only the strongest 1-5 catalog matches.\n"
+                                "3. Use exact dataset_id values from the dataset context. "
+                                "Add color_by only when there is a clearly relevant numeric column in the metadata.\n"
+                                "4. Include a short reason for each suggestion.\n"
+                                "5. Suggestions are pending user decisions. Do not say a dataset was added unless the user accepted it.\n"
+                                "6. Always give a short, decision-oriented reply. "
+                                "If no strong catalog match exists, answer in prose and do not call tools."
                             ),
                         }
                     ],

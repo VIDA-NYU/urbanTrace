@@ -114,11 +114,13 @@ const FloatingCopilotInput = ({
     const fullText = String(responseText);
     const entryId = appendTrace('assistant', '');
     let visible = '';
+    const chunkSize = Math.max(12, Math.ceil(fullText.length / 90));
+    const chunkDelayMs = fullText.length > 1200 ? 6 : RESPONSE_STREAM_DELAY_MS;
 
-    for (let idx = 0; idx < fullText.length; idx += 3) {
-      visible += fullText.slice(idx, idx + 3);
+    for (let idx = 0; idx < fullText.length; idx += chunkSize) {
+      visible += fullText.slice(idx, idx + chunkSize);
       updateTraceText(entryId, visible);
-      await wait(RESPONSE_STREAM_DELAY_MS);
+      await wait(chunkDelayMs);
     }
   }, [appendTrace, updateTraceText]);
 
