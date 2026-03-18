@@ -10,6 +10,12 @@ const H3PreviewDeckGL = ({
   color = [236, 72, 153], 
   useHotspotPalette = false,
   hotspotPalette = null,  // { low: [r,g,b], high: [r,g,b] } – overrides default fire palette
+  highlightedHexId = null,
+  highlightedZoneId = null,
+  onHexHover,
+  onZoneHover,
+  hideLegend = false,
+  customTooltip = null,
   showHex = true, 
   showZones = false,
   // GLOBAL VIEWPORT SYNC: Props for linked camera
@@ -71,6 +77,11 @@ const H3PreviewDeckGL = ({
     } else {
       setLocalViewState(newViewState);
     }
+  };
+
+  const getZoneFeatureId = (feature) => {
+    const props = feature?.properties || {};
+    return String(props.zone_id ?? props.ZONE_ID ?? props.OBJECTID ?? props.objectid ?? props.id ?? props.NAME ?? props.name ?? '');
   };
 
   const { data, maxCount, variableNames } = useMemo(() => {
@@ -147,10 +158,12 @@ const H3PreviewDeckGL = ({
           data,
           pickable: true,
           wireframe: false,
+          stroked: true,
           filled: true,
           extruded: is3D, 
           elevationScale: 20,
           getHexagon: d => d.hex,
+          onHover: info => onHexHover?.(info?.object?.hex || null),
           getFillColor: d => {
             const intensity = maxCount > 1 ? (d.count / maxCount) : 1;
             if (useHotspotPalette) {
@@ -165,6 +178,8 @@ const H3PreviewDeckGL = ({
             const alpha = is3D ? 200 : Math.floor(80 + (175 * intensity));
             return [color[0], color[1], color[2], alpha];
           },
+          getLineColor: d => d.hex === highlightedHexId ? [59, 130, 246, 255] : [255, 255, 255, 80],
+          lineWidthMinPixels: highlightedHexId ? 3 : 1,
           getElevation: d => d.count
         })
       );
@@ -185,6 +200,7 @@ const H3PreviewDeckGL = ({
           extruded: is3D,
           wireframe: is3D,
           lineWidthMinPixels: 1,
+          onHover: info => onZoneHover?.(getZoneFeatureId(info?.object) || null),
           getFillColor: f => {
             const props = f.properties || {};
             if (useHotspotPalette) {
@@ -212,8 +228,8 @@ const H3PreviewDeckGL = ({
             const alpha = is3D ? 180 : Math.floor(60 + (140 * intensity));
             return [16, 185, 129, alpha]; // Emerald green
           },
-          getLineColor: [15, 118, 110, 200], // Teal border
-          getLineWidth: 2,
+          getLineColor: f => getZoneFeatureId(f) === highlightedZoneId ? [59, 130, 246, 255] : [15, 118, 110, 200],
+          getLineWidth: f => getZoneFeatureId(f) === highlightedZoneId ? 4 : 2,
           getElevation: f => {
             const props = f.properties || {};
             let totalVal = props.zone_value || 0;
@@ -232,7 +248,7 @@ const H3PreviewDeckGL = ({
     }
 
     return result;
-  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, is3D, color, useHotspotPalette]);
+  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, is3D, color, useHotspotPalette, hotspotPalette, highlightedHexId, highlightedZoneId, onHexHover, onZoneHover]);
 
   // Auto-fit to zone bounds if showing zones
   useEffect(() => {
@@ -269,6 +285,11 @@ const H3PreviewDeckGL = ({
           layers={layers}
           getTooltip={({ object, layer }) => {
             if (!object) return null;
+
+            if (customTooltip) {
+              const custom = customTooltip({ object, layer });
+              if (custom) return custom;
+            }
             
             // Handle H3 hexagon tooltip
             if (layer?.id === 'h3-hexagon-layer') {
@@ -356,7 +377,7 @@ const H3PreviewDeckGL = ({
        )}
       
       {/* 👇 NEW: Minimized 2D Density Legend */}
-      {!is3D && maxCount > 1 && (
+      {!hideLegend && !is3D && maxCount > 1 && (
         <div style={{
           position: 'absolute', bottom: '8px', left: '8px', zIndex: 10,
           backgroundColor: 'rgba(255, 255, 255, 0.9)', 

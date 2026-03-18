@@ -11,6 +11,8 @@ const OperationsSidebar = () => {
     
     if (opType === 'integrate') {
       reactFlowType = 'integrationNode'; // Trigger our custom Integration Engine UI
+    } else if (opType === 'compare') {
+      reactFlowType = 'compareMapNode';
     }
 
     // 2. Set the payload

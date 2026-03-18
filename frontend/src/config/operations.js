@@ -34,6 +34,12 @@ export const OPERATION_CATEGORIES = [
         icon: Combine, 
         desc: 'Combine H3 datasets' 
       },
+      {
+        type: 'compare',
+        label: 'Compare Maps',
+        icon: Map,
+        desc: 'Spatial delta between two result maps'
+      },
     ]
   },
   {

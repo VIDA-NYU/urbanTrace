@@ -10,6 +10,11 @@ const HOTSPOT_PALETTES = [
   { name: 'Dusk',   emoji: '🌆', low: [233, 213, 255], high: [ 88,  28, 135] },
 ];
 
+const getZoneFeatureId = (feature) => {
+  const props = feature?.properties || {};
+  return String(props.zone_id ?? props.ZONE_ID ?? props.OBJECTID ?? props.objectid ?? props.id ?? props.NAME ?? props.name ?? '');
+};
+
 const ResultMapNode = memo(({ id, data }) => {
   // DATA LINEAGE: Track lineage panel visibility
   const [lineageExpanded, setLineageExpanded] = useState(false);
@@ -148,14 +153,36 @@ const ResultMapNode = memo(({ id, data }) => {
     const out = {};
 
     Object.entries(resultMapData).forEach(([hex, info]) => {
+      const raws = audits.map(v => info?.variables?.[v.column_name]);
+      const hasSignal = raws.some(raw => typeof raw === 'number' && !Number.isNaN(raw) && raw !== 0);
+      if (!hasSignal) {
+        out[hex] = {
+          ...info,
+          count: 0,
+          variables: {
+            ...info.variables,
+            hotspot_score: 0
+          },
+          sample_props: {
+            ...(info.sample_props || {}),
+            hotspot_score: 0
+          }
+        };
+        return;
+      }
+
       let score = 0;
       audits.forEach(v => {
         const name = v.column_name;
         const raw = info?.variables?.[name];
         const { min, max } = stats[name];
         const denom = max - min;
-        let norm = denom > 0 && typeof raw === 'number' ? (raw - min) / denom : 0;
-        if ((v.direction || '').toLowerCase() === 'inverted') norm = 1 - norm;
+        const hasValue = typeof raw === 'number' && !Number.isNaN(raw);
+        let norm = 0;
+        if (hasValue && denom > 0) {
+          norm = (raw - min) / denom;
+          if ((v.direction || '').toLowerCase() === 'inverted') norm = 1 - norm;
+        }
         score += ((Number(v.weight) || 0) / totalWeight) * norm;
       });
 
@@ -208,6 +235,18 @@ const ResultMapNode = memo(({ id, data }) => {
     return {
       ...zoneGeoJson,
       features: zoneGeoJson.features.map(feature => {
+        const raws = audits.map(v => feature?.properties?.[v.column_name]);
+        const hasSignal = raws.some(raw => typeof raw === 'number' && !Number.isNaN(raw) && raw !== 0);
+        if (!hasSignal) {
+          return {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              hotspot_score: 0
+            }
+          };
+        }
+
         let score = 0;
 
         audits.forEach(v => {
@@ -215,8 +254,12 @@ const ResultMapNode = memo(({ id, data }) => {
           const raw = feature?.properties?.[name];
           const { min, max } = stats[name];
           const denom = max - min;
-          let norm = denom > 0 && typeof raw === 'number' ? (raw - min) / denom : 0;
-          if ((v.direction || '').toLowerCase() === 'inverted') norm = 1 - norm;
+          const hasValue = typeof raw === 'number' && !Number.isNaN(raw);
+          let norm = 0;
+          if (hasValue && denom > 0) {
+            norm = (raw - min) / denom;
+            if ((v.direction || '').toLowerCase() === 'inverted') norm = 1 - norm;
+          }
           score += ((Number(v.weight) || 0) / totalWeight) * norm;
         });
 
@@ -239,6 +282,8 @@ const ResultMapNode = memo(({ id, data }) => {
   const usingHotspot = !!(hotspotHexData || hotspotZoneGeoJson);
   const activePalette = HOTSPOT_PALETTES[paletteIdx % HOTSPOT_PALETTES.length];
   const colorHex = usingHotspot ? '#dc2626' : (showZones && !showHex ? '#10b981' : (resultMapData?.color || '#10b981')); 
+  const highlightedZoneId = data?.hoveredCompareFeatureType === 'zone' ? data?.hoveredCompareFeatureId : null;
+  const highlightedHexId = data?.hoveredCompareFeatureType === 'hex' ? data?.hoveredCompareFeatureId : null;
   
   const rgbColor = useMemo(() => {
     const r = parseInt(colorHex.slice(1, 3), 16);
@@ -265,6 +310,34 @@ const ResultMapNode = memo(({ id, data }) => {
 
   // Determine header icon
   const HeaderIcon = showZones && !showHex ? MapPin : Hexagon;
+
+  const comparePayload = useMemo(() => {
+    if (hotspotZoneGeoJson?.features?.length) {
+      return {
+        kind: 'zones',
+        label: nodeTitle,
+        geojson: {
+          ...hotspotZoneGeoJson,
+          features: hotspotZoneGeoJson.features.filter(feature => getZoneFeatureId(feature))
+        }
+      };
+    }
+
+    if (hotspotHexData && Object.keys(hotspotHexData).length > 0) {
+      return {
+        kind: 'hex',
+        label: nodeTitle,
+        hexData: hotspotHexData
+      };
+    }
+
+    return null;
+  }, [nodeTitle, hotspotZoneGeoJson, hotspotHexData]);
+
+  useEffect(() => {
+    if (!data?.onCompareDataReady) return;
+    data.onCompareDataReady(id, comparePayload);
+  }, [id, comparePayload, data?.onCompareDataReady]);
 
   return (
     <div style={{
@@ -354,6 +427,8 @@ const ResultMapNode = memo(({ id, data }) => {
               color={rgbColor}
               useHotspotPalette={usingHotspot}
               hotspotPalette={usingHotspot ? activePalette : null}
+              highlightedHexId={highlightedHexId}
+              highlightedZoneId={highlightedZoneId}
               showHex={showHex}
               showZones={showZones}
               isMapSyncEnabled={isMapSyncEnabled}

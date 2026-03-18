@@ -12,6 +12,7 @@ import OperationNode from './nodes/OperationNode';
 import IntegrationNode from './nodes/IntegrationNode'; // <--- NEW Import
 import DatasetDetailsModal from '../catalog/DatasetDetailsModal'; 
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
+import CompareMapNode from './nodes/CompareMapNode';
 
 const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage }) => {
   const [nodes, setNodes] = useState([]);
@@ -27,6 +28,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     pitch: 0,
     bearing: 0
   });
+  const [hoveredCompareFeatureId, setHoveredCompareFeatureId] = useState(null);
+  const [hoveredCompareFeatureType, setHoveredCompareFeatureType] = useState(null);
 
   const { screenToFlowPosition, getNode, getNodes, getEdges, fitView } = useReactFlow();
   
@@ -44,8 +47,66 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     datasetNode: DatasetNode,
     operationNode: OperationNode,
     integrationNode: IntegrationNode, // <--- NEW Registration
-    resultMapNode: ResultMapNode //
+    resultMapNode: ResultMapNode,
+    compareMapNode: CompareMapNode
   }), []);
+
+  const handleCompareHover = useCallback((featureId, featureType) => {
+    setHoveredCompareFeatureId(featureId || null);
+    setHoveredCompareFeatureType(featureId ? featureType : null);
+  }, []);
+
+  const hydrateCompareNodes = useCallback((nodeList, edgeList) => {
+    return nodeList.map(node => {
+      if (node.type !== 'compareMapNode') return node;
+
+      const connectedResults = edgeList
+        .filter(e => e.target === node.id)
+        .map(e => nodeList.find(n => n.id === e.source))
+        .filter(sourceNode => sourceNode?.type === 'resultMapNode')
+        .slice(0, 2)
+        .map(sourceNode => ({
+          nodeId: sourceNode.id,
+          label: sourceNode.data?.name || 'Result Map',
+          comparePayload: sourceNode.data?.comparePayload || null,
+          spatialData: sourceNode.data?.spatialData || null
+        }));
+
+      const prevConnections = node.data?.connectedResults || [];
+      const sameConnections =
+        prevConnections.length === connectedResults.length &&
+        prevConnections.every((prev, idx) => {
+          const next = connectedResults[idx];
+          return (
+            prev?.nodeId === next?.nodeId &&
+            prev?.label === next?.label &&
+            prev?.comparePayload === next?.comparePayload &&
+            prev?.spatialData === next?.spatialData
+          );
+        });
+      const sameHover = node.data?.hoveredCompareFeatureId === hoveredCompareFeatureId && node.data?.hoveredCompareFeatureType === hoveredCompareFeatureType;
+      const sameSync = node.data?.isMapSyncEnabled === isMapSyncEnabled && node.data?.globalViewState === globalViewState;
+      const sameFns = node.data?.onCompareHover === handleCompareHover && node.data?.onGlobalViewStateChange === setGlobalViewState;
+
+      if (sameConnections && sameHover && sameSync && sameFns) {
+        return node;
+      }
+
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          connectedResults,
+          hoveredCompareFeatureId,
+          hoveredCompareFeatureType,
+          onCompareHover: handleCompareHover,
+          isMapSyncEnabled,
+          globalViewState,
+          onGlobalViewStateChange: setGlobalViewState
+        }
+      };
+    });
+  }, [globalViewState, handleCompareHover, hoveredCompareFeatureId, hoveredCompareFeatureType, isMapSyncEnabled]);
 
   const onNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   
@@ -176,18 +237,49 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }));
   }, [isMapSyncEnabled, globalViewState]);
 
+  useEffect(() => {
+    setNodes(nds => hydrateCompareNodes(nds, edges));
+  }, [edges, hydrateCompareNodes]);
+
   // CROSS-CANVAS CONNECTION: Push highlightedLogTs, focusedLogTs, and onTraceLineage to all ResultMapNodes
   useEffect(() => {
     setNodes(nds => nds.map(node => {
       if (node.type === 'resultMapNode') {
         return {
           ...node,
-          data: { ...node.data, highlightedLogTs, focusedLogTs, onTraceLineage }
+          data: {
+            ...node.data,
+            highlightedLogTs,
+            focusedLogTs,
+            onTraceLineage,
+            hoveredCompareFeatureId,
+            hoveredCompareFeatureType,
+            onCompareDataReady: handleCompareDataReady
+          }
         };
       }
       return node;
     }));
-  }, [highlightedLogTs, focusedLogTs, onTraceLineage]);
+  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType]);
+
+  const handleCompareDataReady = useCallback((nodeId, comparePayload) => {
+    setNodes(nds => {
+      const updatedNodes = nds.map(node => {
+        if (node.id !== nodeId) return node;
+        if (node.data?.comparePayload === (comparePayload || null)) {
+          return node;
+        }
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            comparePayload: comparePayload || null
+          }
+        };
+      });
+      return hydrateCompareNodes(updatedNodes, edges);
+    });
+  }, [edges, hydrateCompareNodes]);
 
 
   // 4. Update onConnect to pass data between nodes
@@ -196,6 +288,30 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     const currentNodes = getNodes();
     const sourceNode = currentNodes.find(n => n.id === params.source);
     const targetNode = currentNodes.find(n => n.id === params.target);
+
+    if (targetNode?.type === 'compareMapNode') {
+      if (sourceNode?.type !== 'resultMapNode') {
+        alert('Compare Map only accepts Result Map nodes as inputs.');
+        return;
+      }
+
+      const currentEdges = getEdges();
+      const existingInputs = currentEdges.filter(e => e.target === params.target);
+      const alreadyConnected = existingInputs.some(e => e.source === params.source);
+
+      if (alreadyConnected) return;
+      if (existingInputs.length >= 2) {
+        alert('Compare Map accepts only two input result maps.');
+        return;
+      }
+
+      setEdges((eds) => addEdge({
+        ...params,
+        animated: true,
+        style: { stroke: '#4b5563', strokeWidth: 2 }
+      }, eds));
+      return;
+    }
 
     // Early return if not a valid connection to IntegrationNode
     if (targetNode?.type !== 'integrationNode' || !sourceNode?.data?.filename) {
@@ -269,7 +385,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         return node;
       }));
     }
-  }, [setNodes, setEdges, getNodes]);
+  }, [setNodes, setEdges, getNodes, getEdges]);
 
   const handleShowInfo = useCallback((nodeData) => {
     setViewingDataset(nodeData); 
@@ -347,6 +463,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           // Inject the callback so the node can talk back to the canvas when the API finishes
           newNodeData.onIntegrationComplete = handleIntegrationComplete;
           newNodeData.onLogActivity = onLogActivity; // ACTIVITY LOG: Pass audit trail callback
+        } else if (newNodeType === 'compareMapNode') {
+          newNodeData.onCompareHover = handleCompareHover;
+          newNodeData.connectedResults = [];
+          newNodeData.isMapSyncEnabled = isMapSyncEnabled;
+          newNodeData.globalViewState = globalViewState;
+          newNodeData.onGlobalViewStateChange = setGlobalViewState;
       } else {
           // DatasetNode: inject column select callback for state inheritance
           // Also include sync props for viewport linking
@@ -366,7 +488,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [screenToFlowPosition, handleShowInfo, handleIntegrationComplete, createColumnSelectHandler]
+    [screenToFlowPosition, handleShowInfo, handleIntegrationComplete, createColumnSelectHandler, handleCompareHover, isMapSyncEnabled, globalViewState]
   );
 
   return (
