@@ -879,7 +879,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         style={{
           position: 'absolute',
           top: '10px',
-          right: '10px',
+          left: '10px',
           zIndex: 100,
           display: 'flex',
           alignItems: 'center',
