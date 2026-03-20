@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import geopandas as gpd
 import json
@@ -9,8 +9,6 @@ import csv
 import io
 import re
 import asyncio
-import urllib.request
-import urllib.error
 from pathlib import Path
 
 try:
@@ -53,6 +51,8 @@ from operators.zoning.aggregators import (
 
 # --- Imports for Map Algebra Engine ---
 from h3_engine import rasterize_geojson_to_h3 
+from llm_agent import UrbanTraceCopilot
+from tool import COPILOT_FRONTEND_TOOLS
 
 # ==========================================
 # 1. APP SETUP & CONSTANTS
@@ -71,6 +71,37 @@ app.add_middleware(
 
 # Directory pointing to the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+_COPILOT_AGENT: UrbanTraceCopilot | None = None
+
+
+def _strip_dataset_suffixes(name: str | None) -> str:
+    if not isinstance(name, str):
+        return ""
+
+    dataset_id = os.path.basename(name.strip())
+
+    for suffix in (".geojson", ".json"):
+        if dataset_id.endswith(suffix):
+            dataset_id = dataset_id[: -len(suffix)]
+            break
+
+    return dataset_id
+
+
+def _geojson_filename(name: str | None) -> str:
+    dataset_id = _strip_dataset_suffixes(name)
+    if not dataset_id:
+        return ""
+    return f"{dataset_id}.geojson"
+
+
+def _normalize_dataset_stem(dataset_name: str | None) -> str:
+    return _strip_dataset_suffixes(dataset_name)
+
+
+def _metadata_path_for_dataset(dataset_name: str | None) -> str:
+    stem = _normalize_dataset_stem(dataset_name)
+    return os.path.join(DATA_DIR, "metadata", f"{stem}.json")
 
 # Operator Registries for Formal Integration
 ALLOCATION_REGISTRY = {
@@ -201,6 +232,25 @@ class CopilotRecommendRequest(BaseModel):
     source_variables: List[CopilotSourceVariable]
 
 
+class CopilotChatRequest(BaseModel):
+    """Payload for UrbanTrace LLM copilot chat with live dashboard graph context."""
+    message: str
+    nodes: list[dict[str, Any]] = Field(default_factory=list)
+    edges: list[dict[str, Any]] = Field(default_factory=list)
+    system_prompt: str = "You are a helpful assistant for UrbanTrace."
+    model: str | None = None
+    thinking_budget_tokens: int | None = None
+    log_stream: bool = True
+
+
+def get_copilot_agent() -> UrbanTraceCopilot:
+    """Lazy singleton so missing API keys do not crash app startup."""
+    global _COPILOT_AGENT
+    if _COPILOT_AGENT is None:
+        _COPILOT_AGENT = UrbanTraceCopilot()
+    return _COPILOT_AGENT
+
+
 class HotspotVariableRequest(BaseModel):
     dataset_name: str
     column_name: str
@@ -219,7 +269,6 @@ class HotspotSynthesisRequest(BaseModel):
 async def list_datasets():
     """Lists available datasets and their metadata for the frontend Node Library."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
-    metadata_dir = os.path.join(DATA_DIR, "metadata")
     
     datasets = []
     
@@ -229,7 +278,7 @@ async def list_datasets():
     for f in os.listdir(geojson_dir):
         if f.endswith(".geojson"):
             base_name = f.replace(".geojson", "")
-            meta_path = os.path.join(metadata_dir, f"{base_name}_metadata.json")
+            meta_path = _metadata_path_for_dataset(base_name)
             
             dataset_info = {
                 "id": base_name,
@@ -251,7 +300,8 @@ async def get_geojson(filename: str, simplify: bool = False):
     print(f"Requesting dataset: {filename} (simplify={simplify})")
     """Serves raw or simplified GeoJSON data to the frontend."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
-    path = os.path.join(geojson_dir, filename)
+    resolved_filename = _geojson_filename(filename)
+    path = os.path.join(geojson_dir, resolved_filename)
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     
@@ -300,7 +350,11 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
                 raise HTTPException(status_code=400, detail=f"Unknown grid aggregation operator: {var.grid_aggregation_operator}")
             
             # Load source dataset
-            source_path = os.path.join(DATA_DIR, "geojson", var.dataset_path)
+            source_path = os.path.join(
+                DATA_DIR,
+                "geojson",
+                _geojson_filename(var.dataset_path),
+            )
             try:
                 source_gdf = gpd.read_file(source_path)
             except Exception as e:
@@ -349,7 +403,11 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
         # Load zones if provided
         zones_gdf = None
         if request.zones_path:
-            zones_path = os.path.join(DATA_DIR, "geojson", request.zones_path)
+            zones_path = os.path.join(
+                DATA_DIR,
+                "geojson",
+                _geojson_filename(request.zones_path),
+            )
             try:
                 zones_gdf = gpd.read_file(zones_path)
             except Exception as e:
@@ -431,49 +489,6 @@ async def get_available_operators():
         "zoning_aggregation": list(ZONING_AGGREGATION_REGISTRY.keys()),
         "geometry_constraints": GEOMETRY_CONSTRAINTS
     }
-
-
-# ==========================================
-# 8. INTEGRATION COPILOT ENDPOINT
-# ==========================================
-
-COPILOT_SYSTEM_PROMPT = """
-You are an expert Spatial Data Scientist and GIS Architect. Your task is to select the
-optimal Zoning Mapping and Zoning Aggregation operators from the provided lists.
-
-Step 1: Analyze the Context & Metadata
-Review dataset_name and column_metadata.name together. If the column name is generic
-(e.g., value, count, total, metric), you MUST rely on dataset_name to determine the meaning.
-Then review num_distinct_values, distribution (mean, coverage), and sample_data.
-
-Step 2: Classify the Data Type
-- Extensive (Count/Total): high num_distinct_values, larger means, values scale with area
-- Intensive (Rate/Density): decimals/floats, keywords like rate/avg/median/density
-- Categorical/Ordinal (Index): low num_distinct_values (often 1-10), integer classes, index-like labels
-
-Step 3: Geospatial Reasoning & Operator Selection
-You are provided target_geometry and valid arrays: available_mapping_operators and available_aggregation_operators.
-- If target is Point/MultiPoint, area-weighted mapping is invalid. Choose point-safe mapping.
-- Extensive -> aggregation should preserve totals (typically Sum)
-- Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
-- Categorical/Ordinal -> use discrete grouping (typically Majority)
-
-Return ONLY a valid JSON array with one object per source variable, each containing:
-dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
-Never invent operators not present in provided arrays.
-""".strip()
-
-
-def _normalize_dataset_stem(dataset_name: str) -> str:
-    base = os.path.basename(dataset_name or "")
-    if base.endswith(".geojson"):
-        return base[:-8]
-    return base
-
-
-def _metadata_path_for_dataset(dataset_name: str) -> str:
-    stem = _normalize_dataset_stem(dataset_name)
-    return os.path.join(DATA_DIR, "metadata", f"{stem}_metadata.json")
 
 
 def _extract_sample_values(sample_csv: Optional[str], target_column: str, max_rows: int = 20) -> List[Any]:
@@ -585,7 +600,7 @@ def _heuristic_recommendations(llm_payload: Dict[str, Any]) -> List[Dict[str, An
             "zoningMapping": zoning_mapping,
             "zoningAggregation": zoning_aggregation,
             "reasoning": reasoning,
-            "engine": "heuristic"  # <--- ADD THIS
+            "engine": "heuristic"
         })
 
     return results
@@ -626,76 +641,25 @@ def _hotspot_reasoning(direction: str, dataset_name: str, column_name: str) -> s
     return f"Higher values in {column_name} ({dataset_name}) directly indicate higher risk/need, so scale is used as-is."
 
 
-HOTSPOT_SYSTEM_PROMPT = """
-You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
-
-The payload may include an optional "goal" field describing what "Priority" means in this context
-(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
-If present, use it to inform both direction and relative weight for each variable.
-If absent, infer the most semantically coherent goal from the variable names and metadata.
-
-For each source variable, infer:
-- direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)
-- reasoning: short justification referencing the goal, dataset context, column metadata, and sample values
-- weight: relative importance in [0,1]; variables more directly tied to the goal should receive higher weight
-
-Use semantic cues from dataset_name and column_name, and validate with sample_data statistics.
-Examples (goal-agnostic defaults):
-- crashes/injuries/poverty/pollution -> normal
-- income/coverage/infrastructure/safety score -> inverted
-
-Return ONLY JSON array of objects with fields:
-dataset_name, column_name, direction, reasoning, weight.
-Do not return markdown.
-""".strip()
-
-
-def _call_portkey_hotspot_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-    api_key = os.getenv("PORTKEY_API_KEY")
-    if not api_key:
-        return None
-
-    base_url = os.getenv("PORTKEY_BASE_URL", "https://ai-gateway.apps.cloud.rt.nyu.edu/v1")
-    model = os.getenv("PORTKEY_MODEL", "@vertexai/anthropic.claude-opus-4-6")
-
-    body = {
-        "model": model,
-        "temperature": 0.1,
-        "max_tokens": int(os.getenv("PORTKEY_MAX_TOKENS", "1024")),
-        "messages": [
-            {"role": "system", "content": HOTSPOT_SYSTEM_PROMPT},
-            {"role": "user", "content": json.dumps(llm_payload)}
-        ]
-    }
-
-    req = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
-        method="POST"
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-            content = payload["choices"][0]["message"]["content"].strip()
-
-            if content.startswith("```json"):
-                content = content.split("```json", 1)[1].rsplit("```", 1)[0].strip()
-            elif content.startswith("```"):
-                content = content.split("```", 1)[1].rsplit("```", 1)[0].strip()
-
-            parsed = json.loads(content)
-            if isinstance(parsed, list):
-                for item in parsed:
-                    item["engine"] = "llm"
-                return parsed
-            return None
-    except Exception:
-        return None
+def _build_heuristic_hotspot_audits(
+    source_payload: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    audits: List[Dict[str, Any]] = []
+    for var in source_payload:
+        direction = _infer_hotspot_direction(
+            var["dataset_name"],
+            var["column_name"],
+            var["sample_data"],
+        )
+        audits.append({
+            "dataset_name": var["dataset_name"],
+            "column_name": var["column_name"],
+            "direction": direction,
+            "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
+            "weight": 1.0,
+            "engine": "heuristic",
+        })
+    return audits
 
 
 @app.post("/api/v1/copilot/synthesize-hotspot")
@@ -751,19 +715,18 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         for v in request.source_variables
     }
 
-    audits = await asyncio.to_thread(_call_portkey_hotspot_structured, llm_payload)
+    audits: Optional[List[Dict[str, Any]]] = None
+    try:
+        copilot = get_copilot_agent()
+    except Exception as exc:
+        print(f"Hotspot synthesis copilot unavailable: {exc}")
+    else:
+        audits = await asyncio.to_thread(
+            copilot.synthesize_hotspot_semantics,
+            llm_payload,
+        )
     if not audits:
-        audits = []
-        for var in source_payload:
-            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
-            audits.append({
-                "dataset_name": var["dataset_name"],
-                "column_name": var["column_name"],
-                "direction": direction,
-                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
-                "weight": 1.0,
-                "engine": "heuristic"
-            })
+        audits = _build_heuristic_hotspot_audits(source_payload)
 
     normalized_audits: List[Dict[str, Any]] = []
     for audit in audits:
@@ -792,17 +755,7 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         })
 
     if not normalized_audits:
-        normalized_audits = []
-        for var in source_payload:
-            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
-            normalized_audits.append({
-                "dataset_name": var["dataset_name"],
-                "column_name": var["column_name"],
-                "direction": direction,
-                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
-                "weight": 1.0,
-                "engine": "heuristic"
-            })
+        normalized_audits = _build_heuristic_hotspot_audits(source_payload)
 
     # Normalize weights to sum to 1
     total_w = sum(max(0.0, float(a.get("weight", 0.0))) for a in normalized_audits)
@@ -824,85 +777,6 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         "variables": normalized_audits,
         "summary": "Priority score is synthesized as a weighted normalized blend where 1.0 always means highest need."
     }
-
-
-def _call_portkey_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-    print("\n--- STARTING PORTKEY CALL ---") # Breadcrumb 1
-    api_key = os.getenv("PORTKEY_API_KEY")
-    if not api_key:
-        print("❌ ERROR: PORTKEY_API_KEY is missing or empty! Aborting LLM call.") # Breadcrumb 2
-        return None
-    
-    print("✅ API Key found.") # Breadcrumb 3
-    # if not api_key:
-    #     return None
-
-    base_url = os.getenv("PORTKEY_BASE_URL", "https://ai-gateway.apps.cloud.rt.nyu.edu/v1")
-    model = os.getenv("PORTKEY_MODEL", "@vertexai/anthropic.claude-opus-4-6")
-
-    print(f"📡 Sending request to: {base_url} using model: {model}") # Breadcrumb 4
-
-    body = {
-        "model": model,
-        "temperature": 0.1,
-        "max_tokens": int(os.getenv("PORTKEY_MAX_TOKENS", "1024")),
-        "messages": [
-            {"role": "system", "content": COPILOT_SYSTEM_PROMPT},
-            {"role": "user", "content": json.dumps(llm_payload)}
-        ]
-        # ,
-        # "response_format": {
-        #     "type": "json_schema",
-        #     "json_schema": schema
-        # }
-    }
-
-    req = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
-        method="POST"
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-            content = payload["choices"][0]["message"]["content"]
-
-            # --- NEW: Safely strip markdown formatting if Claude wraps the JSON ---
-            content = content.strip()
-            if content.startswith("```json"):
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif content.startswith("```"):
-                content = content.split("```")[1].split("```")[0].strip()
-            # -------------------------------------------------------------------
-
-            parsed = json.loads(content)
-            # if isinstance(parsed, list):
-            #     return parsed
-            # return None
-            if isinstance(parsed, list):
-                print("✅ LLM Call Successful!")
-                # Optional: Inject the engine flag here so you know the LLM worked
-                for item in parsed:
-                    item["engine"] = "llm"
-                return parsed
-            return None
-    except urllib.error.HTTPError as e:
-        # This will catch 400, 401, 403, 500 errors and read the actual message from Portkey
-        error_body = e.read().decode("utf-8")
-        print(f"\n❌ PORTKEY HTTP ERROR {e.code}:")
-        print(error_body, "\n")
-        return None
-    except Exception as e:
-        # This catches timeouts, JSON decoding errors, or network drops
-        print(f"\n❌ PORTKEY INTERNAL ERROR: {str(e)}\n")
-        return None
-    # except (urllib.error.HTTPError, urllib.error.URLError, KeyError, IndexError, json.JSONDecodeError):
-    #     return None
 
 
 @app.post("/api/v1/copilot/recommend-operators")
@@ -963,10 +837,19 @@ async def recommend_operators(request: CopilotRecommendRequest):
     }
 
     used_engine = "llm"
-    llm_result = await asyncio.to_thread(_call_portkey_structured, llm_payload)
+    llm_result: Optional[List[Dict[str, Any]]] = None
+    try:
+        copilot = get_copilot_agent()
+    except Exception as exc:
+        print(f"Operator recommendation copilot unavailable: {exc}")
+    else:
+        llm_result = await asyncio.to_thread(
+            copilot.recommend_zoning_operators,
+            llm_payload,
+        )
     if not llm_result:
         llm_result = _heuristic_recommendations(llm_payload)
-        used_engine = "heuristic" # Update flag if we fell back
+        used_engine = "heuristic"
 
     # Enforce available operators and request alignment
     requested_pairs = {
@@ -1001,7 +884,7 @@ async def recommend_operators(request: CopilotRecommendRequest):
             "zoningMapping": zoning_mapping,
             "zoningAggregation": zoning_aggregation,
             "reasoning": reasoning or "Recommended using metadata statistics and geometry-aware zoning constraints.",
-            "engine": rec.get("engine", used_engine) # <--- ADD THIS
+            "engine": rec.get("engine", used_engine)
         })
 
     if not normalized_response:
@@ -1027,13 +910,14 @@ async def run_operation(request: OperationRequest):
 
     try:
         for dataset_id in request.datasetIds:
-            filepath = os.path.join(DATA_DIR, "geojson", f"{dataset_id}.geojson")
+            canonical_id = _strip_dataset_suffixes(dataset_id)
+            filepath = os.path.join(DATA_DIR, "geojson", _geojson_filename(dataset_id))
             if not os.path.exists(filepath):
                 raise HTTPException(status_code=404, detail=f"Dataset not found at {filepath}")
             
-            print(f"Rasterizing {dataset_id}...")
+            print(f"Rasterizing {canonical_id}...")
             hex_data = rasterize_geojson_to_h3(filepath, request.resolution)
-            all_hex_maps.append({"id": dataset_id, "data": hex_data})
+            all_hex_maps.append({"id": canonical_id, "data": hex_data})
 
         final_hex_data = {}
 
@@ -1105,8 +989,8 @@ async def run_operation(request: OperationRequest):
 #     try:
 #         # Extract dataset id from dataset_path
 #         # Example: "NYC_pedestrian_counts.geojson" -> "NYC_pedestrian_counts"
-#         dataset_id = Path(request.dataset_path).stem
-
+#         dataset_id = _strip_dataset_suffixes(Path(request.dataset_path).stem)
+#
 #         # Build equivalent request for /run-operation
 #         operation_request = OperationRequest(
 #             operationType="preview",
@@ -1138,7 +1022,11 @@ async def run_operation(request: OperationRequest):
 #         grid = H3GridSystem()
 
 #         # Build path to the requested dataset
-#         dataset_full_path = os.path.join(DATA_DIR, "geojson", request.dataset_path)
+#         dataset_full_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.dataset_path),
+#         )
         
 #         try:
 #             source_gdf = gpd.read_file(dataset_full_path)
@@ -1236,14 +1124,22 @@ async def run_operation(request: OperationRequest):
 #         grid = H3GridSystem()
 
 #         # Load source dataset
-#         source_path = os.path.join(DATA_DIR, "geojson", request.dataset_path)
+#         source_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.dataset_path),
+#         )
 #         try:
 #             source_gdf = gpd.read_file(source_path)
 #         except Exception as e:
 #             raise HTTPException(status_code=404, detail=f"Could not load source dataset: {str(e)}")
 
 #         # Load zones dataset  
-#         zones_path = os.path.join(DATA_DIR, "geojson", request.zones_path)
+#         zones_path = os.path.join(
+#             DATA_DIR,
+#             "geojson",
+#             _geojson_filename(request.zones_path),
+#         )
 #         try:
 #             zones_gdf = gpd.read_file(zones_path)
 #         except Exception as e:
@@ -1327,3 +1223,95 @@ async def run_operation(request: OperationRequest):
 #         raise HTTPException(status_code=400, detail=str(ve))
 #     except Exception as e:
 #         raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
+
+
+@app.get("/api/operators")
+async def get_available_operators():
+    """
+    Returns all available operators and geometry constraints for the frontend.
+    Enables dynamic operator selection UI.
+    """
+    return {
+        "allocation": list(ALLOCATION_REGISTRY.keys()),
+        "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
+        "zoning_mapping": list(ZONING_MAPPING_REGISTRY.keys()),
+        "zoning_aggregation": list(ZONING_AGGREGATION_REGISTRY.keys()),
+        "geometry_constraints": GEOMETRY_CONSTRAINTS
+    }
+
+
+# ==========================================
+# 7. LLM COPILOT ENDPOINTS
+# ==========================================
+
+@app.post("/api/copilot/chat")
+async def copilot_chat(request: CopilotChatRequest):
+    """
+    Chat endpoint for dashboard-aware copilot.
+    Frontend should send current ReactFlow `nodes` and `edges`.
+    """
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail="`message` cannot be empty")
+
+    try:
+        copilot = get_copilot_agent()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to initialize copilot: {str(e)}")
+
+    try:
+        copilot_result = copilot.run_copilot_turn(
+            user_message=request.message,
+            system_prompt=request.system_prompt,
+            model=request.model,
+            thinking_budget_tokens=request.thinking_budget_tokens,
+            dashboard_nodes=request.nodes,
+            dashboard_edges=request.edges,
+            tools=COPILOT_FRONTEND_TOOLS,
+            max_tool_rounds=3,
+        )
+        response_text = copilot_result.get("message", "")
+        initial_response_text = copilot_result.get("assistant_initial_response", "")
+        tool_calls = copilot_result.get("tool_calls", [])
+        tool_responses = copilot_result.get("tool_responses", [])
+        suggestions = copilot_result.get("suggestions", [])
+        rounds_executed = copilot_result.get("rounds_executed", 0)
+        tool_round_limit_reached = copilot_result.get("tool_round_limit_reached", False)
+
+        if request.log_stream:
+            print("\n=== COPILOT RESPONSE START ===", flush=True)
+            print(f"rounds_executed={rounds_executed}", flush=True)
+            print(f"tool_round_limit_reached={tool_round_limit_reached}", flush=True)
+            print(f"assistant_initial_response={initial_response_text}", flush=True)
+            if tool_calls:
+                print(f"tool_call_count={len(tool_calls)}", flush=True)
+                for idx, tool_call in enumerate(tool_calls, start=1):
+                    print(
+                        f"tool_call_{idx}={json.dumps(tool_call, ensure_ascii=True)}",
+                        flush=True,
+                    )
+            else:
+                print("tool_call_count=0", flush=True)
+            print(f"tool_calls={json.dumps(tool_calls, ensure_ascii=True)}", flush=True)
+            print(f"tool_responses={json.dumps(tool_responses, ensure_ascii=True)}", flush=True)
+            print(f"suggestions={json.dumps(suggestions, ensure_ascii=True)}", flush=True)
+            print(f"assistant_final_response={response_text}", flush=True)
+            print("=== COPILOT RESPONSE END ===", flush=True)
+
+        return {
+            "status": "success",
+            "message": response_text,
+            "tool_calls": tool_calls,
+            "tool_responses": tool_responses,
+            "suggestions": suggestions,
+            "rounds_executed": rounds_executed,
+            "tool_round_limit_reached": tool_round_limit_reached,
+            "node_count": len(request.nodes),
+            "edge_count": len(request.edges),
+            "log_stream": request.log_stream,  # now used as debug-print flag
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Copilot chat failed: {str(e)}")

@@ -1,0 +1,517 @@
+{
+  "geometricType": "Point",
+  "name": "parks_closure_status_due_to_covid_19_playgrounds",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 1028,
+  "nb_profiled_rows": 751,
+  "nb_columns": 18,
+  "columns": [
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "closuretype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "editdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 771
+    },
+    {
+      "name": "gispropnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 862
+    },
+    {
+      "name": "omppropid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1012
+    },
+    {
+      "name": "red_sign_installed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.9813581890812251,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "accessibility",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.08788282290279627,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "accessibilitylevel",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.08788282290279627
+    },
+    {
+      "name": "location",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9544879198074341,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 982
+    },
+    {
+      "name": "point",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9533675909042358,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "rules",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.08788282290279627,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "system",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.08655126498002663,
+      "num_distinct_values": 943
+    },
+    {
+      "name": "approx_date_closed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "approx_date_reopened",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.03861517976031957,
+      "num_distinct_values": 94
+    },
+    {
+      "name": "community_board",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 67,
+      "mean": 287.31424766977364,
+      "stddev": 121.15418001986096,
+      "coverage": [
+        {
+          "range": {
+            "gte": 103.0,
+            "lte": 212.0
+          }
+        },
+        {
+          "range": {
+            "gte": 301.0,
+            "lte": 318.0
+          }
+        },
+        {
+          "range": {
+            "gte": 401.0,
+            "lte": 503.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "district",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 74
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_temporal_columns": 3,
+  "nb_categorical_columns": 7,
+  "nb_numerical_columns": 1,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "point"
+      ],
+      "column_indexes": [
+        11
+      ],
+      "geohashes4": [
+        {
+          "hash": "121130231330",
+          "number": 75
+        },
+        {
+          "hash": "121130231333",
+          "number": 27
+        },
+        {
+          "hash": "121130231331",
+          "number": 41
+        },
+        {
+          "hash": "121130231332",
+          "number": 33
+        },
+        {
+          "hash": "121130231323",
+          "number": 44
+        },
+        {
+          "hash": "121130231322",
+          "number": 9
+        },
+        {
+          "hash": "121130231320",
+          "number": 23
+        },
+        {
+          "hash": "121130231321",
+          "number": 64
+        },
+        {
+          "hash": "121130231302",
+          "number": 20
+        },
+        {
+          "hash": "121130231303",
+          "number": 3
+        },
+        {
+          "hash": "121130231300",
+          "number": 11
+        },
+        {
+          "hash": "121130231312",
+          "number": 4
+        },
+        {
+          "hash": "121130231313",
+          "number": 1
+        },
+        {
+          "hash": "121130231231",
+          "number": 29
+        },
+        {
+          "hash": "121130231233",
+          "number": 1
+        },
+        {
+          "hash": "121130231211",
+          "number": 7
+        },
+        {
+          "hash": "121130231213",
+          "number": 6
+        },
+        {
+          "hash": "121130231210",
+          "number": 6
+        },
+        {
+          "hash": "121130231023",
+          "number": 2
+        },
+        {
+          "hash": "121130231032",
+          "number": 6
+        },
+        {
+          "hash": "121130233111",
+          "number": 25
+        },
+        {
+          "hash": "121130233110",
+          "number": 20
+        },
+        {
+          "hash": "121130233112",
+          "number": 5
+        },
+        {
+          "hash": "121130233113",
+          "number": 5
+        },
+        {
+          "hash": "121130233101",
+          "number": 19
+        },
+        {
+          "hash": "121130233103",
+          "number": 3
+        },
+        {
+          "hash": "121130233100",
+          "number": 1
+        },
+        {
+          "hash": "121130233011",
+          "number": 15
+        },
+        {
+          "hash": "121130320230",
+          "number": 7
+        },
+        {
+          "hash": "121130320232",
+          "number": 31
+        },
+        {
+          "hash": "121130320223",
+          "number": 57
+        },
+        {
+          "hash": "121130320220",
+          "number": 80
+        },
+        {
+          "hash": "121130320222",
+          "number": 29
+        },
+        {
+          "hash": "121130320221",
+          "number": 32
+        },
+        {
+          "hash": "121130322000",
+          "number": 7
+        },
+        {
+          "hash": "121130322001",
+          "number": 3
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.14652329805074,
+                40.728855298802934
+              ],
+              [
+                -73.90654102617174,
+                40.56187048854372
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.97502268404713,
+                40.883931612225524
+              ],
+              [
+                -73.85051321352483,
+                40.75627921904648
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.89270636942929,
+                40.771004489865845
+              ],
+              [
+                -73.72954832402824,
+                40.5928879186983
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 751
+    }
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "editdate"
+      ],
+      "column_indexes": [
+        2
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1592574848.0,
+            "lte": 1592910720.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_closed"
+      ],
+      "column_indexes": [
+        14
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1585681920.0,
+            "lte": 1585681920.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_reopened"
+      ],
+      "column_indexes": [
+        15
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1592524800.0,
+            "lte": 1592732672.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1592751360.0,
+            "lte": 1592910592.0
+          }
+        }
+      ],
+      "temporal_resolution": "minute"
+    }
+  ],
+  "attribute_keywords": [
+    "borough",
+    "closuretype",
+    "editdate",
+    "gispropnum",
+    "omppropid",
+    "red_sign_installed",
+    "red",
+    "sign",
+    "installed",
+    "status",
+    "accessibility",
+    "accessibilitylevel",
+    "location",
+    "name",
+    "point",
+    "rules",
+    "system",
+    "approx_date_closed",
+    "approx",
+    "date",
+    "closed",
+    "approx_date_reopened",
+    "approx",
+    "date",
+    "reopened",
+    "community_board",
+    "community",
+    "board",
+    "district"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.005340468953363597,
+      "2_geo_batch_predict": 0.014596284017898142,
+      "3_process_columns": 0.27054176200181246,
+      "4_latlong_pairing": 2.854998456314206e-05,
+      "5_spatial_coverage": 0.009037378011271358,
+      "6_temporal_coverage": 0.013400775962509215
+    },
+    "total": 1.6621653670445085
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/a4qt-mpr5.csv"
+}

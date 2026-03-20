@@ -1,6 +1,6 @@
 {
   "geometricType": "Point",
-  "name": null,
+  "name": "NYC_bicycle_counts",
   "crs": null,
   "nb_rows": 28459,
   "nb_profiled_rows": 28459,

@@ -1,12 +1,12 @@
 // frontend/src/components/DatasetNode.jsx
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Database, Layers, Palette, Info, X } from 'lucide-react'; // Added Info icon
 import VectorPreviewDeckGL from '../../visualization/VectorPreviewDeckGL'; // Up 2 levels
 
 const DatasetNode = memo(({ id, data }) => {
   const meta = data.metadata || {};
-  const columns = meta.columns || [];
+  const columns = meta.columns;
   const name = meta.name || data.name || 'Untitled';
   const filename = data.filename || name + '.geojson';
   
@@ -14,22 +14,31 @@ const DatasetNode = memo(({ id, data }) => {
   const isMapSyncEnabled = data.isMapSyncEnabled || false;
   const globalViewState = data.globalViewState;
   const onGlobalViewStateChange = data.onGlobalViewStateChange;
-  
-  // Initialize from data if available (for state persistence)
-  const [selectedCol, setSelectedCol] = useState(data.selectedColumn || "");
-  
-  // Notify parent when column selection changes
-  const handleColumnChange = (col) => {
-    setSelectedCol(col);
-    if (data.onColumnSelect) {
-      data.onColumnSelect(col);
+
+  const numericColumns = useMemo(
+    () => (Array.isArray(columns) ? columns : []).filter((column) =>
+      ['Integer', 'Float', 'http://schema.org/Integer', 'http://schema.org/Float'].includes(column.structural_type)
+      || column.mean !== undefined
+    ),
+    [columns]
+  );
+
+  const selectedColumn = typeof data.selectedColumn === 'string'
+    ? data.selectedColumn
+    : (typeof data.colorBy === 'string' ? data.colorBy : '');
+
+  const handleColumnChange = (value) => {
+    if (typeof data.onColumnChange === 'function') {
+      data.onColumnChange(id, value);
+      return;
+    }
+    if (typeof data.onColumnSelect === 'function') {
+      data.onColumnSelect(value);
+    }
+    if (typeof data.onColorByChange === 'function') {
+      data.onColorByChange(id, value);
     }
   };
-
-  const numericColumns = columns.filter(c => 
-    ['Integer', 'Float', 'http://schema.org/Integer', 'http://schema.org/Float'].includes(c.structural_type) 
-    || (c.mean !== undefined)
-  );
 
   return (
     <div style={{
@@ -128,7 +137,7 @@ const DatasetNode = memo(({ id, data }) => {
       {/* 2. Map Preview */}
       <VectorPreviewDeckGL 
         filename={filename} 
-        selectedColumn={selectedCol}
+        selectedColumn={selectedColumn}
         isMapSyncEnabled={isMapSyncEnabled}
         globalViewState={globalViewState}
         onGlobalViewStateChange={onGlobalViewStateChange}
@@ -143,7 +152,7 @@ const DatasetNode = memo(({ id, data }) => {
                <Palette size={11} /> Color by
             </label>
             <select 
-                value={selectedCol} 
+                value={selectedColumn} 
                 onChange={(e) => handleColumnChange(e.target.value)}
                 className="nodrag" 
                 style={{

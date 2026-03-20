@@ -1,0 +1,382 @@
+{
+  "geometricType": "Point",
+  "name": "nyc_parks_drinking_fountains",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 3619,
+  "nb_profiled_rows": 1130,
+  "nb_columns": 13,
+  "columns": [
+    {
+      "name": "system",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3619
+    },
+    {
+      "name": "fountainty",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 33
+    },
+    {
+      "name": "position",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.06017699115044248,
+      "num_distinct_values": 134
+    },
+    {
+      "name": "painted",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.19911504424778761,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "gispropnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 981
+    },
+    {
+      "name": "propertyna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.006194690265486726,
+      "num_distinct_values": 951
+    },
+    {
+      "name": "parentid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1450
+    },
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "fountainco",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 4,
+      "mean": 1.1539823008849557,
+      "stddev": 0.4323296427967026,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 2.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "department",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 76
+    },
+    {
+      "name": "decription",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "featuresta",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9732843041419983,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_categorical_columns": 6,
+  "nb_numerical_columns": 1,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "the_geom"
+      ],
+      "column_indexes": [
+        12
+      ],
+      "geohashes4": [
+        {
+          "hash": "121130233101",
+          "number": 31
+        },
+        {
+          "hash": "121130233103",
+          "number": 4
+        },
+        {
+          "hash": "121130233100",
+          "number": 1
+        },
+        {
+          "hash": "121130233110",
+          "number": 32
+        },
+        {
+          "hash": "121130233111",
+          "number": 36
+        },
+        {
+          "hash": "121130233113",
+          "number": 10
+        },
+        {
+          "hash": "121130233112",
+          "number": 7
+        },
+        {
+          "hash": "121130233011",
+          "number": 22
+        },
+        {
+          "hash": "121130231333",
+          "number": 53
+        },
+        {
+          "hash": "121130231330",
+          "number": 129
+        },
+        {
+          "hash": "121130231331",
+          "number": 80
+        },
+        {
+          "hash": "121130231332",
+          "number": 50
+        },
+        {
+          "hash": "121130231323",
+          "number": 50
+        },
+        {
+          "hash": "121130231321",
+          "number": 109
+        },
+        {
+          "hash": "121130231320",
+          "number": 32
+        },
+        {
+          "hash": "121130231322",
+          "number": 12
+        },
+        {
+          "hash": "121130231303",
+          "number": 10
+        },
+        {
+          "hash": "121130231302",
+          "number": 39
+        },
+        {
+          "hash": "121130231300",
+          "number": 14
+        },
+        {
+          "hash": "121130231313",
+          "number": 1
+        },
+        {
+          "hash": "121130231312",
+          "number": 12
+        },
+        {
+          "hash": "121130231231",
+          "number": 60
+        },
+        {
+          "hash": "121130231233",
+          "number": 3
+        },
+        {
+          "hash": "121130231211",
+          "number": 6
+        },
+        {
+          "hash": "121130231213",
+          "number": 16
+        },
+        {
+          "hash": "121130231210",
+          "number": 4
+        },
+        {
+          "hash": "121130231032",
+          "number": 4
+        },
+        {
+          "hash": "121130231033",
+          "number": 1
+        },
+        {
+          "hash": "121130231023",
+          "number": 2
+        },
+        {
+          "hash": "121130320221",
+          "number": 41
+        },
+        {
+          "hash": "121130320220",
+          "number": 101
+        },
+        {
+          "hash": "121130320222",
+          "number": 33
+        },
+        {
+          "hash": "121130320223",
+          "number": 61
+        },
+        {
+          "hash": "121130320232",
+          "number": 28
+        },
+        {
+          "hash": "121130320230",
+          "number": 14
+        },
+        {
+          "hash": "121130322001",
+          "number": 13
+        },
+        {
+          "hash": "121130322000",
+          "number": 5
+        },
+        {
+          "hash": "121130322010",
+          "number": 4
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.11055620295348,
+                40.73076332336722
+              ],
+              [
+                -73.91098259074904,
+                40.572653737388265
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.97725119579776,
+                40.88111539722077
+              ],
+              [
+                -73.8266541959364,
+                40.755712713585055
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.8867225910332,
+                40.76591332588189
+              ],
+              [
+                -73.73496573862556,
+                40.59258078982398
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 1130
+    }
+  ],
+  "attribute_keywords": [
+    "system",
+    "fountainty",
+    "position",
+    "painted",
+    "gispropnum",
+    "propertyna",
+    "parentid",
+    "borough",
+    "fountainco",
+    "department",
+    "decription",
+    "featuresta",
+    "the_geom",
+    "the",
+    "geom"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.008409575035329908,
+      "2_geo_batch_predict": 0.012193258036859334,
+      "3_process_columns": 0.16522590996464714,
+      "4_latlong_pairing": 2.358201891183853e-05,
+      "5_spatial_coverage": 0.013871972972992808,
+      "6_temporal_coverage": 3.7199934013187885e-06
+    },
+    "total": 1.4959255249705166
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/qnv7-p7a2.csv"
+}

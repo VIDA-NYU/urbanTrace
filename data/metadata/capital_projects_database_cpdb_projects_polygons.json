@@ -1,0 +1,385 @@
+{
+  "geometricType": "MultiPolygon",
+  "name": "capital_projects_database_cpdb_projects_polygons",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 1780,
+  "nb_profiled_rows": 89,
+  "nb_columns": 20,
+  "columns": [
+    {
+      "name": "maprojid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1780
+    },
+    {
+      "name": "magency",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 23,
+      "mean": 695.9775280898876,
+      "stddev": 298.8045085444226,
+      "coverage": [
+        {
+          "range": {
+            "gte": 42.0,
+            "lte": 126.0
+          }
+        },
+        {
+          "range": {
+            "gte": 801.0,
+            "lte": 819.0
+          }
+        },
+        {
+          "range": {
+            "gte": 841.0,
+            "lte": 856.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "projectid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1778
+    },
+    {
+      "name": "descriptio",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "ccnonexemp",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 834,
+      "mean": 4319775.2808988765,
+      "stddev": 12869421.481766144,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 4414000.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ccexempt",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 193,
+      "mean": 1012314.6067415731,
+      "stddev": 5067134.676876756,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "totalcityp",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 934,
+      "mean": 5332089.887640449,
+      "stddev": 13839893.404668784,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 10408000.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nccstate",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 40,
+      "mean": 0.0,
+      "stddev": 0.0,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nccfederal",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 129,
+      "mean": 532280.8988764045,
+      "stddev": 4805417.181877387,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nccother",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 55,
+      "mean": 41797.752808988764,
+      "stddev": 303887.3675060902,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "totalnonci",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 187,
+      "mean": 574078.6516853933,
+      "stddev": 4810393.490468303,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "totalplann",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 979,
+      "mean": 5906168.539325843,
+      "stddev": 15146903.965353427,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 10408000.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "totalspend",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 4199273.338651687,
+      "stddev": 20126980.781511705,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 6232030.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "maxdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 39
+    },
+    {
+      "name": "mindate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 663
+    },
+    {
+      "name": "magencyacr",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 24
+    },
+    {
+      "name": "magencynam",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "typecatego",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.056179775280898875,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "ccpversion",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-polygon",
+        "confidence": 0.9155353307723999,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 2,
+  "nb_numerical_columns": 10,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "maxdate"
+      ],
+      "column_indexes": [
+        13
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1672531200.0,
+            "lte": 1717200000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1748736000.0,
+            "lte": 1811808000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1843430400.0,
+            "lte": 2001196800.0
+          }
+        }
+      ],
+      "temporal_resolution": "month"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "mindate"
+      ],
+      "column_indexes": [
+        14
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1264032000.0,
+            "lte": 1377475200.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1423440000.0,
+            "lte": 1574640000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1677628800.0,
+            "lte": 1843430400.0
+          }
+        }
+      ],
+      "temporal_resolution": "week"
+    }
+  ],
+  "attribute_keywords": [
+    "maprojid",
+    "magency",
+    "projectid",
+    "descriptio",
+    "ccnonexemp",
+    "ccexempt",
+    "totalcityp",
+    "nccstate",
+    "nccfederal",
+    "nccother",
+    "totalnonci",
+    "totalplann",
+    "totalspend",
+    "maxdate",
+    "mindate",
+    "magencyacr",
+    "magencynam",
+    "typecatego",
+    "ccpversion",
+    "the_geom",
+    "the",
+    "geom"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.03016449202550575,
+      "2_geo_batch_predict": 0.02058960503200069,
+      "3_process_columns": 0.04300913697807118,
+      "4_latlong_pairing": 2.6256951969116926e-05,
+      "5_spatial_coverage": 5.777983460575342e-06,
+      "6_temporal_coverage": 0.0027770770248025656
+    },
+    "total": 1.4000996319809929
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/9jkp-n57r.csv"
+}

@@ -1,0 +1,839 @@
+{
+  "geometricType": "Point",
+  "name": "2019_2020_school_point_locations",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 1992,
+  "nb_profiled_rows": 842,
+  "nb_columns": 18,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9715966582298279,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "ats_code",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1931
+    },
+    {
+      "name": "loc_code",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1931
+    },
+    {
+      "name": "loc_name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9089775085449219,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "managed_by",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2,
+      "mean": 1.1294536817102139,
+      "stddev": 0.3357013941017878,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 2.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lcc",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 10,
+      "mean": 5.016627078384798,
+      "stddev": 4.951278922681816,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 8.0
+          }
+        },
+        {
+          "range": {
+            "gte": 15.0,
+            "lte": 36.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "primarybui",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1366
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1334,
+      "mean": 2837184.0249406174,
+      "stddev": 1223549.025946088,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1004627.0,
+            "lte": 2100071.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3009582.0,
+            "lte": 3348044.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4007619.0,
+            "lte": 5107239.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 2730289128.1710215,
+      "stddev": 1221254250.236726,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 1022150080.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2024460043.0,
+            "lte": 3072610201.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4005940001.0,
+            "lte": 5036450007.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "address",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9526972770690918,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "city",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 18
+    },
+    {
+      "name": "boronum",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 6,
+      "mean": 2.7327790973871733,
+      "stddev": 1.157889028991368,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "state",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "zip",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 175,
+      "mean": 10810.908551068884,
+      "stddev": 532.2057358943092,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10002.0,
+            "lte": 10065.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10303.0,
+            "lte": 10473.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11201.0,
+            "lte": 11434.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "geodistric",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 33,
+      "mean": 16.239904988123516,
+      "stddev": 9.48567736381304,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 12.0
+          }
+        },
+        {
+          "range": {
+            "gte": 13.0,
+            "lte": 22.0
+          }
+        },
+        {
+          "range": {
+            "gte": 23.0,
+            "lte": 32.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "adimindist",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 37,
+      "mean": 28.889548693586697,
+      "stddev": 27.00758070821619,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 17.0
+          }
+        },
+        {
+          "range": {
+            "gte": 19.0,
+            "lte": 31.0
+          }
+        },
+        {
+          "range": {
+            "gte": 75.0,
+            "lte": 84.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "xcoordinat",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "x_coord",
+        "confidence": 0.9340412020683289,
+        "source": "ml+validated"
+      },
+      "mean": 1005982.0071258907,
+      "stddev": 23257.25023337888,
+      "coverage": [
+        {
+          "range": {
+            "gte": 982544.0,
+            "lte": 1013928.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1017501.0,
+            "lte": 1056382.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ycoordinat",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1328,
+      "mean": 206365.36104513064,
+      "stddev": 30987.679678085642,
+      "coverage": [
+        {
+          "range": {
+            "gte": 148707.0,
+            "lte": 185799.0
+          }
+        },
+        {
+          "range": {
+            "gte": 187864.0,
+            "lte": 219934.0
+          }
+        },
+        {
+          "range": {
+            "gte": 225764.0,
+            "lte": 260209.0
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_categorical_columns": 2,
+  "nb_numerical_columns": 10,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "the_geom"
+      ],
+      "column_indexes": [
+        0
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302331101",
+          "number": 9
+        },
+        {
+          "hash": "1211302331100",
+          "number": 16
+        },
+        {
+          "hash": "1211302331103",
+          "number": 3
+        },
+        {
+          "hash": "1211302331102",
+          "number": 8
+        },
+        {
+          "hash": "1211302331120",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 4
+        },
+        {
+          "hash": "1211302331110",
+          "number": 8
+        },
+        {
+          "hash": "1211302331111",
+          "number": 7
+        },
+        {
+          "hash": "1211302331113",
+          "number": 2
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331130",
+          "number": 5
+        },
+        {
+          "hash": "1211302331012",
+          "number": 5
+        },
+        {
+          "hash": "1211302331013",
+          "number": 10
+        },
+        {
+          "hash": "1211302331011",
+          "number": 7
+        },
+        {
+          "hash": "1211302331010",
+          "number": 1
+        },
+        {
+          "hash": "1211302331031",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331000",
+          "number": 1
+        },
+        {
+          "hash": "1211302330113",
+          "number": 5
+        },
+        {
+          "hash": "1211302330111",
+          "number": 4
+        },
+        {
+          "hash": "1211302313203",
+          "number": 13
+        },
+        {
+          "hash": "1211302313201",
+          "number": 12
+        },
+        {
+          "hash": "1211302313200",
+          "number": 10
+        },
+        {
+          "hash": "1211302313202",
+          "number": 5
+        },
+        {
+          "hash": "1211302313233",
+          "number": 12
+        },
+        {
+          "hash": "1211302313230",
+          "number": 27
+        },
+        {
+          "hash": "1211302313231",
+          "number": 11
+        },
+        {
+          "hash": "1211302313232",
+          "number": 4
+        },
+        {
+          "hash": "1211302313211",
+          "number": 25
+        },
+        {
+          "hash": "1211302313212",
+          "number": 19
+        },
+        {
+          "hash": "1211302313213",
+          "number": 31
+        },
+        {
+          "hash": "1211302313210",
+          "number": 6
+        },
+        {
+          "hash": "1211302313220",
+          "number": 2
+        },
+        {
+          "hash": "1211302313221",
+          "number": 7
+        },
+        {
+          "hash": "1211302313300",
+          "number": 19
+        },
+        {
+          "hash": "1211302313301",
+          "number": 27
+        },
+        {
+          "hash": "1211302313302",
+          "number": 23
+        },
+        {
+          "hash": "1211302313303",
+          "number": 3
+        },
+        {
+          "hash": "1211302313332",
+          "number": 10
+        },
+        {
+          "hash": "1211302313330",
+          "number": 14
+        },
+        {
+          "hash": "1211302313331",
+          "number": 7
+        },
+        {
+          "hash": "1211302313333",
+          "number": 3
+        },
+        {
+          "hash": "1211302313313",
+          "number": 15
+        },
+        {
+          "hash": "1211302313312",
+          "number": 10
+        },
+        {
+          "hash": "1211302313310",
+          "number": 12
+        },
+        {
+          "hash": "1211302313311",
+          "number": 14
+        },
+        {
+          "hash": "1211302313320",
+          "number": 14
+        },
+        {
+          "hash": "1211302313321",
+          "number": 2
+        },
+        {
+          "hash": "1211302313323",
+          "number": 6
+        },
+        {
+          "hash": "1211302313322",
+          "number": 7
+        },
+        {
+          "hash": "1211302313023",
+          "number": 11
+        },
+        {
+          "hash": "1211302313021",
+          "number": 4
+        },
+        {
+          "hash": "1211302313022",
+          "number": 6
+        },
+        {
+          "hash": "1211302313020",
+          "number": 4
+        },
+        {
+          "hash": "1211302313001",
+          "number": 2
+        },
+        {
+          "hash": "1211302313003",
+          "number": 6
+        },
+        {
+          "hash": "1211302313000",
+          "number": 8
+        },
+        {
+          "hash": "1211302313002",
+          "number": 2
+        },
+        {
+          "hash": "1211302313033",
+          "number": 2
+        },
+        {
+          "hash": "1211302313032",
+          "number": 5
+        },
+        {
+          "hash": "1211302313123",
+          "number": 5
+        },
+        {
+          "hash": "1211302313122",
+          "number": 4
+        },
+        {
+          "hash": "1211302312310",
+          "number": 7
+        },
+        {
+          "hash": "1211302312311",
+          "number": 10
+        },
+        {
+          "hash": "1211302312313",
+          "number": 3
+        },
+        {
+          "hash": "1211302312312",
+          "number": 1
+        },
+        {
+          "hash": "1211302312332",
+          "number": 1
+        },
+        {
+          "hash": "1211302312110",
+          "number": 3
+        },
+        {
+          "hash": "1211302312112",
+          "number": 3
+        },
+        {
+          "hash": "1211302312113",
+          "number": 3
+        },
+        {
+          "hash": "1211302312101",
+          "number": 2
+        },
+        {
+          "hash": "1211302312131",
+          "number": 1
+        },
+        {
+          "hash": "1211302310231",
+          "number": 2
+        },
+        {
+          "hash": "1211302310233",
+          "number": 1
+        },
+        {
+          "hash": "1211302310333",
+          "number": 1
+        },
+        {
+          "hash": "1211302310322",
+          "number": 1
+        },
+        {
+          "hash": "1211302310323",
+          "number": 3
+        },
+        {
+          "hash": "1211303202200",
+          "number": 12
+        },
+        {
+          "hash": "1211303202202",
+          "number": 22
+        },
+        {
+          "hash": "1211303202203",
+          "number": 35
+        },
+        {
+          "hash": "1211303202223",
+          "number": 10
+        },
+        {
+          "hash": "1211303202221",
+          "number": 18
+        },
+        {
+          "hash": "1211303202231",
+          "number": 31
+        },
+        {
+          "hash": "1211303202230",
+          "number": 40
+        },
+        {
+          "hash": "1211303202233",
+          "number": 11
+        },
+        {
+          "hash": "1211303202232",
+          "number": 15
+        },
+        {
+          "hash": "1211303202213",
+          "number": 13
+        },
+        {
+          "hash": "1211303202212",
+          "number": 21
+        },
+        {
+          "hash": "1211303202320",
+          "number": 18
+        },
+        {
+          "hash": "1211303202322",
+          "number": 16
+        },
+        {
+          "hash": "1211303202323",
+          "number": 2
+        },
+        {
+          "hash": "1211303220010",
+          "number": 4
+        },
+        {
+          "hash": "1211303220011",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.01186475549073,
+                40.74739806686792
+              ],
+              [
+                -73.8459922876849,
+                40.593028549309324
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.95572213108925,
+                40.87737994424796
+              ],
+              [
+                -73.75277244688861,
+                40.69043994033427
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 842
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "ats_code",
+    "ats",
+    "code",
+    "loc_code",
+    "loc",
+    "code",
+    "loc_name",
+    "loc",
+    "name",
+    "managed_by",
+    "managed",
+    "by",
+    "lcc",
+    "primarybui",
+    "bin",
+    "bbl",
+    "address",
+    "city",
+    "boronum",
+    "state",
+    "zip",
+    "geodistric",
+    "adimindist",
+    "xcoordinat",
+    "ycoordinat"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0075258309952914715,
+      "2_geo_batch_predict": 0.015801347966771573,
+      "3_process_columns": 0.17887094098841771,
+      "4_latlong_pairing": 3.1028001103550196e-05,
+      "5_spatial_coverage": 0.009912337991409004,
+      "6_temporal_coverage": 3.7599820643663406e-06
+    },
+    "total": 1.5554343480034731
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/a3nt-yts4.csv"
+}
