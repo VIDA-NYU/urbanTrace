@@ -1,6 +1,6 @@
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo, useCallback, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
-import { GitCompareArrows, ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { GitCompareArrows, ArrowDown, ArrowUp, Minus, Eye, EyeOff } from 'lucide-react';
 import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL';
 
 const COMPARE_PALETTE = {
@@ -90,6 +90,7 @@ const deriveComparePayload = (item) => {
 };
 
 const CompareMapNode = memo(({ id, data }) => {
+  const [showDirectionIcons, setShowDirectionIcons] = useState(false);
   const connectedResults = data?.connectedResults || [];
   const validInputs = connectedResults
     .map(item => ({
@@ -316,6 +317,7 @@ const CompareMapNode = memo(({ id, data }) => {
                 color={[75, 85, 99]}
                 useHotspotPalette={true}
                 hotspotPalette={COMPARE_PALETTE}
+                showDirectionSymbols={showDirectionIcons}
                 showHex={comparison.kind === 'hex'}
                 showZones={comparison.kind === 'zones'}
                 isMapSyncEnabled={data?.isMapSyncEnabled}
@@ -329,7 +331,29 @@ const CompareMapNode = memo(({ id, data }) => {
             </div>
 
             <div className="nodrag" style={{ position: 'absolute', right: 8, top: 8, zIndex: 10, background: 'rgba(255,255,255,0.96)', border: '1px solid #d1d5db', borderRadius: '8px', padding: '8px', width: '180px', fontSize: '9px', color: '#374151', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-              <div style={{ fontWeight: 700, fontSize: '10px', color: '#111827', marginBottom: '4px' }}>Δ Comparison</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div style={{ fontWeight: 700, fontSize: '10px', color: '#111827' }}>Δ Comparison</div>
+                <button
+                  className="nodrag"
+                  onClick={() => setShowDirectionIcons(prev => !prev)}
+                  title={showDirectionIcons ? 'Hide direction symbols overlay' : 'Show direction symbols overlay'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '4px',
+                    border: '1px solid #d1d5db',
+                    background: showDirectionIcons ? '#e2e8f0' : '#fff',
+                    color: '#334155',
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                >
+                  {showDirectionIcons ? <Eye size={12} /> : <EyeOff size={12} />}
+                </button>
+              </div>
               <div style={{ marginBottom: '4px' }}><strong>{leftInput?.label || 'Map 1'}</strong> → <strong>{rightInput?.label || 'Map 2'}</strong></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
                 <ArrowUp size={10} color="#374151" /> Higher in Map 2

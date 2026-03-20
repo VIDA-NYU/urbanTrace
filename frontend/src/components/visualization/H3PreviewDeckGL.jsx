@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { H3HexagonLayer } from '@deck.gl/geo-layers';
-import { GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, TextLayer } from '@deck.gl/layers';
+import { cellToLatLng } from 'h3-js';
 import { Layers } from 'lucide-react'; 
 
 const H3PreviewDeckGL = ({ 
@@ -16,6 +17,7 @@ const H3PreviewDeckGL = ({
   onZoneHover,
   hideLegend = false,
   customTooltip = null,
+  showDirectionSymbols = false,
   showHex = true, 
   showZones = false,
   // GLOBAL VIEWPORT SYNC: Props for linked camera
@@ -147,6 +149,51 @@ const H3PreviewDeckGL = ({
     return { zoneFeatures: geojsonData, maxZoneValue: max, zoneVariableNames: [...varNames] };
   }, [geojsonData]);
 
+  const getDirectionSymbol = (delta) => {
+    const abs = Math.abs(Number(delta) || 0);
+    if (abs < 0.1) return '•';
+    return delta > 0 ? '⬆' : '⬇';
+  };
+
+  const getDirectionColor = (delta) => {
+    const abs = Math.abs(Number(delta) || 0);
+    if (abs < 0.1) return [107, 114, 128, 255];
+    return delta > 0 ? [22, 163, 74, 255] : [220, 38, 38, 255];
+  };
+
+  const getDirectionSize = (delta) => {
+    const abs = Math.abs(Number(delta) || 0);
+    if (abs >= 0.5) return 28;
+    if (abs >= 0.25) return 20;
+    if (abs >= 0.1) return 14;
+    return 8;
+  };
+
+  const getPolygonCentroid = (geometry) => {
+    const type = geometry?.type;
+    const coords = geometry?.coordinates;
+    if (!type || !coords) return null;
+
+    let points = [];
+    if (type === 'Polygon') {
+      points = coords.flat(1);
+    } else if (type === 'MultiPolygon') {
+      points = coords.flat(2);
+    }
+
+    const validPoints = points.filter(point => Array.isArray(point) && point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number');
+    if (!validPoints.length) return null;
+
+    const { sumLng, sumLat } = validPoints.reduce((acc, point) => {
+      return {
+        sumLng: acc.sumLng + point[0],
+        sumLat: acc.sumLat + point[1]
+      };
+    }, { sumLng: 0, sumLat: 0 });
+
+    return [sumLng / validPoints.length, sumLat / validPoints.length];
+  };
+
   const layers = useMemo(() => {
     const result = [];
 
@@ -247,8 +294,79 @@ const H3PreviewDeckGL = ({
       );
     }
 
+    if (showDirectionSymbols && showHex && data.length > 0) {
+      const symbolHexData = data
+        .map(d => ({
+          ...d,
+          deltaSigned: Number(d?.variables?.delta_signed)
+        }))
+        .filter(d => Number.isFinite(d.deltaSigned));
+
+      if (symbolHexData.length) {
+        result.push(
+          new TextLayer({
+            id: 'direction-symbols-hex',
+            data: symbolHexData,
+            pickable: false,
+            billboard: true,
+            sizeUnits: 'pixels',
+            getPosition: d => {
+              try {
+                const [lat, lng] = cellToLatLng(d.hex);
+                return [lng, lat];
+              } catch {
+                return null;
+              }
+            },
+            getText: d => getDirectionSymbol(d.deltaSigned),
+            getColor: d => getDirectionColor(d.deltaSigned),
+            getSize: d => getDirectionSize(d.deltaSigned),
+            getTextAnchor: 'middle',
+            getAlignmentBaseline: 'center',
+            characterSet: ['⬆', '⬇', '•'],
+            fontFamily: 'monospace'
+          })
+        );
+      }
+    }
+
+    if (showDirectionSymbols && showZones && zoneFeatures?.features?.length) {
+      const symbolZoneData = zoneFeatures.features
+        .map(feature => {
+          const deltaSigned = Number(feature?.properties?.delta_signed);
+          const centroid = getPolygonCentroid(feature?.geometry);
+          if (!Number.isFinite(deltaSigned) || !centroid) return null;
+          return {
+            feature,
+            deltaSigned,
+            centroid
+          };
+        })
+        .filter(Boolean);
+
+      if (symbolZoneData.length) {
+        result.push(
+          new TextLayer({
+            id: 'direction-symbols-zone',
+            data: symbolZoneData,
+            pickable: false,
+            billboard: true,
+            sizeUnits: 'pixels',
+            getPosition: d => d.centroid,
+            getText: d => getDirectionSymbol(d.deltaSigned),
+            getColor: d => getDirectionColor(d.deltaSigned),
+            getSize: d => getDirectionSize(d.deltaSigned),
+            getTextAnchor: 'middle',
+            getAlignmentBaseline: 'center',
+            characterSet: ['⬆', '⬇', '•'],
+            fontFamily: 'monospace'
+          })
+        );
+      }
+    }
+
     return result;
-  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, is3D, color, useHotspotPalette, hotspotPalette, highlightedHexId, highlightedZoneId, onHexHover, onZoneHover]);
+  }, [data, maxCount, zoneFeatures, maxZoneValue, showHex, showZones, showDirectionSymbols, is3D, color, useHotspotPalette, hotspotPalette, highlightedHexId, highlightedZoneId, onHexHover, onZoneHover]);
 
   // Auto-fit to zone bounds if showing zones
   useEffect(() => {
