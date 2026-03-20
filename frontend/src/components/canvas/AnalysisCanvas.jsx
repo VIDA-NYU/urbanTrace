@@ -406,22 +406,41 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState, handleDeleteNode]); // Ensure setNodes is in the dependency array
 
   // GLOBAL VIEWPORT SYNC: Update existing ResultMapNodes and DatasetNodes when sync state changes
-  useMemo(() => {
-    setNodes(nds => nds.map(node => {
-      if (node.type === 'resultMapNode' || node.type === 'datasetNode') {
+  useEffect(() => {
+    setNodes((nds) => {
+      let hasChanges = false;
+
+      const nextNodes = nds.map((node) => {
+        if (node.type !== 'resultMapNode' && node.type !== 'datasetNode') {
+          return node;
+        }
+
+        const data = node.data || {};
+        const needsUpdate =
+          data.isMapSyncEnabled !== isMapSyncEnabled
+          || data.globalViewState !== globalViewState
+          || data.onGlobalViewStateChange !== setGlobalViewState
+          || data.onDeleteNode !== handleDeleteNode;
+
+        if (!needsUpdate) {
+          return node;
+        }
+
+        hasChanges = true;
         return {
           ...node,
           data: {
-            ...node.data,
+            ...data,
             isMapSyncEnabled,
             globalViewState,
             onGlobalViewStateChange: setGlobalViewState,
             onDeleteNode: handleDeleteNode
           }
         };
-      }
-      return node;
-    }));
+      });
+
+      return hasChanges ? nextNodes : nds;
+    });
   }, [isMapSyncEnabled, globalViewState, handleDeleteNode]);
 
   useEffect(() => {
@@ -863,7 +882,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       isMapSyncEnabled,
       onLogActivity,
       screenToFlowPosition,
-      createColumnSelectHandler,
       handleCompareHover,
       handleDeleteNode,
       queueAutoSuggestRequest,
