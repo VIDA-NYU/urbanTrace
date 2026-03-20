@@ -1,5 +1,6 @@
 // frontend/src/components/layout/IntegrationTopologyPanel.jsx
 import React, { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
@@ -30,6 +31,69 @@ const makePath = (fromRect, toRect, svgRect) => {
   const cx = (x1 + x2) / 2;
   return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
 };
+
+// Pre-processes dense AI text: splits into sentences, highlights the active operator,
+// and dims sentences that belong to the *other* operator.
+const SmartRationaleFormatter = ({ text, activeOperator }) => {
+  if (!text) return null;
+
+  // 1. Extract core identifying words (e.g., "AreaWeightedZoning" -> ["Area", "Weighted"])
+  const keywords = activeOperator
+    .replace(/(Zoning|Aggregation)/ig, '')
+    .match(/[A-Z][a-z]+/g) || [activeOperator];
+
+  // 2. Safely split dense paragraph into sentences based on punctuation FOLLOWED BY A SPACE.
+  // We use a temporary token (|SPLIT|) to avoid breaking decimals like "0.1".
+  const sentences = text
+    .replace(/([.!?])\s+/g, "$1|SPLIT|")
+    .split("|SPLIT|")
+    .filter(s => s.trim().length > 0); // Clean up any empty fragments
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {sentences.map((sentence, i) => {
+        const cleanSentence = sentence.trim();
+        if (!cleanSentence) return null;
+
+        // 3. Check if this sentence mentions our active operator's keywords
+        const isRelevant = keywords.some(kw => 
+          cleanSentence.toLowerCase().includes(kw.toLowerCase())
+        );
+
+        // 4. Create a regex to bold the matching keywords in the text
+        const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+        const parts = cleanSentence.split(regex);
+
+        return (
+          <div 
+            key={i} 
+            style={{ 
+              opacity: isRelevant ? 1 : 0.4, // Dim sentences meant for the other operator
+              display: 'flex', 
+              gap: '6px' 
+            }}
+          >
+            <span style={{ color: isRelevant ? '#6ee7b7' : '#0f766e', flexShrink: 0 }}>
+              •
+            </span>
+            <span>
+              {parts.map((part, j) => 
+                regex.test(part) ? (
+                  <strong key={j} style={{ color: '#ffffff', fontWeight: 600 }}>
+                    {part}
+                  </strong>
+                ) : (
+                  part
+                )
+              )}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 
 /* ─────────────────────────────────────────────
    SUB-COMPONENTS
@@ -100,6 +164,62 @@ const Glyph = ({ count, shape = 'circle', micro = false }) => {
         flexShrink: 0,
       }}
     />
+  );
+};
+
+// Publication-Grade Tooltip for AI Rationale
+// Publication-Grade Tooltip for AI Rationale (Portal Version)
+// Publication-Grade Tooltip for AI Rationale (Portal Version)
+const RationaleTooltip = ({ rationale, operatorName, children }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const anchorRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top + (rect.height / 2),
+        left: rect.left - 8,
+      });
+    }
+    setIsHovered(true);
+  };
+
+  if (!rationale) return children;
+
+  const tooltipContent = isHovered ? createPortal(
+    <div style={{
+      ...styles.tooltipCard,
+      top: `${coords.top}px`,
+      left: `${coords.left}px`,
+    }}>
+      <div style={styles.tooltipHeader}>
+        <span style={{color: '#6ee7b7'}}>✨ AI Rationale</span>
+        <span style={{color: '#99f6e4', fontWeight: 400}}>| {SHORT_LABEL(operatorName)}</span>
+      </div>
+      
+      {/* --- UPDATED BODY SECTION --- */}
+      <div style={styles.tooltipBody}>
+        <SmartRationaleFormatter text={rationale} activeOperator={operatorName} />
+      </div>
+      {/* ---------------------------- */}
+      
+      <div style={styles.tooltipArrow} />
+    </div>,
+    document.body
+  ) : null;
+
+  return (
+    <div 
+      ref={anchorRef}
+      style={{ display: 'flex', justifyContent: 'center' }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      {tooltipContent}
+    </div>
   );
 };
 
@@ -471,7 +591,12 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
                               const used = v.zoningMapping === op;
                               return (
                                 <div key={op} style={styles.bubbleCell}>
-                                  <Glyph count={used ? 1 : 0} shape="triangle" micro />
+                                  <RationaleTooltip 
+                                    rationale={used ? v.rationale : null} 
+                                    operatorName={op}
+                                  >
+                                    <Glyph count={used ? 1 : 0} shape="triangle" micro />
+                                  </RationaleTooltip>
                                 </div>
                               );
                             })}
@@ -480,7 +605,12 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
                               const used = v.zoningAggregation === op;
                               return (
                                 <div key={op} style={styles.bubbleCell}>
-                                  <Glyph count={used ? 1 : 0} shape="circle" micro />
+                                  <RationaleTooltip 
+                                    rationale={used ? v.rationale : null} 
+                                    operatorName={op}
+                                  >
+                                    <Glyph count={used ? 1 : 0} shape="circle" micro />
+                                  </RationaleTooltip>
                                 </div>
                               );
                             })}
@@ -785,6 +915,52 @@ const styles = {
     letterSpacing: '0.12em',
     fontFamily: "'JetBrains Mono', monospace",
   },
+
+  /* ── New Tooltip Styles ── */
+  tooltipCard: {
+    position: 'fixed',
+    // translate(-100%, -50%) pulls it entirely to the left of the coordinate, 
+    // and centers it vertically.
+    transform: 'translate(-100%, -50%)', 
+    width: '240px',
+    background: '#115e59', 
+    border: '1px solid #0f766e',
+    borderRadius: '6px',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+    zIndex: 999999,
+    pointerEvents: 'none',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  tooltipHeader: {
+    padding: '6px 10px',
+    borderBottom: '1px solid #0f766e',
+    fontSize: '9px',
+    fontWeight: '700',
+    letterSpacing: '0.02em',
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontFamily: "'Inter', system-ui, sans-serif",
+  },
+  tooltipBody: {
+    padding: '8px 10px',
+    color: '#f0fdfa',
+    fontSize: '9px',
+    lineHeight: '1.4',
+    fontFamily: "'Inter', system-ui, sans-serif",
+    whiteSpace: 'normal',
+    textAlign: 'left',
+  },
+  tooltipArrow: {
+    position: 'absolute',
+    top: '50%',
+    left: '100%', // Position exactly on the right edge of the tooltip
+    transform: 'translateY(-50%)', // Center the arrow vertically
+    borderTop: '5px solid transparent',
+    borderBottom: '5px solid transparent',
+    borderLeft: '5px solid #115e59', // Colored triangle pointing right
+    borderRight: 'none', // Remove the right border
+  }
 };
 
 export default IntegrationTopologyPanel;

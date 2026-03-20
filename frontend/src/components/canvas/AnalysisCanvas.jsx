@@ -14,7 +14,7 @@ import DatasetDetailsModal from '../catalog/DatasetDetailsModal';
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
 import CompareMapNode from './nodes/CompareMapNode';
 
-const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage }) => {
+const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [viewingDataset, setViewingDataset] = useState(null);
@@ -293,6 +293,17 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     });
   }, [edges, hydrateCompareNodes]);
 
+  useEffect(() => {
+    if (!onActiveLogTimestampsChange) return;
+
+    const activeTimestamps = nodes
+      .filter(node => node.type === 'resultMapNode')
+      .map(node => node.data?.spatialData?.provenance?.timestamp)
+      .filter(Boolean);
+
+    onActiveLogTimestampsChange(activeTimestamps);
+  }, [nodes, onActiveLogTimestampsChange]);
+
 
   // 4. Update onConnect to pass data between nodes
   const onConnect = useCallback((params) => {
@@ -563,9 +574,16 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   );
 };
 
-const AnalysisCanvas = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage }) => (
+const AnalysisCanvas = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => (
   <ReactFlowProvider>
-    <CanvasInner sidebarCollapsed={sidebarCollapsed} onLogActivity={onLogActivity} highlightedLogTs={highlightedLogTs} focusedLogTs={focusedLogTs} onTraceLineage={onTraceLineage} />
+    <CanvasInner
+      sidebarCollapsed={sidebarCollapsed}
+      onLogActivity={onLogActivity}
+      highlightedLogTs={highlightedLogTs}
+      focusedLogTs={focusedLogTs}
+      onTraceLineage={onTraceLineage}
+      onActiveLogTimestampsChange={onActiveLogTimestampsChange}
+    />
   </ReactFlowProvider>
 );
 

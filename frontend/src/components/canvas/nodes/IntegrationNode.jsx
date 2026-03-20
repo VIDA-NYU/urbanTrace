@@ -191,7 +191,7 @@ const IntegrationNode = memo(({ id, data }) => {
   // ==========================================================================
   // EXTRACTED EXECUTION LOGIC: Allows us to pass fresh AI state or current React state
   // ==========================================================================
-  const executeIntegration = async (configsArray) => {
+  const executeIntegration = async (configsArray, freshReasoning = null) => {
     setIsLoading(true);
     const startTime = performance.now();
     try {
@@ -238,6 +238,9 @@ const IntegrationNode = memo(({ id, data }) => {
       resultData.outputMode = zoningEnabled ? outputMode : 'grid';
 
       const durationMs = Math.round(performance.now() - startTime);
+      // 1. Determine the source of truth ONCE before the loop, 
+      // and default to an empty object {} so the lookups never crash.
+      const currentReasoning = freshReasoning || copilotReasoning || {};
 
       // DATA LINEAGE: Capture configuration snapshot for provenance tracking
       resultData.provenance = {
@@ -248,15 +251,24 @@ const IntegrationNode = memo(({ id, data }) => {
         zoningEnabled: zoningEnabled,
         targetZones: zoningEnabled ? data.connectedZoneFilename : null,
         outputMode: zoningEnabled ? outputMode : 'grid',
-        variables: withOutputNames.map(v => ({
-          dataset: v.filename,
-          targetColumn: v.targetColumn,
-          outputName: v.outputName,
-          allocation: v.allocation,
-          aggregation: v.aggregation,
-          zoningMapping: v.zoningMapping,
-          zoningAggregation: v.zoningAggregation
-        }))
+        variables: withOutputNames.map(v => {
+          // Look up the AI rationale from the state using the filename and column
+          const exactKey = `${v.filename}::${v.targetColumn}`;
+          const stemKey = `${(v.filename || '').replace(/\.geojson$/i, '')}::${v.targetColumn}`;
+          // 2. Safely extract the rationale
+          const rationale = currentReasoning[exactKey] || currentReasoning[stemKey] || null;
+
+          return {
+            dataset: v.filename,
+            targetColumn: v.targetColumn,
+            outputName: v.outputName,
+            allocation: v.allocation,
+            aggregation: v.aggregation,
+            zoningMapping: v.zoningMapping,
+            zoningAggregation: v.zoningAggregation,
+            rationale: rationale
+          };
+        })
       };
 
       if (data.onIntegrationComplete) {
@@ -412,7 +424,7 @@ const IntegrationNode = memo(({ id, data }) => {
       setCopilotState('success');
 
       // 4. AUTO-RUN THE PIPELINE with the newly generated configs
-      await executeIntegration(Object.values(nextConfigs));
+      await executeIntegration(Object.values(nextConfigs, reasoningMap));
 
     } catch (error) {
       console.error('Copilot Error:', error);

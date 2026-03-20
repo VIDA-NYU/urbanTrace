@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DatasetSidebar from './components/layout/DatasetSidebar';
 import AnalysisCanvas from './components/canvas/AnalysisCanvas';
@@ -10,6 +10,8 @@ function App() {
   
   // GLOBAL ACTIVITY LOG: Track all pipeline executions for audit trail
   const [activityLogs, setActivityLogs] = useState([]);
+  const [activeLogTimestamps, setActiveLogTimestamps] = useState([]);
+  const prevActiveLogSetRef = useRef(new Set());
   
   // CROSS-CANVAS CONNECTION: Bidirectional hover/highlight between topology matrix and ResultMapNodes
   const [highlightedLogTs, setHighlightedLogTs] = useState(null);  // Matrix→Canvas (hover)
@@ -18,6 +20,28 @@ function App() {
   const appendToActivityLog = (logEntry) => {
     // Prepend so newest appears at top
     setActivityLogs(prevLogs => [logEntry, ...prevLogs]);
+  };
+
+  useEffect(() => {
+    const currentActiveSet = new Set((activeLogTimestamps || []).filter(Boolean));
+    const prevActiveSet = prevActiveLogSetRef.current;
+    const removedTimestamps = [...prevActiveSet].filter(ts => !currentActiveSet.has(ts));
+
+    if (removedTimestamps.length > 0) {
+      setActivityLogs(prevLogs => prevLogs.filter(log => currentActiveSet.has(log.timestamp)));
+      setHighlightedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));
+      setFocusedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));
+    }
+
+    prevActiveLogSetRef.current = currentActiveSet;
+  }, [activeLogTimestamps]);
+
+  // --- NEW: Handle clearing the topology logs ---
+  const handleCleanUp = () => {
+    const activeSet = new Set((activeLogTimestamps || []).filter(Boolean));
+    setActivityLogs(prevLogs => prevLogs.filter(log => activeSet.has(log.timestamp)));
+    setHighlightedLogTs(prev => (prev && !activeSet.has(prev) ? null : prev));
+    setFocusedLogTs(prev => (prev && !activeSet.has(prev) ? null : prev));
   };
 
   return (
@@ -85,6 +109,7 @@ function App() {
           highlightedLogTs={highlightedLogTs}
           focusedLogTs={focusedLogTs}
           onTraceLineage={setFocusedLogTs}
+          onActiveLogTimestampsChange={setActiveLogTimestamps}
         />
       </main>
 
@@ -100,6 +125,7 @@ function App() {
           activityLogs={activityLogs} 
           onHoverLog={setHighlightedLogTs}
           focusedLogTs={focusedLogTs}
+          onCleanUp={handleCleanUp}
         />
       </aside>
       
