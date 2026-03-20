@@ -9,8 +9,6 @@ import csv
 import io
 import re
 import asyncio
-import urllib.request
-import urllib.error
 from pathlib import Path
 
 try:
@@ -87,9 +85,6 @@ def _strip_dataset_suffixes(name: str | None) -> str:
             dataset_id = dataset_id[: -len(suffix)]
             break
 
-    if dataset_id.endswith("_metadata"):
-        dataset_id = dataset_id[:-9]
-
     return dataset_id
 
 
@@ -106,13 +101,7 @@ def _normalize_dataset_stem(dataset_name: str | None) -> str:
 
 def _metadata_path_for_dataset(dataset_name: str | None) -> str:
     stem = _normalize_dataset_stem(dataset_name)
-    preferred = os.path.join(DATA_DIR, "metadata", f"{stem}_metadata.json")
-    legacy = os.path.join(DATA_DIR, "metadata", f"{stem}.json")
-
-    if os.path.exists(preferred) or not os.path.exists(legacy):
-        return preferred
-
-    return legacy
+    return os.path.join(DATA_DIR, "metadata", f"{stem}.json")
 
 # Operator Registries for Formal Integration
 ALLOCATION_REGISTRY = {
@@ -241,6 +230,8 @@ class CopilotSourceVariable(BaseModel):
 class CopilotRecommendRequest(BaseModel):
     target_zoning: CopilotTargetZoning
     source_variables: List[CopilotSourceVariable]
+
+
 class CopilotChatRequest(BaseModel):
     """Payload for UrbanTrace LLM copilot chat with live dashboard graph context."""
     message: str
@@ -500,35 +491,6 @@ async def get_available_operators():
     }
 
 
-# ==========================================
-# 8. INTEGRATION COPILOT ENDPOINT
-# ==========================================
-
-COPILOT_SYSTEM_PROMPT = """
-You are an expert Spatial Data Scientist and GIS Architect. Your task is to select the
-optimal Zoning Mapping and Zoning Aggregation operators from the provided lists.
-
-Step 1: Analyze the Context & Metadata
-Review dataset_name and column_metadata.name together. If the column name is generic
-(e.g., value, count, total, metric), you MUST rely on dataset_name to determine the meaning.
-Then review num_distinct_values, distribution (mean, coverage), and sample_data.
-
-Step 2: Classify the Data Type
-- Extensive (Count/Total): high num_distinct_values, larger means, values scale with area
-- Intensive (Rate/Density): decimals/floats, keywords like rate/avg/median/density
-- Categorical/Ordinal (Index): low num_distinct_values (often 1-10), integer classes, index-like labels
-
-Step 3: Geospatial Reasoning & Operator Selection
-You are provided target_geometry and valid arrays: available_mapping_operators and available_aggregation_operators.
-- If target is Point/MultiPoint, area-weighted mapping is invalid. Choose point-safe mapping.
-- Extensive -> aggregation should preserve totals (typically Sum)
-- Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
-- Categorical/Ordinal -> use discrete grouping (typically Majority)
-
-Return ONLY a valid JSON array with one object per source variable, each containing:
-dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
-Never invent operators not present in provided arrays.
-""".strip()
 def _extract_sample_values(sample_csv: Optional[str], target_column: str, max_rows: int = 20) -> List[Any]:
     if not sample_csv:
         return []
@@ -638,7 +600,7 @@ def _heuristic_recommendations(llm_payload: Dict[str, Any]) -> List[Dict[str, An
             "zoningMapping": zoning_mapping,
             "zoningAggregation": zoning_aggregation,
             "reasoning": reasoning,
-            "engine": "heuristic"  # <--- ADD THIS
+            "engine": "heuristic"
         })
 
     return results
@@ -679,76 +641,25 @@ def _hotspot_reasoning(direction: str, dataset_name: str, column_name: str) -> s
     return f"Higher values in {column_name} ({dataset_name}) directly indicate higher risk/need, so scale is used as-is."
 
 
-HOTSPOT_SYSTEM_PROMPT = """
-You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
-
-The payload may include an optional "goal" field describing what "Priority" means in this context
-(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
-If present, use it to inform both direction and relative weight for each variable.
-If absent, infer the most semantically coherent goal from the variable names and metadata.
-
-For each source variable, infer:
-- direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)
-- reasoning: short justification referencing the goal, dataset context, column metadata, and sample values
-- weight: relative importance in [0,1]; variables more directly tied to the goal should receive higher weight
-
-Use semantic cues from dataset_name and column_name, and validate with sample_data statistics.
-Examples (goal-agnostic defaults):
-- crashes/injuries/poverty/pollution -> normal
-- income/coverage/infrastructure/safety score -> inverted
-
-Return ONLY JSON array of objects with fields:
-dataset_name, column_name, direction, reasoning, weight.
-Do not return markdown.
-""".strip()
-
-
-def _call_portkey_hotspot_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-    api_key = os.getenv("PORTKEY_API_KEY")
-    if not api_key:
-        return None
-
-    base_url = os.getenv("PORTKEY_BASE_URL", "https://ai-gateway.apps.cloud.rt.nyu.edu/v1")
-    model = os.getenv("PORTKEY_MODEL", "@vertexai/anthropic.claude-opus-4-6")
-
-    body = {
-        "model": model,
-        "temperature": 0.1,
-        "max_tokens": int(os.getenv("PORTKEY_MAX_TOKENS", "1024")),
-        "messages": [
-            {"role": "system", "content": HOTSPOT_SYSTEM_PROMPT},
-            {"role": "user", "content": json.dumps(llm_payload)}
-        ]
-    }
-
-    req = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
-        method="POST"
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-            content = payload["choices"][0]["message"]["content"].strip()
-
-            if content.startswith("```json"):
-                content = content.split("```json", 1)[1].rsplit("```", 1)[0].strip()
-            elif content.startswith("```"):
-                content = content.split("```", 1)[1].rsplit("```", 1)[0].strip()
-
-            parsed = json.loads(content)
-            if isinstance(parsed, list):
-                for item in parsed:
-                    item["engine"] = "llm"
-                return parsed
-            return None
-    except Exception:
-        return None
+def _build_heuristic_hotspot_audits(
+    source_payload: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    audits: List[Dict[str, Any]] = []
+    for var in source_payload:
+        direction = _infer_hotspot_direction(
+            var["dataset_name"],
+            var["column_name"],
+            var["sample_data"],
+        )
+        audits.append({
+            "dataset_name": var["dataset_name"],
+            "column_name": var["column_name"],
+            "direction": direction,
+            "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
+            "weight": 1.0,
+            "engine": "heuristic",
+        })
+    return audits
 
 
 @app.post("/api/v1/copilot/synthesize-hotspot")
@@ -804,19 +715,18 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         for v in request.source_variables
     }
 
-    audits = await asyncio.to_thread(_call_portkey_hotspot_structured, llm_payload)
+    audits: Optional[List[Dict[str, Any]]] = None
+    try:
+        copilot = get_copilot_agent()
+    except Exception as exc:
+        print(f"Hotspot synthesis copilot unavailable: {exc}")
+    else:
+        audits = await asyncio.to_thread(
+            copilot.synthesize_hotspot_semantics,
+            llm_payload,
+        )
     if not audits:
-        audits = []
-        for var in source_payload:
-            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
-            audits.append({
-                "dataset_name": var["dataset_name"],
-                "column_name": var["column_name"],
-                "direction": direction,
-                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
-                "weight": 1.0,
-                "engine": "heuristic"
-            })
+        audits = _build_heuristic_hotspot_audits(source_payload)
 
     normalized_audits: List[Dict[str, Any]] = []
     for audit in audits:
@@ -845,17 +755,7 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         })
 
     if not normalized_audits:
-        normalized_audits = []
-        for var in source_payload:
-            direction = _infer_hotspot_direction(var["dataset_name"], var["column_name"], var["sample_data"])
-            normalized_audits.append({
-                "dataset_name": var["dataset_name"],
-                "column_name": var["column_name"],
-                "direction": direction,
-                "reasoning": _hotspot_reasoning(direction, var["dataset_name"], var["column_name"]),
-                "weight": 1.0,
-                "engine": "heuristic"
-            })
+        normalized_audits = _build_heuristic_hotspot_audits(source_payload)
 
     # Normalize weights to sum to 1
     total_w = sum(max(0.0, float(a.get("weight", 0.0))) for a in normalized_audits)
@@ -877,85 +777,6 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         "variables": normalized_audits,
         "summary": "Priority score is synthesized as a weighted normalized blend where 1.0 always means highest need."
     }
-
-
-def _call_portkey_structured(llm_payload: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-    print("\n--- STARTING PORTKEY CALL ---") # Breadcrumb 1
-    api_key = os.getenv("PORTKEY_API_KEY")
-    if not api_key:
-        print("❌ ERROR: PORTKEY_API_KEY is missing or empty! Aborting LLM call.") # Breadcrumb 2
-        return None
-    
-    print("✅ API Key found.") # Breadcrumb 3
-    # if not api_key:
-    #     return None
-
-    base_url = os.getenv("PORTKEY_BASE_URL", "https://ai-gateway.apps.cloud.rt.nyu.edu/v1")
-    model = os.getenv("PORTKEY_MODEL", "@vertexai/anthropic.claude-opus-4-6")
-
-    print(f"📡 Sending request to: {base_url} using model: {model}") # Breadcrumb 4
-
-    body = {
-        "model": model,
-        "temperature": 0.1,
-        "max_tokens": int(os.getenv("PORTKEY_MAX_TOKENS", "1024")),
-        "messages": [
-            {"role": "system", "content": COPILOT_SYSTEM_PROMPT},
-            {"role": "user", "content": json.dumps(llm_payload)}
-        ]
-        # ,
-        # "response_format": {
-        #     "type": "json_schema",
-        #     "json_schema": schema
-        # }
-    }
-
-    req = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
-        method="POST"
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
-            content = payload["choices"][0]["message"]["content"]
-
-            # --- NEW: Safely strip markdown formatting if Claude wraps the JSON ---
-            content = content.strip()
-            if content.startswith("```json"):
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif content.startswith("```"):
-                content = content.split("```")[1].split("```")[0].strip()
-            # -------------------------------------------------------------------
-
-            parsed = json.loads(content)
-            # if isinstance(parsed, list):
-            #     return parsed
-            # return None
-            if isinstance(parsed, list):
-                print("✅ LLM Call Successful!")
-                # Optional: Inject the engine flag here so you know the LLM worked
-                for item in parsed:
-                    item["engine"] = "llm"
-                return parsed
-            return None
-    except urllib.error.HTTPError as e:
-        # This will catch 400, 401, 403, 500 errors and read the actual message from Portkey
-        error_body = e.read().decode("utf-8")
-        print(f"\n❌ PORTKEY HTTP ERROR {e.code}:")
-        print(error_body, "\n")
-        return None
-    except Exception as e:
-        # This catches timeouts, JSON decoding errors, or network drops
-        print(f"\n❌ PORTKEY INTERNAL ERROR: {str(e)}\n")
-        return None
-    # except (urllib.error.HTTPError, urllib.error.URLError, KeyError, IndexError, json.JSONDecodeError):
-    #     return None
 
 
 @app.post("/api/v1/copilot/recommend-operators")
@@ -1016,10 +837,19 @@ async def recommend_operators(request: CopilotRecommendRequest):
     }
 
     used_engine = "llm"
-    llm_result = await asyncio.to_thread(_call_portkey_structured, llm_payload)
+    llm_result: Optional[List[Dict[str, Any]]] = None
+    try:
+        copilot = get_copilot_agent()
+    except Exception as exc:
+        print(f"Operator recommendation copilot unavailable: {exc}")
+    else:
+        llm_result = await asyncio.to_thread(
+            copilot.recommend_zoning_operators,
+            llm_payload,
+        )
     if not llm_result:
         llm_result = _heuristic_recommendations(llm_payload)
-        used_engine = "heuristic" # Update flag if we fell back
+        used_engine = "heuristic"
 
     # Enforce available operators and request alignment
     requested_pairs = {
@@ -1054,7 +884,7 @@ async def recommend_operators(request: CopilotRecommendRequest):
             "zoningMapping": zoning_mapping,
             "zoningAggregation": zoning_aggregation,
             "reasoning": reasoning or "Recommended using metadata statistics and geometry-aware zoning constraints.",
-            "engine": rec.get("engine", used_engine) # <--- ADD THIS
+            "engine": rec.get("engine", used_engine)
         })
 
     if not normalized_response:

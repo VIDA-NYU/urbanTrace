@@ -10,6 +10,10 @@ from pathlib import Path
 from typing import Any
 from portkey_ai import Portkey
 from tool import (
+    HOTSPOT_SYNTHESIS_FIELDS,
+    HOTSPOT_SYNTHESIS_PROMPT,
+    ZONING_OPERATOR_RECOMMENDATION_FIELDS,
+    ZONING_OPERATOR_RECOMMENDATION_PROMPT,
     build_suggestions_from_tool_calls,
     build_tool_responses_from_tool_calls,
     get_dashboard_snapshot_json,
@@ -36,9 +40,12 @@ class UrbanTraceCopilot:
         metadata_dir: str | Path = DEFAULT_METADATA_DIR,
         descriptions_csv: str | Path = DEFAULT_DESCRIPTIONS_CSV,
     ) -> None:
-
         resolved_api_key = os.getenv("PORTKEY_API_KEY")
         resolved_model = os.getenv("PORTKEY_MODEL", "@gpt-5-mini/gpt-5-mini")
+        resolved_base_url = os.getenv(
+            "PORTKEY_BASE_URL",
+            "https://ai-gateway.apps.cloud.rt.nyu.edu/v1",
+        )
 
         if not resolved_api_key:
             raise ValueError(
@@ -46,7 +53,7 @@ class UrbanTraceCopilot:
             )
 
         self.portkey = Portkey(
-            base_url="https://ai-gateway.apps.cloud.rt.nyu.edu/v1",
+            base_url=resolved_base_url,
             api_key=resolved_api_key,
             model=resolved_model,
             strict_open_ai_compliance=False,
@@ -282,6 +289,102 @@ class UrbanTraceCopilot:
                 "budget_tokens": thinking_budget_tokens,
             }
         return self._create_completion(payload, retries=retries)
+
+    @staticmethod
+    def _strip_code_fences(content: str) -> str:
+        normalized = content.strip()
+        if normalized.startswith("```json"):
+            return normalized.split("```json", 1)[1].split("```", 1)[0].strip()
+        if normalized.startswith("```"):
+            return normalized.split("```", 1)[1].split("```", 1)[0].strip()
+        return normalized
+
+    def _run_structured_json_list_task(
+        self,
+        task_label: str,
+        system_prompt: str,
+        response_fields: tuple[str, ...],
+        task_payload: dict[str, Any],
+        model: str | None = None,
+        retries: int = 2,
+    ) -> list[dict[str, Any]] | None:
+        """
+        Run a small structured JSON-list task.
+        Returns None so callers can fall back to heuristics on any failure.
+        """
+        messages = [
+            {
+                "role": "system",
+                "content": [{"type": "text", "text": system_prompt}],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(task_payload, ensure_ascii=True),
+                    }
+                ],
+            },
+        ]
+
+        try:
+            response = self._complete_messages(
+                messages=messages,
+                stream=False,
+                model=model,
+                thinking_budget_tokens=None,
+                retries=retries,
+                tools=None,
+            )
+            raw_text = self.extract_response_text(response)
+            parsed = json.loads(self._strip_code_fences(raw_text))
+        except Exception as exc:
+            print(f"{task_label} failed: {exc}")
+            return None
+
+        if not isinstance(parsed, list):
+            return None
+
+        results: list[dict[str, Any]] = []
+        for item in parsed:
+            if not isinstance(item, dict):
+                continue
+            normalized = {field: item.get(field, "") for field in response_fields}
+            normalized["engine"] = "llm"
+            results.append(normalized)
+
+        return results or None
+
+    def recommend_zoning_operators(
+        self,
+        recommendation_payload: dict[str, Any],
+        model: str | None = None,
+        retries: int = 2,
+    ) -> list[dict[str, Any]] | None:
+        return self._run_structured_json_list_task(
+            task_label="Structured zoning recommendation",
+            system_prompt=ZONING_OPERATOR_RECOMMENDATION_PROMPT,
+            response_fields=ZONING_OPERATOR_RECOMMENDATION_FIELDS,
+            task_payload=recommendation_payload,
+            model=model,
+            retries=retries,
+        )
+
+    def synthesize_hotspot_semantics(
+        self,
+        hotspot_payload: dict[str, Any],
+        model: str | None = None,
+        retries: int = 2,
+    ) -> list[dict[str, Any]] | None:
+        return self._run_structured_json_list_task(
+            task_label="Structured hotspot synthesis",
+            system_prompt=HOTSPOT_SYNTHESIS_PROMPT,
+            response_fields=HOTSPOT_SYNTHESIS_FIELDS,
+            task_payload=hotspot_payload,
+            model=model,
+            retries=retries,
+        )
 
     @staticmethod
     def _as_assistant_tool_call(

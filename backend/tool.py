@@ -52,6 +52,72 @@ SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES = {
     "add_dataset_node",
 }
 
+ZONING_OPERATOR_RECOMMENDATION_FIELDS = (
+    "dataset_name",
+    "column_name",
+    "classification",
+    "zoningMapping",
+    "zoningAggregation",
+    "reasoning",
+)
+
+ZONING_OPERATOR_RECOMMENDATION_PROMPT = """
+You are an expert Spatial Data Scientist and GIS Architect. Your task is to select the
+optimal Zoning Mapping and Zoning Aggregation operators from the provided lists.
+
+Step 1: Analyze the Context & Metadata
+Review dataset_name and column_metadata.name together. If the column name is generic
+(e.g., value, count, total, metric), you MUST rely on dataset_name to determine the meaning.
+Then review num_distinct_values, distribution (mean, coverage), and sample_data.
+
+Step 2: Classify the Data Type
+- Extensive (Count/Total): high num_distinct_values, larger means, values scale with area
+- Intensive (Rate/Density): decimals/floats, keywords like rate/avg/median/density
+- Categorical/Ordinal (Index): low num_distinct_values (often 1-10), integer classes, index-like labels
+
+Step 3: Geospatial Reasoning & Operator Selection
+You are provided target_geometry and valid arrays: available_mapping_operators and available_aggregation_operators.
+- If target is Point/MultiPoint, area-weighted mapping is invalid. Choose point-safe mapping.
+- Extensive -> aggregation should preserve totals (typically Sum)
+- Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
+- Categorical/Ordinal -> use discrete grouping (typically Majority)
+
+Return ONLY a valid JSON array with one object per source variable, each containing:
+dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
+Never invent operators not present in provided arrays.
+""".strip()
+
+HOTSPOT_SYNTHESIS_FIELDS = (
+    "dataset_name",
+    "column_name",
+    "direction",
+    "reasoning",
+    "weight",
+)
+
+HOTSPOT_SYNTHESIS_PROMPT = """
+You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
+
+The payload may include an optional "goal" field describing what "Priority" means in this context
+(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
+If present, use it to inform both direction and relative weight for each variable.
+If absent, infer the most semantically coherent goal from the variable names and metadata.
+
+For each source variable, infer:
+- direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)
+- reasoning: short justification referencing the goal, dataset context, column metadata, and sample values
+- weight: relative importance in [0,1]; variables more directly tied to the goal should receive higher weight
+
+Use semantic cues from dataset_name and column_name, and validate with sample_data statistics.
+Examples (goal-agnostic defaults):
+- crashes/injuries/poverty/pollution -> normal
+- income/coverage/infrastructure/safety score -> inverted
+
+Return ONLY JSON array of objects with fields:
+dataset_name, column_name, direction, reasoning, weight.
+Do not return markdown.
+""".strip()
+
 
 def _normalize_dataset_id(name: str | None) -> str:
     if not isinstance(name, str):
