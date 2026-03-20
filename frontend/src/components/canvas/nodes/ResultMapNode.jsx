@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useEffect, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
-import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair } from 'lucide-react';
+import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
 import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL'; 
 
 const HOTSPOT_PALETTES = [
@@ -513,6 +513,25 @@ const ResultMapNode = memo(({ id, data }) => {
               {lineageExpanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
             </button>
           )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              data?.onDeleteNode?.(id);
+            }}
+            className="nodrag"
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '2px 4px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            title="Remove node"
+          >
+            <X size={12} />
+          </button>
         </div>
       </div>
 

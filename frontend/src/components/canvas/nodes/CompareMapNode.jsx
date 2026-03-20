@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useCallback, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
-import { GitCompareArrows, ArrowDown, ArrowUp, Minus, Eye, EyeOff } from 'lucide-react';
+import { GitCompareArrows, ArrowDown, ArrowUp, Minus, Eye, EyeOff, X } from 'lucide-react';
 import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL';
 
 const COMPARE_PALETTE = {
@@ -302,8 +302,33 @@ const CompareMapNode = memo(({ id, data }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 'bold' }}>
           <GitCompareArrows size={14} /> Spatial Delta Map
         </div>
-        <div style={{ fontSize: '9px', backgroundColor: 'rgba(255,255,255,0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-          Degree of Change
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ fontSize: '9px', backgroundColor: 'rgba(255,255,255,0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+            Degree of Change
+          </div>
+          <button
+            className="nodrag"
+            onClick={(e) => {
+              e.stopPropagation();
+              data?.onDeleteNode?.(id);
+            }}
+            title="Remove node"
+            style={{
+              border: 'none',
+              background: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              width: '18px',
+              height: '18px',
+              borderRadius: '4px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: 0
+            }}
+          >
+            <X size={12} />
+          </button>
         </div>
       </div>
 

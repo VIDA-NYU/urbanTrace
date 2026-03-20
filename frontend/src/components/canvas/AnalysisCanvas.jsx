@@ -56,6 +56,11 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setHoveredCompareFeatureType(featureId ? featureType : null);
   }, []);
 
+  const handleDeleteNode = useCallback((nodeId) => {
+    setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
+    setNodes(nds => nds.filter(node => node.id !== nodeId));
+  }, []);
+
   const hydrateCompareNodes = useCallback((nodeList, edgeList) => {
     return nodeList.map(node => {
       if (node.type !== 'compareMapNode') return node;
@@ -86,7 +91,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         });
       const sameHover = node.data?.hoveredCompareFeatureId === hoveredCompareFeatureId && node.data?.hoveredCompareFeatureType === hoveredCompareFeatureType;
       const sameSync = node.data?.isMapSyncEnabled === isMapSyncEnabled && node.data?.globalViewState === globalViewState;
-      const sameFns = node.data?.onCompareHover === handleCompareHover && node.data?.onGlobalViewStateChange === setGlobalViewState;
+      const sameFns =
+        node.data?.onCompareHover === handleCompareHover &&
+        node.data?.onGlobalViewStateChange === setGlobalViewState &&
+        node.data?.onDeleteNode === handleDeleteNode;
 
       if (sameConnections && sameHover && sameSync && sameFns) {
         return node;
@@ -102,11 +110,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           onCompareHover: handleCompareHover,
           isMapSyncEnabled,
           globalViewState,
-          onGlobalViewStateChange: setGlobalViewState
+          onGlobalViewStateChange: setGlobalViewState,
+          onDeleteNode: handleDeleteNode
         }
       };
     });
-  }, [globalViewState, handleCompareHover, hoveredCompareFeatureId, hoveredCompareFeatureType, isMapSyncEnabled]);
+  }, [globalViewState, handleCompareHover, handleDeleteNode, hoveredCompareFeatureId, hoveredCompareFeatureType, isMapSyncEnabled]);
 
   const onNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   
@@ -194,7 +203,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           // GLOBAL VIEWPORT SYNC: Pass sync props to ResultMapNode
           isMapSyncEnabled,
           globalViewState,
-          onGlobalViewStateChange: setGlobalViewState
+          onGlobalViewStateChange: setGlobalViewState,
+          onDeleteNode: handleDeleteNode
         }
       };
 
@@ -217,7 +227,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         }
       ];
     });
-  }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState]); // Ensure setNodes is in the dependency array
+  }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState, handleDeleteNode]); // Ensure setNodes is in the dependency array
 
   // GLOBAL VIEWPORT SYNC: Update existing ResultMapNodes and DatasetNodes when sync state changes
   useMemo(() => {
@@ -229,13 +239,14 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             ...node.data,
             isMapSyncEnabled,
             globalViewState,
-            onGlobalViewStateChange: setGlobalViewState
+            onGlobalViewStateChange: setGlobalViewState,
+            onDeleteNode: handleDeleteNode
           }
         };
       }
       return node;
     }));
-  }, [isMapSyncEnabled, globalViewState]);
+  }, [isMapSyncEnabled, globalViewState, handleDeleteNode]);
 
   useEffect(() => {
     setNodes(nds => hydrateCompareNodes(nds, edges));
@@ -254,13 +265,14 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             onTraceLineage,
             hoveredCompareFeatureId,
             hoveredCompareFeatureType,
-            onCompareDataReady: handleCompareDataReady
+            onCompareDataReady: handleCompareDataReady,
+            onDeleteNode: handleDeleteNode
           }
         };
       }
       return node;
     }));
-  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType]);
+  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType, handleDeleteNode]);
 
   const handleCompareDataReady = useCallback((nodeId, comparePayload) => {
     setNodes(nds => {
@@ -463,12 +475,14 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           // Inject the callback so the node can talk back to the canvas when the API finishes
           newNodeData.onIntegrationComplete = handleIntegrationComplete;
           newNodeData.onLogActivity = onLogActivity; // ACTIVITY LOG: Pass audit trail callback
+          newNodeData.onDeleteNode = handleDeleteNode;
         } else if (newNodeType === 'compareMapNode') {
           newNodeData.onCompareHover = handleCompareHover;
           newNodeData.connectedResults = [];
           newNodeData.isMapSyncEnabled = isMapSyncEnabled;
           newNodeData.globalViewState = globalViewState;
           newNodeData.onGlobalViewStateChange = setGlobalViewState;
+          newNodeData.onDeleteNode = handleDeleteNode;
       } else {
           // DatasetNode: inject column select callback for state inheritance
           // Also include sync props for viewport linking
@@ -477,6 +491,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           newNodeData.isMapSyncEnabled = isMapSyncEnabled;
           newNodeData.globalViewState = globalViewState;
           newNodeData.onGlobalViewStateChange = setGlobalViewState;
+          newNodeData.onDeleteNode = handleDeleteNode;
       }
 
       const newNode = {
@@ -488,7 +503,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [screenToFlowPosition, handleShowInfo, handleIntegrationComplete, createColumnSelectHandler, handleCompareHover, isMapSyncEnabled, globalViewState]
+    [screenToFlowPosition, handleShowInfo, handleIntegrationComplete, createColumnSelectHandler, handleCompareHover, handleDeleteNode, isMapSyncEnabled, globalViewState]
   );
 
   return (

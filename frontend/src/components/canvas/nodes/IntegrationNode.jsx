@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Network, Play, AlertCircle, MapPin, ChevronDown, ChevronUp, Settings, Sparkles, Loader2 } from 'lucide-react';
+import { Network, Play, AlertCircle, MapPin, ChevronDown, ChevronUp, Settings, Sparkles, Loader2, X } from 'lucide-react';
 
 const ALLOCATION_OPS = [
   "BinaryContainment",
@@ -489,12 +489,37 @@ const IntegrationNode = memo(({ id, data }) => {
         borderBottom: '1px solid #e2e8f0',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px'
+        justifyContent: 'space-between'
       }}>
-        <Network size={14} color="#0284c7" />
-        <span style={{ fontWeight: '600', color: '#0369a1' }}>
-          Spatial Integration
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Network size={14} color="#0284c7" />
+          <span style={{ fontWeight: '600', color: '#0369a1' }}>
+            Spatial Integration
+          </span>
+        </div>
+        <button
+          className="nodrag"
+          onClick={(e) => {
+            e.stopPropagation();
+            data?.onDeleteNode?.(id);
+          }}
+          title="Remove node"
+          style={{
+            border: 'none',
+            background: 'rgba(2,132,199,0.12)',
+            color: '#0369a1',
+            width: '18px',
+            height: '18px',
+            borderRadius: '4px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            padding: 0
+          }}
+        >
+          <X size={12} />
+        </button>
       </div>
 
       {/* 2. Controls Section */}

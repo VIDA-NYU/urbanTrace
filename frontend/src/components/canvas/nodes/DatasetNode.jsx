@@ -1,10 +1,10 @@
 // frontend/src/components/DatasetNode.jsx
 import React, { memo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Database, Layers, Palette, Info } from 'lucide-react'; // Added Info icon
+import { Database, Layers, Palette, Info, X } from 'lucide-react'; // Added Info icon
 import VectorPreviewDeckGL from '../../visualization/VectorPreviewDeckGL'; // Up 2 levels
 
-const DatasetNode = memo(({ data }) => {
+const DatasetNode = memo(({ id, data }) => {
   const meta = data.metadata || {};
   const columns = meta.columns || [];
   const name = meta.name || data.name || 'Untitled';
@@ -66,36 +66,63 @@ const DatasetNode = memo(({ data }) => {
           </span>
         </div>
 
-        {/* Right: Info Button */}
-        <button 
-          className="nodrag" // Crucial: Prevents dragging when clicking button
-          onClick={(e) => {
-             e.stopPropagation(); // Prevents selecting the node
-             // We check if the parent passed a handler function
-             if (data.onShowInfo) {
-                 data.onShowInfo(data); 
-             } else {
-                 alert("Metadata:\n" + JSON.stringify(meta, null, 2)); // Fallback
-             }
-          }}
-          title="See Dataset Details"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#64748b',
-            borderRadius: '4px',
-            transition: 'background 0.2s, color 0.2s'
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.color = '#2563eb'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
-        >
-          <Info size={14} />
-        </button>
+        {/* Right: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <button 
+            className="nodrag" // Crucial: Prevents dragging when clicking button
+            onClick={(e) => {
+               e.stopPropagation(); // Prevents selecting the node
+               // We check if the parent passed a handler function
+               if (data.onShowInfo) {
+                   data.onShowInfo(data); 
+               } else {
+                   alert("Metadata:\n" + JSON.stringify(meta, null, 2)); // Fallback
+               }
+            }}
+            title="See Dataset Details"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#64748b',
+              borderRadius: '4px',
+              transition: 'background 0.2s, color 0.2s'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.color = '#2563eb'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
+          >
+            <Info size={14} />
+          </button>
+
+          <button
+            className="nodrag"
+            onClick={(e) => {
+              e.stopPropagation();
+              data?.onDeleteNode?.(id);
+            }}
+            title="Remove node"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#64748b',
+              borderRadius: '4px',
+              transition: 'background 0.2s, color 0.2s'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fee2e2'; e.currentTarget.style.color = '#b91c1c'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
       {/* 2. Map Preview */}
