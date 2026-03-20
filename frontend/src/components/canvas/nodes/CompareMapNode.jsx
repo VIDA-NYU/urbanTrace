@@ -30,10 +30,20 @@ const deriveComparePayload = (item) => {
   if (!spatial) return null;
 
   if (spatial?.geojson?.features?.length) {
+    const excludeProps = ['zone_id', 'ZONE_ID', 'OBJECTID', 'objectid', 'Shape_Area', 'Shape_Leng'];
     const features = spatial.geojson.features
       .map(feature => {
         const props = feature?.properties || {};
-        const score = Number(props.hotspot_score ?? props.zone_value ?? props.value ?? props.count);
+        let score = Number(props.hotspot_score ?? props.zone_value ?? props.value ?? props.count);
+
+        if (Number.isNaN(score)) {
+          const numericVals = Object.entries(props)
+            .filter(([key, val]) => !excludeProps.includes(key) && typeof val === 'number' && !Number.isNaN(val))
+            .map(([, val]) => val);
+
+          score = numericVals.length ? numericVals.reduce((sum, val) => sum + val, 0) : Number.NaN;
+        }
+
         if (Number.isNaN(score)) return null;
         return {
           ...feature,

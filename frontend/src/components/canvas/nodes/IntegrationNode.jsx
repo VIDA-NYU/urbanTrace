@@ -195,13 +195,24 @@ const IntegrationNode = memo(({ id, data }) => {
     setIsLoading(true);
     const startTime = performance.now();
     try {
+      const withOutputNames = configsArray.map(v => {
+        const datasetBase = (v.filename || '').split('/').pop().replace(/\.geojson$/i, '');
+        const safeDataset = datasetBase.replace(/[^a-zA-Z0-9_]+/g, '_');
+        const safeColumn = String(v.targetColumn || '').replace(/[^a-zA-Z0-9_]+/g, '_');
+        return {
+          ...v,
+          outputName: `${safeDataset}__${safeColumn}`
+        };
+      });
+
       const response = await fetch('http://localhost:8000/api/integrate_multivariate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          variables: configsArray.map(v => ({
+          variables: withOutputNames.map(v => ({
             dataset_path: v.filename,
             target_column: v.targetColumn,
+            output_name: v.outputName,
             allocation_operator: v.allocation,
             grid_aggregation_operator: v.aggregation,
             zoning_mapping_operator: v.zoningMapping,
@@ -232,14 +243,15 @@ const IntegrationNode = memo(({ id, data }) => {
       resultData.provenance = {
         timestamp: new Date().toISOString(),
         durationMs,
-        isMultivariate: configsArray.length > 1,
+        isMultivariate: withOutputNames.length > 1,
         resolution: parseInt(resolution),
         zoningEnabled: zoningEnabled,
         targetZones: zoningEnabled ? data.connectedZoneFilename : null,
         outputMode: zoningEnabled ? outputMode : 'grid',
-        variables: configsArray.map(v => ({
+        variables: withOutputNames.map(v => ({
           dataset: v.filename,
           targetColumn: v.targetColumn,
+          outputName: v.outputName,
           allocation: v.allocation,
           aggregation: v.aggregation,
           zoningMapping: v.zoningMapping,

@@ -15,6 +15,34 @@ const getZoneFeatureId = (feature) => {
   return String(props.zone_id ?? props.ZONE_ID ?? props.OBJECTID ?? props.objectid ?? props.id ?? props.NAME ?? props.name ?? '');
 };
 
+const normalizeDatasetName = (value) => {
+  return String(value || '')
+    .split('/')
+    .pop()
+    .replace(/\.geojson$/i, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .toLowerCase();
+};
+
+const getDatasetDisplayName = (value) => {
+  return String(value || '')
+    .split('/')
+    .pop()
+    .replace(/\.geojson$/i, '');
+};
+
+const truncateLabel = (value, maxLength = 14) => {
+  const text = String(value || '');
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
+const getAuditDisplayLabel = (auditVar) => {
+  const column = auditVar?.column_name || 'unknown';
+  const dataset = getDatasetDisplayName(auditVar?.dataset_name);
+  if (!dataset) return column;
+  return `${column} - ${truncateLabel(dataset, 12)}`;
+};
+
 const ResultMapNode = memo(({ id, data }) => {
   // DATA LINEAGE: Track lineage panel visibility
   const [lineageExpanded, setLineageExpanded] = useState(false);
@@ -50,6 +78,86 @@ const ResultMapNode = memo(({ id, data }) => {
   
   // Grab the GeoJSON zones (for zoned output)
   const zoneGeoJson = data?.spatialData?.geojson;
+
+  const resolveAuditValueKey = (auditVar, auditIndex) => {
+    const datasetName = normalizeDatasetName(auditVar?.dataset_name);
+    const columnName = auditVar?.column_name;
+
+    const variables = provenance?.variables || [];
+
+    const matchedProvenance = variables.find(v => (
+      normalizeDatasetName(v?.dataset) === datasetName &&
+      v?.targetColumn === columnName
+    ));
+
+    const relaxedDatasetMatch = !matchedProvenance
+      ? variables.find(v => {
+          const provenanceDataset = normalizeDatasetName(v?.dataset);
+          const sameColumn = v?.targetColumn === columnName;
+          const looselySameDataset = provenanceDataset.includes(datasetName) || datasetName.includes(provenanceDataset);
+          return sameColumn && looselySameDataset;
+        })
+      : null;
+
+    const indexedMatch = (!matchedProvenance && !relaxedDatasetMatch && Number.isInteger(auditIndex) && variables[auditIndex])
+      ? variables[auditIndex]
+      : null;
+
+    const fallbackByColumn = (!matchedProvenance && !relaxedDatasetMatch && !indexedMatch)
+      ? variables.find(v => v?.targetColumn === columnName)
+      : null;
+
+    const resolved = matchedProvenance || relaxedDatasetMatch || indexedMatch || fallbackByColumn;
+
+    let resolution = 'unresolved';
+    if (matchedProvenance) resolution = 'exact';
+    else if (relaxedDatasetMatch) resolution = 'relaxed-dataset';
+    else if (indexedMatch) resolution = 'index-fallback';
+    else if (fallbackByColumn) resolution = 'column-fallback';
+
+    return {
+      valueKey: resolved?.outputName || resolved?.targetColumn || columnName,
+      resolution,
+      resolvedTrack: resolved || null
+    };
+  };
+
+  const activeAuditVars = tweakAudits || hotspotAudit?.variables || [];
+
+  const auditMappings = useMemo(() => {
+    return activeAuditVars.map((auditVar, auditIndex) => {
+      const resolved = resolveAuditValueKey(auditVar, auditIndex);
+      return {
+        ...auditVar,
+        valueKey: resolved.valueKey,
+        resolution: resolved.resolution,
+        resolvedTrack: resolved.resolvedTrack
+      };
+    });
+  }, [activeAuditVars, provenance]);
+
+  useEffect(() => {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return;
+    if (!auditMappings.length) return;
+
+    const unresolved = auditMappings.filter(item => item.resolution === 'unresolved');
+    if (!unresolved.length) return;
+
+    console.warn('[ResultMapNode] Unresolved audit variable mappings', {
+      nodeId: id,
+      unresolved: unresolved.map(item => ({
+        dataset_name: item.dataset_name,
+        column_name: item.column_name,
+        valueKey: item.valueKey,
+        resolution: item.resolution
+      })),
+      provenanceVariables: (provenance?.variables || []).map(v => ({
+        dataset: v.dataset,
+        targetColumn: v.targetColumn,
+        outputName: v.outputName
+      }))
+    });
+  }, [auditMappings, id, provenance]);
 
   const isHotspotCandidate = useMemo(() => {
     return !!(provenance?.isMultivariate && provenance?.variables?.length > 1);
@@ -126,11 +234,10 @@ const ResultMapNode = memo(({ id, data }) => {
   };
 
   const hotspotHexData = useMemo(() => {
-    const activeAudits = tweakAudits || hotspotAudit?.variables;
-    if (!isHotspotCandidate || !resultMapData || !activeAudits?.length) return null;
+    if (!isHotspotCandidate || !resultMapData || !auditMappings.length) return null;
 
-    const audits = activeAudits;
-    const varNames = audits.map(v => v.column_name);
+    const audits = auditMappings;
+    const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
     varNames.forEach(name => {
@@ -153,7 +260,7 @@ const ResultMapNode = memo(({ id, data }) => {
     const out = {};
 
     Object.entries(resultMapData).forEach(([hex, info]) => {
-      const raws = audits.map(v => info?.variables?.[v.column_name]);
+      const raws = audits.map(v => info?.variables?.[v.valueKey]);
       const hasSignal = raws.some(raw => typeof raw === 'number' && !Number.isNaN(raw) && raw !== 0);
       if (!hasSignal) {
         out[hex] = {
@@ -173,7 +280,7 @@ const ResultMapNode = memo(({ id, data }) => {
 
       let score = 0;
       audits.forEach(v => {
-        const name = v.column_name;
+        const name = v.valueKey;
         const raw = info?.variables?.[name];
         const { min, max } = stats[name];
         const denom = max - min;
@@ -201,14 +308,13 @@ const ResultMapNode = memo(({ id, data }) => {
     });
 
     return out;
-  }, [isHotspotCandidate, resultMapData, hotspotAudit, tweakAudits]);
+  }, [isHotspotCandidate, resultMapData, auditMappings, provenance]);
 
   const hotspotZoneGeoJson = useMemo(() => {
-    const activeAudits = tweakAudits || hotspotAudit?.variables;
-    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !activeAudits?.length) return null;
+    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !auditMappings.length) return null;
 
-    const audits = activeAudits;
-    const varNames = audits.map(v => v.column_name);
+    const audits = auditMappings;
+    const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
     varNames.forEach(name => {
@@ -235,7 +341,7 @@ const ResultMapNode = memo(({ id, data }) => {
     return {
       ...zoneGeoJson,
       features: zoneGeoJson.features.map(feature => {
-        const raws = audits.map(v => feature?.properties?.[v.column_name]);
+        const raws = audits.map(v => feature?.properties?.[v.valueKey]);
         const hasSignal = raws.some(raw => typeof raw === 'number' && !Number.isNaN(raw) && raw !== 0);
         if (!hasSignal) {
           return {
@@ -250,7 +356,7 @@ const ResultMapNode = memo(({ id, data }) => {
         let score = 0;
 
         audits.forEach(v => {
-          const name = v.column_name;
+          const name = v.valueKey;
           const raw = feature?.properties?.[name];
           const { min, max } = stats[name];
           const denom = max - min;
@@ -272,7 +378,7 @@ const ResultMapNode = memo(({ id, data }) => {
         };
       })
     };
-  }, [isHotspotCandidate, zoneGeoJson, hotspotAudit, tweakAudits]);
+  }, [isHotspotCandidate, zoneGeoJson, auditMappings, provenance]);
   
   // Determine what to show
   const showHex = !isZoned || outputMode === 'grid' || outputMode === 'both';
@@ -473,12 +579,19 @@ const ResultMapNode = memo(({ id, data }) => {
             {(tweakAudits || hotspotAudit.variables).map((v, idx) => {
               const totalW = (tweakAudits || hotspotAudit.variables).reduce((s, a) => s + (a.weight || 0), 0) || 1;
               const dispPct = Math.round((v.weight / totalW) * 100);
+              const displayLabel = getAuditDisplayLabel(v);
+              const fullDataset = getDatasetDisplayName(v?.dataset_name);
               return (
                 <div key={`card-${v.column_name}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: '4px', marginBottom: '4px', alignItems: 'center' }}>
                   <span style={{ color: v.direction === 'inverted' ? '#b45309' : '#047857' }}>
                     {v.direction === 'inverted' ? '↓' : '↑'}
                   </span>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.reasoning}>{v.column_name}</span>
+                  <span
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    title={`${fullDataset || 'Unknown dataset'} · ${v.column_name}${v.reasoning ? `\n${v.reasoning}` : ''}`}
+                  >
+                    {displayLabel}
+                  </span>
                   <span style={{ fontWeight: 600 }}>{dispPct}%</span>
                 </div>
               );
@@ -560,10 +673,17 @@ const ResultMapNode = memo(({ id, data }) => {
             {(tweakAudits || []).map((v, idx) => {
               const totalW = (tweakAudits || []).reduce((s, a) => s + (a.weight || 0), 0) || 1;
               const dispPct = Math.round((v.weight / totalW) * 100);
+              const displayLabel = getAuditDisplayLabel(v);
+              const fullDataset = getDatasetDisplayName(v?.dataset_name);
               return (
                 <div key={`tweak-${v.column_name}-${idx}`} style={{ marginBottom: '9px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', alignItems: 'center' }}>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontSize: '9px' }} title={v.column_name}>{v.column_name}</span>
+                    <span
+                      style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontSize: '9px' }}
+                      title={`${fullDataset || 'Unknown dataset'} · ${v.column_name}`}
+                    >
+                      {displayLabel}
+                    </span>
                     <span style={{ fontWeight: 600, marginLeft: '6px', fontSize: '9px', minWidth: '28px', textAlign: 'right' }}>{dispPct}%</span>
                   </div>
                   <input
