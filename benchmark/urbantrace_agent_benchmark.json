@@ -1,0 +1,601 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "slug": "pedestrian-safety-risk-screening",
+      "file": "cases/1-pedestrian-safety-risk-screening.md",
+      "title": "Pedestrian safety risk screening",
+      "theme": "mobility / safety",
+      "status": "revised",
+      "query": "Which NYC neighborhoods should be screened as higher-priority candidates for pedestrian safety follow-up when crash harm is interpreted together with pedestrian activity rather than from crash totals alone? Use the available UrbanTrace datalake to identify the datasets needed for a neighborhood-level screen, choose a neighborhood geography that planners would plausibly use, and explain how the resulting screen should guide later corridor- or intersection-level review.",
+      "expected_relevant_datasets": [
+        "NYC_vehicle_collisions_crashes",
+        "NYC_pedestrian_counts",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_automated_traffic_volume_counts",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection + geography harmonization, not just for naming a safety dataset.",
+      "source_hint": "Vision Zero: DOT Releases Update to Borough Pedestrian Safety Action Plans, With Targeted Analysis of Priority Corridors and Intersections; Bi-Annual Pedestrian Counts",
+      "notes": "",
+      "index_status": "present"
+    },
+    {
+      "id": 2,
+      "slug": "bike-safety-and-infrastructure-mismatch",
+      "file": "cases/2-bike-safety-and-infrastructure-mismatch.md",
+      "title": "Bike safety and infrastructure mismatch",
+      "theme": "mobility / safety",
+      "status": "revised",
+      "query": "NYC DOT describes a citywide goal of accelerating safe cycling through a connected bicycle network, especially in places where cycling demand is already strong, while tracking bike counts and bicycle crash outcomes as separate signals of network performance. Using UrbanTrace, identify which NYC neighborhoods look like plausible candidates for bike-network improvement because they combine **relatively strong observed bicycle activity**, **weaker or less protective bike-route coverage**, and **continued cyclist crash burden**. Select the datasets needed for that comparison, choose a common geography, and explain which neighborhoods would merit closer review for protected-lane expansion, route upgrades, or related safety interventions. Keep the analysis grounded in what the available datasets can actually support.",
+      "expected_relevant_datasets": [
+        "NYC_bicycle_counts",
+        "NYC_Bike_Routes",
+        "NYC_vehicle_collisions_crashes",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_pedestrian_counts",
+        "NYC_automated_traffic_volume_counts"
+      ],
+      "why_relevant": "This case is credible because the local catalog contains a realistic three-part planning stack:",
+      "source_hint": "NYC DOT — Bike Network and Ridership; Safe Streets for Cycling",
+      "notes": "",
+      "index_status": "present"
+    },
+    {
+      "id": 3,
+      "slug": "traffic-burden-near-vulnerable-communities",
+      "file": "cases/3-traffic-burden-near-vulnerable-communities.md",
+      "title": "Traffic burden near vulnerable communities",
+      "theme": "mobility / equity / environmental justice",
+      "status": "revised draft",
+      "query": "You are assisting a city environmental-justice or public-health analyst who needs to identify NYC communities where **high traffic activity coincides with social vulnerability**. The analyst is not asking for a generic traffic hotspot map. They want a screening workflow that uses UrbanTrace to combine traffic activity with neighborhood poverty, unemployment, and population burden, then summarizes the results at a defensible community geography for prioritization. The answer should explicitly acknowledge that traffic counts are a **proxy for burden/exposure**, not a direct health outcome, and should stay consistent with NYC environmental-health framing around unequal impacts from traffic-related pollution.",
+      "expected_relevant_datasets": [
+        "NYC_automated_traffic_volume_counts",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_population",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "MODZCTA",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a source-grounded transportation-equity / environmental-burden selection problem.",
+      "source_hint": "New York City Community Air Survey; The public health impacts of PM2.5 from traffic air pollution",
+      "notes": "",
+      "index_status": "present"
+    },
+    {
+      "id": 4,
+      "slug": "air-pollution-and-neighborhood-disadvantage",
+      "file": "cases/4-air-pollution-and-neighborhood-disadvantage.md",
+      "title": "Air pollution and neighborhood disadvantage",
+      "theme": "environment / equity",
+      "status": "revised",
+      "query": "You are assisting a public-health / environmental justice analyst who needs to identify NYC neighborhoods where **higher ambient air pollution and socioeconomic disadvantage overlap**. The analyst wants a screening view that is credible for NYC health-equity reporting: it should use a real local air-pollution layer, pair it with neighborhood poverty and unemployment, state the geography used for comparison, and explain what the output can and cannot support. Using UrbanTrace, determine which datasets should be selected, what common geography or harmonization step is most defensible, and how the resulting analysis would support an environmental-justice narrative grounded in NYC Community Air Survey findings.",
+      "expected_relevant_datasets": [
+        "NYC_air_pollution",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_HVI",
+        "NYC_population"
+      ],
+      "why_relevant": "This is a strong benchmark for dataset selection under geography mismatch, not just for naming an air-quality file.",
+      "source_hint": "New York City Community Air Survey; New York City’s Environmental Justice for All Report Scope of Work",
+      "notes": "A strong benchmark answer should not assume that NTAs are the right join target.",
+      "index_status": "present"
+    },
+    {
+      "id": 5,
+      "slug": "heat-vulnerability-and-public-resource-access",
+      "file": "cases/5-heat-vulnerability-and-public-resource-access.md",
+      "title": "Heat vulnerability and public resource access",
+      "theme": "climate / public services",
+      "status": "revised",
+      "query": "You are supporting a resilience planning discussion about extreme heat in New York City. The goal is to identify areas with **high heat vulnerability and comparatively thinner access to everyday civic resources** already represented in the UrbanTrace catalog, especially libraries and schools. The task is a planning-oriented screening exercise: it should use the city’s heat vulnerability layer, pair it with local public-facility datasets, state the geography used for comparison, and clearly distinguish between **formal cooling-center operations** and **broader civic-resource access** that may matter for outreach, communication, and neighborhood resilience. Using UrbanTrace, determine which datasets should be selected, what common geography is most defensible, and how the result should be interpreted.",
+      "expected_relevant_datasets": [
+        "NYC_HVI",
+        "NYC_libraries",
+        "NYC_Schools",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection under proxy reasoning and geography mismatch, not just for naming the heat layer.",
+      "source_hint": "Interactive heat vulnerability index – Environment & Health Data Portal; 2025 Heat Mortality Report",
+      "notes": "The previous draft treated NTA as the obvious common geography.",
+      "index_status": "present"
+    },
+    {
+      "id": 6,
+      "slug": "digital-divide-and-public-access-points",
+      "file": "cases/6-digital-divide-and-public-access-points.md",
+      "title": "Digital divide and public access points",
+      "theme": "digital equity / public services",
+      "status": "revised",
+      "query": "You are helping a digital equity team identify NYC areas where residents may have **greater reliance on public digital-access infrastructure**. The task is not just to map Wi‑Fi or libraries separately. It should screen for neighborhoods where public access points — especially public Wi‑Fi hotspots, libraries, and public computer centers — may matter more because poverty burden is higher and resident population is large. Using UrbanTrace, determine which datasets should be selected, what comparison geography is most defensible given the local repo, and how the result should be interpreted for a realistic NYC digital-equity planning workflow.",
+      "expected_relevant_datasets": [
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "NYC_libraries",
+        "NYC_poverty_rate",
+        "NYC_population",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_Schools",
+        "MODZCTA"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, proxy reasoning, and geography discipline under the current UrbanTrace copilot design.",
+      "source_hint": "Digital Equity - NYC Office of Technology and Innovation; The New York City Digital Equity Roadmap",
+      "notes": "The previous draft treated NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
+      "index_status": "present"
+    },
+    {
+      "id": 7,
+      "slug": "school-siting-relative-to-vulnerable-populations",
+      "file": "cases/7-school-siting-relative-to-vulnerable-populations.md",
+      "title": "School siting relative to vulnerable populations",
+      "theme": "public services / equity",
+      "status": "revised",
+      "query": "You are preparing an exploratory equity memo on school access for a city audience concerned with whether vulnerable neighborhoods may be under-served by nearby school facilities. The goal is **not** to evaluate school quality or produce a capital-plan recommendation from scratch. Instead, the task is to screen for places where **population pressure and social vulnerability are high while school presence appears comparatively sparse**, using only datasets already available in UrbanTrace. Select the most relevant datasets, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with recent NYC reporting on school building conditions, accessibility, enrollment pressure, and facilities planning.",
+      "expected_relevant_datasets": [
+        "NYC_Schools",
+        "NYC_population",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "MODZCTA",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection under geography mismatch and proxy discipline.",
+      "source_hint": "Barriers to Learning: Age, Accessibility, Space Usage, and Air Conditioning in NYC School Buildings; Accessible NYC 2025: An Accessibility Guide for City Agencies",
+      "notes": "The current draft leaned toward NTA geography because NYC_Schools contains nta2020.",
+      "index_status": "present"
+    },
+    {
+      "id": 8,
+      "slug": "library-access-under-poverty-burden",
+      "file": "cases/8-library-access-under-poverty-burden.md",
+      "title": "Library access under poverty burden",
+      "theme": "public services / equity",
+      "status": "revised",
+      "query": "You are helping a civic-access analyst examine whether library distribution appears equitable relative to neighborhood need. The city is especially interested in whether **higher-poverty neighborhoods may have weaker library access**, since libraries function as public education, information, and service-access infrastructure. This benchmark should therefore go beyond simply mapping library points: it should compare library presence against poverty burden and neighborhood scale, and produce a plausible planning-oriented answer about where access may be comparatively thin. Using UrbanTrace, determine which datasets should be selected, what comparison geography is most defensible given the local repo, and how the result should be interpreted for a realistic equity-oriented public-service workflow.",
+      "expected_relevant_datasets": [
+        "NYC_libraries",
+        "NYC_poverty_rate",
+        "NYC_population",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "MODZCTA"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and proxy interpretation under the current UrbanTrace copilot design.",
+      "source_hint": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026; Digital Equity - NYC Office of Technology and Innovation",
+      "notes": "The previous draft listed NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
+      "index_status": "present"
+    },
+    {
+      "id": 9,
+      "slug": "housing-stress-and-unemployment-overlap",
+      "file": "cases/9-housing-stress-and-unemployment-overlap.md",
+      "title": "Housing stress and unemployment overlap",
+      "theme": "housing / inequality",
+      "status": "revised",
+      "query": "You are supporting a policy researcher who wants to screen for neighborhoods facing **compounded housing and economic stress**. The goal is to identify areas where housing pressure plausibly overlaps with labor-market distress and poverty, so the city can prioritize follow-up on neighborhood instability and affordability risk. Using UrbanTrace, determine which datasets should be combined, what geography should anchor the comparison, and how the result should be interpreted for a realistic, source-grounded housing-stress workflow.",
+      "expected_relevant_datasets": [
+        "NYC_housing_units",
+        "NYC_unemployment_rate",
+        "NYC_poverty_rate",
+        "NYC_population",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_income_diversity_ratio",
+        "MODZCTA"
+      ],
+      "why_relevant": "This benchmark is really about proxy discipline, geography discipline, and explanation quality under the current UrbanTrace copilot design.",
+      "source_hint": "New Yorkers in Need: The Housing Insecurity Crisis; Economic conditions data for NYC – Environment & Health Data Portal",
+      "notes": "The prior draft listed NTA_Neighborhood_Tabulation_Areas as a core layer and implied NYC_housing_units was the primary housing-side dataset.",
+      "index_status": "present"
+    },
+    {
+      "id": 10,
+      "slug": "income-diversity-and-public-amenity-mismatch",
+      "file": "cases/10-income-diversity-and-public-amenity-mismatch.md",
+      "title": "Income diversity and public amenity mismatch",
+      "theme": "inequality / public services",
+      "status": "revised",
+      "query": "You are helping an urban policy team explore whether neighborhoods with **lower income diversity** also appear comparatively underserved by visible public amenities such as libraries or public Wi‑Fi hotspots. The benchmark is not asking for a generic demographic summary. It is testing whether the agent can connect an abstract neighborhood-structure indicator to concrete civic infrastructure, choose a defensible comparison geography from the local UrbanTrace catalog, and explain what the result would and would not mean in a realistic planning workflow.",
+      "expected_relevant_datasets": [
+        "NYC_income_diversity_ratio",
+        "NYC_libraries",
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_population",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and proxy interpretation under the current UrbanTrace copilot design.",
+      "source_hint": "The New York City Digital Equity Roadmap; Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
+      "notes": "The earlier draft treated NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
+      "index_status": "present"
+    },
+    {
+      "id": 11,
+      "slug": "arrest-patterns-and-social-conditions",
+      "file": "cases/11-arrest-patterns-and-social-conditions.md",
+      "title": "Arrest patterns and social conditions",
+      "theme": "public safety / equity",
+      "status": "revised",
+      "query": "You are helping an urban policy team explore whether some NYC neighborhoods show comparatively elevated arrest activity while also facing higher poverty or unemployment. The benchmark is not asking for a generic crime summary or a race-only disparity narrative. It is testing whether the agent can connect a point-based enforcement dataset to neighborhood social-condition layers, choose a defensible common geography from the local UrbanTrace catalog, and explain the difference between an exploratory burden screen and a causal claim about policing or community behavior.",
+      "expected_relevant_datasets": [
+        "NYPD_arrests_data",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_population"
+      ],
+      "possible_distractors": [
+        "NTA_Neighborhood_Tabulation_Areas",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation control under the current UrbanTrace copilot design.",
+      "source_hint": "Color Contrast: Racial and Ethnic Disparities in New York City Law Enforcement; Reports & Analysis – Crime & Enforcement",
+      "notes": "The seed metadata lists NTA_Neighborhood_Tabulation_Areas as an expected relevant dataset, but the actual repo evidence says the cleaner first-pass comparison unit is the sub-borough-area geography already shared by the social-condition layers:",
+      "index_status": "present"
+    },
+    {
+      "id": 12,
+      "slug": "councils-with-greatest-compounded-need",
+      "file": "cases/12-councils-with-greatest-compounded-need.md",
+      "title": "Councils with greatest compounded need",
+      "theme": "governance / prioritization",
+      "status": "revised",
+      "query": "You are helping an urban policy team identify which NYC City Council districts appear to face the greatest combined burden from poverty, unemployment, air-pollution burden, and crash risk. The benchmark is not asking for a generic district profile. It is testing whether the agent can connect multiple burden layers that live on different geographies, recognize that City Council districts are a governance-facing reporting unit rather than the native analysis unit for most source layers, and explain what kind of composite prioritization would be credible under the current UrbanTrace workflow.",
+      "expected_relevant_datasets": [
+        "City_Council_Districs",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_air_pollution",
+        "NYC_vehicle_collisions_crashes"
+      ],
+      "possible_distractors": [
+        "NYC_population",
+        "NYC_HVI"
+      ],
+      "why_relevant": "This is a benchmark for cross-domain dataset selection, geography harmonization, and composite-prioritization discipline under the current UrbanTrace copilot design.",
+      "source_hint": "Poverty Measure – NYC Opportunity; New York City Community Air Survey",
+      "notes": "The seed correctly points to City Council districts as the governance target, but the repo evidence shows that the burden layers do not share that geography natively.",
+      "index_status": "present"
+    },
+    {
+      "id": 13,
+      "slug": "zip-based-screening-for-vulnerable-service-gaps",
+      "file": "cases/13-zip-based-screening-for-vulnerable-service-gaps.md",
+      "title": "ZIP-based screening for vulnerable service gaps",
+      "theme": "service planning / geography discipline",
+      "status": "revised",
+      "query": "You are helping a city planning or outreach team do a **ZIP-like screening** for places where vulnerability appears high but public-service coverage may be comparatively weak. The benchmark is intentionally tricky: the original seed mentions `MODZCTA`, poverty, unemployment, libraries, and Wi‑Fi, but the local UrbanTrace repo does **not** place all of those layers on the same geography. A benchmark-credible answer therefore has to do more than name plausible datasets. It needs to recognize the ZIP-level requirement, choose the most defensible comparison geography available in the repo, and explain whether the result is a strict ZIP-based screen or a looser cross-geography approximation.",
+      "expected_relevant_datasets": [
+        "NYC_HVI",
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "NYC_libraries",
+        "citywide_public_computer_centers"
+      ],
+      "possible_distractors": [
+        "MODZCTA",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_Schools"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and benchmark honesty under the current UrbanTrace copilot design.",
+      "source_hint": "Interactive heat vulnerability index; Digital Equity - NYC Office of Technology and Innovation",
+      "notes": "This is the core correction for the case.",
+      "index_status": "present"
+    },
+    {
+      "id": 14,
+      "slug": "14-climate-vulnerability-and-air-pollution-overlap",
+      "file": "cases/14-climate-vulnerability-and-air-pollution-overlap.md",
+      "title": "Climate vulnerability and air pollution overlap",
+      "theme": "climate / environment",
+      "status": "drafted",
+      "query": "You are helping a public-health or climate-equity analyst identify NYC neighborhoods where **higher heat vulnerability and worse ambient air pollution overlap**. The benchmark should stay grounded in the actual UrbanTrace catalog rather than inventing a perfect common geography. A strong answer should select the right environmental layers, explain whether they can be compared directly or require harmonization, and describe what the resulting map would and would not mean for neighborhood prioritization.",
+      "expected_relevant_datasets": [
+        "NYC_HVI",
+        "NYC_air_pollution"
+      ],
+      "possible_distractors": [
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_population",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "why_relevant": "This is a benchmark for cross-domain environmental burden reasoning under geography mismatch, not just for naming two plausible datasets.",
+      "source_hint": "",
+      "notes": "Use NYC_HVI and NYC_air_pollution, but make the geography mismatch explicit before any overlap screen.",
+      "index_status": "missing_from_index"
+    },
+    {
+      "id": 15,
+      "slug": "15-neighborhoods-needing-safer-routes-to-schools",
+      "file": "cases/15-neighborhoods-needing-safer-routes-to-schools.md",
+      "title": "Neighborhoods needing safer routes to schools",
+      "theme": "mobility / child safety",
+      "status": "revised",
+      "query": "Which school-rich areas also show heavy traffic or collision concerns that might motivate safer-route interventions? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with real NYC school-safety planning rather than generic traffic hotspot mapping.",
+      "expected_relevant_datasets": [
+        "NYC_Schools",
+        "NYC_vehicle_collisions_crashes",
+        "NYC_automated_traffic_volume_counts",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_pedestrian_counts",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection + scale discipline + policy-grounded interpretation.",
+      "source_hint": "NYC DOT — School Safety; DDC Feature: Safe Routes to School",
+      "notes": "Roll the three point layers up to NTAs and treat the result as school-safety screening, not a route audit.",
+      "index_status": "missing_from_index"
+    },
+    {
+      "id": 16,
+      "slug": "16-pedestrian-demand-versus-civic-support-assets",
+      "file": "cases/16-pedestrian-demand-versus-civic-support-assets.md",
+      "title": "Pedestrian demand versus civic support assets",
+      "theme": "mobility / public services",
+      "status": "revised",
+      "query": "Which areas have heavy pedestrian activity but relatively limited nearby civic resources such as libraries or public Wi‑Fi? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with real NYC pedestrian/public-realm and digital-access planning rather than a generic amenity map.",
+      "expected_relevant_datasets": [
+        "NYC_pedestrian_counts",
+        "NYC_libraries",
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_population",
+        "NYC_Schools",
+        "City_Council_Districs",
+        "seating_locations"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection + geography discipline + interpretation discipline.",
+      "source_hint": "NYC DOT — Pedestrian Mobility Plan; NYC DOT — NYC Streets Plan",
+      "notes": "Aggregate pedestrian counts, libraries, and Wi-Fi hotspots to NTAs and interpret the output as a civic-support screening layer.",
+      "index_status": "missing_from_index"
+    },
+    {
+      "id": 17,
+      "slug": "17-small-business-activity-and-neighborhood-context",
+      "file": "cases/17-small-business-activity-and-neighborhood-context.md",
+      "title": "Small business activity and neighborhood context",
+      "theme": "economic development",
+      "status": "revised",
+      "query": "How do business license locations align with neighborhood population, unemployment, and poverty patterns? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted without overstating what business-license data can prove about local economic vitality.",
+      "expected_relevant_datasets": [
+        "NYC_Issued_Licenses",
+        "NYC_population",
+        "NYC_unemployment_rate",
+        "NYC_poverty_rate"
+      ],
+      "possible_distractors": [
+        "NTA_Neighborhood_Tabulation_Areas",
+        "City_Council_Districs",
+        "MODZCTA"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation discipline under the current UrbanTrace copilot design.",
+      "source_hint": "Neighborhood 360° - SBS; Commercial District Needs Assessments - SBS",
+      "notes": "Anchor the first pass on the shared sub-borough socioeconomic polygons, not on NTA fields embedded in the license file.",
+      "index_status": "missing_from_index"
+    },
+    {
+      "id": 18,
+      "slug": "bike-routes-in-environmentally-burdened-areas",
+      "file": "cases/18-bike-routes-in-environmentally-burdened-areas.md",
+      "title": "Bike routes in environmentally burdened areas",
+      "theme": "mobility / environment",
+      "status": "revised",
+      "query": "Which NYC areas with worse air-pollution burden appear to have weaker bike-route support? Using only the datasets already available in UrbanTrace, identify the strongest layers for a first-pass screen, choose the most defensible common geography, and explain the limits of what this analysis can and cannot say about environmental justice and active transportation.",
+      "expected_relevant_datasets": [
+        "NYC_air_pollution",
+        "NYC_Bike_Routes",
+        "NYC_bicycle_counts"
+      ],
+      "possible_distractors": [
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_HVI",
+        "NYC_vehicle_collisions_crashes"
+      ],
+      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation discipline under the current UrbanTrace copilot design.",
+      "source_hint": "New York City Community Air Survey (NYCCAS); New York City’s Environmental Justice for All Report Scope of Work",
+      "notes": "Use air-pollution burden plus bike-route supply and optional bicycle-count context, but avoid assuming NTA is the natural shared geography.",
+      "index_status": "present"
+    },
+    {
+      "id": 19,
+      "slug": "population-concentration-and-service-density",
+      "file": "cases/19-population-concentration-and-service-density.md",
+      "title": "Population concentration and service density",
+      "theme": "public services / capacity",
+      "status": "revised",
+      "query": "You are helping an urban services team do a first-pass screen for places where **resident population is large but visible civic service presence appears relatively sparse** in the UrbanTrace catalog. The benchmark is not asking for a generic amenity map. It is testing whether the agent can connect a population-pressure layer to several service-point layers, recognize that those service layers are not interchangeable, choose a defensible comparison geography, and explain what this kind of screening can and cannot say about service adequacy. Using only datasets already available in UrbanTrace, identify the strongest layers for this task, explain the best first-pass geography, and describe how the result should be interpreted.",
+      "expected_relevant_datasets": [
+        "NYC_population",
+        "NYC_libraries",
+        "NYC_Wi-Fi_Hotspot_Locations",
+        "NYC_Schools"
+      ],
+      "possible_distractors": [
+        "NTA_Neighborhood_Tabulation_Areas",
+        "MODZCTA",
+        "City_Council_Districs"
+      ],
+      "why_relevant": "This is a benchmark for population-pressure reasoning, service-proxy discipline, and geography harmonization under the current UrbanTrace copilot design.",
+      "source_hint": "Population Reports — NYC Planning; Population Changes in NYC Neighborhoods — NYC Planning",
+      "notes": "Use the shared population geography first, then compare counts of libraries, schools, and Wi-Fi assets as service-density proxies.",
+      "index_status": "present"
+    },
+    {
+      "id": 20,
+      "slug": "multi-burden-neighborhood-screening",
+      "file": "cases/20-multi-burden-neighborhood-screening.md",
+      "title": "Multi-burden neighborhood screening",
+      "theme": "composite prioritization",
+      "status": "revised",
+      "query": "You are helping a city analyst identify NYC neighborhoods for priority intervention where multiple burdens overlap: poverty, unemployment, heat vulnerability, ambient air pollution, and traffic safety harm. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right local layers, explain which burdens are directly available versus which require aggregation or temporal choices, and make the geography-harmonization problem explicit instead of pretending all variables already line up cleanly.",
+      "expected_relevant_datasets": [
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_HVI",
+        "NYC_air_pollution",
+        "NYC_vehicle_collisions_crashes"
+      ],
+      "possible_distractors": [
+        "NYC_population",
+        "MODZCTA",
+        "City_Council_Districs",
+        "raw traffic volume datasets"
+      ],
+      "why_relevant": "This is not a one-table lookup task.",
+      "source_hint": "",
+      "notes": "Choose a reporting geography, aggregate crashes, select a time slice for air pollution, crosswalk HVI, then normalize the burden measures before combining them.",
+      "index_status": "present"
+    },
+    {
+      "id": 21,
+      "slug": "commercial-corridors-needing-public-realm-support",
+      "file": "cases/21-commercial-corridors-needing-public-realm-support.md",
+      "title": "Commercial corridors needing public-realm support",
+      "theme": "economic development / public realm",
+      "status": "drafted",
+      "query": "You are helping a neighborhood-commercial-district team identify NYC areas where **street-level business activity and pedestrian presence appear meaningful, but visible public-realm support looks comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right local business, pedestrian, and public-space program layers; choose a defensible common geography; and explain what this kind of screening can and cannot say about corridor vitality, merchant need, or investment priority.",
+      "expected_relevant_datasets": [
+        "NYC_pedestrian_counts",
+        "NYC_Issued_Licenses",
+        "open_streets_locations",
+        "nyc_dot_pedestrian_plazas_point_feature",
+        "NTA_Neighborhood_Tabulation_Areas"
+      ],
+      "possible_distractors": [
+        "NYC_population",
+        "open_storefronts_applications_historical",
+        "street_seats_2014_2019"
+      ],
+      "why_relevant": "This is a benchmark for economic-vitality reasoning under mixed data types and imperfect business proxies.",
+      "source_hint": "Neighborhood 360° - SBS; Commercial District Needs Assessments - SBS",
+      "notes": "For this benchmark, NTA is the cleanest first-pass answer.",
+      "index_status": "present"
+    },
+    {
+      "id": 22,
+      "slug": "youth-workforce-opportunity-access-under-economic-stress",
+      "file": "cases/22-youth-workforce-opportunity-access-under-economic-stress.md",
+      "title": "Youth workforce-opportunity access under economic stress",
+      "theme": "economic opportunity / service access",
+      "status": "drafted",
+      "query": "You are helping a city analyst identify NYC neighborhoods where **economic stress appears high but local access to youth and workforce-development program sites may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the best local program-site and socioeconomic layers, explain which service-site fields are actually usable for filtering workforce-relevant programs, choose a defensible common geography, and keep the result framed as a screening tool rather than a definitive measure of opportunity access.",
+      "expected_relevant_datasets": [
+        "dycd_program_sites",
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_population"
+      ],
+      "possible_distractors": [
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_Issued_Licenses",
+        "NYC_libraries",
+        "citywide_public_computer_centers"
+      ],
+      "why_relevant": "This is a benchmark for economic-opportunity reasoning with a large administrative point layer plus neighborhood hardship context.",
+      "source_hint": "Jobs & Internships - DYCD; Workforce Job Trainings - DYCD",
+      "notes": "The strongest first-pass answer should anchor on the shared socioeconomic geography.",
+      "index_status": "present"
+    },
+    {
+      "id": 23,
+      "slug": "older-adult-service-access-in-heat-vulnerable-zip-areas",
+      "file": "cases/23-older-adult-service-access-in-heat-vulnerable-zip-areas.md",
+      "title": "Older-adult service access in heat-vulnerable ZIP areas",
+      "theme": "aging / climate resilience / service access",
+      "status": "drafted",
+      "query": "You are helping a city analyst identify NYC areas where **heat vulnerability appears high and local access to NYC Aging contracted providers may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right aging-service and heat-vulnerability layers, explain the ZIP-like geography choices clearly, distinguish between provider types instead of treating every aging site as identical, and keep the result framed as a screening tool rather than a definitive measure of unmet need among older adults.",
+      "expected_relevant_datasets": [
+        "department_for_the_aging_nyc_aging_all_contracted_providers",
+        "NYC_HVI",
+        "MODZCTA"
+      ],
+      "possible_distractors": [
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_population"
+      ],
+      "why_relevant": "This is a benchmark for service-access reasoning under vulnerable-population targeting and imperfect ZIP geography.",
+      "source_hint": "Older Adult Center - NYC Aging; Find Help - NYC Aging",
+      "notes": "The cleanest first-pass answer should stay ZIP-like.",
+      "index_status": "present"
+    },
+    {
+      "id": 24,
+      "slug": "cooling-water-access-in-heat-vulnerable-zip-areas",
+      "file": "cases/24-cooling-water-access-in-heat-vulnerable-zip-areas.md",
+      "title": "Cooling-water access in heat-vulnerable ZIP areas",
+      "theme": "climate resilience / parks access / public health",
+      "status": "drafted",
+      "query": "You are helping a city resilience analyst identify NYC ZIP-like areas where **heat vulnerability appears high but visible access to outdoor cooling-water amenities may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right heat-vulnerability and parks amenity layers, explain the ZIP-like geography choices clearly, distinguish between everyday cooling-water amenities and the City’s formal cooling-center system, and keep the result framed as a screening tool rather than a definitive measure of heat safety.",
+      "expected_relevant_datasets": [
+        "NYC_HVI",
+        "nyc_parks_drinking_fountains",
+        "nyc_parks_spray_showers",
+        "MODZCTA"
+      ],
+      "possible_distractors": [
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_libraries"
+      ],
+      "why_relevant": "This is a benchmark for heat-resilience reasoning with underused parks datasets and imperfect ZIP geography.",
+      "source_hint": "Extreme Heat: Beat the Heat! — NYC Emergency Management; Interactive heat vulnerability index",
+      "notes": "The cleanest first-pass answer should stay ZIP-like.",
+      "index_status": "present"
+    },
+    {
+      "id": 25,
+      "slug": "accessible-crossing-support-near-older-adult-services",
+      "file": "cases/25-accessible-crossing-support-near-older-adult-services.md",
+      "title": "Accessible crossing support near older-adult services",
+      "theme": "accessibility / aging / pedestrian infrastructure",
+      "status": "drafted",
+      "query": "You are helping a city accessibility or aging-services analyst identify NYC community districts where **older-adult service destinations appear present but nearby accessible pedestrian-crossing support may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right older-adult destination and crossing-accessibility layers, explain why community-district geography is the cleanest first-pass comparison in this repo, distinguish between different kinds of crossing features, and keep the result framed as a screening tool rather than a definitive ADA-compliance or walkability score.",
+      "expected_relevant_datasets": [
+        "department_for_the_aging_nyc_aging_all_contracted_providers",
+        "accessible_pedestrian_signal_locations",
+        "pedestrian_ramp_locations",
+        "Community_Districs"
+      ],
+      "possible_distractors": [
+        "exclusive_pedestrian_signal_barnes_dance_locations",
+        "MODZCTA",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_vehicle_collisions_crashes"
+      ],
+      "why_relevant": "This is a benchmark for pedestrian-accessibility reasoning with underused DOT accessibility layers plus a real public-service destination inventory.",
+      "source_hint": "Older Adult Center - NYC Aging; Accessible NYC 2025: An Accessibility Guide for City Agencies",
+      "notes": "The cleanest first-pass answer should use community districts.",
+      "index_status": "present"
+    }
+  ]
+}
