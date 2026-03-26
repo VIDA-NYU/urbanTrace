@@ -1,0 +1,241 @@
+{
+  "geometricType": "Point",
+  "name": "478a-yykk",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 105,
+  "nb_profiled_rows": 105,
+  "nb_columns": 9,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.944974422454834,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "nodeid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 75,
+      "mean": 47913.26666666667,
+      "stddev": 15522.10279830893,
+      "coverage": [
+        {
+          "range": {
+            "gte": 22514.0,
+            "lte": 38030.0
+          }
+        },
+        {
+          "range": {
+            "gte": 53839.0,
+            "lte": 58259.0
+          }
+        },
+        {
+          "range": {
+            "gte": 68101.0,
+            "lte": 101914.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "oft",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 72,
+      "mean": 3.287848154008479e+17,
+      "stddev": 1.110155849358875e+17,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0772023122e+17,
+            "lte": 2.2883027202e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 4.2956544309e+17,
+            "lte": 5.25908529307e+17
+          }
+        }
+      ]
+    },
+    {
+      "name": "onstreetname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8800147771835327,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "fromstreetname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 40
+    },
+    {
+      "name": "borough_code",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "work_start_date",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 7
+    },
+    {
+      "name": "work_end_date",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 10
+    },
+    {
+      "name": "purpose",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 1,
+  "nb_numerical_columns": 2,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "work_start_date"
+      ],
+      "column_indexes": [
+        6
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1698019200.0,
+            "lte": 1698796800.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1702166400.0,
+            "lte": 1702857600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1703980800.0,
+            "lte": 1704067200.0
+          }
+        }
+      ],
+      "temporal_resolution": "week"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "work_end_date"
+      ],
+      "column_indexes": [
+        7
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1705708800.0,
+            "lte": 1706572800.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1709856000.0,
+            "lte": 1710288000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1711411200.0,
+            "lte": 1711843200.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "nodeid",
+    "oft",
+    "onstreetname",
+    "fromstreetname",
+    "borough_code",
+    "borough",
+    "code",
+    "work_start_date",
+    "work",
+    "start",
+    "date",
+    "work_end_date",
+    "work",
+    "end",
+    "date",
+    "purpose"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0014978150138631463,
+      "2_geo_batch_predict": 0.009946764970663935,
+      "3_process_columns": 0.022904326033312827,
+      "4_latlong_pairing": 2.2087013348937035e-05,
+      "5_spatial_coverage": 0.001252710004337132,
+      "6_temporal_coverage": 0.002533779013901949
+    },
+    "total": 1.3926919170189649
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/478a-yykk.csv"
+}

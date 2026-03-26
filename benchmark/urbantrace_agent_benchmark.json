@@ -596,6 +596,88 @@
       "source_hint": "Older Adult Center - NYC Aging; Accessible NYC 2025: An Accessibility Guide for City Agencies",
       "notes": "The cleanest first-pass answer should use community districts.",
       "index_status": "present"
+    },
+    {
+      "id": 26,
+      "slug": "crime-burden-and-educational-vulnerability-screening",
+      "file": "cases/26-crime-burden-and-educational-vulnerability-screening.md",
+      "title": "Crime burden and educational vulnerability screening",
+      "theme": "education / safety / youth",
+      "status": "drafted",
+      "query": "You are helping a city education, youth-services, or public-safety analyst identify NYC community districts where **student performance appears comparatively weak while neighborhood crime burden is also comparatively elevated**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right academic-outcome and neighborhood-crime layers, explain why community-district geography is the cleanest first-pass comparison in this repo, distinguish between normalized crime-rate tables and raw incident datasets, and keep the result framed as a screening tool rather than a causal claim about why students perform the way they do.",
+      "expected_relevant_datasets": [
+        "NYC_students_performing_english_language_arts",
+        "NYC_students_performing_math",
+        "NYC_crime_rate_per_1000_residents",
+        "NYC_crime_rate_property",
+        "Community_Districs"
+      ],
+      "possible_distractors": [
+        "nypd_complaint_data_current_year_to_date",
+        "2017_2018_schools_nypd_crime_data_report",
+        "2020_doe_high_school_directory",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_poverty_rate"
+      ],
+      "why_relevant": "This is a benchmark for cross-sector education-and-safety reasoning using a real NYC policy framing, NYC-specific empirical research, and a clean shared community-district geography in the UrbanTrace catalog.",
+      "source_hint": "Community Violence Prevention Framework; Office of Neighborhood Safety Annual Report 2023; School Climate and the Impact of Neighborhood Crime on Test Scores",
+      "notes": "The cleanest first-pass answer should use community districts via BoroCD / Community District. Community_Districs is acceptable as a QA boundary layer but is not strictly required if the agent relies on the aligned derived tables.",
+      "index_status": "present"
+    },
+    {
+      "id": 27,
+      "slug": "affordability-stress-despite-housing-growth",
+      "file": "cases/27-affordability-stress-despite-housing-growth.md",
+      "title": "Affordability stress despite housing growth",
+      "theme": "housing / affordability / neighborhood change",
+      "status": "drafted",
+      "query": "You are helping a city housing, planning, or anti-displacement analyst identify NYC sub-borough areas where **the local housing stock appears to have grown, but rents may still have risen faster than median household income**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right housing-stock, rent, and local-income layers, explain why sub-borough area geography is the cleanest first-pass comparison in this repo, distinguish between direct affordability signals and weaker socioeconomic distractors, and keep the result framed as a screening tool rather than a definitive displacement or affordability score.",
+      "expected_relevant_datasets": [
+        "NYC_housing_units",
+        "NYC_median_household_income",
+        "NYC_median_rent",
+        "NYC_population"
+      ],
+      "possible_distractors": [
+        "NYC_poverty_rate",
+        "NYC_unemployment_rate",
+        "NYC_income_diversity_ratio",
+        "Community_Districs",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "MODZCTA"
+      ],
+      "why_relevant": "This is a benchmark for housing-affordability reasoning grounded in real NYC housing policy, fair-housing planning, and anti-displacement screening, using a clean shared sub-borough geography in the UrbanTrace catalog.",
+      "source_hint": "Problem - NYC Housing; Housing Our Neighbors; City of Yes for Housing Opportunity; Displacement Risk; NYU Furman Center State of the City",
+      "notes": "The cleanest first-pass answer should use Sub-Borough Area. NYC_population is a strong optional enhancement, but the core trio should remain housing units, median rent, and median household income.",
+      "index_status": "present"
+    },
+    {
+      "id": 28,
+      "slug": "academic-recovery-vs-neighborhood-conditions-after-2022",
+      "file": "cases/28-academic-recovery-vs-neighborhood-conditions-after-2022.md",
+      "title": "Academic recovery vs neighborhood conditions after 2022",
+      "theme": "education recovery / safety / youth",
+      "status": "drafted",
+      "query": "You are helping a city education, youth-services, or public-safety analyst identify NYC community districts where **post-2022 academic recovery appears comparatively weak while neighborhood crime burden remains comparatively high**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right academic-recovery and neighborhood-crime layers, explain why community-district geography is the cleanest first-pass comparison in this repo, account for the 2020 assessment suspension and 2021 comparability caveats, distinguish between normalized crime-rate tables and raw incident datasets, and keep the result framed as a screening tool rather than a causal claim about why recovery differs.",
+      "expected_relevant_datasets": [
+        "NYC_students_performing_english_language_arts",
+        "NYC_students_performing_math",
+        "NYC_crime_rate_per_1000_residents",
+        "NYC_crime_rate_property",
+        "Community_Districs"
+      ],
+      "possible_distractors": [
+        "nypd_complaint_data_current_year_to_date",
+        "2017_2018_schools_nypd_crime_data_report",
+        "2020_doe_high_school_directory",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "MODZCTA",
+        "NYC_poverty_rate"
+      ],
+      "why_relevant": "This is a benchmark for post-pandemic education-recovery reasoning using real NYC policy framing, NYC-specific research on neighborhood conditions and student outcomes, and a clean shared community-district geography in the UrbanTrace catalog.",
+      "source_hint": "NYC Public Schools 2023-24 and 2024-25 Grades 3-8 test score releases; Community Violence Prevention Framework; ONS Annual Report 2023; Laurito et al. on neighborhood crime and test scores; NYSED 2020 suspension memo and 2021 assessment participation guidance.",
+      "notes": "The cleanest first-pass answer should use community districts via BoroCD / Community District. Community_Districs is acceptable as a QA boundary layer but is not strictly required if the agent relies on the aligned derived tables. Strong answers should focus the recovery window on 2022-2024 and explicitly note the 2020 and 2021 assessment caveats.",
+      "index_status": "present"
     }
   ]
 }

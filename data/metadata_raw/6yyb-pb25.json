@@ -1,0 +1,257 @@
+{
+  "geometricType": "MultiLineString",
+  "name": "6yyb-pb25",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 133051,
+  "nb_profiled_rows": 970,
+  "nb_columns": 12,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-line",
+        "confidence": 0.9264630675315857,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "segmentid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 116327,
+      "mean": 742488.6329896908,
+      "stddev": 2280997.9519152846,
+      "coverage": [
+        {
+          "range": {
+            "gte": 5933.0,
+            "lte": 109319.0
+          }
+        },
+        {
+          "range": {
+            "gte": 117702.0,
+            "lte": 309943.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "boroughcod",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 6
+    },
+    {
+      "name": "oftcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 82548,
+      "mean": 3.578408795155392e+17,
+      "stddev": 1.2738507041866808e+17,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.1061013471013474e+17,
+            "lte": 2.4162023532024512e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 2.6032021052021594e+17,
+            "lte": 3.871603427303861e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0844041849041856e+17,
+            "lte": 5.530005239705253e+17
+          }
+        }
+      ]
+    },
+    {
+      "name": "onstreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 7833
+    },
+    {
+      "name": "fromstreet",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 7791
+    },
+    {
+      "name": "tostreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 7723
+    },
+    {
+      "name": "wkt",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "line",
+        "confidence": 0.8235222101211548,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "manualrati",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 10,
+      "mean": 7.444329896907217,
+      "stddev": 1.3095579699788067,
+      "coverage": [
+        {
+          "range": {
+            "gte": 5.0,
+            "lte": 7.0
+          }
+        },
+        {
+          "range": {
+            "gte": 8.0,
+            "lte": 8.0
+          }
+        },
+        {
+          "range": {
+            "gte": 9.0,
+            "lte": 9.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ratinglaye",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "inspection",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 2320
+    },
+    {
+      "name": "shape_stle",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 269.79850646454537,
+      "stddev": 219.37527286052477,
+      "coverage": [
+        {
+          "range": {
+            "gte": 17.0915132945,
+            "lte": 177.213617952
+          }
+        },
+        {
+          "range": {
+            "gte": 208.398172473,
+            "lte": 452.256934987
+          }
+        },
+        {
+          "range": {
+            "gte": 503.101243255,
+            "lte": 971.432188958
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_temporal_columns": 1,
+  "nb_categorical_columns": 2,
+  "nb_numerical_columns": 4,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "inspection"
+      ],
+      "column_indexes": [
+        10
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1412553600.0,
+            "lte": 1576022400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1643241600.0,
+            "lte": 1701475200.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "segmentid",
+    "boroughcod",
+    "oftcode",
+    "onstreetna",
+    "fromstreet",
+    "tostreetna",
+    "wkt",
+    "manualrati",
+    "ratinglaye",
+    "inspection",
+    "shape_stle",
+    "shape",
+    "stle"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.21350570500362664,
+      "2_geo_batch_predict": 0.013679711031727493,
+      "3_process_columns": 0.19336757500423118,
+      "4_latlong_pairing": 2.704904181882739e-05,
+      "5_spatial_coverage": 5.826004780828953e-06,
+      "6_temporal_coverage": 0.006530748039949685
+    },
+    "total": 1.7552162909996696
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/6yyb-pb25.csv"
+}

@@ -1,0 +1,179 @@
+{
+  "geometricType": "Point",
+  "name": "uh2s-ftgh",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 83,
+  "nb_profiled_rows": 83,
+  "nb_columns": 6,
+  "columns": [
+    {
+      "name": "treatment",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "date",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 66
+    },
+    {
+      "name": "nodeid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 81,
+      "mean": 153296.2168674699,
+      "stddev": 981489.7577579869,
+      "coverage": [
+        {
+          "range": {
+            "gte": 9073.0,
+            "lte": 54403.0
+          }
+        },
+        {
+          "range": {
+            "gte": 56000.0,
+            "lte": 105322.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "wkt_geometry",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9422341585159302,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "x",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 1003296.188415662,
+      "stddev": 23559.91984370741,
+      "coverage": [
+        {
+          "range": {
+            "gte": 981997.5901,
+            "lte": 1014367.757
+          }
+        },
+        {
+          "range": {
+            "gte": 1017882.609,
+            "lte": 1052558.723
+          }
+        }
+      ]
+    },
+    {
+      "name": "y",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 205094.81913614454,
+      "stddev": 35071.02213679673,
+      "coverage": [
+        {
+          "range": {
+            "gte": 142063.0285,
+            "lte": 181028.5827
+          }
+        },
+        {
+          "range": {
+            "gte": 187208.0514,
+            "lte": 217040.9107
+          }
+        },
+        {
+          "range": {
+            "gte": 231726.1828,
+            "lte": 265576.8492
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_temporal_columns": 1,
+  "nb_numerical_columns": 3,
+  "types": [
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "date"
+      ],
+      "column_indexes": [
+        1
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1399248000.0,
+            "lte": 1409529600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1475193600.0,
+            "lte": 1573084800.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1633046400.0,
+            "lte": 1694044800.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "treatment",
+    "date",
+    "nodeid",
+    "wkt_geometry",
+    "wkt",
+    "geometry",
+    "x",
+    "y"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0012999409809708595,
+      "2_geo_batch_predict": 0.008102890977170318,
+      "3_process_columns": 0.014190505025908351,
+      "4_latlong_pairing": 2.2181018721312284e-05,
+      "5_spatial_coverage": 0.0005206670030020177,
+      "6_temporal_coverage": 0.0017636099946685135
+    },
+    "total": 1.332731563015841
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/uh2s-ftgh.csv"
+}

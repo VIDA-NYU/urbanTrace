@@ -1,0 +1,251 @@
+{
+  "geometricType": "MultiPolygon",
+  "name": "qexa-qpj6",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 11,
+  "nb_profiled_rows": 11,
+  "nb_columns": 12,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-polygon",
+        "confidence": 0.9146153926849365,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "lp_number",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "current_",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1
+    },
+    {
+      "name": "scen_lm_na",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "last_actio",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "public_hea",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "desdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 10
+    },
+    {
+      "name": "caldate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.8181818181818182,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "shape_leng",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 20224.719028900272,
+      "stddev": 15901.341311830765,
+      "coverage": [
+        {
+          "range": {
+            "gte": 576.067621353,
+            "lte": 10687.4957902
+          }
+        },
+        {
+          "range": {
+            "gte": 25688.285529,
+            "lte": 33353.9206675
+          }
+        }
+      ]
+    },
+    {
+      "name": "shape_area",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 8160371.7998817805,
+      "stddev": 11603084.968866032,
+      "coverage": [
+        {
+          "range": {
+            "gte": 14339.5594832,
+            "lte": 4567108.19316
+          }
+        },
+        {
+          "range": {
+            "gte": 17386226.5411,
+            "lte": 21790725.6634
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 3,
+  "nb_numerical_columns": 2,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "desdate"
+      ],
+      "column_indexes": [
+        8
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 135302400.0,
+            "lte": 186105600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 272592000.0,
+            "lte": 432864000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1216080000.0,
+            "lte": 1526342400.0
+          }
+        }
+      ],
+      "temporal_resolution": "quarter"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "caldate"
+      ],
+      "column_indexes": [
+        9
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1170115200.0,
+            "lte": 1170115200.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1521504000.0,
+            "lte": 1521504000.0
+          }
+        }
+      ],
+      "temporal_resolution": "year"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "borough",
+    "lp_number",
+    "lp",
+    "number",
+    "current_",
+    "current",
+    "",
+    "scen_lm_na",
+    "scen",
+    "lm",
+    "na",
+    "status",
+    "last_actio",
+    "last",
+    "actio",
+    "public_hea",
+    "public",
+    "hea",
+    "desdate",
+    "caldate",
+    "shape_leng",
+    "shape",
+    "leng",
+    "shape_area",
+    "shape",
+    "area"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0021250579738989472,
+      "2_geo_batch_predict": 0.013657937000971287,
+      "3_process_columns": 0.005402900977060199,
+      "4_latlong_pairing": 2.666597720235586e-05,
+      "5_spatial_coverage": 5.400972440838814e-06,
+      "6_temporal_coverage": 0.001618820009753108
+    },
+    "total": 1.352664228004869
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/qexa-qpj6.csv"
+}

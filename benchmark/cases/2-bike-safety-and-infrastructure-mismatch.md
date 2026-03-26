@@ -99,6 +99,5 @@ A strong answer should:
 
 ## Retrieval / provenance notes
 
-- Case structure remains aligned to the benchmark batch under `benchmark/cases/` and `benchmark/index.json`.
 - This revision tightens the case around the actual local dataset affordances so it is more reliable for evaluating agent behavior under the current `backend/llm_agent.py` + `backend/tool.py` workflow.
 - The benchmark intentionally asks for **plausible candidates for follow-up** rather than definitive engineering prescriptions, because the available counts are sparse counters and route quality is only partially captured through metadata fields.

@@ -1,0 +1,478 @@
+{
+  "geometricType": "Point",
+  "name": "mf9g-zhbw",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 21,
+  "nb_profiled_rows": 21,
+  "nb_columns": 18,
+  "columns": [
+    {
+      "name": "address",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9589074850082397,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.19047619047619047,
+      "num_distinct_values": 18,
+      "mean": 3208396002.0,
+      "stddev": 1207596013.012018,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1011090099.0,
+            "lte": 2027650005.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3006250002.0,
+            "lte": 4043460075.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4102190094.0,
+            "lte": 5027050225.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.47619047619047616,
+      "num_distinct_values": 12,
+      "mean": 3189023.0,
+      "stddev": 1349145.669316428,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1076222.0,
+            "lte": 2129381.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3332350.0,
+            "lte": 3404783.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4217682.0,
+            "lte": 5141714.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "boro",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.19047619047619047,
+      "num_distinct_values": 6,
+      "mean": 3.176470588235294,
+      "stddev": 1.1997692973159493,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "borocd",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "missing_values_ratio": 0.19047619047619047,
+      "num_distinct_values": 12,
+      "mean": 322.88235294117646,
+      "stddev": 120.29614553159126,
+      "coverage": [
+        {
+          "range": {
+            "gte": 104.0,
+            "lte": 202.0
+          }
+        },
+        {
+          "range": {
+            "gte": 301.0,
+            "lte": 311.0
+          }
+        },
+        {
+          "range": {
+            "gte": 402.0,
+            "lte": 502.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "city",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "c_and_d",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "districtcode",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.19047619047619047,
+      "num_distinct_values": 12
+    },
+    {
+      "name": "objectid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 21,
+      "mean": 229.23809523809524,
+      "stddev": 225.38198363833973,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 14.0
+          }
+        },
+        {
+          "range": {
+            "gte": 321.0,
+            "lte": 334.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 21
+    },
+    {
+      "name": "mgp",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 21
+    },
+    {
+      "name": "organics",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "paper",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "refuse",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2
+    },
+    {
+      "name": "state",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "zip",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 17,
+      "mean": 10180.857142857143,
+      "stddev": 1499.1010412820042,
+      "coverage": [
+        {
+          "range": {
+            "gte": 7105.0,
+            "lte": 7306.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10019.0,
+            "lte": 10474.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11101.0,
+            "lte": 11433.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "point",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9633157849311829,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_categorical_columns": 6,
+  "nb_numerical_columns": 6,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "point",
+      "column_names": [
+        "point"
+      ],
+      "column_indexes": [
+        17
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211303202221211",
+          "number": 1
+        },
+        {
+          "hash": "1211303202221303",
+          "number": 1
+        },
+        {
+          "hash": "1211303202203220",
+          "number": 1
+        },
+        {
+          "hash": "1211302313032322",
+          "number": 1
+        },
+        {
+          "hash": "1211302313031121",
+          "number": 1
+        },
+        {
+          "hash": "1211302313333202",
+          "number": 1
+        },
+        {
+          "hash": "1211302313333300",
+          "number": 1
+        },
+        {
+          "hash": "1211302313313133",
+          "number": 1
+        },
+        {
+          "hash": "1211302313311103",
+          "number": 1
+        },
+        {
+          "hash": "1211302313303133",
+          "number": 1
+        },
+        {
+          "hash": "1211302313303301",
+          "number": 1
+        },
+        {
+          "hash": "1211302313302313",
+          "number": 1
+        },
+        {
+          "hash": "1211302313112002",
+          "number": 1
+        },
+        {
+          "hash": "1211302313121131",
+          "number": 1
+        },
+        {
+          "hash": "1211302313210113",
+          "number": 1
+        },
+        {
+          "hash": "1211302311232311",
+          "number": 1
+        },
+        {
+          "hash": "1211302310332312",
+          "number": 1
+        },
+        {
+          "hash": "1211302310333201",
+          "number": 1
+        },
+        {
+          "hash": "1211302312311010",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100322",
+          "number": 2
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.1993570728708,
+                40.7383240696502
+              ],
+              [
+                -74.0783651939611,
+                40.5796524543301
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.0802451290018,
+                40.7730494664267
+              ],
+              [
+                -73.9296075577868,
+                40.5892783409149
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9429240465795,
+                40.8194963700661
+              ],
+              [
+                -73.7844488201242,
+                40.7046021456717
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 21
+    }
+  ],
+  "attribute_keywords": [
+    "address",
+    "bbl",
+    "bin",
+    "boro",
+    "borocd",
+    "city",
+    "c_and_d",
+    "c",
+    "and",
+    "d",
+    "districtcode",
+    "objectid",
+    "label",
+    "mgp",
+    "name",
+    "organics",
+    "paper",
+    "refuse",
+    "state",
+    "zip",
+    "point"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0017934329807758331,
+      "2_geo_batch_predict": 0.015079704986419529,
+      "3_process_columns": 0.01083926303545013,
+      "4_latlong_pairing": 2.9026996344327927e-05,
+      "5_spatial_coverage": 0.0014872429892420769,
+      "6_temporal_coverage": 4.776986315846443e-06
+    },
+    "total": 1.3174421819858253
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/mf9g-zhbw.csv"
+}
