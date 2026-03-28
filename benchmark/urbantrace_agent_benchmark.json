@@ -19,6 +19,32 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection + geography harmonization, not just for naming a safety dataset.",
       "source_hint": "Vision Zero: DOT Releases Update to Borough Pedestrian Safety Action Plans, With Targeted Analysis of Priority Corridors and Intersections; Bi-Annual Pedestrian Counts",
+      "supporting_references": [
+        {
+          "title": "Vision Zero: DOT Releases Update to Borough Pedestrian Safety Action Plans, With Targeted Analysis of Priority Corridors and Intersections",
+          "type": "official NYC DOT press release / policy update",
+          "agency": "NYC Department of Transportation",
+          "url": "https://www.nyc.gov/html/dot/html/pr2023/vision-zero-borough-pedestrian-safety-action-plan.shtml",
+          "why_relevant": "Directly grounds the benchmark in a real NYC pedestrian-safety planning workflow. The release explicitly describes data-driven prioritization of corridors and intersections and references KSI-based ranking logic.",
+          "confidence": "high"
+        },
+        {
+          "title": "Bi-Annual Pedestrian Counts",
+          "type": "official NYC Open Data dataset",
+          "agency": "NYC Department of Transportation",
+          "url": "https://data.cityofnewyork.us/d/cqsj-cfgu",
+          "why_relevant": "Official source corresponding to the local `NYC_pedestrian_counts` table. Supports using pedestrian counts as the best available local exposure proxy instead of relying on crash totals alone.",
+          "confidence": "high"
+        },
+        {
+          "title": "Motor Vehicle Collisions - Crashes",
+          "type": "official NYC Open Data dataset",
+          "agency": "NYPD",
+          "url": "https://data.cityofnewyork.us/d/h9gi-nx95",
+          "why_relevant": "Canonical city crash-event dataset and the clearest upstream source for the local `NYC_vehicle_collisions_crashes` table.",
+          "confidence": "high"
+        }
+      ],
       "notes": "",
       "index_status": "present"
     },
@@ -42,6 +68,29 @@
       ],
       "why_relevant": "This case is credible because the local catalog contains a realistic three-part planning stack:",
       "source_hint": "NYC DOT — Bike Network and Ridership; Safe Streets for Cycling",
+      "supporting_references": [
+        {
+          "title": "NYC DOT — Bike Network and Ridership",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/bicyclists/bikestats.shtml",
+          "why_relevant": "This page explicitly presents bike network growth, ridership trends, bike counts, and bicycle crash data as related components of cycling policy. It is the clearest source-level justification for a benchmark that asks the agent to synthesize demand, infrastructure, and safety instead of using only one of them.",
+          "confidence": "high"
+        },
+        {
+          "title": "Safe Streets for Cycling",
+          "type": "official NYC DOT report",
+          "url": "https://www.nyc.gov/html/dot/downloads/pdf/safe-streets-for-cycling.pdf",
+          "why_relevant": "This report grounds the policy motivation for safer cycling investments and network expansion. It supports a benchmark that looks for places where safety interventions and route upgrades may still be needed.",
+          "confidence": "medium-high"
+        },
+        {
+          "title": "A Plan for Cycling in New York City",
+          "type": "official NYC DOT report",
+          "url": "https://www.nyc.gov/html/dot/downloads/pdf/bike-safety-plan.pdf",
+          "why_relevant": "This planning document supports the benchmark’s emphasis on city-led network planning, route expansion, and safety-oriented cycling investment rather than generic recreation or commuting analysis.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "",
       "index_status": "present"
     },
@@ -66,6 +115,29 @@
       ],
       "why_relevant": "This is a source-grounded transportation-equity / environmental-burden selection problem.",
       "source_hint": "New York City Community Air Survey; The public health impacts of PM2.5 from traffic air pollution",
+      "supporting_references": [
+        {
+          "title": "New York City Community Air Survey",
+          "type": "official NYC Health program page",
+          "url": "https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page",
+          "why_relevant": "Official NYC source stating that neighborhood air quality differs across the city, that traffic is one of the studied sources, and that additional environmental-justice monitoring sites were included to understand emissions in low-income neighborhoods.",
+          "confidence": "high"
+        },
+        {
+          "title": "The public health impacts of PM2.5 from traffic air pollution",
+          "type": "official NYC Health data story",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-stories/traffic-and-air-pollution/",
+          "why_relevant": "Directly supports the unequal-burden framing: traffic is a major PM2.5 source in NYC, impacts are more acute in less wealthy neighborhoods, and traffic-related PM2.5 is reported as higher in high-poverty neighborhoods.",
+          "confidence": "high"
+        },
+        {
+          "title": "New York City’s Environmental Justice for All Report Scope of Work",
+          "type": "official NYC scope/report",
+          "url": "https://www.nyc.gov/assets/sustainability/downloads/pdf/EJ-Report-Scope.pdf",
+          "why_relevant": "Provides city policy grounding for environmental-justice screening and prioritization across neighborhoods.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "",
       "index_status": "present"
     },
@@ -89,6 +161,29 @@
       ],
       "why_relevant": "This is a strong benchmark for dataset selection under geography mismatch, not just for naming an air-quality file.",
       "source_hint": "New York City Community Air Survey; New York City’s Environmental Justice for All Report Scope of Work",
+      "supporting_references": [
+        {
+          "title": "NYC Community Air Survey (NYCCAS)",
+          "type": "official NYC Health report / data feature",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/nyccas/",
+          "what_it_supports": "NYCCAS is NYC’s long-running neighborhood air-monitoring program. The report explicitly says it presents **maps of neighborhood air pollution levels by year** and identifies local sources driving differences across neighborhoods. It also notes that PM2.5, NO2, NO, and black carbon are highest in areas with greater traffic density, building density, warehouses, and commercial cooking.",
+          "why_it_matters_for_this_benchmark": "This directly grounds a neighborhood-level burden-screening task rather than a citywide summary."
+        },
+        {
+          "title": "NYC Health: *The public health impacts of PM2.5 from traffic air pollution*",
+          "type": "official NYC Health data story",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-stories/traffic-and-air-pollution/",
+          "what_it_supports": "The page states that traffic-related PM2.5 impacts are not evenly distributed across the city and that **PM2.5 levels from all traffic sources are about 50% higher in high-poverty neighborhoods than in low-poverty neighborhoods**.",
+          "why_it_matters_for_this_benchmark": "This is the clearest official justification for combining an air-pollution burden layer with poverty-related neighborhood disadvantage in an environmental-justice framing."
+        },
+        {
+          "title": "NYC Community Air Survey landing page",
+          "type": "official NYC Health program page",
+          "url": "https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page",
+          "what_it_supports": "The page explains that NYCCAS was created to evaluate how air quality differs across NYC neighborhoods and notes the addition of **environmental justice sites** to better understand emissions in low-income neighborhoods.",
+          "why_it_matters_for_this_benchmark": "It reinforces that NYCCAS is intended for neighborhood-scale inequality analysis, not just for generic pollution mapping."
+        }
+      ],
       "notes": "A strong benchmark answer should not assume that NTAs are the right join target.",
       "index_status": "present"
     },
@@ -112,6 +207,39 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection under proxy reasoning and geography mismatch, not just for naming the heat layer.",
       "source_hint": "Interactive heat vulnerability index – Environment & Health Data Portal; 2025 Heat Mortality Report",
+      "supporting_references": [
+        {
+          "title": "Interactive heat vulnerability index",
+          "type": "official NYC Health data feature",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "what_it_supports": "The page explicitly frames heat impacts as neighborhood inequities and states that structural racism has limited access to resources that protect health, including air conditioning, green space, and neighborhood cooling resources.",
+          "why_it_matters_for_this_benchmark": "This is the clearest official justification for treating heat vulnerability as a neighborhood screening problem linked to resource access."
+        },
+        {
+          "title": "2025 NYC Heat-Related Mortality Report",
+          "type": "official NYC Health report page",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/heat-report/",
+          "what_it_supports": "The report states that more than 500 New Yorkers die prematurely from heat in an average summer, that lack of access to home air conditioning is the most important risk factor for heat-stress death, and that emergency response should be coupled with equitable investments that reduce heat risk.",
+          "why_it_matters_for_this_benchmark": "It supports a screening task that prioritizes high-vulnerability neighborhoods for follow-up around access to protective resources."
+        },
+        {
+          "title": "NYC Emergency Management — Extreme Heat: Beat the Heat!",
+          "type": "official NYC Emergency Management preparedness page",
+          "agency": "NYC Emergency Management",
+          "url": "https://www.nyc.gov/site/em/ready/extreme-heat.page",
+          "what_it_supports": "The page instructs residents without air conditioning to plan to visit cool public places and notes that the City opens cooling centers during heat emergencies.",
+          "why_it_matters_for_this_benchmark": "It justifies the public-resource-access angle while also clarifying that formal cooling-center operations are a separate official system."
+        },
+        {
+          "title": "Cool Options NYC",
+          "type": "official city finder",
+          "url": "https://finder.nyc.gov/coolingcenters/",
+          "what_it_supports": "This is the city’s dedicated cool-options / cooling-center finder.",
+          "why_it_matters_for_this_benchmark": "It is the key reason a strong answer should **not** mislabel libraries or schools from the local repo as official cooling centers."
+        }
+      ],
       "notes": "The previous draft treated NTA as the obvious common geography.",
       "index_status": "present"
     },
@@ -136,6 +264,32 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, proxy reasoning, and geography discipline under the current UrbanTrace copilot design.",
       "source_hint": "Digital Equity - NYC Office of Technology and Innovation; The New York City Digital Equity Roadmap",
+      "supporting_references": [
+        {
+          "title": "Digital Equity — NYC Office of Technology and Innovation",
+          "type": "official program page",
+          "agency": "NYC Office of Technology and Innovation",
+          "url": "https://www.nyc.gov/content/oti/pages/digital-equity",
+          "what_it_supports": "NYC formally treats digital equity as a city policy priority rather than a narrow telecom issue.",
+          "why_it_matters_for_this_benchmark": "It justifies a benchmark framed around neighborhood digital-access need and public digital support infrastructure."
+        },
+        {
+          "title": "The New York City Digital Equity Roadmap",
+          "type": "official NYC report",
+          "agency": "NYC Office of Technology and Innovation",
+          "url": "https://www.nyc.gov/assets/oti/downloads/pdf/DE-Roadmap.pdf",
+          "what_it_supports": "The roadmap frames digital inequity in terms of affordability, device access, skills, and community-based support.",
+          "why_it_matters_for_this_benchmark": "It supports using public computer centers, libraries, and Wi‑Fi access points as meaningful public-facing infrastructure for digital inclusion."
+        },
+        {
+          "title": "City Launches ‘Neighborhood Tech Help’ to Bridge Digital Divide Across the Boroughs",
+          "type": "official NYC announcement",
+          "agency": "NYC Department of Housing Preservation and Development / connected city initiative",
+          "url": "https://www.nyc.gov/site/hpd/news/015-25/city-launches-neighborhood-tech-help-bridge-digital-divide-across-boroughs",
+          "what_it_supports": "NYC is actively investing in neighborhood-based technical help to bridge the digital divide.",
+          "why_it_matters_for_this_benchmark": "It confirms that a neighborhood screening product is a realistic planning use case, not an invented scenario."
+        }
+      ],
       "notes": "The previous draft treated NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
       "index_status": "present"
     },
@@ -160,6 +314,32 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection under geography mismatch and proxy discipline.",
       "source_hint": "Barriers to Learning: Age, Accessibility, Space Usage, and Air Conditioning in NYC School Buildings; Accessible NYC 2025: An Accessibility Guide for City Agencies",
+      "supporting_references": [
+        {
+          "title": "Barriers to Learning: Age, Accessibility, Space Usage, and Air Conditioning in NYC School Buildings",
+          "type": "policy report",
+          "agency_publisher": "New York City Independent Budget Office",
+          "url": "https://www.ibo.nyc.gov/content/publications/2025-march-barriers-to-learning-age-accessibility-space-usage-and-air-conditioning-in-nyc-school-buildings",
+          "what_it_supports": "It frames school building accessibility, conditions, and space usage as meaningful public-policy concerns rather than purely operational details.",
+          "why_it_matters_for_this_benchmark": "It justifies treating school facilities as part of an equity conversation, which makes a neighborhood screening benchmark credible."
+        },
+        {
+          "title": "NYC School Construction Authority — Capital Plan public-input process / current capital-plan materials",
+          "type": "official NYC facilities-planning page",
+          "agency": "New York City School Construction Authority",
+          "url": "https://www.nycsca.org/Community/Overview/Capital-Plan-Reports-and-Data/Current-Capital-Plan",
+          "what_it_supports": "The SCA states that capital planning is updated in response to public input, enrollment changes, housing trends, building conditions, and budget constraints.",
+          "why_it_matters_for_this_benchmark": "It supports the idea that a neighborhood-level screen for population pressure and relative facility presence is relevant to real facilities-planning conversations, while still being only a first-pass screen."
+        },
+        {
+          "title": "NYC School Construction Authority — Enrollment, Capacity & Utilization Report page",
+          "type": "official NYC facilities-planning page",
+          "agency": "New York City School Construction Authority",
+          "url": "https://www.nycsca.org/Community/Overview/Capital-Plan-Reports-and-Data/Enrollment-Capacity-Utilization-Report",
+          "what_it_supports": "The SCA treats enrollment, capacity, and utilization as formal dimensions of facilities review.",
+          "why_it_matters_for_this_benchmark": "It is the reason a strong benchmark answer should avoid overclaiming from raw school-point counts alone; point density is a screening signal, not a substitute for seat-capacity analysis."
+        }
+      ],
       "notes": "The current draft leaned toward NTA geography because NYC_Schools contains nta2020.",
       "index_status": "present"
     },
@@ -183,6 +363,24 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, geography discipline, and proxy interpretation under the current UrbanTrace copilot design.",
       "source_hint": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026; Digital Equity - NYC Office of Technology and Innovation",
+      "supporting_references": [
+        {
+          "title": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
+          "type": "official NYC service report",
+          "agency": "City of New York",
+          "url": "https://www.nyc.gov/assets/operations/downloads/pdf/pmmr2026/lib.pdf",
+          "what_it_supports": "The City tracks library circulation, programs, computer sessions, and Wi‑Fi sessions as meaningful service outputs.",
+          "why_it_matters_for_this_benchmark": "It supports treating libraries as active public-service infrastructure rather than just a passive amenity layer."
+        },
+        {
+          "title": "Digital Equity — NYC Office of Technology and Innovation",
+          "type": "official program page",
+          "agency": "NYC Office of Technology and Innovation",
+          "url": "https://www.nyc.gov/content/oti/pages/digital-equity",
+          "what_it_supports": "NYC formally frames equitable access to digital resources and support as a city policy concern.",
+          "why_it_matters_for_this_benchmark": "It reinforces the idea that libraries matter as access infrastructure for residents who may face higher barriers to information, services, and connectivity."
+        }
+      ],
       "notes": "The previous draft listed NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
       "index_status": "present"
     },
@@ -207,30 +405,72 @@
       ],
       "why_relevant": "This benchmark is really about proxy discipline, geography discipline, and explanation quality under the current UrbanTrace copilot design.",
       "source_hint": "New Yorkers in Need: The Housing Insecurity Crisis; Economic conditions data for NYC – Environment & Health Data Portal",
+      "supporting_references": [
+        {
+          "title": "New Yorkers in Need: The Housing Insecurity Crisis",
+          "type": "public report",
+          "agency_publisher": "Office of the New York State Comptroller",
+          "url": "https://www.osc.ny.gov/reports/new-yorkers-need-housing-insecurity-crisis",
+          "what_it_supports": "Housing insecurity in New York is driven primarily by cost burden, and affordability strain is linked to broader household instability.",
+          "why_it_matters_for_this_benchmark": "It justifies a benchmark that evaluates housing pressure together with economic hardship rather than treating housing as a simple stock lookup."
+        },
+        {
+          "title": "Poverty Measure — NYC Opportunity",
+          "type": "official NYC program/report page",
+          "agency": "NYC Opportunity",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-measure.page",
+          "what_it_supports": "NYC’s poverty framework explicitly accounts for the city’s high housing costs and emphasizes the way rising living costs create financial pressure.",
+          "why_it_matters_for_this_benchmark": "It supports combining poverty with a housing-cost proxy instead of treating poverty and housing as unrelated topics."
+        },
+        {
+          "title": "New York City Government Poverty Measure 2022",
+          "type": "official NYC report",
+          "agency": "NYC Opportunity",
+          "url": "https://www.nyc.gov/assets/opportunity/pdf/MOE-2022-Poverty-Measure-Comprehensive-Brief.pdf",
+          "what_it_supports": "Poverty rose as temporary supports receded and basic costs increased, reinforcing the relevance of compounded affordability and economic stress.",
+          "why_it_matters_for_this_benchmark": "It strengthens the economic-hardship side of the benchmark, even though the repo’s actual operational layer is `NYC_poverty_rate`."
+        }
+      ],
       "notes": "The prior draft listed NTA_Neighborhood_Tabulation_Areas as a core layer and implied NYC_housing_units was the primary housing-side dataset.",
       "index_status": "present"
     },
     {
       "id": 10,
-      "slug": "income-diversity-and-public-amenity-mismatch",
+      "slug": "high-poverty-neighborhoods-and-public-digital-access-support",
       "file": "cases/10-income-diversity-and-public-amenity-mismatch.md",
-      "title": "Income diversity and public amenity mismatch",
-      "theme": "inequality / public services",
+      "title": "High-poverty neighborhoods and public digital-access support",
+      "theme": "digital equity / public access / neighborhood need",
       "status": "revised",
-      "query": "You are helping an urban policy team explore whether neighborhoods with **lower income diversity** also appear comparatively underserved by visible public amenities such as libraries or public Wi‑Fi hotspots. The benchmark is not asking for a generic demographic summary. It is testing whether the agent can connect an abstract neighborhood-structure indicator to concrete civic infrastructure, choose a defensible comparison geography from the local UrbanTrace catalog, and explain what the result would and would not mean in a realistic planning workflow.",
+      "query": "You are helping an urban policy or digital-equity team identify NYC sub-borough areas where **poverty appears comparatively high while visible public digital-access support may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right neighborhood poverty layer, add population so amenity counts can be interpreted fairly, choose the cleanest first-pass geography already supported in the repo, distinguish public digital-access infrastructure from broader or weaker amenity proxies, and keep the result framed as a screening tool rather than proof that any neighborhood is definitively underserved.",
       "expected_relevant_datasets": [
-        "NYC_income_diversity_ratio",
-        "NYC_libraries",
-        "NYC_Wi-Fi_Hotspot_Locations",
-        "NTA_Neighborhood_Tabulation_Areas"
+        "NYC_poverty_rate",
+        "NYC_population",
+        "citywide_public_computer_centers"
       ],
       "possible_distractors": [
-        "NYC_population",
-        "City_Council_Districs"
+        "NYC_income_diversity_ratio",
+        "NYC_median_household_income",
+        "NTA_Neighborhood_Tabulation_Areas",
+        "NYC_libraries",
+        "NYC_Wi-Fi_Hotspot_Locations"
       ],
-      "why_relevant": "This is a benchmark for dataset selection, geography discipline, and proxy interpretation under the current UrbanTrace copilot design.",
-      "source_hint": "The New York City Digital Equity Roadmap; Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
-      "notes": "The earlier draft treated NTA_Neighborhood_Tabulation_Areas as an expected core layer.",
+      "why_relevant": "This redesign replaces an abstract and poorly retrieved socioeconomic construct with a directly retrievable poverty indicator, a required population normalization layer, and a specific public digital-access infrastructure layer, making the benchmark much less ambiguous while staying policy-relevant.",
+      "source_hint": "NYC Digital Equity materials; public digital-access infrastructure; sub-borough poverty and population layers",
+      "supporting_references": [
+        {
+          "title": "NYC Digital Equity materials",
+          "source": "source_hint"
+        },
+        {
+          "title": "public digital-access infrastructure",
+          "source": "source_hint"
+        },
+        {
+          "title": "sub-borough poverty and population layers",
+          "source": "source_hint"
+        }
+      ],
+      "notes": "Use Sub-Borough Area as the cleanest first-pass geography. The benchmark should be considered failed if population normalization is ignored or if the answer substitutes income diversity or median income for poverty.",
       "index_status": "present"
     },
     {
@@ -253,6 +493,33 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation control under the current UrbanTrace copilot design.",
       "source_hint": "Color Contrast: Racial and Ethnic Disparities in New York City Law Enforcement; Reports & Analysis – Crime & Enforcement",
+      "supporting_references": [
+        {
+          "title": "Color Contrast: Racial and Ethnic Disparities in New York City Law Enforcement",
+          "type": "policy / research report",
+          "organization": "John Jay Research and Evaluation Center",
+          "date": "March 2024",
+          "url": "https://johnjayrec.nyc/2024/03/18/prrc79_colorcontrast/",
+          "what_it_supports": "The report explicitly states that arrest rates vary across NYC neighborhoods and examines disparity after accounting for neighborhood demographics and crime rates.",
+          "why_it_matters_for_this_benchmark": "It makes neighborhood-level arrest-pattern analysis a credible NYC policy task rather than an invented benchmark scenario."
+        },
+        {
+          "title": "Reports & Analysis – Crime & Enforcement",
+          "type": "official NYPD reporting page",
+          "agency": "New York City Police Department",
+          "url": "https://www.nyc.gov/site/nypd/stats/reports-analysis/crime-enf.page",
+          "what_it_supports": "NYPD’s own enforcement reports include statistics on arrests and race/ethnicity drawn from NYPD records management and booking data.",
+          "why_it_matters_for_this_benchmark": "It confirms that arrest activity is a recognized official enforcement signal suitable for neighborhood-pattern analysis."
+        },
+        {
+          "title": "Poverty Data – NYC Opportunity",
+          "type": "official NYC data/documentation page",
+          "agency": "NYC Opportunity",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-data.page",
+          "what_it_supports": "NYC publishes data resources to replicate or extend its poverty research.",
+          "why_it_matters_for_this_benchmark": "It supports using neighborhood poverty as a legitimate city-policy context layer in an overlap screen with enforcement activity."
+        }
+      ],
       "notes": "The seed metadata lists NTA_Neighborhood_Tabulation_Areas as an expected relevant dataset, but the actual repo evidence says the cleaner first-pass comparison unit is the sub-borough-area geography already shared by the social-condition layers:",
       "index_status": "present"
     },
@@ -277,6 +544,48 @@
       ],
       "why_relevant": "This is a benchmark for cross-domain dataset selection, geography harmonization, and composite-prioritization discipline under the current UrbanTrace copilot design.",
       "source_hint": "Poverty Measure – NYC Opportunity; New York City Community Air Survey",
+      "supporting_references": [
+        {
+          "title": "Poverty Measure – NYC Opportunity",
+          "type": "official NYC policy / documentation page",
+          "agency": "NYC Opportunity",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-measure.page",
+          "what_it_supports": "NYC describes the NYCgov Poverty Measure as accounting for the city’s higher housing costs and emphasizes that many New Yorkers faced mounting financial pressure as costs rose and temporary supports expired.",
+          "why_it_matters_for_this_benchmark": "It grounds the use of poverty-related hardship as a real city-policy burden relevant to district prioritization."
+        },
+        {
+          "title": "Poverty Data – NYC Opportunity",
+          "type": "official NYC data/documentation page",
+          "agency": "NYC Opportunity",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-data.page",
+          "what_it_supports": "NYC publishes underlying poverty-related datasets for researchers who want to replicate or expand poverty research.",
+          "why_it_matters_for_this_benchmark": "It supports treating poverty as a documented, operational city indicator rather than an invented benchmark variable."
+        },
+        {
+          "title": "New York City Community Air Survey",
+          "type": "official NYC data portal page",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page",
+          "what_it_supports": "NYC maintains neighborhood air-pollution measures suitable for local burden analysis.",
+          "why_it_matters_for_this_benchmark": "It grounds the air-pollution component of the compounded-need screen in a real NYC monitoring and reporting program."
+        },
+        {
+          "title": "Vision Zero – NYC.gov",
+          "type": "official city program page",
+          "agency": "New York City",
+          "url": "https://www.nyc.gov/content/visionzero/pages/",
+          "what_it_supports": "NYC treats crash and traffic-injury prevention as an active city policy priority.",
+          "why_it_matters_for_this_benchmark": "It makes crash risk a legitimate component of a district-level prioritization screen rather than an arbitrary add-on."
+        },
+        {
+          "title": "Economic conditions data for NYC – Environment & Health Data Portal",
+          "type": "official NYC portal page",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/economic-conditions/",
+          "what_it_supports": "NYC maintains neighborhood economic-condition indicators, including unemployment-oriented context, in a city health/equity reporting environment.",
+          "why_it_matters_for_this_benchmark": "It supports using unemployment as part of a broader burden screen rather than as an unrelated labor-market side variable."
+        }
+      ],
       "notes": "The seed correctly points to City Council districts as the governance target, but the repo evidence shows that the burden layers do not share that geography natively.",
       "index_status": "present"
     },
@@ -302,6 +611,40 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, geography discipline, and benchmark honesty under the current UrbanTrace copilot design.",
       "source_hint": "Interactive heat vulnerability index; Digital Equity - NYC Office of Technology and Innovation",
+      "supporting_references": [
+        {
+          "title": "Interactive heat vulnerability index — Environment & Health Data Portal",
+          "type": "official NYC portal page",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "what_it_supports": "NYC explicitly frames heat vulnerability as shaped by structural and social inequities and treats vulnerability mapping as a neighborhood planning tool.",
+          "why_it_matters_for_this_benchmark": "It provides the strongest official grounding for using a ZIP/ZCTA-like vulnerability layer already present in the local repo."
+        },
+        {
+          "title": "Digital Equity — NYC Office of Technology and Innovation",
+          "type": "official program page",
+          "agency": "NYC Office of Technology and Innovation",
+          "url": "https://www.nyc.gov/content/oti/pages/digital-equity",
+          "what_it_supports": "NYC formally treats digital equity and neighborhood access to digital support as a city policy priority.",
+          "why_it_matters_for_this_benchmark": "It supports a benchmark focused on public-access infrastructure such as Wi‑Fi, libraries, and public computer centers."
+        },
+        {
+          "title": "The New York City Digital Equity Roadmap",
+          "type": "official NYC report",
+          "agency": "NYC Office of Technology and Innovation",
+          "url": "https://www.nyc.gov/assets/oti/downloads/pdf/DE-Roadmap.pdf",
+          "what_it_supports": "The roadmap frames digital inequity in terms of affordability, devices, skills, and community-based support infrastructure.",
+          "why_it_matters_for_this_benchmark": "It justifies using multiple public-access service proxies rather than a single facilities layer."
+        },
+        {
+          "title": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
+          "type": "official NYC service report",
+          "agency": "City of New York",
+          "url": "https://www.nyc.gov/assets/operations/downloads/pdf/pmmr2026/lib.pdf",
+          "what_it_supports": "NYC tracks library computer sessions, Wi‑Fi sessions, circulation, and programming as active public-service outputs.",
+          "why_it_matters_for_this_benchmark": "It supports treating libraries as real service-access infrastructure rather than a generic civic amenity."
+        }
+      ],
       "notes": "This is the core correction for the case.",
       "index_status": "present"
     },
@@ -325,6 +668,33 @@
       ],
       "why_relevant": "This is a benchmark for cross-domain environmental burden reasoning under geography mismatch, not just for naming two plausible datasets.",
       "source_hint": "",
+      "supporting_references": [
+        {
+          "title": "Interactive heat vulnerability index",
+          "type": "official NYC Health data feature",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "what_it_supports": "NYC explicitly frames heat vulnerability as a neighborhood inequity issue. The page states that Black New Yorkers are disproportionately affected by extreme heat and that structural racism has limited access to protective resources such as air conditioning, green space, and neighborhood cooling resources.",
+          "why_it_matters_for_this_benchmark": "It provides the clearest official basis for treating `NYC_HVI` as a climate-vulnerability layer rather than a generic weather surface."
+        },
+        {
+          "title": "NYC Community Air Survey (NYCCAS) annual report page",
+          "type": "official NYC Health data feature",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/nyccas/",
+          "what_it_supports": "NYC Health describes NYCCAS as the city’s long-running neighborhood air-monitoring program, says it presents **maps of neighborhood air pollution levels by year**, and identifies local sources that drive differences across neighborhoods. The page also notes that ozone is produced in the presence of sunlight and heat and that the very hot summer of 2023 likely contributed to higher ozone levels.",
+          "why_it_matters_for_this_benchmark": "It directly grounds the air-pollution half of the case and gives an official NYC reason to treat heat-related climate conditions and air quality as linked policy concerns, especially for ozone."
+        },
+        {
+          "title": "Rappold et al. (2025). *Does socioeconomic and environmental burden affect vulnerability to extreme air pollution and heat? A case-crossover study of mortality in California*.",
+          "type": "peer-reviewed journal article",
+          "venue": "Journal of Exposure Science & Environmental Epidemiology",
+          "doi": "10.1038/s41370-024-00676-9",
+          "url": "https://doi.org/10.1038/s41370-024-00676-9",
+          "what_it_supports": "The abstract states that extreme heat and air pollution are each associated with increased mortality and that prior evidence suggests combined exposure can be more harmful than either exposure alone.",
+          "why_it_matters_for_this_benchmark": "Even though it is not NYC-specific, it provides credible scientific support for why a benchmark might look for **overlapping heat and pollution burdens** instead of treating them as unrelated environmental layers."
+        }
+      ],
       "notes": "Use NYC_HVI and NYC_air_pollution, but make the geography mismatch explicit before any overlap screen.",
       "index_status": "missing_from_index"
     },
@@ -348,6 +718,43 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection + scale discipline + policy-grounded interpretation.",
       "source_hint": "NYC DOT — School Safety; DDC Feature: Safe Routes to School",
+      "supporting_references": [
+        {
+          "title": "NYC DOT — School Safety",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/schoolsafety.shtml",
+          "why_relevant": "The page explicitly says DOT School Safety focuses on street redesigns near schools and on high-crash corridors and intersections near schools, using school slow zones, signage, signals, and traffic-calming measures.",
+          "confidence": "high"
+        },
+        {
+          "title": "DDC Feature: Safe Routes to School",
+          "type": "official NYC DDC feature page",
+          "url": "https://www.nyc.gov/site/ddc/resources/features/september-2016-safe-routes-to-school.page",
+          "why_relevant": "This page gives unusually concrete program logic: DOT examined accident histories around schools, combined school information with crash data, and prioritized schools using geocoded school/crash information within a 700-foot radius. That directly supports a benchmark built around schools plus nearby crash/traffic signals.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT Unveils New Student Safety Measures to Commemorate International Walk-And-Roll-To-School Day",
+          "type": "official NYC DOT press release",
+          "url": "https://www.nyc.gov/html/dot/html/pr2024/new-student-safety-measures.shtml",
+          "why_relevant": "This official release updates the policy context by explicitly linking student safety to safer walking, bicycling, and micromobility access near schools and by referencing the report *Safe Streets, Safe Schools, Safe Kids*.",
+          "confidence": "high"
+        },
+        {
+          "title": "Motor Vehicle Collisions - Crashes",
+          "type": "official NYC Open Data dataset",
+          "url": "https://data.cityofnewyork.us/d/h9gi-nx95",
+          "why_relevant": "Canonical city crash-event source corresponding to the local collision dataset used in the benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "Automated Traffic Volume Counts",
+          "type": "official NYC Open Data dataset",
+          "url": "https://data.cityofnewyork.us/d/7ym2-wayt",
+          "why_relevant": "Upstream source for the local traffic-count layer used here as a practical traffic-pressure proxy.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "Roll the three point layers up to NTAs and treat the result as school-safety screening, not a route audit.",
       "index_status": "missing_from_index"
     },
@@ -373,6 +780,50 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection + geography discipline + interpretation discipline.",
       "source_hint": "NYC DOT — Pedestrian Mobility Plan; NYC DOT — NYC Streets Plan",
+      "supporting_references": [
+        {
+          "title": "NYC DOT — Pedestrian Mobility Plan",
+          "type": "official NYC DOT planning page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/pedestrian-mobility.shtml",
+          "why_relevant": "The page explicitly describes NYC as a city of pedestrians, says DOT developed a holistic data-driven framework, and explains that anticipated pedestrian volumes and pedestrian generators are used to classify streets. That directly supports using pedestrian-demand evidence in a benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — NYC Streets Plan",
+          "type": "official NYC DOT planning page / plan",
+          "url": "https://www.nyc.gov/html/dot/html/about/nyc-streets-plan.shtml",
+          "why_relevant": "The page says the city needs safe and welcoming streets and public spaces and describes the Streets Plan as a five-year plan to improve the safety, accessibility, and quality of city streets. That supports a benchmark framed as public-realm and accessibility screening rather than only traffic measurement.",
+          "confidence": "high"
+        },
+        {
+          "title": "City Launches ‘Neighborhood Tech Help’ to Bridge Digital Divide Across the Boroughs",
+          "type": "official NYC announcement",
+          "url": "https://www.nyc.gov/site/hpd/news/015-25/city-launches-neighborhood-tech-help-bridge-digital-divide-across-boroughs",
+          "why_relevant": "The city explicitly ties in-person digital support, libraries, and internet/device access to essential services and neighborhood need. That strongly supports treating libraries and public connectivity assets as meaningful civic-support infrastructure.",
+          "confidence": "high"
+        },
+        {
+          "title": "The New York City Digital Equity Roadmap",
+          "type": "official NYC report",
+          "url": "https://www.nyc.gov/assets/oti/downloads/pdf/DE-Roadmap.pdf",
+          "why_relevant": "The roadmap provides the citywide policy context for evaluating public digital-access infrastructure, of which Wi‑Fi and library-linked support are practical local proxies.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — Pedestrian Plazas",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/nyc-plaza-program.shtml",
+          "why_relevant": "The page frames pedestrian-oriented public space as a safety, walkability, transit-access, and equity issue, which helps ground the broader public-realm interpretation of this case.",
+          "confidence": "medium-high"
+        },
+        {
+          "title": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
+          "type": "official NYC service report",
+          "url": "https://www.nyc.gov/assets/operations/downloads/pdf/pmmr2026/lib.pdf",
+          "why_relevant": "This report supports treating libraries as active service infrastructure rather than passive amenities.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "Aggregate pedestrian counts, libraries, and Wi-Fi hotspots to NTAs and interpret the output as a civic-support screening layer.",
       "index_status": "missing_from_index"
     },
@@ -397,6 +848,43 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation discipline under the current UrbanTrace copilot design.",
       "source_hint": "Neighborhood 360° - SBS; Commercial District Needs Assessments - SBS",
+      "supporting_references": [
+        {
+          "title": "Neighborhood 360° - SBS",
+          "type": "official NYC SBS program page",
+          "url": "https://www.nyc.gov/site/sbs/neighborhoods/neighborhood-360.page",
+          "why_relevant": "SBS says Neighborhood 360° supports projects that strengthen and revitalize the streets, small businesses, and community-based organizations that anchor NYC neighborhoods.",
+          "confidence": "high"
+        },
+        {
+          "title": "Commercial District Needs Assessments - SBS",
+          "type": "official NYC SBS program / reports page",
+          "url": "https://www.nyc.gov/site/sbs/neighborhoods/commercial-district-needs-assessments.page",
+          "why_relevant": "The page says CDNAs highlight the existing business landscape, consumer characteristics, physical environment, and unique character of commercial corridors and local businesses that make up neighborhood identity.",
+          "confidence": "high"
+        },
+        {
+          "title": "City Releases Community-Informed Commercial District Needs Assessments to Help Neighborhoods Better Support Small Businesses",
+          "type": "official NYC SBS press release",
+          "url": "https://www.nyc.gov/site/sbs/about/pr20181031_CDNA.page",
+          "why_relevant": "The release explicitly connects neighborhood conditions, business data, and small-business support in NYC commercial districts.",
+          "confidence": "high"
+        },
+        {
+          "title": "Issued Licenses - NYC Open Data / DCWP",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/w7w3-xahh",
+          "why_relevant": "Official source for the business-license point layer used in this benchmark, including coverage, attribution, and field definitions.",
+          "confidence": "high"
+        },
+        {
+          "title": "Poverty Data - NYC Opportunity",
+          "type": "official NYC documentation / data page",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-data.page",
+          "why_relevant": "Supports using poverty as an official city policy context layer rather than an invented benchmark covariate.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "Anchor the first pass on the shared sub-borough socioeconomic polygons, not on NTA fields embedded in the license file.",
       "index_status": "missing_from_index"
     },
@@ -420,6 +908,43 @@
       ],
       "why_relevant": "This is a benchmark for dataset selection, geography discipline, and interpretation discipline under the current UrbanTrace copilot design.",
       "source_hint": "New York City Community Air Survey (NYCCAS); New York City’s Environmental Justice for All Report Scope of Work",
+      "supporting_references": [
+        {
+          "title": "New York City Community Air Survey (NYCCAS)",
+          "type": "official NYC Health program page",
+          "url": "https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page",
+          "why_relevant": "The page explicitly describes neighborhood air-quality differences, traffic-related pollutants, and inclusion of additional environmental-justice monitoring sites.",
+          "confidence": "high"
+        },
+        {
+          "title": "New York City’s Environmental Justice for All Report Scope of Work",
+          "type": "official NYC environmental justice planning document",
+          "url": "https://www.nyc.gov/assets/sustainability/downloads/pdf/EJ-Report-Scope.pdf",
+          "why_relevant": "Provides direct city grounding for environmental-justice screening and neighborhood burden assessment.",
+          "confidence": "high"
+        },
+        {
+          "title": "A Plan for Cycling in New York City",
+          "type": "official NYC DOT report",
+          "url": "https://www.nyc.gov/html/dot/downloads/pdf/bike-safety-plan.pdf",
+          "why_relevant": "Establishes bicycle-network planning and expansion as a real NYC policy domain rather than an invented benchmark theme.",
+          "confidence": "high"
+        },
+        {
+          "title": "Safe Streets for Cycling",
+          "type": "official NYC DOT report",
+          "url": "https://www.nyc.gov/html/dot/downloads/pdf/safe-streets-for-cycling.pdf",
+          "why_relevant": "Supports the use of bike-network conditions and network gaps as a defensible planning concern in NYC.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — Bike Network and Ridership",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/bicyclists/bikestats.shtml",
+          "why_relevant": "Provides programmatic context for bike-network extent and ridership tracking, supporting why bike-route and bike-count layers belong in the same analytic family even if they should not be interpreted identically.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "Use air-pollution burden plus bike-route supply and optional bicycle-count context, but avoid assuming NTA is the natural shared geography.",
       "index_status": "present"
     },
@@ -444,6 +969,57 @@
       ],
       "why_relevant": "This is a benchmark for population-pressure reasoning, service-proxy discipline, and geography harmonization under the current UrbanTrace copilot design.",
       "source_hint": "Population Reports — NYC Planning; Population Changes in NYC Neighborhoods — NYC Planning",
+      "supporting_references": [
+        {
+          "title": "Population Reports — NYC Planning",
+          "type": "official NYC planning page",
+          "url": "https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population-current-estimates.page",
+          "why_relevant": "Confirms that NYC Planning treats population measurement and change as a formal planning input, which grounds the population-pressure side of the benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "Population Changes in NYC Neighborhoods — NYC Planning",
+          "type": "official NYC planning page",
+          "url": "https://www.nyc.gov/site/planning/planning-level/nyc-population/current-future-populations.page",
+          "why_relevant": "Supports the idea that neighborhood-scale population patterns are a legitimate city-planning concern rather than an invented benchmark framing.",
+          "confidence": "medium-high"
+        },
+        {
+          "title": "Public Libraries | New York City Preliminary Mayor’s Management Report FY2026",
+          "type": "official NYC service report",
+          "url": "https://www.nyc.gov/assets/operations/downloads/pdf/pmmr2026/lib.pdf",
+          "why_relevant": "Treats libraries as active service infrastructure by tracking usage, programming, computer sessions, and Wi‑Fi sessions.",
+          "confidence": "high"
+        },
+        {
+          "title": "Digital Equity — NYC Office of Technology and Innovation",
+          "type": "official program page",
+          "url": "https://www.nyc.gov/content/oti/pages/digital-equity",
+          "why_relevant": "Establishes digital access and supporting public infrastructure as a real city policy domain, which makes public Wi‑Fi a defensible service-side layer.",
+          "confidence": "high"
+        },
+        {
+          "title": "The New York City Digital Equity Roadmap",
+          "type": "official NYC report",
+          "url": "https://www.nyc.gov/assets/oti/downloads/pdf/DE-Roadmap.pdf",
+          "why_relevant": "Supports the interpretation of public connectivity infrastructure as part of neighborhood service access rather than a mere amenity count.",
+          "confidence": "high"
+        },
+        {
+          "title": "Barriers to Learning: Age, Accessibility, Space Usage, and Air Conditioning in NYC School Buildings",
+          "type": "policy report",
+          "url": "https://www.ibo.nyc.gov/content/publications/2025-march-barriers-to-learning-age-accessibility-space-usage-and-air-conditioning-in-nyc-school-buildings",
+          "why_relevant": "Gives real NYC grounding for why school facilities matter in planning conversations, while also reinforcing that school presence should be interpreted carefully rather than as a generic service count.",
+          "confidence": "medium-high"
+        },
+        {
+          "title": "NYC School Construction Authority — Current Capital Plan",
+          "type": "official NYC facilities-planning page",
+          "url": "https://www.nycsca.org/Community/Overview/Capital-Plan-Reports-and-Data/Current-Capital-Plan",
+          "why_relevant": "Supports the broader planning context that service and facilities provision responds to population change, enrollment, and public input.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "Use the shared population geography first, then compare counts of libraries, schools, and Wi-Fi assets as service-density proxies.",
       "index_status": "present"
     },
@@ -470,6 +1046,66 @@
       ],
       "why_relevant": "This is not a one-table lookup task.",
       "source_hint": "",
+      "supporting_references": [
+        {
+          "title": "Interactive heat vulnerability index",
+          "type": "official NYC Health data feature",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "what_it_supports": "NYC explicitly frames heat vulnerability as a neighborhood inequity issue and links disproportionate heat harm to structural racism, poverty, air-conditioning access, green space, and neighborhood cooling resources.",
+          "why_it_matters_here": "It supports using `NYC_HVI` as a true vulnerability layer, not just a temperature proxy."
+        },
+        {
+          "title": "New York City Community Air Survey (NYCCAS) / Air quality reporting",
+          "type": "official NYC Health program / data reporting",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page",
+          "what_it_supports": "NYC Health treats neighborhood air-pollution differences as an urban public-health burden and publishes neighborhood-scale PM2.5, NO2, and related measures.",
+          "why_it_matters_here": "It is the cleanest official grounding for the `NYC_air_pollution` layer in a cumulative-burden screen."
+        },
+        {
+          "title": "Economic conditions data for NYC",
+          "type": "official NYC Health data explorer",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/economic-conditions/",
+          "what_it_supports": "NYC publicly reports neighborhood-level economic-condition indicators including poverty and unemployment.",
+          "why_it_matters_here": "It supports the inclusion of poverty and unemployment as official local burden indicators rather than generic ACS variables chosen ad hoc."
+        },
+        {
+          "title": "Vision Zero",
+          "type": "official NYC city program page",
+          "agency": "City of New York / NYC DOT and partners",
+          "url": "https://www.nyc.gov/content/visionzero/pages/",
+          "what_it_supports": "NYC treats traffic deaths and serious injuries as a major policy priority and frames traffic harm as an intervention-worthy burden.",
+          "why_it_matters_here": "It supports using crash injury burden as the traffic-safety component of a priority screen rather than a generic mobility metric like traffic volume."
+        },
+        {
+          "title": "New York City’s Environmental Justice for All Report Scope of Work",
+          "type": "official NYC environmental justice planning document",
+          "agency": "City of New York",
+          "url": "https://www.nyc.gov/assets/sustainability/downloads/pdf/EJ-Report-Scope.pdf",
+          "what_it_supports": "The city’s environmental-justice planning explicitly centers cumulative burdens, inequitable exposures, and vulnerable communities.",
+          "why_it_matters_here": "It provides official NYC policy justification for a benchmark built around overlapping environmental and socioeconomic burdens rather than a single hazard."
+        },
+        {
+          "title": "Morello-Frosch, Pastor, Porras, & Sadd (2012). *Cumulative Environmental Vulnerability and Environmental Justice in California’s San Joaquin Valley*.",
+          "type": "peer-reviewed article",
+          "venue": "International Journal of Environmental Research and Public Health",
+          "doi": "10.3390/ijerph9051593",
+          "url": "https://doi.org/10.3390/ijerph9051593",
+          "what_it_supports": "A concrete methodological precedent for combining social vulnerability and environmental burden into a cumulative screening framework.",
+          "why_it_matters_here": "It is a strong conceptual match for this case’s composite-prioritization logic."
+        },
+        {
+          "title": "Rappold et al. (2025). *Does socioeconomic and environmental burden affect vulnerability to extreme air pollution and heat? A case-crossover study of mortality in California*.",
+          "type": "peer-reviewed article",
+          "venue": "Journal of Exposure Science & Environmental Epidemiology",
+          "doi": "10.1038/s41370-024-00676-9",
+          "url": "https://doi.org/10.1038/s41370-024-00676-9",
+          "what_it_supports": "Socioeconomic and environmental burdens can interact in ways that worsen vulnerability to heat and air pollution.",
+          "why_it_matters_here": "It strengthens the case for looking at **overlap** rather than treating each burden independently."
+        }
+      ],
       "notes": "Choose a reporting geography, aggregate crashes, select a time slice for air pollution, crosswalk HVI, then normalize the burden measures before combining them.",
       "index_status": "present"
     },
@@ -495,6 +1131,50 @@
       ],
       "why_relevant": "This is a benchmark for economic-vitality reasoning under mixed data types and imperfect business proxies.",
       "source_hint": "Neighborhood 360° - SBS; Commercial District Needs Assessments - SBS",
+      "supporting_references": [
+        {
+          "title": "Neighborhood 360° - SBS",
+          "type": "official NYC SBS program page",
+          "url": "https://www.nyc.gov/site/sbs/neighborhoods/neighborhood-360.page",
+          "why_relevant": "SBS says Neighborhood 360° supports commercial revitalization projects that strengthen the streets, small businesses, and community-based organizations that anchor NYC neighborhoods.",
+          "confidence": "high"
+        },
+        {
+          "title": "Commercial District Needs Assessments - SBS",
+          "type": "official NYC SBS program / reports page",
+          "url": "https://www.nyc.gov/site/sbs/neighborhoods/commercial-district-needs-assessments.page",
+          "why_relevant": "SBS says CDNAs highlight the business landscape, consumer characteristics, physical environment, and streetscape conditions of commercial corridors, and identify opportunities for revitalization, public programming, streetscape enhancements, and business support.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — Pedestrian Mobility Plan",
+          "type": "official NYC DOT planning page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/pedestrian-mobility.shtml",
+          "why_relevant": "The page explicitly frames businesses as pedestrian generators and describes a data-driven approach to pedestrian needs, which supports using pedestrian counts in a commercial-corridor benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — Open Streets",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/openstreets.shtml",
+          "why_relevant": "NYC DOT says Open Streets can promote economic development, support community uses, and create new public space, making it a strong public-realm support layer for this case.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC DOT — Pedestrian Plazas",
+          "type": "official NYC DOT program page",
+          "url": "https://www.nyc.gov/html/dot/html/pedestrians/nyc-plaza-program.shtml",
+          "why_relevant": "NYC DOT says plazas enhance walkability, access, community, commerce, and culture, which directly supports using plaza locations as a public-realm support signal.",
+          "confidence": "high"
+        },
+        {
+          "title": "Issued Licenses - NYC Open Data / DCWP",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/w7w3-xahh",
+          "why_relevant": "Official source for the regulated business-license dataset used as the local business-presence layer.",
+          "confidence": "high"
+        }
+      ],
       "notes": "For this benchmark, NTA is the cleanest first-pass answer.",
       "index_status": "present"
     },
@@ -520,6 +1200,43 @@
       ],
       "why_relevant": "This is a benchmark for economic-opportunity reasoning with a large administrative point layer plus neighborhood hardship context.",
       "source_hint": "Jobs & Internships - DYCD; Workforce Job Trainings - DYCD",
+      "supporting_references": [
+        {
+          "title": "Jobs & Internships - DYCD",
+          "type": "official NYC DYCD program page",
+          "url": "https://www.nyc.gov/site/dycd/services/jobs-internships.page",
+          "why_relevant": "The page says DYCD is the City’s lead agency for youth employment programs and lists workforce-oriented offerings such as SYEP, Train & Earn, Learn & Earn, Advance & Earn, and Work, Learn & Grow.",
+          "confidence": "high"
+        },
+        {
+          "title": "Workforce Job Trainings - DYCD",
+          "type": "official NYC DYCD services page",
+          "url": "https://www.nyc.gov/site/dycd/services/jobs-internships/workforce_job_trainings.page",
+          "why_relevant": "Supports the benchmark’s emphasis on workforce-oriented DYCD programming rather than treating all youth-service sites as interchangeable.",
+          "confidence": "medium-high"
+        },
+        {
+          "title": "DYCD Program Sites - NYC Open Data",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/ebkm-iyma",
+          "why_relevant": "Official documentation for the site inventory represented locally as `dycd_program_sites`, including the program and geography fields that drive this benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "Economic conditions data for NYC - Environment & Health Data Portal",
+          "type": "official NYC portal page",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/economic-conditions/",
+          "why_relevant": "Official city framing for neighborhood poverty and unemployment as meaningful economic-condition indicators.",
+          "confidence": "high"
+        },
+        {
+          "title": "Poverty Data - NYC Opportunity",
+          "type": "official NYC documentation page",
+          "url": "https://www.nyc.gov/site/opportunity/poverty-in-nyc/poverty-data.page",
+          "why_relevant": "Supports the use of poverty as an official local hardship metric in a benchmark about access to opportunity.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "The strongest first-pass answer should anchor on the shared socioeconomic geography.",
       "index_status": "present"
     },
@@ -544,6 +1261,43 @@
       ],
       "why_relevant": "This is a benchmark for service-access reasoning under vulnerable-population targeting and imperfect ZIP geography.",
       "source_hint": "Older Adult Center - NYC Aging; Find Help - NYC Aging",
+      "supporting_references": [
+        {
+          "title": "Older Adult Center - NYC Aging",
+          "type": "official NYC Aging service page",
+          "url": "https://www.nyc.gov/site/dfta/services/older-adult-center.page",
+          "why_relevant": "NYC Aging says there are more than 300 older adult centers and affiliated sites citywide, open to adults age 60 and older, providing meals, activities, fitness programs, and social services.",
+          "confidence": "high"
+        },
+        {
+          "title": "Find Help - NYC Aging",
+          "type": "official NYC Aging service / referral page",
+          "url": "https://www.nyc.gov/site/dfta/services/find-help.page",
+          "why_relevant": "NYC Aging describes Aging Connect as the agency’s information and resource center connecting older adults, families, and community members to local services, programs, and opportunities.",
+          "confidence": "high"
+        },
+        {
+          "title": "Department for the Aging (NYC Aging) - All Contracted Providers",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/cqc8-am9x",
+          "why_relevant": "Official documentation for the local provider directory, stating that it includes Older Adult Center, Abuse Prevention, Home Care, Legal Services, NORC, Transportation, Case Management, Home Delivered Meal, and Caregiver contracts.",
+          "confidence": "high"
+        },
+        {
+          "title": "Interactive heat vulnerability index",
+          "type": "official NYC Health portal page",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "why_relevant": "Official city framing for neighborhood heat vulnerability and inequitable exposure to heat risk.",
+          "confidence": "high"
+        },
+        {
+          "title": "2025 NYC Heat-Related Mortality Report",
+          "type": "official NYC Health report page",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/heat-report/",
+          "why_relevant": "Provides official evidence that heat remains a major public-health burden in NYC and that protection and cooling access matter for resilience planning.",
+          "confidence": "high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should stay ZIP-like.",
       "index_status": "present"
     },
@@ -569,6 +1323,43 @@
       ],
       "why_relevant": "This is a benchmark for heat-resilience reasoning with underused parks datasets and imperfect ZIP geography.",
       "source_hint": "Extreme Heat: Beat the Heat! — NYC Emergency Management; Interactive heat vulnerability index",
+      "supporting_references": [
+        {
+          "title": "Extreme Heat: Beat the Heat! — NYC Emergency Management",
+          "type": "official NYC preparedness page",
+          "url": "https://www.nyc.gov/site/em/ready/extreme-heat.page",
+          "why_relevant": "The page states that extreme heat kills, notes substantial preventable mortality, and tells residents without home air conditioning to use free public places and the City’s cool-options resources. That supports the broader need for neighborhood heat-protection screening.",
+          "confidence": "high"
+        },
+        {
+          "title": "Interactive heat vulnerability index",
+          "type": "official NYC Health portal page",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/",
+          "why_relevant": "The page explicitly frames heat as a neighborhood inequity issue and mentions reduced access to neighborhood cooling resources, directly supporting the vulnerability side of the benchmark.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC Parks Drinking Fountains — NYC Open Data",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/qnv7-p7a2",
+          "why_relevant": "Official documentation for the local drinking-fountain inventory, stating that it covers outdoor drinking fountains in parks and includes physical-environment attributes.",
+          "confidence": "high"
+        },
+        {
+          "title": "NYC Parks Spray Showers — NYC Open Data",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/ckaz-6gaa",
+          "why_relevant": "Official documentation for the local spray-shower inventory, stating that it provides the locations of spray showers under NYC Parks jurisdiction.",
+          "confidence": "high"
+        },
+        {
+          "title": "Cool Options NYC",
+          "type": "official city finder / service page",
+          "url": "https://finder.nyc.gov/coolingcenters/",
+          "why_relevant": "Useful as an explicit boundary condition: it is the City’s formal cool-options system, which helps a strong agent explain why fountains and spray showers should not be mislabeled as official cooling centers.",
+          "confidence": "medium-high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should stay ZIP-like.",
       "index_status": "present"
     },
@@ -594,6 +1385,43 @@
       ],
       "why_relevant": "This is a benchmark for pedestrian-accessibility reasoning with underused DOT accessibility layers plus a real public-service destination inventory.",
       "source_hint": "Older Adult Center - NYC Aging; Accessible NYC 2025: An Accessibility Guide for City Agencies",
+      "supporting_references": [
+        {
+          "title": "Older Adult Center - NYC Aging",
+          "type": "official NYC Aging service page",
+          "url": "https://www.nyc.gov/site/dfta/services/older-adult-center.page",
+          "why_relevant": "Officially establishes older-adult centers as real service destinations across the five boroughs and notes programming for older adults, including specialized support for blind and visually impaired older adults.",
+          "confidence": "high"
+        },
+        {
+          "title": "Accessible NYC 2025: An Accessibility Guide for City Agencies",
+          "type": "official NYC guide",
+          "url": "https://www.nyc.gov/assets/mopd/downloads/pdf/accessible-nyc-2025.pdf",
+          "why_relevant": "Provides official citywide accessibility guidance that supports treating curb ramps, pedestrian signals, and accessible routes as meaningful parts of equitable access.",
+          "confidence": "high"
+        },
+        {
+          "title": "Accessible Pedestrian Signal Locations - NYC Open Data",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/de3m-c5p4",
+          "why_relevant": "Official documentation for the APS inventory represented locally in the repo.",
+          "confidence": "high"
+        },
+        {
+          "title": "Pedestrian Ramp Locations - NYC Open Data",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/ufzp-rrqu",
+          "why_relevant": "Official documentation for the curb-ramp / pedestrian-ramp inventory represented locally in the repo.",
+          "confidence": "high"
+        },
+        {
+          "title": "Department for the Aging (NYC Aging) - All Contracted Providers",
+          "type": "official dataset documentation",
+          "url": "https://data.cityofnewyork.us/api/views/cqc8-am9x",
+          "why_relevant": "Official documentation for the older-adult provider inventory used as the destination layer in this case.",
+          "confidence": "high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should use community districts.",
       "index_status": "present"
     },
@@ -621,6 +1449,40 @@
       ],
       "why_relevant": "This is a benchmark for cross-sector education-and-safety reasoning using a real NYC policy framing, NYC-specific empirical research, and a clean shared community-district geography in the UrbanTrace catalog.",
       "source_hint": "Community Violence Prevention Framework; Office of Neighborhood Safety Annual Report 2023; School Climate and the Impact of Neighborhood Crime on Test Scores",
+      "supporting_references": [
+        {
+          "title": "Community Violence Prevention Framework",
+          "type": "official NYC policy / public health framework",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://www.nyc.gov/assets/doh/downloads/pdf/vio/community-violence-prevention-framework.pdf",
+          "why_relevant": "Grounds the benchmark in an official NYC framework that explicitly connects violence to the places where people live and learn, supporting neighborhood-based cross-sector screening.",
+          "confidence": "high"
+        },
+        {
+          "title": "Office of Neighborhood Safety Annual Report 2023",
+          "type": "official NYC annual report",
+          "agency": "NYC Office of Neighborhood Safety",
+          "url": "https://criminaljustice.cityofnewyork.us/wp-content/uploads/2025/06/ONS-Annual-Report-2023-FINAL.pdf",
+          "why_relevant": "Shows that NYC actually targets violence-prevention and youth-support work geographically, making a district-level triage benchmark realistic.",
+          "confidence": "high"
+        },
+        {
+          "title": "School Climate and the Impact of Neighborhood Crime on Test Scores",
+          "type": "peer-reviewed research",
+          "authors": "A. Laurito et al.",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6545988/",
+          "why_relevant": "NYC-focused empirical evidence that neighborhood violent crime exposure can affect student test outcomes, making the benchmark substantively credible.",
+          "confidence": "high"
+        },
+        {
+          "title": "The Academic Effects of Chronic Exposure to Neighborhood Violence",
+          "type": "NYC-focused academic research",
+          "authors": "Amy Ellen Schwartz et al.",
+          "url": "https://surface.syr.edu/cpr/229/",
+          "why_relevant": "Supports the use of repeated neighborhood violence exposure as a meaningful context variable for academic screening.",
+          "confidence": "high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should use community districts via BoroCD / Community District. Community_Districs is acceptable as a QA boundary layer but is not strictly required if the agent relies on the aligned derived tables.",
       "index_status": "present"
     },
@@ -648,6 +1510,56 @@
       ],
       "why_relevant": "This is a benchmark for housing-affordability reasoning grounded in real NYC housing policy, fair-housing planning, and anti-displacement screening, using a clean shared sub-borough geography in the UrbanTrace catalog.",
       "source_hint": "Problem - NYC Housing; Housing Our Neighbors; City of Yes for Housing Opportunity; Displacement Risk; NYU Furman Center State of the City",
+      "supporting_references": [
+        {
+          "title": "Problem - NYC Housing",
+          "type": "official NYC housing policy background page",
+          "agency": "City of New York",
+          "url": "https://www.nyc.gov/site/housing/about/problem.page",
+          "why_relevant": "Directly states that high rent burden affects nearly every income group and neighborhood, and that NYC’s affordable-housing crisis reflects a mismatch between demand and supply.",
+          "confidence": "high"
+        },
+        {
+          "title": "Mayor Adams Outlines Blueprint for “Housing Our Neighbors”",
+          "type": "official NYC policy / press release",
+          "agency": "NYC Mayor’s Office",
+          "url": "https://www.nyc.gov/mayors-office/news/2022/06/mayor-adams-outlines-blueprint-housing-our-neighbors-plan-get-new-yorkers-safe",
+          "why_relevant": "Grounds the benchmark in an official citywide housing blueprint linking supply, affordability, rent burden, and equitable housing policy.",
+          "confidence": "high"
+        },
+        {
+          "title": "City of Yes for Housing Opportunity Final Plan",
+          "type": "official NYC planning document",
+          "agency": "NYC Department of City Planning",
+          "url": "https://www.nyc.gov/assets/planning/download/pdf/plans-studies/city-of-yes/housing-opportunity/city-of-yes-for-housing-opportunity_final-plan.pdf",
+          "why_relevant": "Frames the housing crisis in terms of shortage, uneven neighborhood housing production, rent burden, fair housing, and anti-gentrification pressure.",
+          "confidence": "high"
+        },
+        {
+          "title": "Displacement Risk",
+          "type": "official NYC planning / housing data explainer",
+          "agencies": "NYC Department of City Planning and NYC Department of Housing Preservation and Development",
+          "url": "https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/displacement-risk/",
+          "why_relevant": "Supports treating this benchmark as a screening tool for anti-displacement follow-up rather than a simple supply-success metric.",
+          "confidence": "high"
+        },
+        {
+          "title": "State of New York City’s Housing and Neighborhood Report",
+          "type": "research / data methodology reference",
+          "organization": "NYU Furman Center",
+          "url": "https://www.furmancenter.org/data-tool/state-of-the-city/",
+          "why_relevant": "Explains why sub-borough areas are a standard housing-analysis geography and why they differ from community districts.",
+          "confidence": "high"
+        },
+        {
+          "title": "The effect of rezoning on local housing supply and demand: Evidence from New York City",
+          "type": "peer-reviewed academic research",
+          "author": "Hsi-Ling Liao",
+          "url": "https://www.sciencedirect.com/science/article/pii/S016604622500105X",
+          "why_relevant": "NYC-focused evidence that upzoning can increase housing supply while also changing neighborhood mobility and composition, reinforcing the need for a calibrated benchmark.",
+          "confidence": "high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should use Sub-Borough Area. NYC_population is a strong optional enhancement, but the core trio should remain housing units, median rent, and median household income.",
       "index_status": "present"
     },
@@ -676,6 +1588,80 @@
       ],
       "why_relevant": "This is a benchmark for post-pandemic education-recovery reasoning using real NYC policy framing, NYC-specific research on neighborhood conditions and student outcomes, and a clean shared community-district geography in the UrbanTrace catalog.",
       "source_hint": "NYC Public Schools 2023-24 and 2024-25 Grades 3-8 test score releases; Community Violence Prevention Framework; ONS Annual Report 2023; Laurito et al. on neighborhood crime and test scores; NYSED 2020 suspension memo and 2021 assessment participation guidance.",
+      "supporting_references": [
+        {
+          "title": "NYC Public Schools Releases Grades 3–8 State Test Score Data for 2023–24 School Year",
+          "type": "official NYC education release",
+          "agency": "New York City Public Schools",
+          "url": "https://www.schools.nyc.gov/home/2024/08/21/new-york-city-public-schools-releases-grades-3-8-state-test-score-data-for-2023-24-school-year",
+          "why_relevant": "anchors the post-2022 recovery period and shows the city is actively interpreting recent ELA and math performance trends.",
+          "confidence": "high"
+        },
+        {
+          "title": "Mayor Adams, Chancellor Aviles-Ramos Celebrate Grades 3–8 State Test Score Data Showing Increased Proficiency for 2024–25 School Year",
+          "type": "official NYC education release",
+          "agency": "New York City Public Schools",
+          "url": "https://www.schools.nyc.gov/home/2025/08/11/mayor-adams-chancellor-aviles-ramos-celebrate-grades-3-8-state-test-score-data-showing-increased-proficiency-for-2024-2025-school-year",
+          "why_relevant": "shows that NYC continues to treat this period as one of system recovery and instructional investment.",
+          "confidence": "high"
+        },
+        {
+          "title": "Community Violence Prevention Framework",
+          "type": "official NYC public health framework",
+          "agency": "NYC Department of Health and Mental Hygiene",
+          "url": "https://www.nyc.gov/assets/doh/downloads/pdf/vio/community-violence-prevention-framework.pdf",
+          "why_relevant": "grounds the benchmark in a place-based, public-health framing of neighborhood violence.",
+          "confidence": "high"
+        },
+        {
+          "title": "ONS Annual Report 2023",
+          "type": "official NYC annual report",
+          "agency": "NYC Office of Neighborhood Safety",
+          "url": "https://criminaljustice.cityofnewyork.us/wp-content/uploads/2025/06/ONS-Annual-Report-2023-FINAL.pdf",
+          "why_relevant": "shows that NYC actually targets violence-prevention and youth/family supports geographically.",
+          "confidence": "high"
+        },
+        {
+          "title": "School Climate and the Impact of Neighborhood Crime on Test Scores",
+          "type": "peer-reviewed NYC-focused research",
+          "authors": "Agustina Laurito et al.",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6545988/",
+          "why_relevant": "provides NYC-based evidence that neighborhood violent crime exposure is associated with lower ELA outcomes and interacts with school climate.",
+          "confidence": "high"
+        },
+        {
+          "title": "Policing and Educational Outcomes",
+          "type": "NYC research / policy brief",
+          "organization": "NYU Research Alliance for New York City Schools",
+          "url": "https://steinhardt.nyu.edu/research-alliance/research/policing-and-educational-outcomes",
+          "why_relevant": "supports the broader idea that neighborhood safety and enforcement conditions can shape educational trajectories.",
+          "confidence": "high"
+        },
+        {
+          "title": "Suspension of the Spring 2020 Grades 3–8 English Language Arts Test Shipments and Computer-based Test Window Opening",
+          "type": "official state assessment memo",
+          "agency": "New York State Education Department",
+          "url": "https://www.nysed.gov/memo/state-assessment/suspension-spring-2020-grades-3-8-english-language-arts-test-shipments-and",
+          "why_relevant": "justifies excluding 2020 from any continuous assessment trend.",
+          "confidence": "high"
+        },
+        {
+          "title": "State Education Department Releases Spring 2021 Grades 3–8 ELA and Math Assessment Data",
+          "type": "official state assessment release",
+          "agency": "New York State Education Department",
+          "url": "https://www.nysed.gov/news/2023/state-education-department-releases-spring-2021-grades-3-8-ela-and-math-assessment-data",
+          "why_relevant": "explicitly says 2021 participation was low and results were not representative, supporting a 2022–2024 recovery window.",
+          "confidence": "high"
+        },
+        {
+          "title": "Community Districts",
+          "type": "official NYC geography / boundary dataset",
+          "agency": "NYC Department of City Planning",
+          "url": "https://catalog.data.gov/dataset/community-districts-74cf7",
+          "why_relevant": "confirms the formal planning geography and explains that NYC has 59 community districts plus 12 Joint Interest Areas.",
+          "confidence": "high"
+        }
+      ],
       "notes": "The cleanest first-pass answer should use community districts via BoroCD / Community District. Community_Districs is acceptable as a QA boundary layer but is not strictly required if the agent relies on the aligned derived tables. Strong answers should focus the recovery window on 2022-2024 and explicitly note the 2020 and 2021 assessment caveats.",
       "index_status": "present"
     }
