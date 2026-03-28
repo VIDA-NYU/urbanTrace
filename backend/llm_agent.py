@@ -1,4 +1,4 @@
-"""Simple Portkey-backed chat agent with UrbanTrace dataset context."""
+"""Simple multi-provider chat agent with UrbanTrace dataset context."""
 
 from __future__ import annotations
 
@@ -8,7 +8,17 @@ import os
 import time
 from pathlib import Path
 from typing import Any
-from portkey_ai import Portkey
+
+try:
+    from openai import OpenAI
+except ImportError:  # pragma: no cover
+    OpenAI = None
+
+try:
+    from portkey_ai import Portkey
+except ImportError:  # pragma: no cover
+    Portkey = None
+
 from tool import (
     HOTSPOT_SYNTHESIS_FIELDS,
     HOTSPOT_SYNTHESIS_PROMPT,
@@ -33,37 +43,105 @@ DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions.csv"
 
 
 class UrbanTraceCopilot:
-    """Very small helper around Portkey chat.completions for UrbanTrace."""
+    """Very small helper around Portkey/OpenAI chat.completions for UrbanTrace."""
+
+    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai"}
+    _DEFAULT_PORTKEY_MODEL = "@vertexai/gemini-3-pro-preview"
+    _DEFAULT_OPENAI_MODEL = "gpt-5-mini"
+    _DEFAULT_PORTKEY_BASE_URL = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1/"
+    _REQUEST_TIMEOUT_SECONDS = 60
 
     def __init__(
         self,
+        llm_provider: str | None = None,
+        llm_model: str | None = None,
         metadata_dir: str | Path = DEFAULT_METADATA_DIR,
         descriptions_csv: str | Path = DEFAULT_DESCRIPTIONS_CSV,
     ) -> None:
-        resolved_api_key = os.getenv("PORTKEY_API_KEY")
-        resolved_model = os.getenv("PORTKEY_MODEL", "@gpt-5-mini/gpt-5-mini")
-        resolved_base_url = os.getenv(
-            "PORTKEY_BASE_URL",
-            "https://ai-gateway.apps.cloud.rt.nyu.edu/v1",
+        self.provider = self._normalize_provider(
+            llm_provider or os.getenv("LLM_PROVIDER") or "portkey"
         )
+        if self.provider is None:
+            self.provider = "portkey"
 
-        if not resolved_api_key:
-            raise ValueError(
-                "Missing Portkey API key. Set PORTKEY_API_KEY or pass api_key."
-            )
+        self.portkey_api_key = os.getenv("PORTKEY_API_KEY")
+        self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.request_timeout = self._REQUEST_TIMEOUT_SECONDS
 
-        self.portkey = Portkey(
-            base_url=resolved_base_url,
-            api_key=resolved_api_key,
-            model=resolved_model,
-            strict_open_ai_compliance=False,
-        )
-        self.model = resolved_model
+        if self.provider == "portkey":
+            self.model = llm_model or os.getenv("PORTKEY_MODEL") or self._DEFAULT_PORTKEY_MODEL
+        else:
+            self.model = llm_model or os.getenv("OPENAI_MODEL") or self._DEFAULT_OPENAI_MODEL
+
+        self.portkey: Any | None = None
+        self.openai: Any | None = None
+        self._ensure_provider_client()
+
         self.metadata_dir = Path(metadata_dir)
         self.descriptions_csv = Path(descriptions_csv)
         self.dataset_descriptions: dict[str, str] = {}
         self.dataset_context = self._build_dataset_context()
         self.dashboard_state: dict[str, list[dict[str, Any]]] = {"nodes": [], "edges": []}
+
+    @classmethod
+    def _normalize_provider(cls, provider: str | None) -> str | None:
+        if provider is None:
+            return None
+        normalized = provider.strip().lower()
+        if not normalized:
+            return None
+        if normalized not in cls._SUPPORTED_LLM_PROVIDERS:
+            supported = ", ".join(sorted(cls._SUPPORTED_LLM_PROVIDERS))
+            raise ValueError(f"Unsupported llm provider '{provider}'. Choose one of: {supported}.")
+        return normalized
+
+    def _get_portkey_client(self) -> Any:
+        if self.portkey is not None:
+            return self.portkey
+
+        if Portkey is None:
+            raise ImportError(
+                "Portkey provider requested but 'portkey-ai' is not installed. "
+                "Install it with `pip install portkey-ai`."
+            )
+        if not self.portkey_api_key:
+            raise ValueError("Missing Portkey API key. Set PORTKEY_API_KEY.")
+
+        self.portkey = Portkey(
+            base_url=self._DEFAULT_PORTKEY_BASE_URL,
+            api_key=self.portkey_api_key,
+            model=self.model,
+            strict_open_ai_compliance=False,
+            request_timeout=self.request_timeout * 1000,
+        )
+        return self.portkey
+
+    def _get_openai_client(self) -> Any:
+        if self.openai is not None:
+            return self.openai
+
+        if OpenAI is None:
+            raise ImportError(
+                "OpenAI provider requested but 'openai' is not installed. "
+                "Install it with `pip install openai`."
+            )
+        if not self.openai_api_key:
+            raise ValueError("Missing OpenAI API key. Set OPENAI_API_KEY.")
+
+        client_kwargs: dict[str, Any] = {
+            "api_key": self.openai_api_key,
+            "timeout": self.request_timeout,
+        }
+
+        self.openai = OpenAI(**client_kwargs)
+        return self.openai
+
+    def _ensure_provider_client(self) -> Any:
+        if self.provider == "portkey":
+            return self._get_portkey_client()
+        if self.provider == "openai":
+            return self._get_openai_client()
+        raise ValueError(f"Unsupported llm provider '{self.provider}'.")
 
     @staticmethod
     def _normalize_dataset_id(name: str) -> str:
@@ -122,10 +200,11 @@ class UrbanTraceCopilot:
                 continue
         return metadata
 
-    def _build_dataset_context(
-        self,
-        max_description_chars: int = 500,
-    ) -> str:
+    _TOKEN_LIMIT = 272_000
+    _OVERHEAD_TOKENS = 20_000   # reserved for system prompts, user message, tool schemas
+    _CHARS_PER_TOKEN = 4        # conservative approximation
+
+    def _build_dataset_context(self) -> str:
         descriptions = self._load_descriptions()
         self.dataset_descriptions = descriptions
         metadata = self._load_metadata()
@@ -134,27 +213,58 @@ class UrbanTraceCopilot:
         if not dataset_ids:
             return "No dataset descriptions or metadata were found."
 
+        max_chars_per_entry: int = (
+            (self._TOKEN_LIMIT - self._OVERHEAD_TOKENS) * self._CHARS_PER_TOKEN
+            // max(len(dataset_ids), 1)
+        )
+
         context_lines = [
             "UrbanTrace dataset catalog:",
             "Use this context when answering dataset questions.",
         ]
 
         for dataset_id in dataset_ids:
-            dataset_meta = metadata.get(dataset_id, {})
+            meta = metadata.get(dataset_id, {})
+            description = descriptions.get(dataset_id, "")
 
-            description = descriptions.get(dataset_id, "No description available.")
-            if len(description) > max_description_chars:
-                description = f"{description[:max_description_chars].rstrip()}..."
+            parts: list[str] = [
+                f"geometry={meta.get('geometricType', 'unknown')}",
+            ]
 
-            context_lines.append(
-                (
-                    f"- {dataset_id}: "
-                    f"geometry={dataset_meta.get('geometricType', 'unknown')}; "
-                    f"rows={dataset_meta.get('nb_rows', 'unknown')}; "
-                    "profile=Refer to metadata/dashboard context for profile columns; "
-                    f"description={description}"
-                )
-            )
+            attr_kw = meta.get("attribute_keywords", [])
+            if attr_kw:
+                parts.append(f"attribute_keywords=[{', '.join(str(k) for k in attr_kw)}]")
+
+            nb_columns = meta.get("nb_columns")
+            if nb_columns is not None:
+                parts.append(f"nb_columns={nb_columns}")
+
+            columns = meta.get("columns", [])
+            if columns:
+                col_summaries = []
+                for c in columns:
+                    if not isinstance(c, dict):
+                        continue
+                    col_parts = [c["name"]] if c.get("name") else []
+                    if c.get("structural_type"):
+                        col_parts.append(f"type={c['structural_type']}")
+                    sem = c.get("semantic_types")
+                    if sem:
+                        col_parts.append(f"semantic={sem}")
+                    geo = c.get("geo_classifier")
+                    if geo:
+                        col_parts.append(f"geo={geo}")
+                    col_summaries.append("(" + ", ".join(col_parts) + ")")
+                if col_summaries:
+                    parts.append(f"columns=[{'; '.join(col_summaries)}]")
+
+            if description:
+                parts.append(f"description={description}")
+
+            entry = f"- id={dataset_id}: {'; '.join(parts)}"
+            if len(entry) > max_chars_per_entry:
+                entry = entry[:max_chars_per_entry - 3] + "..."
+            context_lines.append(entry)
 
         return "\n".join(context_lines)
 
@@ -192,11 +302,26 @@ class UrbanTraceCopilot:
         attempt = 0
         while True:
             try:
-                return self.portkey.chat.completions.create(**payload)
+                if self.provider == "portkey":
+                    client = self._get_portkey_client()
+                    return client.chat.completions.create(
+                        **payload,
+                        timeout=self.request_timeout * 1000,
+                    )
+                if self.provider == "openai":
+                    client = self._get_openai_client()
+                    return client.chat.completions.create(
+                        **payload,
+                        timeout=self.request_timeout * 1000,
+                    )
+                raise ValueError(f"Unsupported llm provider '{self.provider}'.")
             except Exception as exc:
                 message = str(exc)
 
-                retryable = any(code in message for code in ("502", "503", "504", "Bad Gateway"))
+                retryable = any(
+                    code in message
+                    for code in ("429", "500", "502", "503", "504", "Bad Gateway", "Rate limit")
+                )
                 if retryable and attempt < retries:
                     time.sleep(1.25 * (attempt + 1))
                     attempt += 1
@@ -209,86 +334,63 @@ class UrbanTraceCopilot:
         system_prompt: str,
         include_tool_guidance: bool = False,
     ) -> list[dict[str, Any]]:
-        """Build chat messages with system, dataset, and dashboard context."""
-        messages: list[dict[str, Any]] = [
-            {
-                "role": "system",
-                "content": [{"type": "text", "text": system_prompt}],
-            },
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": (
-                            "You have access to these UrbanTrace dataset descriptions "
-                            "and metadata:\n"
-                            f"{self.dataset_context}"
-                        ),
-                    }
-                ],
-            },
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": self._build_dashboard_context_message(),
-                    }
-                ],
-            },
+        """Build chat messages with system, dataset, and dashboard context.
+
+        All system content is merged into a SINGLE system message with a plain
+        string content value. This is required for Gemini compatibility — Gemini
+        only accepts one system instruction and does not accept content-block lists
+        for system messages. OpenAI models handle plain strings equally well.
+        """
+        system_parts = [
+            system_prompt,
+            (
+                "You have access to these UrbanTrace dataset descriptions and metadata:\n"
+                f"{self.dataset_context}"
+            ),
+            self._build_dashboard_context_message(),
         ]
 
         if include_tool_guidance:
-            messages.append(
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": (
-                                "Copilot rules:\n"
-                                "1. Use suggest_add_dataset_node when the user asks to add a dataset, "
-                                "place a dataset, or asks which datasets are relevant or good starting points.\n"
-                                "2. Suggest only the strongest 1-5 catalog matches.\n"
-                                "3. Use exact dataset_id values from the dataset context. "
-                                "Add color_by only when there is a clearly relevant numeric column in the metadata.\n"
-                                "4. Include a short reason for each suggestion.\n"
-                                "5. Suggestions are pending user decisions. Do not say a dataset was added unless the user accepted it.\n"
-                                "6. Always give a short, decision-oriented reply. "
-                                "If no strong catalog match exists, answer in prose and do not call tools."
-                            ),
-                        }
-                    ],
-                }
+            system_parts.append(
+                "Copilot rules:\n"
+                "1. Use suggest_add_dataset_node when the user asks to add a dataset, "
+                "place a dataset, or asks which datasets are relevant or good starting points.\n"
+                "2. Suggest only the strongest few matches.\n"
+                "3. Use exact dataset_id values from the dataset context. "
+                "Add color_by only when there is a clearly relevant numeric column in the metadata.\n"
+                "4. Include a short reason for each suggestion.\n"
+                "5. Suggestions are pending user decisions. Do not say a dataset was added unless the user accepted it.\n"
+                "6. Always give a short, decision-oriented reply. "
+                "If no strong catalog match exists, answer in prose and do not call tools."
             )
 
-        messages.append({"role": "user", "content": user_message})
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": "\n\n".join(system_parts)},
+            {"role": "user", "content": user_message},
+        ]
         return messages
 
     def _complete_messages(
         self,
         messages: list[dict[str, Any]],
         stream: bool,
-        model: str | None,
         thinking_budget_tokens: int | None,
         retries: int,
         tools: list[dict[str, Any]] | None = None,
     ) -> Any:
-        model_name = model or self.model
         payload: dict[str, Any] = {
-            "model": model_name,
+            "model": self.model,
             "stream": stream,
             "messages": messages,
         }
         if tools:
             payload["tools"] = tools
-        if thinking_budget_tokens is not None:
+        if self.provider == "portkey" and thinking_budget_tokens is not None:
             payload["thinking"] = {
                 "type": "enabled",
                 "budget_tokens": thinking_budget_tokens,
             }
-        return self._create_completion(payload, retries=retries)
+        return self._create_completion(payload=payload, retries=retries)
 
     @staticmethod
     def _strip_code_fences(content: str) -> str:
@@ -305,7 +407,6 @@ class UrbanTraceCopilot:
         system_prompt: str,
         response_fields: tuple[str, ...],
         task_payload: dict[str, Any],
-        model: str | None = None,
         retries: int = 2,
     ) -> list[dict[str, Any]] | None:
         """
@@ -315,16 +416,11 @@ class UrbanTraceCopilot:
         messages = [
             {
                 "role": "system",
-                "content": [{"type": "text", "text": system_prompt}],
+                "content": system_prompt,
             },
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": json.dumps(task_payload, ensure_ascii=True),
-                    }
-                ],
+                "content": json.dumps(task_payload, ensure_ascii=True),
             },
         ]
 
@@ -332,7 +428,6 @@ class UrbanTraceCopilot:
             response = self._complete_messages(
                 messages=messages,
                 stream=False,
-                model=model,
                 thinking_budget_tokens=None,
                 retries=retries,
                 tools=None,
@@ -359,7 +454,6 @@ class UrbanTraceCopilot:
     def recommend_zoning_operators(
         self,
         recommendation_payload: dict[str, Any],
-        model: str | None = None,
         retries: int = 2,
     ) -> list[dict[str, Any]] | None:
         return self._run_structured_json_list_task(
@@ -367,14 +461,12 @@ class UrbanTraceCopilot:
             system_prompt=ZONING_OPERATOR_RECOMMENDATION_PROMPT,
             response_fields=ZONING_OPERATOR_RECOMMENDATION_FIELDS,
             task_payload=recommendation_payload,
-            model=model,
             retries=retries,
         )
 
     def synthesize_hotspot_semantics(
         self,
         hotspot_payload: dict[str, Any],
-        model: str | None = None,
         retries: int = 2,
     ) -> list[dict[str, Any]] | None:
         return self._run_structured_json_list_task(
@@ -382,7 +474,6 @@ class UrbanTraceCopilot:
             system_prompt=HOTSPOT_SYNTHESIS_PROMPT,
             response_fields=HOTSPOT_SYNTHESIS_FIELDS,
             task_payload=hotspot_payload,
-            model=model,
             retries=retries,
         )
 
@@ -465,7 +556,6 @@ class UrbanTraceCopilot:
         user_message: str,
         system_prompt: str = "You are a helpful assistant for UrbanTrace.",
         stream: bool = True,
-        model: str | None = None,
         thinking_budget_tokens: int | None = None,
         retries: int = 2,
         dashboard_nodes: list[dict[str, Any]] | None = None,
@@ -473,7 +563,7 @@ class UrbanTraceCopilot:
         tools: list[dict[str, Any]] | None = None,
     ) -> Any:
         """
-        Create a Portkey chat completion with dataset + live dashboard context.
+        Create a chat completion with dataset + live dashboard context.
         """
         if dashboard_nodes is not None or dashboard_edges is not None:
             self.set_dashboard_state(
@@ -490,7 +580,6 @@ class UrbanTraceCopilot:
         return self._complete_messages(
             messages=messages,
             stream=stream,
-            model=model,
             thinking_budget_tokens=thinking_budget_tokens,
             retries=retries,
             tools=tools,
@@ -502,7 +591,6 @@ class UrbanTraceCopilot:
         system_prompt: str,
         tool_calls: list[dict[str, Any]],
         tool_responses: list[dict[str, Any]],
-        model: str | None = None,
         thinking_budget_tokens: int | None = None,
         retries: int = 2,
     ) -> str:
@@ -531,7 +619,6 @@ class UrbanTraceCopilot:
         response = self._complete_messages(
             messages=messages,
             stream=False,
-            model=model,
             thinking_budget_tokens=thinking_budget_tokens,
             retries=retries,
             tools=None,
@@ -542,7 +629,6 @@ class UrbanTraceCopilot:
         self,
         user_message: str,
         system_prompt: str = "You are a helpful assistant for UrbanTrace.",
-        model: str | None = None,
         thinking_budget_tokens: int | None = None,
         retries: int = 2,
         dashboard_nodes: list[dict[str, Any]] | None = None,
@@ -582,7 +668,6 @@ class UrbanTraceCopilot:
             round_response = self._complete_messages(
                 messages=messages,
                 stream=False,
-                model=model,
                 thinking_budget_tokens=thinking_budget_tokens,
                 retries=retries,
                 tools=tools,
@@ -623,7 +708,6 @@ class UrbanTraceCopilot:
                 system_prompt=system_prompt,
                 tool_calls=all_tool_calls,
                 tool_responses=all_tool_responses,
-                model=model,
                 thinking_budget_tokens=thinking_budget_tokens,
                 retries=retries,
             )

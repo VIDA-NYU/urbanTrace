@@ -238,7 +238,6 @@ class CopilotChatRequest(BaseModel):
     nodes: list[dict[str, Any]] = Field(default_factory=list)
     edges: list[dict[str, Any]] = Field(default_factory=list)
     system_prompt: str = "You are a helpful assistant for UrbanTrace."
-    model: str | None = None
     thinking_budget_tokens: int | None = None
     log_stream: bool = True
 
@@ -1266,7 +1265,6 @@ async def copilot_chat(request: CopilotChatRequest):
         copilot_result = copilot.run_copilot_turn(
             user_message=request.message,
             system_prompt=request.system_prompt,
-            model=request.model,
             thinking_budget_tokens=request.thinking_budget_tokens,
             dashboard_nodes=request.nodes,
             dashboard_edges=request.edges,

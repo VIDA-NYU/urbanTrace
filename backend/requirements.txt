@@ -3,4 +3,5 @@ geopandas
 fastapi
 uvicorn
 portkey-ai
+openai
 python-dotenv
