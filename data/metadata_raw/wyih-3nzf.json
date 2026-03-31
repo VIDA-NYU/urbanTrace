@@ -1,0 +1,263 @@
+{
+  "geometricType": "MultiLineString",
+  "name": "wyih-3nzf",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 24948,
+  "nb_profiled_rows": 1224,
+  "nb_columns": 10,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-line",
+        "confidence": 0.9177320599555969,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "objectid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 24948,
+      "mean": 19491.6658496732,
+      "stddev": 10851.673196200409,
+      "coverage": [
+        {
+          "range": {
+            "gte": 993.0,
+            "lte": 12360.0
+          }
+        },
+        {
+          "range": {
+            "gte": 13373.0,
+            "lte": 24192.0
+          }
+        },
+        {
+          "range": {
+            "gte": 25786.0,
+            "lte": 36382.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "oftcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 24814,
+      "mean": 3.684264221862911e+17,
+      "stddev": 1.2405491237872171e+17,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.1071013391013397e+17,
+            "lte": 2.7372022673022675e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 3.068803107303108e+17,
+            "lte": 4.373954107404358e+17
+          }
+        },
+        {
+          "range": {
+            "gte": 4.51090417740418e+17,
+            "lte": 5.5585054099554176e+17
+          }
+        }
+      ]
+    },
+    {
+      "name": "geoborough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "onstreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3194
+    },
+    {
+      "name": "fromstreet",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.8116766810417175,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "tostreetna",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 4404
+    },
+    {
+      "name": "dateprotec",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 916
+    },
+    {
+      "name": "dateprot_1",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 916
+    },
+    {
+      "name": "shape_stle",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 435.4314232375905,
+      "stddev": 313.2647279677646,
+      "coverage": [
+        {
+          "range": {
+            "gte": 117.87108466,
+            "lte": 480.841125584
+          }
+        },
+        {
+          "range": {
+            "gte": 544.692738438,
+            "lte": 1066.97450882
+          }
+        }
+      ]
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 1,
+  "nb_numerical_columns": 3,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "dateprotec"
+      ],
+      "column_indexes": [
+        7
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1555632000.0,
+            "lte": 1593043200.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1595894400.0,
+            "lte": 1637280000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1650412800.0,
+            "lte": 1699228800.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "dateprot_1"
+      ],
+      "column_indexes": [
+        8
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1713484800.0,
+            "lte": 1750809600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1753660800.0,
+            "lte": 1795046400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1808179200.0,
+            "lte": 1857081600.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "objectid",
+    "oftcode",
+    "geoborough",
+    "onstreetna",
+    "fromstreet",
+    "tostreetna",
+    "dateprotec",
+    "dateprot_1",
+    "dateprot",
+    "1",
+    "shape_stle",
+    "shape",
+    "stle"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.037008351006079465,
+      "2_geo_batch_predict": 0.01140105101512745,
+      "3_process_columns": 0.28305374295450747,
+      "4_latlong_pairing": 2.7729023713618517e-05,
+      "5_spatial_coverage": 5.2969553507864475e-06,
+      "6_temporal_coverage": 0.01618743798462674
+    },
+    "total": 1.677994623023551
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/wyih-3nzf.csv"
+}

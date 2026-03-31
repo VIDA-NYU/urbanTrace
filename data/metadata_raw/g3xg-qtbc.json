@@ -1,0 +1,406 @@
+{
+  "geometricType": "Polygon",
+  "name": "g3xg-qtbc",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 5753,
+  "nb_profiled_rows": 524,
+  "nb_columns": 24,
+  "columns": [
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "cemspermittable",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.0019083969465648854,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "closuretype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.2652671755725191,
+      "num_distinct_values": 6
+    },
+    {
+      "name": "dimensions",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 18
+    },
+    {
+      "name": "editdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 8
+    },
+    {
+      "name": "fieldnumber",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.009541984732824428,
+      "missing_values_ratio": 0.0019083969465648854,
+      "num_distinct_values": 119,
+      "mean": 4.675675675675675,
+      "stddev": 18.91841422382535,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 10.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "gispropnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 765
+    },
+    {
+      "name": "name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1318
+    },
+    {
+      "name": "nets_rims_goals_removed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.5610687022900763,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "omppropid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.0019083969465648854,
+      "num_distinct_values": 1000
+    },
+    {
+      "name": "parkdistrict",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 69
+    },
+    {
+      "name": "primarysport",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 15
+    },
+    {
+      "name": "propertyname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 750
+    },
+    {
+      "name": "red_sign_installed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.3187022900763359,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "subpropertyname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.6679389312977099
+    },
+    {
+      "name": "surfacetype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 10
+    },
+    {
+      "name": "system",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 5753
+    },
+    {
+      "name": "yellow_sign_removed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.3282442748091603,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    },
+    {
+      "name": "polygon",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "polygon",
+        "confidence": 0.8177366852760315,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "approx_date_closed",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.2099236641221374,
+      "num_distinct_values": 661
+    },
+    {
+      "name": "approx_date_reopened",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.24618320610687022,
+      "num_distinct_values": 260
+    },
+    {
+      "name": "approx_date_nets_rims_goals_added",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.6698473282442748,
+      "num_distinct_values": 87
+    },
+    {
+      "name": "nets_rims_goals_added",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Boolean",
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.6507633587786259,
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3
+    }
+  ],
+  "nb_spatial_columns": 1,
+  "nb_temporal_columns": 4,
+  "nb_categorical_columns": 11,
+  "nb_numerical_columns": 1,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "editdate"
+      ],
+      "column_indexes": [
+        4
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1597244672.0,
+            "lte": 1597244672.0
+          }
+        }
+      ],
+      "temporal_resolution": "minute"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_closed"
+      ],
+      "column_indexes": [
+        20
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1585281536.0,
+            "lte": 1585972736.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1586059264.0,
+            "lte": 1586547072.0
+          }
+        }
+      ],
+      "temporal_resolution": "minute"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_reopened"
+      ],
+      "column_indexes": [
+        21
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1593489664.0,
+            "lte": 1594180864.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "approx_date_nets_rims_goals_added"
+      ],
+      "column_indexes": [
+        22
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1593921536.0,
+            "lte": 1594267136.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1594439936.0,
+            "lte": 1594958336.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1595044864.0,
+            "lte": 1595649536.0
+          }
+        }
+      ],
+      "temporal_resolution": "minute"
+    }
+  ],
+  "attribute_keywords": [
+    "borough",
+    "cemspermittable",
+    "closuretype",
+    "dimensions",
+    "editdate",
+    "fieldnumber",
+    "gispropnum",
+    "name",
+    "nets_rims_goals_removed",
+    "nets",
+    "rims",
+    "goals",
+    "removed",
+    "omppropid",
+    "parkdistrict",
+    "primarysport",
+    "propertyname",
+    "red_sign_installed",
+    "red",
+    "sign",
+    "installed",
+    "status",
+    "subpropertyname",
+    "surfacetype",
+    "system",
+    "yellow_sign_removed",
+    "yellow",
+    "sign",
+    "removed",
+    "polygon",
+    "approx_date_closed",
+    "approx",
+    "date",
+    "closed",
+    "approx_date_reopened",
+    "approx",
+    "date",
+    "reopened",
+    "approx_date_nets_rims_goals_added",
+    "approx",
+    "date",
+    "nets",
+    "rims",
+    "goals",
+    "added",
+    "nets_rims_goals_added",
+    "nets",
+    "rims",
+    "goals",
+    "added"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.022156545019242913,
+      "2_geo_batch_predict": 0.02444634004496038,
+      "3_process_columns": 0.20852637704228982,
+      "4_latlong_pairing": 3.01100080832839e-05,
+      "5_spatial_coverage": 6.55400799587369e-06,
+      "6_temporal_coverage": 0.00908361398614943
+    },
+    "total": 1.5585162080242299
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/g3xg-qtbc.csv"
+}

@@ -1,0 +1,1248 @@
+{
+  "geometricType": "Point",
+  "name": "ncre-qhxs",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 38781,
+  "nb_profiled_rows": 534,
+  "nb_columns": 27,
+  "columns": [
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9484645128250122,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "bin_number",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 36799,
+      "mean": 2520775.9606741574,
+      "stddev": 1179200.865441807,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1002026.0,
+            "lte": 2000191.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3000370.0,
+            "lte": 3356574.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4001359.0,
+            "lte": 5014670.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 33384,
+      "mean": 2463084804.241573,
+      "stddev": 1144180420.7631252,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1001770024.0,
+            "lte": 1020410046.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2045060040.0,
+            "lte": 3051800049.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4001480013.0,
+            "lte": 5005720018.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "boroughid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "block",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1756,
+      "mean": 1926.426966292135,
+      "stddev": 1980.6897848205047,
+      "coverage": [
+        {
+          "range": {
+            "gte": 149.0,
+            "lte": 1457.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1679.0,
+            "lte": 3515.0
+          }
+        },
+        {
+          "range": {
+            "gte": 5031.0,
+            "lte": 10288.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lot",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 596,
+      "mean": 309.84082397003743,
+      "stddev": 1360.5741225040933,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 95.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lp_number",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 1756
+    },
+    {
+      "name": "lm_name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "pluto_addr",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9519773125648499,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "desig_addr",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/address"
+      ],
+      "geo_classifier": {
+        "label": "address",
+        "confidence": 0.9566488862037659,
+        "source": "ml"
+      }
+    },
+    {
+      "name": "public_hea",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 543
+    },
+    {
+      "name": "lm_type",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "hist_distr",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.0018726591760299626,
+      "num_distinct_values": 161
+    },
+    {
+      "name": "other_hear",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.9962546816479401,
+      "num_distinct_values": 10
+    },
+    {
+      "name": "boundaries",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 13
+    },
+    {
+      "name": "most_curre",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "last_actio",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "count_bldg",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2,
+      "mean": 0.8895131086142322,
+      "stddev": 0.31349567495848896,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "non_bldg",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.9719101123595506,
+      "num_distinct_values": 116
+    },
+    {
+      "name": "vacant_lot",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2,
+      "mean": 0.0149812734082397,
+      "stddev": 0.12147771340993979,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "secnd_bldg",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2,
+      "mean": 0.06367041198501873,
+      "stddev": 0.24416488408998652,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "desdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 523
+    },
+    {
+      "name": "caldate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.5973782771535581,
+      "num_distinct_values": 215
+    },
+    {
+      "name": "latitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/latitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.72108444352174,
+      "stddev": 0.0547294540457489,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.6379226969,
+            "lte": 40.6947587784
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7032116718,
+            "lte": 40.7525061359
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7688545705,
+            "lte": 40.8304998968
+          }
+        }
+      ]
+    },
+    {
+      "name": "longitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/longitude"
+      ],
+      "geo_classifier": {
+        "label": "longitude",
+        "confidence": 0.952191174030304,
+        "source": "ml+validated"
+      },
+      "mean": -73.95502309469686,
+      "stddev": 0.0570138836854754,
+      "coverage": [
+        {
+          "range": {
+            "gte": -74.008056035,
+            "lte": -73.9641641593
+          }
+        },
+        {
+          "range": {
+            "gte": -73.9592303096,
+            "lte": -73.8872396264
+          }
+        }
+      ]
+    },
+    {
+      "name": "point",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9600039720535278,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 6,
+  "nb_temporal_columns": 3,
+  "nb_categorical_columns": 5,
+  "nb_numerical_columns": 8,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "latlong",
+      "column_names": [
+        "latitude",
+        "longitude"
+      ],
+      "column_indexes": [
+        24,
+        25
+      ],
+      "geohashes4": [
+        {
+          "hash": "12113023132103",
+          "number": 25
+        },
+        {
+          "hash": "12113023132111",
+          "number": 36
+        },
+        {
+          "hash": "12113023132112",
+          "number": 29
+        },
+        {
+          "hash": "12113023132113",
+          "number": 32
+        },
+        {
+          "hash": "12113023132110",
+          "number": 2
+        },
+        {
+          "hash": "12113023132130",
+          "number": 35
+        },
+        {
+          "hash": "12113023132132",
+          "number": 5
+        },
+        {
+          "hash": "12113023132131",
+          "number": 8
+        },
+        {
+          "hash": "12113023132133",
+          "number": 5
+        },
+        {
+          "hash": "12113023132121",
+          "number": 11
+        },
+        {
+          "hash": "12113023132120",
+          "number": 10
+        },
+        {
+          "hash": "12113023132013",
+          "number": 5
+        },
+        {
+          "hash": "12113023132012",
+          "number": 7
+        },
+        {
+          "hash": "12113023132031",
+          "number": 2
+        },
+        {
+          "hash": "12113023132030",
+          "number": 1
+        },
+        {
+          "hash": "12113023131233",
+          "number": 9
+        },
+        {
+          "hash": "12113023131232",
+          "number": 6
+        },
+        {
+          "hash": "12113023131223",
+          "number": 2
+        },
+        {
+          "hash": "12113023131322",
+          "number": 6
+        },
+        {
+          "hash": "12113023133313",
+          "number": 1
+        },
+        {
+          "hash": "12113023133303",
+          "number": 10
+        },
+        {
+          "hash": "12113023133301",
+          "number": 2
+        },
+        {
+          "hash": "12113023133302",
+          "number": 1
+        },
+        {
+          "hash": "12113023133332",
+          "number": 1
+        },
+        {
+          "hash": "12113023133112",
+          "number": 9
+        },
+        {
+          "hash": "12113023133111",
+          "number": 2
+        },
+        {
+          "hash": "12113023133113",
+          "number": 15
+        },
+        {
+          "hash": "12113023133100",
+          "number": 8
+        },
+        {
+          "hash": "12113023133103",
+          "number": 1
+        },
+        {
+          "hash": "12113023133102",
+          "number": 1
+        },
+        {
+          "hash": "12113023133101",
+          "number": 3
+        },
+        {
+          "hash": "12113023133122",
+          "number": 6
+        },
+        {
+          "hash": "12113023133123",
+          "number": 1
+        },
+        {
+          "hash": "12113023133131",
+          "number": 1
+        },
+        {
+          "hash": "12113023133031",
+          "number": 8
+        },
+        {
+          "hash": "12113023133021",
+          "number": 3
+        },
+        {
+          "hash": "12113023133011",
+          "number": 33
+        },
+        {
+          "hash": "12113023133010",
+          "number": 10
+        },
+        {
+          "hash": "12113023133001",
+          "number": 4
+        },
+        {
+          "hash": "12113023133000",
+          "number": 15
+        },
+        {
+          "hash": "12113023133201",
+          "number": 14
+        },
+        {
+          "hash": "12113023133200",
+          "number": 12
+        },
+        {
+          "hash": "12113023130210",
+          "number": 3
+        },
+        {
+          "hash": "12113023130211",
+          "number": 2
+        },
+        {
+          "hash": "12113023130233",
+          "number": 6
+        },
+        {
+          "hash": "12113023130202",
+          "number": 1
+        },
+        {
+          "hash": "12113023130221",
+          "number": 1
+        },
+        {
+          "hash": "12113023130332",
+          "number": 1
+        },
+        {
+          "hash": "12113023130333",
+          "number": 2
+        },
+        {
+          "hash": "12113023130322",
+          "number": 1
+        },
+        {
+          "hash": "12113023123121",
+          "number": 1
+        },
+        {
+          "hash": "12113023121130",
+          "number": 1
+        },
+        {
+          "hash": "12113023311132",
+          "number": 1
+        },
+        {
+          "hash": "12113023311133",
+          "number": 17
+        },
+        {
+          "hash": "12113023311130",
+          "number": 1
+        },
+        {
+          "hash": "12113023311020",
+          "number": 4
+        },
+        {
+          "hash": "12113023311003",
+          "number": 1
+        },
+        {
+          "hash": "12113032022120",
+          "number": 6
+        },
+        {
+          "hash": "12113032022122",
+          "number": 2
+        },
+        {
+          "hash": "12113032022002",
+          "number": 21
+        },
+        {
+          "hash": "12113032022003",
+          "number": 7
+        },
+        {
+          "hash": "12113032022000",
+          "number": 1
+        },
+        {
+          "hash": "12113032022020",
+          "number": 14
+        },
+        {
+          "hash": "12113032022030",
+          "number": 8
+        },
+        {
+          "hash": "12113032022032",
+          "number": 4
+        },
+        {
+          "hash": "12113032022031",
+          "number": 12
+        },
+        {
+          "hash": "12113032022033",
+          "number": 1
+        },
+        {
+          "hash": "12113032022012",
+          "number": 2
+        },
+        {
+          "hash": "12113032022211",
+          "number": 6
+        },
+        {
+          "hash": "12113032022331",
+          "number": 1
+        },
+        {
+          "hash": "12113032023210",
+          "number": 6
+        },
+        {
+          "hash": "12113032200020",
+          "number": 3
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.0079524657,
+                40.7366490886
+              ],
+              [
+                -73.9018012863,
+                40.6410738362
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9818160741,
+                40.8304998968
+              ],
+              [
+                -73.8853959848,
+                40.7480829185
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 534
+    },
+    {
+      "type": "point",
+      "column_names": [
+        "point"
+      ],
+      "column_indexes": [
+        26
+      ],
+      "geohashes4": [
+        {
+          "hash": "12113023132103",
+          "number": 25
+        },
+        {
+          "hash": "12113023132111",
+          "number": 36
+        },
+        {
+          "hash": "12113023132112",
+          "number": 29
+        },
+        {
+          "hash": "12113023132113",
+          "number": 32
+        },
+        {
+          "hash": "12113023132110",
+          "number": 2
+        },
+        {
+          "hash": "12113023132130",
+          "number": 35
+        },
+        {
+          "hash": "12113023132132",
+          "number": 5
+        },
+        {
+          "hash": "12113023132131",
+          "number": 8
+        },
+        {
+          "hash": "12113023132133",
+          "number": 5
+        },
+        {
+          "hash": "12113023132121",
+          "number": 11
+        },
+        {
+          "hash": "12113023132120",
+          "number": 10
+        },
+        {
+          "hash": "12113023132013",
+          "number": 5
+        },
+        {
+          "hash": "12113023132012",
+          "number": 7
+        },
+        {
+          "hash": "12113023132031",
+          "number": 2
+        },
+        {
+          "hash": "12113023132030",
+          "number": 1
+        },
+        {
+          "hash": "12113023131233",
+          "number": 9
+        },
+        {
+          "hash": "12113023131232",
+          "number": 6
+        },
+        {
+          "hash": "12113023131223",
+          "number": 2
+        },
+        {
+          "hash": "12113023131322",
+          "number": 6
+        },
+        {
+          "hash": "12113023133313",
+          "number": 1
+        },
+        {
+          "hash": "12113023133303",
+          "number": 10
+        },
+        {
+          "hash": "12113023133301",
+          "number": 2
+        },
+        {
+          "hash": "12113023133302",
+          "number": 1
+        },
+        {
+          "hash": "12113023133332",
+          "number": 1
+        },
+        {
+          "hash": "12113023133112",
+          "number": 9
+        },
+        {
+          "hash": "12113023133111",
+          "number": 2
+        },
+        {
+          "hash": "12113023133113",
+          "number": 15
+        },
+        {
+          "hash": "12113023133100",
+          "number": 8
+        },
+        {
+          "hash": "12113023133103",
+          "number": 1
+        },
+        {
+          "hash": "12113023133102",
+          "number": 1
+        },
+        {
+          "hash": "12113023133101",
+          "number": 3
+        },
+        {
+          "hash": "12113023133122",
+          "number": 6
+        },
+        {
+          "hash": "12113023133123",
+          "number": 1
+        },
+        {
+          "hash": "12113023133131",
+          "number": 1
+        },
+        {
+          "hash": "12113023133031",
+          "number": 8
+        },
+        {
+          "hash": "12113023133021",
+          "number": 3
+        },
+        {
+          "hash": "12113023133011",
+          "number": 33
+        },
+        {
+          "hash": "12113023133010",
+          "number": 10
+        },
+        {
+          "hash": "12113023133001",
+          "number": 4
+        },
+        {
+          "hash": "12113023133000",
+          "number": 15
+        },
+        {
+          "hash": "12113023133201",
+          "number": 14
+        },
+        {
+          "hash": "12113023133200",
+          "number": 12
+        },
+        {
+          "hash": "12113023130210",
+          "number": 3
+        },
+        {
+          "hash": "12113023130211",
+          "number": 2
+        },
+        {
+          "hash": "12113023130233",
+          "number": 6
+        },
+        {
+          "hash": "12113023130202",
+          "number": 1
+        },
+        {
+          "hash": "12113023130221",
+          "number": 1
+        },
+        {
+          "hash": "12113023130332",
+          "number": 1
+        },
+        {
+          "hash": "12113023130333",
+          "number": 2
+        },
+        {
+          "hash": "12113023130322",
+          "number": 1
+        },
+        {
+          "hash": "12113023123121",
+          "number": 1
+        },
+        {
+          "hash": "12113023121130",
+          "number": 1
+        },
+        {
+          "hash": "12113023311132",
+          "number": 1
+        },
+        {
+          "hash": "12113023311133",
+          "number": 17
+        },
+        {
+          "hash": "12113023311130",
+          "number": 1
+        },
+        {
+          "hash": "12113023311020",
+          "number": 4
+        },
+        {
+          "hash": "12113023311003",
+          "number": 1
+        },
+        {
+          "hash": "12113032022120",
+          "number": 6
+        },
+        {
+          "hash": "12113032022122",
+          "number": 2
+        },
+        {
+          "hash": "12113032022002",
+          "number": 21
+        },
+        {
+          "hash": "12113032022003",
+          "number": 7
+        },
+        {
+          "hash": "12113032022000",
+          "number": 1
+        },
+        {
+          "hash": "12113032022020",
+          "number": 14
+        },
+        {
+          "hash": "12113032022030",
+          "number": 8
+        },
+        {
+          "hash": "12113032022032",
+          "number": 4
+        },
+        {
+          "hash": "12113032022031",
+          "number": 12
+        },
+        {
+          "hash": "12113032022033",
+          "number": 1
+        },
+        {
+          "hash": "12113032022012",
+          "number": 2
+        },
+        {
+          "hash": "12113032022211",
+          "number": 6
+        },
+        {
+          "hash": "12113032022331",
+          "number": 1
+        },
+        {
+          "hash": "12113032023210",
+          "number": 6
+        },
+        {
+          "hash": "12113032200020",
+          "number": 3
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.0079524657,
+                40.7366490886
+              ],
+              [
+                -73.9018012863,
+                40.6410738362
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9818160741,
+                40.8304998968
+              ],
+              [
+                -73.8853959848,
+                40.7480829185
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 534
+    }
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "other_hear"
+      ],
+      "column_indexes": [
+        13
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 458438400.0,
+            "lte": 458438400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1456185600.0,
+            "lte": 1456185600.0
+          }
+        }
+      ],
+      "temporal_resolution": "year"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "desdate"
+      ],
+      "column_indexes": [
+        22
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": -129600000.0,
+            "lte": 180662400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 275616000.0,
+            "lte": 867110400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 993513600.0,
+            "lte": 1560816000.0
+          }
+        }
+      ],
+      "temporal_resolution": "month"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "caldate"
+      ],
+      "column_indexes": [
+        23
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 848361600.0,
+            "lte": 1078790400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1150761600.0,
+            "lte": 1369094400.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1428969600.0,
+            "lte": 1612224000.0
+          }
+        }
+      ],
+      "temporal_resolution": "month"
+    }
+  ],
+  "attribute_keywords": [
+    "the_geom",
+    "the",
+    "geom",
+    "bin_number",
+    "bin",
+    "number",
+    "bbl",
+    "boroughid",
+    "block",
+    "lot",
+    "lp_number",
+    "lp",
+    "number",
+    "lm_name",
+    "lm",
+    "name",
+    "pluto_addr",
+    "pluto",
+    "addr",
+    "desig_addr",
+    "desig",
+    "addr",
+    "public_hea",
+    "public",
+    "hea",
+    "lm_type",
+    "lm",
+    "type",
+    "hist_distr",
+    "hist",
+    "distr",
+    "other_hear",
+    "other",
+    "hear",
+    "boundaries",
+    "most_curre",
+    "most",
+    "curre",
+    "status",
+    "last_actio",
+    "last",
+    "actio",
+    "count_bldg",
+    "count",
+    "bldg",
+    "non_bldg",
+    "non",
+    "bldg",
+    "vacant_lot",
+    "vacant",
+    "lot",
+    "secnd_bldg",
+    "secnd",
+    "bldg",
+    "desdate",
+    "caldate",
+    "latitude",
+    "longitude",
+    "point"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.1376041590119712,
+      "2_geo_batch_predict": 0.02177659299923107,
+      "3_process_columns": 0.22138299804646522,
+      "4_latlong_pairing": 4.6708970330655575e-05,
+      "5_spatial_coverage": 0.01581925601931289,
+      "6_temporal_coverage": 0.004323954985011369
+    },
+    "total": 1.6688830580096692
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/ncre-qhxs.csv"
+}

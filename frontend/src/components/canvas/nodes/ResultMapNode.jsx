@@ -445,6 +445,47 @@ const ResultMapNode = memo(({ id, data }) => {
     data.onCompareDataReady(id, comparePayload);
   }, [id, comparePayload, data?.onCompareDataReady]);
 
+  // ==========================================================================
+  // GEOJSON EXPORT LOGIC
+  // ==========================================================================
+  const handleDownloadGeoJson = (e) => {
+    e.stopPropagation(); // Prevent React Flow from dragging the node
+
+    // Export the hotspot version if active, otherwise fallback to the raw zoned output
+    const geoDataToDownload = (usingHotspot && hotspotZoneGeoJson) 
+      ? hotspotZoneGeoJson 
+      : zoneGeoJson;
+
+    if (!geoDataToDownload) {
+      console.warn('No GeoJSON data available to download.');
+      return;
+    }
+
+    // 1. Convert the GeoJSON object to a string
+    const dataStr = JSON.stringify(geoDataToDownload, null, 2);
+    
+    // 2. Create a Blob from the string
+    const blob = new Blob([dataStr], { type: 'application/geo+json' });
+    
+    // 3. Create a temporary object URL
+    const url = URL.createObjectURL(blob);
+    
+    // 4. Create a hidden <a> tag, click it, and remove it
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Create a clean filename based on the node title
+    const cleanName = nodeTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.download = `${cleanName}_export.geojson`;
+    
+    document.body.appendChild(link);
+    link.click();
+    
+    // 5. Clean up the URL to prevent memory leaks
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{
       width: '100%',
@@ -483,6 +524,24 @@ const ResultMapNode = memo(({ id, data }) => {
               {outputMode}
             </div>
           )}
+
+          {/* --- NEW: DOWNLOAD BUTTON --- */}
+          {(showZones && (zoneGeoJson || hotspotZoneGeoJson)) && (
+            <button
+              onClick={handleDownloadGeoJson}
+              className="nodrag"
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none', borderRadius: '4px', padding: '2px 4px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', transition: 'background 0.15s ease'
+              }}
+              title="Download GeoJSON mapping"
+            >
+              <Download size={12} />
+            </button>
+          )}
+          {/* ---------------------------- */}
+
           {/* CROSS-CANVAS CONNECTION: Trace Lineage toggle */}
           {provenance && data?.onTraceLineage && (
             <button

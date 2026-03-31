@@ -1,0 +1,677 @@
+{
+  "geometricType": "Point",
+  "name": "ayeb-p4mv",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 16,
+  "nb_profiled_rows": 16,
+  "nb_columns": 22,
+  "columns": [
+    {
+      "name": "schoolname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "buildingnumber",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 16
+    },
+    {
+      "name": "streetname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 16
+    },
+    {
+      "name": "suiteapt",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.25,
+      "num_distinct_values": 12
+    },
+    {
+      "name": "city",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 8
+    },
+    {
+      "name": "state",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "zipcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 14,
+      "mean": 11076.4375,
+      "stddev": 373.1266488657035,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10453.0,
+            "lte": 10462.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11101.0,
+            "lte": 11235.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11355.0,
+            "lte": 11435.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "latitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/latitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.737897830624995,
+      "stddev": 0.07854362537055318,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.57879901,
+            "lte": 40.6505228
+          }
+        },
+        {
+          "range": {
+            "gte": 40.70127889,
+            "lte": 40.76002371
+          }
+        },
+        {
+          "range": {
+            "gte": 40.83131485,
+            "lte": 40.85135355
+          }
+        }
+      ]
+    },
+    {
+      "name": "longitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/longitude"
+      ],
+      "geo_classifier": {
+        "label": "longitude",
+        "confidence": 0.9561417102813721,
+        "source": "ml+validated"
+      },
+      "mean": -73.88789301500002,
+      "stddev": 0.057245362245496804,
+      "coverage": [
+        {
+          "range": {
+            "gte": -74.00697102,
+            "lte": -73.92758529
+          }
+        },
+        {
+          "range": {
+            "gte": -73.90872505,
+            "lte": -73.89009651
+          }
+        },
+        {
+          "range": {
+            "gte": -73.85175616,
+            "lte": -73.78704132
+          }
+        }
+      ]
+    },
+    {
+      "name": "contact",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 8
+    },
+    {
+      "name": "telephone",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 11
+    },
+    {
+      "name": "email",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 9
+    },
+    {
+      "name": "web",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 8
+    },
+    {
+      "name": "borough",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "community_board",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 11,
+      "mean": 338.4375,
+      "stddev": 83.6413240793688,
+      "coverage": [
+        {
+          "range": {
+            "gte": 203.0,
+            "lte": 210.0
+          }
+        },
+        {
+          "range": {
+            "gte": 307.0,
+            "lte": 315.0
+          }
+        },
+        {
+          "range": {
+            "gte": 401.0,
+            "lte": 412.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "council_district",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 11,
+      "mean": 26.9375,
+      "stddev": 9.40391374641431,
+      "coverage": [
+        {
+          "range": {
+            "gte": 14.0,
+            "lte": 20.0
+          }
+        },
+        {
+          "range": {
+            "gte": 25.0,
+            "lte": 29.0
+          }
+        },
+        {
+          "range": {
+            "gte": 38.0,
+            "lte": 48.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 16,
+      "mean": 3541670.9375,
+      "stddev": 945451.553921357,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2008253.0,
+            "lte": 2130513.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3200477.0,
+            "lte": 3394271.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4003131.0,
+            "lte": 4614364.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 16,
+      "mean": 3354869569.75,
+      "stddev": 847667534.8620536,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2028530017.0,
+            "lte": 2040730001.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3007247501.0,
+            "lte": 3087600060.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4002140238.0,
+            "lte": 4098307502.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "census_tract",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 16,
+      "mean": 6415.5,
+      "stddev": 9082.224348968704,
+      "coverage": [
+        {
+          "range": {
+            "gte": 82.0,
+            "lte": 855.0
+          }
+        },
+        {
+          "range": {
+            "gte": 17102.0,
+            "lte": 17902.0
+          }
+        },
+        {
+          "range": {
+            "gte": 19902.0,
+            "lte": 23301.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nta",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 12
+    },
+    {
+      "name": "location",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "point",
+        "confidence": 0.9743441343307495,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "data_as_of_date",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 1
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_temporal_columns": 1,
+  "nb_categorical_columns": 1,
+  "nb_numerical_columns": 6,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "latlong",
+      "column_names": [
+        "latitude",
+        "longitude"
+      ],
+      "column_indexes": [
+        7,
+        8
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302313032222",
+          "number": 1
+        },
+        {
+          "hash": "1211302313330300",
+          "number": 1
+        },
+        {
+          "hash": "1211302313330031",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312303",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312201",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312213",
+          "number": 1
+        },
+        {
+          "hash": "1211302313322232",
+          "number": 1
+        },
+        {
+          "hash": "1211302312312310",
+          "number": 1
+        },
+        {
+          "hash": "1211302312313310",
+          "number": 1
+        },
+        {
+          "hash": "1211302331111002",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100332",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100033",
+          "number": 1
+        },
+        {
+          "hash": "1211303202230210",
+          "number": 1
+        },
+        {
+          "hash": "1211303202232123",
+          "number": 1
+        },
+        {
+          "hash": "1211303202232312",
+          "number": 1
+        },
+        {
+          "hash": "1211303202231003",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.00697102,
+                40.6505228
+              ],
+              [
+                -73.93472896,
+                40.57879901
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.93467777,
+                40.85135355
+              ],
+              [
+                -73.84297149,
+                40.74229181
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.83081589,
+                40.76002371
+              ],
+              [
+                -73.78704132,
+                40.70127889
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 16
+    },
+    {
+      "type": "point",
+      "column_names": [
+        "location"
+      ],
+      "column_indexes": [
+        20
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302313032222",
+          "number": 1
+        },
+        {
+          "hash": "1211302313330300",
+          "number": 1
+        },
+        {
+          "hash": "1211302313330031",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312303",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312201",
+          "number": 1
+        },
+        {
+          "hash": "1211302313312213",
+          "number": 1
+        },
+        {
+          "hash": "1211302313322232",
+          "number": 1
+        },
+        {
+          "hash": "1211302312312310",
+          "number": 1
+        },
+        {
+          "hash": "1211302312313310",
+          "number": 1
+        },
+        {
+          "hash": "1211302331111002",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100332",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100033",
+          "number": 1
+        },
+        {
+          "hash": "1211303202230210",
+          "number": 1
+        },
+        {
+          "hash": "1211303202232123",
+          "number": 1
+        },
+        {
+          "hash": "1211303202232312",
+          "number": 1
+        },
+        {
+          "hash": "1211303202231003",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.00697102,
+                40.6505228
+              ],
+              [
+                -73.93472896,
+                40.57879901
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.93467777,
+                40.85135355
+              ],
+              [
+                -73.84297149,
+                40.74229181
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.83081589,
+                40.76002371
+              ],
+              [
+                -73.78704132,
+                40.70127889
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 16
+    }
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "data_as_of_date"
+      ],
+      "column_indexes": [
+        21
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1703808000.0,
+            "lte": 1703808000.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "schoolname",
+    "buildingnumber",
+    "streetname",
+    "suiteapt",
+    "city",
+    "state",
+    "zipcode",
+    "latitude",
+    "longitude",
+    "contact",
+    "telephone",
+    "email",
+    "web",
+    "borough",
+    "community_board",
+    "community",
+    "board",
+    "council_district",
+    "council",
+    "district",
+    "bin",
+    "bbl",
+    "census_tract",
+    "census",
+    "tract",
+    "nta",
+    "location",
+    "data_as_of_date",
+    "data",
+    "as",
+    "of",
+    "date"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.0019887349917553365,
+      "2_geo_batch_predict": 0.014389329997356981,
+      "3_process_columns": 0.014009272039402276,
+      "4_latlong_pairing": 4.091899609193206e-05,
+      "5_spatial_coverage": 0.0031364840106107295,
+      "6_temporal_coverage": 0.0008953200303949416
+    },
+    "total": 1.3565717339515686
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/ayeb-p4mv.csv"
+}

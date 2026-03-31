@@ -1,0 +1,433 @@
+{
+  "geometricType": "MultiLineString",
+  "name": "uiay-nctu",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 386,
+  "nb_profiled_rows": 386,
+  "nb_columns": 29,
+  "columns": [
+    {
+      "name": "object_id",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 386,
+      "mean": 193.5,
+      "stddev": 111.42822802144886,
+      "coverage": [
+        {
+          "range": {
+            "gte": 7.0,
+            "lte": 124.0
+          }
+        },
+        {
+          "range": {
+            "gte": 137.0,
+            "lte": 253.0
+          }
+        },
+        {
+          "range": {
+            "gte": 266.0,
+            "lte": 380.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "orgname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "appronstre",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 169
+    },
+    {
+      "name": "boroughname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/AdministrativeArea"
+      ],
+      "geo_classifier": {
+        "label": "borough",
+        "confidence": 0.8763304352760315,
+        "source": "ml+validated"
+      }
+    },
+    {
+      "name": "apprfromst",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 143
+    },
+    {
+      "name": "apprtostre",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 155
+    },
+    {
+      "name": "apprdayswe",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 23
+    },
+    {
+      "name": "reviewstat",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "apprmonope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.5259067357512953,
+      "num_distinct_values": 23
+    },
+    {
+      "name": "apprmonclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.5259067357512953,
+      "num_distinct_values": 29
+    },
+    {
+      "name": "apprtueope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.5155440414507773,
+      "num_distinct_values": 24
+    },
+    {
+      "name": "apprtueclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.5181347150259067,
+      "num_distinct_values": 29
+    },
+    {
+      "name": "apprwedope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.49222797927461137,
+      "num_distinct_values": 26
+    },
+    {
+      "name": "apprwedclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.49222797927461137,
+      "num_distinct_values": 29
+    },
+    {
+      "name": "apprthuope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.4792746113989637,
+      "num_distinct_values": 25
+    },
+    {
+      "name": "apprthuclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.4792746113989637,
+      "num_distinct_values": 30
+    },
+    {
+      "name": "apprfriope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.29015544041450775,
+      "num_distinct_values": 25
+    },
+    {
+      "name": "apprfriclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.29015544041450775,
+      "num_distinct_values": 33
+    },
+    {
+      "name": "apprsatope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.4119170984455959,
+      "num_distinct_values": 15
+    },
+    {
+      "name": "apprsatclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.4119170984455959,
+      "num_distinct_values": 17
+    },
+    {
+      "name": "apprsunope",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.42487046632124353,
+      "num_distinct_values": 15
+    },
+    {
+      "name": "apprsunclo",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.42487046632124353,
+      "num_distinct_values": 14
+    },
+    {
+      "name": "apprstartd",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 73
+    },
+    {
+      "name": "apprenddat",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 48
+    },
+    {
+      "name": "shape_stle",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 340.72647898787665,
+      "stddev": 172.1880719307733,
+      "coverage": [
+        {
+          "range": {
+            "gte": 151.803706456,
+            "lte": 331.381210674
+          }
+        },
+        {
+          "range": {
+            "gte": 393.17947635,
+            "lte": 591.884297324
+          }
+        }
+      ]
+    },
+    {
+      "name": "segmentidt",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 382,
+      "mean": 120316.18393782384,
+      "stddev": 645518.7371998371,
+      "coverage": [
+        {
+          "range": {
+            "gte": 16920.0,
+            "lte": 91126.0
+          }
+        },
+        {
+          "range": {
+            "gte": 148414.0,
+            "lte": 314172.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "segmentidf",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 382,
+      "mean": 98733.58031088083,
+      "stddev": 460503.99262896494,
+      "coverage": [
+        {
+          "range": {
+            "gte": 16920.0,
+            "lte": 91126.0
+          }
+        },
+        {
+          "range": {
+            "gte": 148411.0,
+            "lte": 321739.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "lionversion",
+      "structural_type": "https://metadata.datadrivendiscovery.org/types/MissingData",
+      "semantic_types": []
+    },
+    {
+      "name": "the_geom",
+      "structural_type": "http://schema.org/GeoShape",
+      "semantic_types": [],
+      "geo_classifier": {
+        "label": "multi-line",
+        "confidence": 0.9205787181854248,
+        "source": "ml+validated"
+      }
+    }
+  ],
+  "nb_spatial_columns": 2,
+  "nb_temporal_columns": 2,
+  "nb_categorical_columns": 7,
+  "nb_numerical_columns": 4,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "apprstartd"
+      ],
+      "column_indexes": [
+        22
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1672531200.0,
+            "lte": 1677456000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1679702400.0,
+            "lte": 1686960000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1688169600.0,
+            "lte": 1694044800.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "apprenddat"
+      ],
+      "column_indexes": [
+        23
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1691107200.0,
+            "lte": 1703980800.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1714435200.0,
+            "lte": 1719705600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2556057600.0,
+            "lte": 2556057600.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "object_id",
+    "object",
+    "id",
+    "orgname",
+    "appronstre",
+    "boroughname",
+    "apprfromst",
+    "apprtostre",
+    "apprdayswe",
+    "reviewstat",
+    "apprmonope",
+    "apprmonclo",
+    "apprtueope",
+    "apprtueclo",
+    "apprwedope",
+    "apprwedclo",
+    "apprthuope",
+    "apprthuclo",
+    "apprfriope",
+    "apprfriclo",
+    "apprsatope",
+    "apprsatclo",
+    "apprsunope",
+    "apprsunclo",
+    "apprstartd",
+    "apprenddat",
+    "shape_stle",
+    "shape",
+    "stle",
+    "segmentidt",
+    "segmentidf",
+    "lionversion",
+    "the_geom",
+    "the",
+    "geom"
+  ],
+  "_profiling_times": {
+    "steps": {
+      "1_load_data": 0.004129106993786991,
+      "2_geo_batch_predict": 0.026449424971360713,
+      "3_process_columns": 0.2321956770028919,
+      "4_latlong_pairing": 3.3838965464383364e-05,
+      "5_spatial_coverage": 7.220951374620199e-06,
+      "6_temporal_coverage": 0.004099534009583294
+    },
+    "total": 1.560670184029732
+  },
+  "source_file": "/scratch/yfw215/atlas-profiler/datasets/nyc_open_data/uiay-nctu.csv"
+}
