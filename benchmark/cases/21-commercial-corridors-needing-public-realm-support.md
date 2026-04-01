@@ -8,7 +8,7 @@
 
 ## Task
 
-> You are helping a neighborhood-commercial-district team identify NYC areas where **street-level business activity and pedestrian presence appear meaningful, but visible public-realm support looks comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right local business, pedestrian, and public-space program layers; choose a defensible common geography; and explain what this kind of screening can and cannot say about corridor vitality, merchant need, or investment priority.
+> A neighborhood commercial-district team wants to identify NYC areas where street-level business activity and pedestrian presence appear meaningful but visible public-realm support looks comparatively thin. Using the available data catalog, select the business, pedestrian, and public-space program datasets needed for a first-pass screen, choose a defensible common geography, and explain what the results can and cannot say about corridor vitality or investment priority.
 
 ## Why this benchmark matters
 

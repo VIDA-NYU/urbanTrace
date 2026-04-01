@@ -4,11 +4,11 @@
 **Case ID:** 9  
 **Theme:** housing / inequality  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are supporting a policy researcher who wants to screen for neighborhoods facing **compounded housing and economic stress**. The goal is to identify areas where housing pressure plausibly overlaps with labor-market distress and poverty, so the city can prioritize follow-up on neighborhood instability and affordability risk. Using UrbanTrace, determine which datasets should be combined, what geography should anchor the comparison, and how the result should be interpreted for a realistic, source-grounded housing-stress workflow.
+> A housing-policy researcher wants to identify NYC neighborhoods facing compounded housing and economic stress, especially where housing pressure overlaps with labor-market distress and poverty. Using the available data catalog, choose the most defensible housing-pressure, unemployment, poverty, and population datasets, select the geography that should anchor the comparison, and explain how the screen should guide later affordability or instability follow-up.
 
 ## Why this benchmark matters
 
@@ -32,6 +32,8 @@ Official and public policy materials support a benchmark that connects housing s
 The New York State Comptroller’s report *New Yorkers in Need: The Housing Insecurity Crisis* explicitly frames housing insecurity as driven primarily by affordability pressure and links it to broader economic hardship. The report notes that in 2022 nearly 3 million New York households were housing insecure, that cost burdens were the primary driver, and that households were often forced into tradeoffs with other essentials. That is a strong policy basis for a benchmark centered on **housing pressure**, not merely housing stock.
 
 NYC Opportunity’s poverty-measure materials reinforce the same logic from the economic side: the NYC poverty measure is designed in part to reflect the City’s unusually high housing costs, and the 2022 writeup emphasizes that when temporary aid receded and the cost of basic necessities rose, many New Yorkers faced growing financial pressure. That supports a benchmark where poverty and unemployment are not side notes but part of the explanation for why housing stress matters.
+
+NYC Health’s **Housing stability** data explorer makes the housing-pressure problem more explicit. It states that rising housing costs increase rent burden for many New Yorkers and that, because of the city’s housing crisis, some families are at risk of eviction, residential instability, overcrowding, and homelessness. That gives the benchmark a direct official local reason to combine rent pressure with economic hardship rather than treating it as a loose proxy exercise.
 
 In the local UrbanTrace repo, that source-grounded framing has an important consequence: `NYC_housing_units` alone is **not** the best primary housing-stress layer. The metadata shows it is a sub-borough time series of annual housing-unit counts. That is useful context for stock and trend, but it is not itself an affordability or instability measure. By contrast, `NYC_median_rent` is a much more defensible local proxy for housing pressure because it directly captures neighborhood rent levels over time on the same sub-borough geography as the unemployment, poverty, and population layers.
 
@@ -187,6 +189,20 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** Poverty rose as temporary supports receded and basic costs increased, reinforcing the relevance of compounded affordability and economic stress.
 - **Why it matters for this benchmark:** It strengthens the economic-hardship side of the benchmark, even though the repo’s actual operational layer is `NYC_poverty_rate`.
 
+### 4) 2021 New York City Housing and Vacancy Survey: Selected Initial Findings
+- **Type:** official NYC housing report
+- **Agency:** NYC Department of Housing Preservation and Development / U.S. Census Bureau
+- **URL:** https://www.nyc.gov/assets/hpd/downloads/pdfs/services/2021-nychvs-selected-initial-findings.pdf
+- **What it supports:** The report states that **more than half of renter households** were rent burdened in 2021 and that **one third** were severely burdened.
+- **Why it matters for this benchmark:** It adds direct NYC evidence that affordability pressure is severe enough to justify a neighborhood screen built around rent, poverty, and unemployment.
+
+### 5) Housing stability data for NYC
+- **Type:** official NYC Health data explorer
+- **Agency:** NYC Department of Health and Mental Hygiene
+- **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/housing-stability/
+- **What it supports:** The page states that rising housing costs increase rent burden for many New Yorkers and links eviction risk to residential instability, overcrowding, and homelessness.
+- **Why it matters for this benchmark:** It is direct local support for treating rent pressure plus economic hardship as a meaningful neighborhood stress screen.
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -241,4 +257,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one NYC-specific official source directly on neighborhood rent burden, evictions, or Housing and Vacancy Survey affordability conditions that can be cleanly tied to the local dataset inventory. The case is benchmark-usable now because the available official/public sources justify the policy scenario, and the repo metadata clearly supports the rent-proxy and sub-borough-geography corrections.
+If this case gets one more pass later, the best upgrade would be adding a local neighborhood layer for **rent burden, eviction filings, or arrears** on the same geography as the rent and labor-market tables. The case now has direct NYC support for the housing-stress problem itself, but the repo still requires median rent to stand in as the closest operational neighborhood proxy.

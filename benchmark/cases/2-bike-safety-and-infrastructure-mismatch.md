@@ -4,11 +4,11 @@
 **Case ID:** 2  
 **Theme:** mobility / safety  
 **Language:** English  
-**Reviewed on:** 2026-03-22
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> NYC DOT describes a citywide goal of accelerating safe cycling through a connected bicycle network, especially in places where cycling demand is already strong, while tracking bike counts and bicycle crash outcomes as separate signals of network performance. Using UrbanTrace, identify which NYC neighborhoods look like plausible candidates for bike-network improvement because they combine **relatively strong observed bicycle activity**, **weaker or less protective bike-route coverage**, and **continued cyclist crash burden**. Select the datasets needed for that comparison, choose a common geography, and explain which neighborhoods would merit closer review for protected-lane expansion, route upgrades, or related safety interventions. Keep the analysis grounded in what the available datasets can actually support.
+> An NYC cycling-planning analyst wants to identify neighborhoods that may warrant bike-network improvements because bicycle activity is relatively strong, bike-route coverage or protection appears weaker, and cyclist crash burden remains meaningful. Using the available data catalog, identify the datasets needed for that comparison, choose a defensible common geography, and explain how the results should guide follow-up on protected-lane expansion, route upgrades, or related safety interventions.
 
 ## Why this benchmark matters
 
@@ -18,7 +18,7 @@ This case is credible because the local catalog contains a realistic three-part 
 - **network supply and facility type** from `NYC_Bike_Routes`; and
 - **safety outcomes** from `NYC_vehicle_collisions_crashes`, including cyclist injury/killed fields.
 
-It also fits the current UrbanTrace agent architecture. `backend/llm_agent.py` builds answers from dataset descriptions, metadata, and dashboard context, while `backend/tool.py` only supports dataset-suggestion behavior. So benchmark quality here depends on whether the agent can pick the right datasets, avoid seductive but wrong substitutes, and articulate a defensible harmonization strategy.
+It also fits the current agent architecture. `backend/llm_agent.py` builds answers from dataset descriptions, metadata, and dashboard context, while `backend/tool.py` only supports dataset-suggestion behavior. So benchmark quality here depends on whether the agent can pick the right datasets, avoid seductive but wrong substitutes, and articulate a defensible harmonization strategy.
 
 ## Recommended benchmark framing
 
@@ -58,13 +58,19 @@ A strong answer should:
 - **Why relevant:** This page explicitly presents bike network growth, ridership trends, bike counts, and bicycle crash data as related components of cycling policy. It is the clearest source-level justification for a benchmark that asks the agent to synthesize demand, infrastructure, and safety instead of using only one of them.
 - **Confidence:** high
 
-### 2) Safe Streets for Cycling
+### 2) Vision Zero: Mayor de Blasio Announces "Green Wave" Bicycle Plan to Address Cycling Fatalities
+- **Type:** official NYC press release
+- **URL:** https://www.nyc.gov/office-of-the-mayor/news/368-19/vision-zero-mayor-de-blasio-green-wave-bicycle-plan-address-cycling-fatalities---
+- **Why relevant:** This announcement directly ties cyclist fatalities to the need for a citywide protected-bike-lane buildout and identifies high-risk community-board areas where cycling deaths were concentrated. That makes the benchmark’s demand-plus-infrastructure-plus-safety framing much more explicit.
+- **Confidence:** high
+
+### 3) Safe Streets for Cycling
 - **Type:** official NYC DOT report
 - **URL:** https://www.nyc.gov/html/dot/downloads/pdf/safe-streets-for-cycling.pdf
 - **Why relevant:** This report grounds the policy motivation for safer cycling investments and network expansion. It supports a benchmark that looks for places where safety interventions and route upgrades may still be needed.
 - **Confidence:** medium-high
 
-### 3) A Plan for Cycling in New York City
+### 4) A Plan for Cycling in New York City
 - **Type:** official NYC DOT report
 - **URL:** https://www.nyc.gov/html/dot/downloads/pdf/bike-safety-plan.pdf
 - **Why relevant:** This planning document supports the benchmark’s emphasis on city-led network planning, route expansion, and safety-oriented cycling investment rather than generic recreation or commuting analysis.

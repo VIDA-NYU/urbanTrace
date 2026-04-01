@@ -4,11 +4,11 @@
 **Case ID:** 7  
 **Theme:** public services / equity  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are preparing an exploratory equity memo on school access for a city audience concerned with whether vulnerable neighborhoods may be under-served by nearby school facilities. The goal is **not** to evaluate school quality or produce a capital-plan recommendation from scratch. Instead, the task is to screen for places where **population pressure and social vulnerability are high while school presence appears comparatively sparse**, using only datasets already available in UrbanTrace. Select the most relevant datasets, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with recent NYC reporting on school building conditions, accessibility, enrollment pressure, and facilities planning.
+> An education and planning team wants to screen for NYC neighborhoods where population pressure and social vulnerability are high while school presence appears comparatively sparse. Using the available data catalog, select the school, poverty, unemployment, and population datasets needed for a first-pass access screen, choose a defensible common geography, and explain how the results should inform later facilities or outreach review without being treated as a school-quality evaluation.
 
 ## Why this benchmark matters
 
@@ -28,7 +28,9 @@ This fits the current repo well. `backend/llm_agent.py` assembles answers from d
 
 The Independent Budget Office report *Barriers to Learning: Age, Accessibility, Space Usage, and Air Conditioning in NYC School Buildings* frames school facilities as an equity issue, not just a building inventory issue. It is directly relevant because it ties school conditions and accessibility to how well facilities serve students across the city.
 
-The NYC School Construction Authority’s capital-plan materials add the planning rationale for a neighborhood screening benchmark. The SCA states that its five-year capital-plan process adapts to **changes in enrollment, housing trends, building conditions, and educational initiatives**, and that sites can be added through a public-input and planning process. That is exactly the kind of context that makes an UrbanTrace benchmark about neighborhood pressure and relative facility presence credible: the benchmark is not claiming to replace formal siting analysis, but to identify where further facilities review may be warranted.
+The NYC School Construction Authority’s capital-planning materials add a more direct siting rationale. The SCA’s capital-plan and demographic materials state that projected enrollment is combined with projected housing growth, note that **new housing development projects can stress local schools by introducing an influx of new students**, and publish identified seat-need tables by district. That is exactly the kind of official planning context that makes a benchmark about neighborhood pressure and relative facility presence credible: the benchmark is not claiming to replace formal siting analysis, but to identify where further facilities review may be warranted.
+
+The Mayor’s 2025 school-opening announcement sharpens that rationale further by saying the City is **increasing seat capacity in neighborhoods with overcrowded schools**. That is a direct official statement that neighborhood differences in school-seat pressure are a real planning problem, not just an inference from the capital-plan machinery.
 
 Those sources support a benchmark framed as:
 
@@ -182,12 +184,12 @@ It should **not** be interpreted as:
 - **What it supports:** It frames school building accessibility, conditions, and space usage as meaningful public-policy concerns rather than purely operational details.
 - **Why it matters for this benchmark:** It justifies treating school facilities as part of an equity conversation, which makes a neighborhood screening benchmark credible.
 
-### 2) NYC School Construction Authority — Capital Plan public-input process / current capital-plan materials
+### 2) NYCSCA Capital Plan Reports & Data
 - **Type:** official NYC facilities-planning page
 - **Agency:** New York City School Construction Authority
-- **URL:** https://www.nycsca.org/Community/Overview/Capital-Plan-Reports-and-Data/Current-Capital-Plan
-- **What it supports:** The SCA states that capital planning is updated in response to public input, enrollment changes, housing trends, building conditions, and budget constraints.
-- **Why it matters for this benchmark:** It supports the idea that a neighborhood-level screen for population pressure and relative facility presence is relevant to real facilities-planning conversations, while still being only a first-pass screen.
+- **URL:** https://nycsca.org/Community/Capital-Plan-Reports-Data
+- **What it supports:** The SCA states that projected enrollment is combined with projected housing growth, that new housing development can stress local schools, and that the agency tracks identified seat need by district.
+- **Why it matters for this benchmark:** It is the clearest direct official support for screening neighborhoods where population pressure may be rising faster than visible school presence.
 
 ### 3) NYC School Construction Authority — Enrollment, Capacity & Utilization Report page
 - **Type:** official NYC facilities-planning page
@@ -195,6 +197,13 @@ It should **not** be interpreted as:
 - **URL:** https://www.nycsca.org/Community/Overview/Capital-Plan-Reports-and-Data/Enrollment-Capacity-Utilization-Report
 - **What it supports:** The SCA treats enrollment, capacity, and utilization as formal dimensions of facilities review.
 - **Why it matters for this benchmark:** It is the reason a strong benchmark answer should avoid overclaiming from raw school-point counts alone; point density is a screening signal, not a substitute for seat-capacity analysis.
+
+### 4) Mayor Adams, Chancellor Aviles-Ramos Announce Seven New Schools Opening in 2025-2026 Academic Year
+- **Type:** official NYC Mayor's Office press release
+- **Agency:** Mayor's Office of the City of New York
+- **URL:** https://www.nyc.gov/mayors-office/news/2025/05/mayor-adams-chancellor-aviles-ramos-seven-new-schools-opening-2025-2026-academic-year
+- **What it supports:** The City says new schools are being opened while continuing to increase seat capacity in neighborhoods with overcrowded schools.
+- **Why it matters for this benchmark:** It is a direct official problem statement tying neighborhood-level school access pressure to seat-capacity expansion.
 
 ## Suggested evaluation notes
 
@@ -245,4 +254,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one official NYCPS / SCA source that speaks more directly to public-school seat need or school-access inequity at neighborhood scale. Even without that, this case is now benchmark-usable because the IBO report supplies the equity/facilities rationale, the SCA materials justify the planning context, and the repo metadata clearly supports the geography correction and school-layer caveats.
+If this case gets one more pass later, the best upgrade would be adding a source that more directly links seat need to student travel or school-access barriers at neighborhood scale. The case now already has direct official support for projected housing growth and identified seat need, so the remaining gap is about travel/access consequences rather than facilities planning itself.

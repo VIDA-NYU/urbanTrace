@@ -4,11 +4,11 @@
 **Case ID:** 19  
 **Theme:** public services / capacity  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping an urban services team do a first-pass screen for places where **resident population is large but visible civic service presence appears relatively sparse** in the UrbanTrace catalog. The benchmark is not asking for a generic amenity map. It is testing whether the agent can connect a population-pressure layer to several service-point layers, recognize that those service layers are not interchangeable, choose a defensible comparison geography, and explain what this kind of screening can and cannot say about service adequacy. Using only datasets already available in UrbanTrace, identify the strongest layers for this task, explain the best first-pass geography, and describe how the result should be interpreted.
+> An urban-services team wants a first-pass screen of NYC areas where resident population is large but visible civic service presence, such as libraries, schools, or public computer centers, appears relatively sparse. Using the available data catalog, identify the population layer and the most relevant service-point datasets, choose a defensible comparison geography, distinguish between different kinds of service sites, and explain what the screen can and cannot say about service adequacy.
 
 ## Why this benchmark matters
 
@@ -30,11 +30,13 @@ This case is supported by real NYC planning and service materials, but the frami
 
 First, NYC Planning’s population-reporting pages establish that the city actively tracks current and future population patterns for planning purposes. That is enough official grounding to treat **population concentration** as a legitimate service-planning context rather than an invented benchmark setup.
 
-Second, the City’s **Preliminary Mayor’s Management Report** treats libraries as active public-service infrastructure by tracking circulation, programming, computer sessions, and Wi‑Fi sessions. That supports using library locations as one meaningful civic-service signal rather than a decorative amenity layer.
+Second, the City’s **Preliminary Mayor’s Management Report** treats libraries as active public-service infrastructure by tracking circulation, programming, computer sessions, and Wi‑Fi sessions. The FY2024 Mayor’s Management Report goes further by explicitly describing the libraries as part of the City’s **social infrastructure**, prioritizing equitable access across boroughs and highlighting lower-income neighborhoods and **book deserts**. That gives the benchmark a much more direct service-access rationale than a generic amenity framing.
 
 Third, NYC’s **Digital Equity** program and the **Digital Equity Roadmap** explicitly frame public connectivity and community access infrastructure as policy-relevant. That makes public Wi‑Fi hotspots a defensible service-side layer in a benchmark about resident concentration and neighborhood access.
 
-Fourth, recent school-facilities reporting from the Independent Budget Office and planning materials from the School Construction Authority make clear that school buildings, enrollment pressure, and facilities planning are real city concerns. But those same sources also imply an important limitation: school points are not a simple all-purpose civic-service count. The local `NYC_Schools` layer contains public and non-public institutions and does not directly measure seat availability or catchment access.
+Fourth, the City’s **Neighborhood Tech Help** expansion materials make the access problem more explicit: they describe in-person technology support for low-income New Yorkers at public libraries, affordable housing developments, and older-adult centers, and present the service as a response to digital-literacy and service-navigation barriers. That gives the benchmark a more direct urban-services grounding than relying on infrastructure inventories alone.
+
+Fifth, recent school-facilities reporting from the Independent Budget Office and planning materials from the School Construction Authority make clear that school buildings, enrollment pressure, and facilities planning are real city concerns. But those same sources also imply an important limitation: school points are not a simple all-purpose civic-service count. The local `NYC_Schools` layer contains public and non-public institutions and does not directly measure seat availability or catchment access.
 
 So the benchmark-credible synthesis is:
 
@@ -225,6 +227,18 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 - **Why relevant:** Supports the broader planning context that service and facilities provision responds to population change, enrollment, and public input.
 - **Confidence:** medium-high
 
+### 8) HPD, NYC Aging, NYPL Announce Expansion of Neighborhood Tech Help to the Bronx and Upper Manhattan
+- **Type:** official NYC press release
+- **URL:** https://www.nyc.gov/site/hpd/news/058-25/hpd-nyc-aging-nypl-expansion-neighborhood-tech-help-the-bronx-upper-manhattan.page
+- **Why relevant:** Directly frames neighborhood library and tech-support presence as a response to digital-literacy and service-access barriers facing low-income New Yorkers, which strengthens the public-service side of this screen.
+- **Confidence:** high
+
+### 9) Public Libraries | New York City Mayor’s Management Report FY2024
+- **Type:** official NYC service report
+- **URL:** https://www.nyc.gov/assets/operations/downloads/pdf/mmr2024/lib.pdf
+- **Why relevant:** The report describes libraries as part of the City’s social infrastructure and explicitly highlights equitable access, lower-income neighborhoods, and book deserts.
+- **Confidence:** high
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -266,4 +280,4 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger NYC-specific source on neighborhood service access or branch/civic-facility distribution that explicitly discusses resident concentration and access standards. The case is benchmark-usable now because the local metadata clearly supports the geometry choice, and the official population, library, digital-equity, and school-facilities materials are sufficient to justify a cautious service-density benchmark.
+If this case gets one more pass later, the best upgrade would be adding a local source or layer on service **capacity, hours, or travel-time access** so the benchmark can move beyond visible site presence. The case now already has direct official support for unequal service access in lower-income neighborhoods.

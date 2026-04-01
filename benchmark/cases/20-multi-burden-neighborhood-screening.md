@@ -8,7 +8,7 @@
 
 ## Task
 
-> You are helping a city analyst identify NYC neighborhoods for priority intervention where multiple burdens overlap: poverty, unemployment, heat vulnerability, ambient air pollution, and traffic safety harm. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right local layers, explain which burdens are directly available versus which require aggregation or temporal choices, and make the geography-harmonization problem explicit instead of pretending all variables already line up cleanly.
+> A city analyst wants to identify NYC neighborhoods for priority follow-up where multiple burdens overlap: poverty, unemployment, heat vulnerability, ambient air pollution, and traffic safety harm. Using the available data catalog, select the most defensible datasets for each burden, explain which indicators are directly available versus which require aggregation or temporal choices, choose a workable common geography or harmonization strategy, and describe how the resulting screen should be interpreted.
 
 ## Why this benchmark matters
 
@@ -116,6 +116,13 @@ This case is supported by a combination of official NYC materials and peer-revie
 - **URL:** https://doi.org/10.1038/s41370-024-00676-9
 - **What it supports:** Socioeconomic and environmental burdens can interact in ways that worsen vulnerability to heat and air pollution.
 - **Why it matters here:** It strengthens the case for looking at **overlap** rather than treating each burden independently.
+
+### 8) New York City Neighborhood Health Atlas
+- **Type:** official NYC Health platform
+- **Agency:** NYC Department of Health and Mental Hygiene
+- **URL:** https://www.nyc.gov/site/doh/health/neighborhood-health/nyc-neighborhood-health-atlas.page
+- **What it supports:** NYC Health describes the Atlas as a neighborhood tool covering social and economic conditions, housing, and neighborhood conditions including **air quality** and **crime complaints**.
+- **Why it matters here:** It adds NYC-specific evidence that cross-domain neighborhood screening is an established city public-health planning approach, even if this benchmark uses a different set of local layers and geographies.
 
 ## Local dataset evidence from the repo
 
@@ -293,4 +300,4 @@ A high-quality answer would likely say:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one NYC-specific source that more explicitly discusses cumulative neighborhood burden across environmental, socioeconomic, and traffic-safety dimensions in a single framework. The case is already benchmark-usable now because the official NYC sources ground each burden category, the peer-reviewed literature supports cumulative screening, and the repo metadata clearly defines the harmonization challenge.
+If this case gets one more pass later, the best upgrade would be adding a **single official NYC methodology** that combines environmental, socioeconomic, and injury indicators into one operational score. The case now has direct city support for multi-domain neighborhood screening, but the benchmark still requires the agent to design the composite logic itself.

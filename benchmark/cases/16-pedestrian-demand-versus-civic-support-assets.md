@@ -8,7 +8,7 @@
 
 ## Task
 
-> Which areas have heavy pedestrian activity but relatively limited nearby civic resources such as libraries or public Wi‑Fi? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with real NYC pedestrian/public-realm and digital-access planning rather than a generic amenity map.
+> A public-realm analyst wants to identify NYC areas with heavy pedestrian activity but relatively limited nearby civic resources such as libraries or public Wi-Fi. Using the available data catalog, select the pedestrian-activity and civic-support datasets needed for a first-pass neighborhood screen, choose a defensible common geography, and explain how the results should be interpreted for pedestrian-support and public-access planning rather than as a generic amenity map.
 
 ## Why this benchmark matters
 

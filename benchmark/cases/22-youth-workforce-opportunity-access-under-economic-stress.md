@@ -8,7 +8,7 @@
 
 ## Task
 
-> You are helping a city analyst identify NYC neighborhoods where **economic stress appears high but local access to youth and workforce-development program sites may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the best local program-site and socioeconomic layers, explain which service-site fields are actually usable for filtering workforce-relevant programs, choose a defensible common geography, and keep the result framed as a screening tool rather than a definitive measure of opportunity access.
+> A city analyst wants to identify NYC neighborhoods where economic stress appears high but access to youth and workforce-development program sites may be comparatively thin. Using the available data catalog, select the most relevant program-site and socioeconomic datasets, explain which service-site fields are usable for identifying workforce-related programs, choose a defensible common geography, and describe how the results should guide later opportunity-access follow-up.
 
 ## Why this benchmark matters
 

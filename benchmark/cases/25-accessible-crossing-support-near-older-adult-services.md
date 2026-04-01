@@ -4,11 +4,11 @@
 **Case ID:** 25  
 **Theme:** accessibility / aging / pedestrian infrastructure  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping a city accessibility or aging-services analyst identify NYC community districts where **older-adult service destinations appear present but nearby accessible pedestrian-crossing support may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right older-adult destination and crossing-accessibility layers, explain why community-district geography is the cleanest first-pass comparison in this repo, distinguish between different kinds of crossing features, and keep the result framed as a screening tool rather than a definitive ADA-compliance or walkability score.
+> An accessibility or aging-services analyst wants to identify NYC community districts where older-adult service destinations appear present but nearby accessible pedestrian-crossing support may be comparatively thin. Using the available data catalog, select the older-adult destination and crossing-accessibility datasets needed for a first-pass screen, explain why community districts are the most defensible comparison geography here, distinguish between different crossing-support features, and describe how the results should be interpreted.
 
 ## Why this benchmark matters
 
@@ -40,6 +40,8 @@ This case is grounded in official NYC materials rather than invented scenario fr
 NYC Aging’s official **Older Adult Center** page states that there are more than 300 older adult centers and affiliated sites across the five boroughs, that membership is free and open to New Yorkers age 60 and older, and that centers provide meals, classes, fitness programs, social services, and other supports. The page also notes that some centers serve special populations, including **VISIONS at Selis Manor Senior Center for blind and visually impaired older adults**. That gives direct official grounding for treating older-adult service locations as meaningful pedestrian destinations whose surrounding street accessibility matters.
 
 The City’s official **Accessible NYC 2025** guide, published by the Mayor’s Office for People with Disabilities, provides broader policy grounding that accessible routes, curb ramps, pedestrian signals, and street-crossing conditions are core parts of inclusive city access. That supports a benchmark focused on whether the agent can identify relevant pedestrian-accessibility infrastructure rather than defaulting to generic mobility or safety layers.
+
+NYC DOT’s **Safe Streets for Seniors** program makes the pedestrian-risk problem direct. The agency states that older adults represent less than 15 percent of the city population but more than 45 percent of pedestrian fatalities, and it describes engineering responses such as longer crossing times, safety islands, signal improvements, and ADA-compliant ramp work in senior-priority areas. That is precisely the kind of urban problem statement this benchmark needs.
 
 The official NYC Open Data documentation for **Accessible Pedestrian Signal Locations** and **Pedestrian Ramp Locations** then provides the concrete local infrastructure layers already present in the repo. Those datasets make this a credible UrbanTrace benchmark because the task can be framed around real local evidence already in the datalake, not around imagined access measures.
 
@@ -214,6 +216,12 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 - **Type:** official dataset documentation
 - **URL:** https://data.cityofnewyork.us/api/views/cqc8-am9x
 - **Why relevant:** Official documentation for the older-adult provider inventory used as the destination layer in this case.
+- **Confidence:** high
+
+### 6) Safe Streets for Seniors
+- **Type:** official NYC DOT program page
+- **URL:** https://www.nyc.gov/html/dot/html/pedestrians/safeseniors.shtml
+- **Why relevant:** Directly states that older adults face disproportionate pedestrian fatality risk and links that risk to signal timing, crossings, ramps, and other street-design interventions.
 - **Confidence:** high
 
 ## Data access points for reproducibility

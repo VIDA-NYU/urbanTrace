@@ -8,7 +8,7 @@
 
 ## Task
 
-> Which NYC sub-borough areas should be screened as higher-priority candidates for housing-affordability follow-up where the local housing stock has grown, but rents have still risen faster than median household income? Use the available UrbanTrace datalake to identify the datasets needed for a neighborhood-level screen, choose the planning geography that is most defensible for this repo, and explain how the resulting screen should guide later anti-displacement, preservation, rezoning, or affordable-housing review.
+> A housing-policy analyst wants to identify NYC sub-borough areas where the housing stock has grown but rents have still risen faster than median household income. Using the available data catalog, select the housing-stock, rent, and income datasets needed for that comparison, confirm the most defensible common geography, and explain how the results should guide later anti-displacement, preservation, rezoning, or affordable-housing review.
 
 ## Why this benchmark matters
 
