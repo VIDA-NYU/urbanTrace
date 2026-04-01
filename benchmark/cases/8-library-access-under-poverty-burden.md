@@ -4,11 +4,11 @@
 **Case ID:** 8  
 **Theme:** public services / equity  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping a civic-access analyst examine whether library distribution appears equitable relative to neighborhood need. The city is especially interested in whether **higher-poverty neighborhoods may have weaker library access**, since libraries function as public education, information, and service-access infrastructure. This benchmark should therefore go beyond simply mapping library points: it should compare library presence against poverty burden and neighborhood scale, and produce a plausible planning-oriented answer about where access may be comparatively thin. Using UrbanTrace, determine which datasets should be selected, what comparison geography is most defensible given the local repo, and how the result should be interpreted for a realistic equity-oriented public-service workflow.
+> A civic-access analyst wants to identify NYC neighborhoods where higher poverty may coincide with comparatively thin library access. Using the available data catalog, choose the library, poverty, and population datasets needed for a neighborhood screen, select a defensible comparison geography, and explain how the results should inform public-service planning without over-claiming service adequacy.
 
 ## Why this benchmark matters
 
@@ -25,7 +25,7 @@ A stronger agent should recognize that this case is really about **public librar
 
 ## Source-grounded planning rationale
 
-Official NYC materials support treating libraries as a meaningful public-service and civic-access resource. The City’s FY2026 Preliminary Mayor’s Management Report tracks circulation, program attendance, computer sessions, and Wi‑Fi sessions across the library systems, which is a strong official signal that libraries are not just buildings on a map: they are actively used public-service infrastructure. NYC’s Digital Equity materials also reinforce that residents rely on community institutions for digital and service access, which makes library distribution relevant for equity screening even when the benchmark is broader than digital inclusion alone.
+Official NYC materials support treating libraries as a meaningful public-service and civic-access resource. The City’s FY2026 Preliminary Mayor’s Management Report tracks circulation, program attendance, computer sessions, and Wi‑Fi sessions across the library systems, which is a strong official signal that libraries are not just buildings on a map: they are actively used public-service infrastructure. The FY2024 Mayor’s Management Report goes further by explicitly framing the libraries as part of the City’s social infrastructure, prioritizing equitable access across boroughs and highlighting lower-income neighborhoods and book deserts. NYC’s Digital Equity materials also reinforce that residents rely on community institutions for digital and service access, which makes library distribution relevant for equity screening even when the benchmark is broader than digital inclusion alone.
 
 That policy framing supports a benchmark about **where public library access may be comparatively thin relative to poverty burden and resident population**. In the local UrbanTrace catalog, the most credible need-side datasets are `NYC_poverty_rate` and `NYC_population`, and the most credible facility-side dataset is `NYC_libraries`.
 
@@ -150,12 +150,26 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** The City tracks library circulation, programs, computer sessions, and Wi‑Fi sessions as meaningful service outputs.
 - **Why it matters for this benchmark:** It supports treating libraries as active public-service infrastructure rather than just a passive amenity layer.
 
-### 2) Digital Equity — NYC Office of Technology and Innovation
+### 2) Public Libraries | New York City Mayor’s Management Report FY2024
+- **Type:** official NYC service report
+- **Agency:** City of New York
+- **URL:** https://www.nyc.gov/assets/operations/downloads/pdf/mmr2024/lib.pdf
+- **What it supports:** The report describes the library systems as part of the City’s social infrastructure, says they prioritize equitable access across boroughs, and highlights lower-income neighborhoods and book deserts.
+- **Why it matters for this benchmark:** It is direct official support for treating unequal library access as an equity and neighborhood-resource issue rather than a generic amenity count.
+
+### 3) Digital Equity — NYC Office of Technology and Innovation
 - **Type:** official program page
 - **Agency:** NYC Office of Technology and Innovation
 - **URL:** https://www.nyc.gov/content/oti/pages/digital-equity
 - **What it supports:** NYC formally frames equitable access to digital resources and support as a city policy concern.
 - **Why it matters for this benchmark:** It reinforces the idea that libraries matter as access infrastructure for residents who may face higher barriers to information, services, and connectivity.
+
+### 4) NYC’s Public Libraries to Expand Sunday Library Service to 11 Additional Branches Citywide
+- **Type:** official NYC Council press release
+- **Agency:** New York City Council
+- **URL:** https://council.nyc.gov/press/2025/08/04/2933/
+- **What it supports:** The city expanded Sunday service and described libraries as neighborhood public resources that provide educational and economic opportunity across communities.
+- **Why it matters for this benchmark:** It gives direct NYC planning and budget context for treating branch access as a real service-distribution question rather than a generic amenity count.
 
 ## Suggested evaluation notes
 
@@ -207,4 +221,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger NYC-specific source on neighborhood library service planning or branch access equity. The case is already benchmark-usable now because the official NYC service and digital-equity materials justify the planning scenario, and the repo metadata clearly supports the geography and public-library-filter corrections.
+If this case gets one more pass later, the best upgrade would be adding branch-level **hours, staffing, or capital-condition data** so the benchmark can go beyond branch counts. The case now has direct NYC support for treating unequal library access as a planning issue, but the local repo still measures presence more cleanly than service intensity.

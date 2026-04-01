@@ -8,7 +8,7 @@
 
 ## Task
 
-> Which school-rich areas also show heavy traffic or collision concerns that might motivate safer-route interventions? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted in a way that is consistent with real NYC school-safety planning rather than generic traffic hotspot mapping.
+> An education or street-safety planner wants to identify school-rich NYC areas that also show heavy traffic or collision concerns and may warrant safer-routes interventions. Using the available data catalog, select the school, traffic, and safety datasets needed for a first-pass neighborhood screen, choose a defensible common geography, and explain how the results should guide later school-area or corridor-level review.
 
 ## Why this benchmark matters
 

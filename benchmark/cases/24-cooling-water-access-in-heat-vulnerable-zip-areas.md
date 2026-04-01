@@ -4,11 +4,11 @@
 **Case ID:** 24  
 **Theme:** climate resilience / parks access / public health  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping a city resilience analyst identify NYC ZIP-like areas where **heat vulnerability appears high but visible access to outdoor cooling-water amenities may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right heat-vulnerability and parks amenity layers, explain the ZIP-like geography choices clearly, distinguish between everyday cooling-water amenities and the City’s formal cooling-center system, and keep the result framed as a screening tool rather than a definitive measure of heat safety.
+> A resilience analyst wants to identify NYC ZIP-like areas where heat vulnerability is high but visible access to outdoor cooling-water amenities may be comparatively thin. Using the available data catalog, select the heat-vulnerability and parks-amenity datasets needed for the screen, explain the most defensible ZIP-like geography choice, distinguish everyday cooling-water amenities from the city's formal cooling-center system, and describe how the results should guide heat-resilience follow-up.
 
 ## Why this benchmark matters
 
@@ -40,6 +40,8 @@ This case is grounded in official NYC materials rather than invented scenario fr
 NYC Emergency Management’s **Extreme Heat: Beat the Heat!** page states that extreme heat kills, that more than 500 New Yorkers die prematurely from preventable heat illness in an average year, and that people without home air conditioning should plan to use free public places and the City’s **Cool Options NYC** map. That provides direct official grounding for treating neighborhood heat protection as a real planning concern.
 
 NYC Health’s **Interactive heat vulnerability index** page further grounds the benchmark by explicitly framing heat risk as a neighborhood inequity issue. The page says Black New Yorkers are disproportionately affected by heat and that structural inequities limit access to health-protective resources such as air conditioning, green space, and **neighborhood cooling resources**. That is strong official support for a benchmark about place-based heat protection assets.
+
+The City also makes the outdoor-amenity connection directly. Official heat-emergency guidance tells New Yorkers to use the City’s **Cool It! NYC** resources for spray showers, drinking fountains, and other outdoor cooling options, and DEP’s Water-On-the-Go materials explicitly present public drinking fountains as a way to help New Yorkers **stay cool** and beat the heat. That is the missing direct support for treating parks water amenities as part of neighborhood heat-relief infrastructure rather than as unrelated park features.
 
 On the amenity side, the official NYC Open Data documentation for **NYC Parks Drinking Fountains** states that the dataset inventories outdoor drinking fountains in parks, while the official documentation for **NYC Parks Spray Showers** states that it provides the locations of spray showers under the jurisdiction of NYC Parks and points users to the Parks spray-shower program page. Those are legitimate city-managed warm-weather amenity layers already present in the local repo.
 
@@ -213,6 +215,12 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 - **URL:** https://finder.nyc.gov/coolingcenters/
 - **Why relevant:** Useful as an explicit boundary condition: it is the City’s formal cool-options system, which helps a strong agent explain why fountains and spray showers should not be mislabeled as official cooling centers.
 - **Confidence:** medium-high
+
+### 6) DEP Helps New Yorkers Stay Cool With Launch of Water-On-the-Go Season
+- **Type:** official NYC press release
+- **URL:** https://www.nyc.gov/html/dep/html/press_releases/14-057pr.shtml
+- **Why relevant:** This is a direct official statement that public drinking fountains are a heat-relief resource, not just a generic parks amenity. It strengthens the case for using fountains as a legitimate outdoor cooling-water layer.
+- **Confidence:** high
 
 ## Data access points for reproducibility
 

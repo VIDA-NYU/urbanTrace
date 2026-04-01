@@ -4,11 +4,11 @@
 **Case ID:** 18  
 **Theme:** mobility / environment  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> Which NYC areas with worse air-pollution burden appear to have weaker bike-route support? Using only the datasets already available in UrbanTrace, identify the strongest layers for a first-pass screen, choose the most defensible common geography, and explain the limits of what this analysis can and cannot say about environmental justice and active transportation.
+> An environmental-justice and active-transportation analyst wants to identify NYC areas where worse air-pollution burden appears to coincide with weaker bike-route support. Using the available data catalog, select the air-quality and bike-network datasets needed for a first-pass screen, choose a defensible common geography, and explain what the results can and cannot say about environmental burden and active-transportation access.
 
 ## Why this benchmark matters
 
@@ -32,6 +32,8 @@ First, the NYC Health Department’s **New York City Community Air Survey (NYCCA
 Second, New York City’s **Environmental Justice for All Report Scope of Work** provides official city grounding for screening place-based environmental burdens and inequities. Even without using every element of that report in the benchmark, it is strong official justification for asking which neighborhoods face heavier environmental burdens and may deserve targeted planning attention.
 
 Third, NYC DOT’s cycling planning materials — especially **A Plan for Cycling in New York City** and **Safe Streets for Cycling** — establish that bike-network planning is a real city transportation priority, including expansion of safe cycling facilities and attention to network gaps. Those sources justify the mobility side of the benchmark.
+
+NYC Health’s **Active Design** guidance makes the equity connection more direct. The City describes Active Design Guidelines 2.0 as a plan to improve health and equity through the built environment and says New York should ensure **safe and protected bicycle infrastructure in all neighborhoods**. That is strong official support for treating bike-network support as part of a health-and-equity planning conversation rather than just a recreation or mode-share topic.
 
 The benchmark-credible synthesis is therefore not “bike routes will prove pollution reduction here.” It is narrower and more defensible:
 
@@ -200,6 +202,12 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 - **Why relevant:** Provides programmatic context for bike-network extent and ridership tracking, supporting why bike-route and bike-count layers belong in the same analytic family even if they should not be interpreted identically.
 - **Confidence:** medium-high
 
+### 6) Active Design - NYC Health
+- **Type:** official NYC Health guidance page
+- **URL:** https://www.nyc.gov/site/doh/health/health-topics/active-design.page
+- **Why relevant:** The page explicitly links health and equity to built-environment strategies and calls for safe and protected bicycle infrastructure in all neighborhoods.
+- **Confidence:** high
+
 ## Data access points for reproducibility
 
 1. **Air-pollution burden layer**
@@ -260,4 +268,4 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one directly quotable NYC source that more explicitly links active transportation investments to broader sustainability or environmental-justice planning. The case is benchmark-usable now because the local metadata clearly supports the geometry choice, and the official NYCCAS, environmental-justice, and DOT cycling materials are sufficient to justify a cautious screening benchmark.
+If this case gets one more pass later, the best upgrade would be adding one directly quotable NYC source that ties bicycle-network investment more specifically to **air-quality or traffic-exposure reduction**, rather than to health and equity more broadly. The case now already has direct official support for treating bike infrastructure as an equitable built-environment resource.

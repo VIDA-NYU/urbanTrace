@@ -4,11 +4,11 @@
 **Case ID:** 17  
 **Theme:** economic development  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> How do business license locations align with neighborhood population, unemployment, and poverty patterns? Using only the datasets already available in UrbanTrace, identify the most relevant layers for a first-pass neighborhood screening, choose the most defensible common geography, and explain how the result should be interpreted without overstating what business-license data can prove about local economic vitality.
+> An economic-development analyst wants to understand how business-license locations align with neighborhood population, unemployment, and poverty patterns across NYC. Using the available data catalog, identify the business and neighborhood-context datasets needed for a first-pass screen, choose a defensible common geography, and explain how the results should be interpreted without overstating what business-license data can prove about local economic vitality.
 
 ## Why this benchmark matters
 
@@ -34,6 +34,8 @@ First, the SBS **Neighborhood 360°** page says the program was created to ident
 Second, the SBS **Commercial District Needs Assessments (CDNAs)** page says each assessment highlights the **existing business landscape, consumer characteristics, physical environment, and unique character of the commercial corridors and local businesses that make up the identity of each neighborhood**. It also notes that the assessments identify needs and opportunities for local neighborhood revitalization. This is especially useful benchmark grounding because it frames local business patterns explicitly in neighborhood context rather than as a citywide aggregate only.
 
 Third, SBS’s 2018 release on CDNAs says the assessments help neighborhoods better support **local small businesses**, and that they include **existing conditions, business data, and an overview of neighborhoods** based on observations, surveys, and stakeholder engagement. That makes the benchmark’s combination of business-location evidence plus neighborhood context well aligned with real NYC practice.
+
+SBS’s **Starting a BID** guidance makes the neighborhood-commercial-problem statement more explicit. It says BIDs are most successful in areas with vacancy rates below 20 percent, and that areas with **high vacancy rates or unstable local economies** may need other economic-development strategies. That is direct official support for a benchmark that treats business presence in neighborhood context as a planning issue, while also warning that one proxy alone should not be over-read.
 
 On the data side, the official DCWP **Issued Licenses** dataset states that it features licenses issued by the NYC Department of Consumer and Worker Protection and includes fields such as business category, license status, borough, community board, council district, NTA, and coordinates. This gives the repo a credible point-based proxy for a subset of neighborhood business activity.
 
@@ -206,6 +208,12 @@ A benchmark-credible answer should clearly state what this analysis can and cann
 - **Why relevant:** Supports using poverty as an official city policy context layer rather than an invented benchmark covariate.
 - **Confidence:** medium-high
 
+### 6) Starting a BID - SBS
+- **Type:** official NYC SBS guidance page
+- **URL:** https://www.nyc.gov/site/sbs/neighborhoods/starting-a-bid.page
+- **Why relevant:** The page says BIDs are most successful where vacancy rates are below 20 percent and notes that areas with high vacancy or unstable local economies may need different economic-development strategies.
+- **Confidence:** high
+
 ## Data access points for reproducibility
 
 1. **Business-license point layer**
@@ -271,4 +279,4 @@ A benchmark-credible answer should clearly state what this analysis can and cann
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger official source on neighborhood commercial vacancy, corridor health, or merchant-support targeting that can complement the DCWP licensing proxy. The case is benchmark-usable now because the repo metadata clearly supports the geometry choice, and the SBS / DCWP materials are sufficient to justify a neighborhood-screening benchmark about licensed business presence in local socioeconomic context.
+If this case gets one more pass later, the best upgrade would be adding a local layer or report on merchant turnover, storefront occupancy, or vacancy by neighborhood so the benchmark can go beyond licensing presence. The case now has direct official support linking local economic stability and commercial occupancy to neighborhood development strategy.

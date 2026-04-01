@@ -8,7 +8,7 @@
 
 ## Task
 
-> You are helping a city planning or outreach team do a **ZIP-like screening** for places where vulnerability appears high but public-service coverage may be comparatively weak. The benchmark is intentionally tricky: the original seed mentions `MODZCTA`, poverty, unemployment, libraries, and Wi‑Fi, but the local UrbanTrace repo does **not** place all of those layers on the same geography. A benchmark-credible answer therefore has to do more than name plausible datasets. It needs to recognize the ZIP-level requirement, choose the most defensible comparison geography available in the repo, and explain whether the result is a strict ZIP-based screen or a looser cross-geography approximation.
+> A city planning or outreach team wants a ZIP-like screening of NYC areas where vulnerability is high but public-service coverage may be comparatively weak. The request mentions poverty, unemployment, libraries, and public Wi-Fi at a ZIP-style geography. Using the available data catalog, identify the datasets that best support that request, choose the most defensible geography available, and explain whether the final screen is a true ZIP-based comparison or a cross-geography approximation.
 
 ## Why this benchmark matters
 
@@ -206,6 +206,13 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** NYC tracks library computer sessions, Wi‑Fi sessions, circulation, and programming as active public-service outputs.
 - **Why it matters for this benchmark:** It supports treating libraries as real service-access infrastructure rather than a generic civic amenity.
 
+### 5) NYC Health coronavirus-data repository geography notes
+- **Type:** official NYC Health technical documentation
+- **Agency:** NYC Department of Health and Mental Hygiene
+- **URL:** https://github.com/nychealth/coronavirus-data
+- **What it supports:** NYC Health explains that ZIP codes are not area units, that ZCTAs provide area-based geography, and that **MODZCTA** combines smaller-population census blocks to create more stable population denominators.
+- **Why it matters for this benchmark:** It provides a direct official explanation of why a ZIP-like benchmark must distinguish between ZCTA and MODZCTA rather than treating them as interchangeable.
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -262,4 +269,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one official NYC source specifically explaining MODZCTA versus ZCTA use in public-health reporting. The case is already benchmark-usable now because the repo metadata clearly exposes the geography mismatch, and the official HVI, digital-equity, and library-service materials are sufficient to ground the vulnerability-plus-service-access framing.
+If this case gets one more pass later, the best upgrade would be adding a **repo-native crosswalk or harmonized lookup** between the specific ZCTA-2020 and MODZCTA layers used locally. The case now has direct official documentation on the geography distinction, but the benchmark still depends on the agent explaining rather than executing that translation.

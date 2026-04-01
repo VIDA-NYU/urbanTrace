@@ -8,7 +8,7 @@
 
 ## Task
 
-> Which NYC community districts should be screened as higher-priority candidates for cross-sector follow-up where post-2022 academic recovery appears comparatively weak while neighborhood crime burden remains comparatively high? Use the available UrbanTrace datalake to identify the datasets needed for a community-district screen, choose the planning geography that is most defensible for this repo, and explain how the resulting screen should guide later school-support, youth-service, trauma-informed, or place-based safety follow-up.
+> An education or cross-agency policy analyst wants to identify NYC community districts that may need follow-up where post-2022 academic recovery appears weak while neighborhood crime burden remains high. Using the available data catalog, select the education and community-district safety datasets needed for the screen, confirm the most defensible planning geography, and explain how the results should guide later school-support, youth-service, trauma-informed, or place-based safety follow-up.
 
 ## Why this benchmark matters
 

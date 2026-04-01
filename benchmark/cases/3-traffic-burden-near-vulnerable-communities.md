@@ -4,11 +4,11 @@
 **Case ID:** 3  
 **Theme:** mobility / equity / environmental justice  
 **Language:** English  
-**Reviewed on:** 2026-03-22
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are assisting a city environmental-justice or public-health analyst who needs to identify NYC communities where **high traffic activity coincides with social vulnerability**. The analyst is not asking for a generic traffic hotspot map. They want a screening workflow that uses UrbanTrace to combine traffic activity with neighborhood poverty, unemployment, and population burden, then summarizes the results at a defensible community geography for prioritization. The answer should explicitly acknowledge that traffic counts are a **proxy for burden/exposure**, not a direct health outcome, and should stay consistent with NYC environmental-health framing around unequal impacts from traffic-related pollution.
+> A public-health or environmental-justice analyst wants to identify NYC communities where heavy traffic activity coincides with social vulnerability. Using the available data catalog, build a screening workflow that combines traffic activity with neighborhood poverty, unemployment, and population burden, summarize the results at a defensible community geography, and make clear that traffic counts are a proxy for exposure rather than a direct health outcome.
 
 ## Why this benchmark matters
 
@@ -26,6 +26,7 @@ The case is supported by official NYC health / environmental-justice materials r
 
 - NYC Health’s **New York City Community Air Survey** states that the program studies how pollutants from **traffic** and other sources affect air quality in different neighborhoods, and that extra monitoring sites were added to better understand emissions in **low-income neighborhoods**.
 - NYC Health’s **The public health impacts of PM2.5 from traffic air pollution** states that traffic is a major PM2.5 source in NYC and that the impacts are felt more acutely in less wealthy neighborhoods; it further notes that PM2.5 from all traffic sources is about **50% higher in high-poverty neighborhoods than in low-poverty neighborhoods**.
+- NYC Health’s **Air quality** data explorer states that health impacts from fine particulate matter, black carbon, and sulfur dioxide are **higher in high-poverty neighborhoods**, which gives this benchmark a direct official equity rationale beyond generic traffic exposure language.
 - NYC’s **Environmental Justice for All Report Scope of Work** provides city-level policy grounding for neighborhood burden screening tied to environmental justice.
 
 That makes this case benchmark-credible as a screening question about where heavy traffic activity and social vulnerability overlap, even though the local repo dataset is traffic volume counts rather than direct exposure modeling.
@@ -109,6 +110,12 @@ It is also good if the agent mentions one or more limitations:
 - **URL:** https://www.nyc.gov/assets/sustainability/downloads/pdf/EJ-Report-Scope.pdf
 - **Why relevant:** Provides city policy grounding for environmental-justice screening and prioritization across neighborhoods.
 - **Confidence:** medium-high
+
+### 4) Air quality data for NYC
+- **Type:** official NYC Health data explorer
+- **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/air-quality/
+- **Why relevant:** The page states that health impacts from several major pollutants are higher in high-poverty neighborhoods, making the benchmark’s traffic-plus-vulnerability framing more directly official and NYC-specific.
+- **Confidence:** high
 
 ## Data access points for reproducibility
 

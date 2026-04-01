@@ -4,11 +4,11 @@
 **Case ID:** 6  
 **Theme:** digital equity / public services  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping a digital equity team identify NYC areas where residents may have **greater reliance on public digital-access infrastructure**. The task is not just to map Wi‑Fi or libraries separately. It should screen for neighborhoods where public access points — especially public Wi‑Fi hotspots, libraries, and public computer centers — may matter more because poverty burden is higher and resident population is large. Using UrbanTrace, determine which datasets should be selected, what comparison geography is most defensible given the local repo, and how the result should be interpreted for a realistic NYC digital-equity planning workflow.
+> A digital-equity team wants to identify NYC neighborhoods where residents may rely more heavily on public digital-access infrastructure because poverty is high and population is large. Using the available data catalog, identify the best datasets for public Wi-Fi hotspots, libraries, public computer centers, poverty, and population, choose a defensible comparison geography, and explain how the screen should be interpreted for digital-equity planning.
 
 ## Why this benchmark matters
 
@@ -26,6 +26,8 @@ A stronger agent should recognize that this case is really about **public digita
 ## Source-grounded planning rationale
 
 NYC’s Office of Technology and Innovation explicitly frames digital equity as a citywide public-policy priority. The City’s Digital Equity Roadmap describes digital inequity in terms of broadband affordability, device access, skills, and the need for community support infrastructure. The more recent Neighborhood Tech Help announcement makes the same logic concrete: the City is funding neighborhood-based technical assistance to help residents get online, use devices, and navigate digital services.
+
+The Adams administration’s 2025 digital-equity investment announcement makes the physical public-access infrastructure need even more direct. The City said it was investing new capital funds to renovate **computer labs in libraries and older adult centers across the five boroughs** and expanding other initiatives to meet the immediate needs of under-connected New Yorkers. That is strong official support for treating libraries and public computer centers as real digital-access assets in a neighborhood screening benchmark.
 
 That policy framing supports a benchmark about **where public digital-access infrastructure may be especially important**. In the local UrbanTrace catalog, the most credible public-access proxies are:
 
@@ -179,6 +181,20 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** NYC is actively investing in neighborhood-based technical help to bridge the digital divide.
 - **Why it matters for this benchmark:** It confirms that a neighborhood screening product is a realistic planning use case, not an invented scenario.
 
+### 4) NYPL Wireless Initiative
+- **Type:** institutional program page
+- **Organization:** The New York Public Library
+- **URL:** https://www.nypl.org/help/services/computers-internet-and-wireless-access/nypl-wireless
+- **What it supports:** NYPL describes itself as one of the city’s largest providers of free public computers and high-speed internet access points and documents branch-based and neighborhood-based connectivity programs.
+- **Why it matters for this benchmark:** It adds direct NYC evidence that libraries function as public digital-access infrastructure, not merely as a weak amenity proxy.
+
+### 5) Mayor Adams, Chief Technology Officer Fraser Announce $2.4 Million Investment, Release Roadmap to Advance Digital Equity in Disadvantaged Communities
+- **Type:** official NYC Mayor's Office press release
+- **Agency:** Mayor's Office of the City of New York
+- **URL:** https://www.nyc.gov/office-of-the-mayor/news/129-25/mayor-adams-chief-technology-officer-fraser-2-4-million-investment-release-roadmap-to
+- **What it supports:** The City says it is renovating computer labs in libraries and older adult centers across the five boroughs and expanding initiatives to meet the immediate needs of under-connected New Yorkers.
+- **Why it matters for this benchmark:** It is direct official support for treating public computer centers and libraries as neighborhood digital-access infrastructure rather than only generic civic assets.
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -228,4 +244,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger official source specifically about public access computing or library-based digital inclusion in NYC. The case is already benchmark-usable now because the Digital Equity program materials and Neighborhood Tech Help announcement are sufficient to justify the planning scenario, and the repo metadata clearly supports the dataset and geography corrections.
+If this case gets one more pass later, the best upgrade would be adding a source or local layer with **branch- or center-level usage volumes** for public computers, training participation, or Wi-Fi sessions. The case now has direct NYC support for library-based and center-based digital inclusion, but it still relies on visible site presence rather than observed utilization.

@@ -4,11 +4,11 @@
 **Case ID:** 23  
 **Theme:** aging / climate resilience / service access  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping a city analyst identify NYC areas where **heat vulnerability appears high and local access to NYC Aging contracted providers may be comparatively thin**. The benchmark should stay grounded in the actual UrbanTrace catalog and current copilot behavior. A strong answer should select the right aging-service and heat-vulnerability layers, explain the ZIP-like geography choices clearly, distinguish between provider types instead of treating every aging site as identical, and keep the result framed as a screening tool rather than a definitive measure of unmet need among older adults.
+> A city services analyst wants to identify NYC ZIP-like areas where heat vulnerability is high and access to contracted older-adult service providers may be comparatively thin. Using the available data catalog, select the heat-vulnerability and aging-service datasets needed for this screen, explain the most defensible ZIP-like geography choice, distinguish between provider types, and describe how the results should be interpreted as a screening tool rather than a definitive measure of unmet need.
 
 ## Why this benchmark matters
 
@@ -39,11 +39,13 @@ This case is grounded in official NYC materials rather than invented scenario fr
 
 NYC Aging’s **Older Adult Centers** page says there are **more than 300 older adult centers and affiliated sites** across the five boroughs that provide meals, activities, classes, fitness programs, and social services. The page also says membership is free and open to New Yorkers age 60 and older, and it explicitly positions centers as places that can reduce isolation and connect residents to benefits, transportation, and health-related support. That gives a direct official basis for treating neighborhood access to older-adult service locations as a meaningful planning question.
 
+NYC Aging’s **Older Adult Center Program Standards** make the heat-resilience link even more direct. The standards state that center programs must maintain hazard-specific response procedures for **heat waves** and that, during a heat wave, the program functions as a **City-designated Cooling Center**, providing air-conditioned space, drinking water, staffing, accessibility accommodations, and extended-hour operations. That is a strong official basis for treating at least some older-adult service sites as part of the city’s heat-response and resilience infrastructure, not merely as generic community amenities.
+
 NYC Aging’s **Find Help** page further grounds the idea that the agency operates a citywide resource-and-referral system connecting older adults and their families to local services, programs, and opportunities in their communities. That supports a benchmark about where neighborhood-scale provider presence may deserve closer review.
 
 The official **NYC Aging – All Contracted Providers** dataset documentation is especially important because it states that the City contracts with external organizations to provide services for adults age 60 and older and that the dataset includes **Older Adult Center, Abuse Prevention, Home Care, Legal Services, NORC, Transportation, Case Management, Home Delivered Meal, and Caregiver** contracts. That makes the local dataset a strong, real service-access layer rather than a hypothetical list of amenities.
 
-On the heat-risk side, NYC Health’s **Interactive heat vulnerability index** page explicitly frames neighborhood heat vulnerability as an equity and planning problem. The page says Black New Yorkers are disproportionately affected by extreme heat and that structural inequities limit access to protective resources such as air conditioning, green space, and neighborhood cooling resources. The **2025 NYC Heat-Related Mortality Report** further shows that heat causes substantial preventable mortality in the city and emphasizes the importance of cooling and structural interventions.
+On the heat-risk side, NYC Health’s **Hot Weather and Your Health** guidance states directly that **adults age 60 and older are more likely to die from heat** because they are more likely to have combinations of risk factors such as chronic conditions, limited mobility, and difficulty leaving home. The **Interactive heat vulnerability index** page also explicitly frames neighborhood heat vulnerability as an equity and planning problem. The page says Black New Yorkers are disproportionately affected by extreme heat and that structural inequities limit access to protective resources such as air conditioning, green space, and neighborhood cooling resources. The **2025 NYC Heat-Related Mortality Report** further shows that heat causes substantial preventable mortality in the city and emphasizes the importance of cooling and structural interventions.
 
 Together, those official materials support a benchmark-credible synthesis:
 
@@ -183,25 +185,37 @@ A benchmark-credible answer should make the interpretation boundaries explicit.
 - **Why relevant:** NYC Aging says there are more than 300 older adult centers and affiliated sites citywide, open to adults age 60 and older, providing meals, activities, fitness programs, and social services.
 - **Confidence:** high
 
-### 2) Find Help - NYC Aging
+### 2) Older Adult Center Program Standards
+- **Type:** official NYC Aging program standards PDF
+- **URL:** https://www.nyc.gov/assets/dfta/downloads/pdf/community/Older-Adult-Center-Program-Standards-Final-Draft%206-8-2023-v2.pdf
+- **Why relevant:** NYC Aging’s standards explicitly require older adult center programs to prepare for **heat waves** and to function as **City-designated Cooling Centers** during heat emergencies, providing air-conditioned space, water, staffing, and accessibility accommodations.
+- **Confidence:** high
+
+### 3) Find Help - NYC Aging
 - **Type:** official NYC Aging service / referral page
 - **URL:** https://www.nyc.gov/site/dfta/services/find-help.page
 - **Why relevant:** NYC Aging describes Aging Connect as the agency’s information and resource center connecting older adults, families, and community members to local services, programs, and opportunities.
 - **Confidence:** high
 
-### 3) Department for the Aging (NYC Aging) - All Contracted Providers
+### 4) Department for the Aging (NYC Aging) - All Contracted Providers
 - **Type:** official dataset documentation
 - **URL:** https://data.cityofnewyork.us/api/views/cqc8-am9x
 - **Why relevant:** Official documentation for the local provider directory, stating that it includes Older Adult Center, Abuse Prevention, Home Care, Legal Services, NORC, Transportation, Case Management, Home Delivered Meal, and Caregiver contracts.
 - **Confidence:** high
 
-### 4) Interactive heat vulnerability index
+### 5) Interactive heat vulnerability index
 - **Type:** official NYC Health portal page
 - **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/hvi/
 - **Why relevant:** Official city framing for neighborhood heat vulnerability and inequitable exposure to heat risk.
 - **Confidence:** high
 
-### 5) 2025 NYC Heat-Related Mortality Report
+### 6) Hot Weather and Your Health
+- **Type:** official NYC Health guidance page
+- **URL:** https://www.nyc.gov/site/doh/health/emergency-preparedness/emergencies-extreme-weather-heat.page
+- **Why relevant:** NYC Health says **adults age 60 and older are more likely to die from heat** because they are more likely to have combinations of risk factors, directly supporting the benchmark’s focus on older adults under heat stress.
+- **Confidence:** high
+
+### 7) 2025 NYC Heat-Related Mortality Report
 - **Type:** official NYC Health report page
 - **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/heat-report/
 - **Why relevant:** Provides official evidence that heat remains a major public-health burden in NYC and that protection and cooling access matter for resilience planning.

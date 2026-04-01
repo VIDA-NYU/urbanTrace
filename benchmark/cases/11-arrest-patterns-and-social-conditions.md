@@ -4,11 +4,11 @@
 **Case ID:** 11  
 **Theme:** public safety / equity  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping an urban policy team explore whether some NYC neighborhoods show comparatively elevated arrest activity while also facing higher poverty or unemployment. The benchmark is not asking for a generic crime summary or a race-only disparity narrative. It is testing whether the agent can connect a point-based enforcement dataset to neighborhood social-condition layers, choose a defensible common geography from the local UrbanTrace catalog, and explain the difference between an exploratory burden screen and a causal claim about policing or community behavior.
+> An urban-policy analyst wants to explore whether some NYC neighborhoods show comparatively elevated arrest activity while also facing higher poverty or unemployment. Using the available data catalog, identify the enforcement and social-condition datasets needed for a neighborhood screen, choose a defensible common geography, and explain how to interpret the result as an exploratory burden screen rather than a causal claim about policing or community behavior.
 
 ## Why this benchmark matters
 
@@ -28,6 +28,8 @@ A stronger agent should recognize that this case is really about **screening for
 A strong external grounding source is the John Jay Research and Evaluation Center’s 2024 report **Color Contrast: Racial and Ethnic Disparities in New York City Law Enforcement**, which explicitly states that **arrest rates vary across New York City neighborhoods** and examines whether disparities persist after accounting for neighborhood demographics and crime rates. That makes neighborhood-pattern analysis of arrests an evidence-backed NYC public-policy task rather than an invented scenario.
 
 An official NYPD source also supports this benchmark. The NYPD **Crime and Enforcement Activity Reports** page states that its enforcement reports present statistics on race and ethnicity from NYPD records, including **arrests** recorded through the booking process. That confirms that arrest activity is a recognized, reportable enforcement signal in NYC’s own institutional reporting.
+
+The NYC Comptroller’s report **Addressing the Harms of Prohibition** makes the arrest-plus-disadvantage overlap even more explicit. Its neighborhood analysis found that places with the highest marijuana-arrest rates tended to have **lower incomes, higher unemployment, and higher poverty** than neighborhoods with lower arrest rates. While that report is offense-specific rather than a full arrest-system study, it is direct local evidence that enforcement concentration and socioeconomic disadvantage can overlap at neighborhood scale in NYC.
 
 On the social-conditions side, the local repo already contains neighborhood poverty and unemployment layers:
 
@@ -188,6 +190,13 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** NYC publishes data resources to replicate or extend its poverty research.
 - **Why it matters for this benchmark:** It supports using neighborhood poverty as a legitimate city-policy context layer in an overlap screen with enforcement activity.
 
+### 4) Addressing the Harms of Prohibition: What NYC Can do to Support an Equitable Cannabis Industry
+- **Type:** official NYC Comptroller report
+- **Agency / publisher:** Office of the New York City Comptroller
+- **URL:** https://comptroller.nyc.gov/reports/addressing-the-harms-of-prohibition-what-nyc-can-do-to-support-an-equitable-cannabis-industry/
+- **What it supports:** The report finds that neighborhoods with the highest marijuana-arrest rates tended to have lower incomes and higher unemployment and poverty than lower-arrest neighborhoods.
+- **Why it matters for this benchmark:** It is unusually direct NYC evidence that arrest concentration and socioeconomic disadvantage can overlap geographically, which is exactly the logic this screening benchmark is testing.
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -241,4 +250,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger official or academic source that ties neighborhood socioeconomic conditions to arrest or enforcement variation more directly than the current arrest-disparity report does. The case is benchmark-usable now because the repo metadata clearly supports the geometry correction, and the John Jay / NYPD sources are sufficient to justify neighborhood-level analysis of arrest patterns in NYC.
+If this case gets one more pass later, the best upgrade would be adding one broader NYC source that links **all-category arrest or enforcement patterns**, not just cannabis enforcement, to neighborhood disadvantage. The case now has direct local support for the overlap logic, so the remaining gap is breadth across offense types rather than whether the problem is real.

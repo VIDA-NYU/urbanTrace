@@ -4,11 +4,11 @@
 **Case ID:** 12  
 **Theme:** governance / prioritization  
 **Language:** English  
-**Reviewed on:** 2026-03-23
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are helping an urban policy team identify which NYC City Council districts appear to face the greatest combined burden from poverty, unemployment, air-pollution burden, and crash risk. The benchmark is not asking for a generic district profile. It is testing whether the agent can connect multiple burden layers that live on different geographies, recognize that City Council districts are a governance-facing reporting unit rather than the native analysis unit for most source layers, and explain what kind of composite prioritization would be credible under the current UrbanTrace workflow.
+> A city policy team wants to identify which NYC City Council districts appear to face the greatest combined burden from poverty, unemployment, air-pollution burden, and crash risk. Using the available data catalog, select the relevant burden layers, explain how each would need to be harmonized to a council-district reporting unit, and describe what kind of district-level prioritization would be credible for policy follow-up.
 
 ## Why this benchmark matters
 
@@ -29,6 +29,10 @@ A stronger agent should recognize that this case is really about **reconciling m
 This case is supported by real NYC public-policy materials rather than invented scenario framing.
 
 The NYC Opportunity poverty-measure materials explicitly frame poverty as part of broader citywide economic hardship and note that many New Yorkers faced mounting financial pressure as temporary relief receded and the cost of basic necessities rose. That is a strong official basis for using poverty-related burden as one component of a district-prioritization screen.
+
+The City Council’s planning toolkit adds a governance-facing justification for a compounded-need screen. It argues that land-use and investment decisions should be grounded in neighborhood needs rather than ad hoc project-by-project choices, and it frames equitable access to essential services and safe streets in historically underinvested communities as a core planning concern. That is a direct fit for a benchmark that asks which council districts may warrant policy follow-up when multiple burdens overlap.
+
+The City’s **Environmental Justice for All Report** scope adds a second direct rationale for compounded-need screening. It explicitly calls for evaluating environmental concerns **overlaid with social and economic vulnerability**, analyzing the distribution of benefits and burdens, and differentiating areas by the level of **priority risk mitigation / risk management** required. That is very close to the composite-screen logic this benchmark asks the agent to describe.
 
 The repo also contains a direct unemployment layer (`NYC_unemployment_rate`) on the same sub-borough geography as poverty. Together, those two local datasets provide a credible **socioeconomic-need component**.
 
@@ -215,6 +219,20 @@ A benchmark-credible answer should also note several limits:
 - **What it supports:** NYC maintains neighborhood economic-condition indicators, including unemployment-oriented context, in a city health/equity reporting environment.
 - **Why it matters for this benchmark:** It supports using unemployment as part of a broader burden screen rather than as an unrelated labor-market side variable.
 
+### 6) Speaker Adams’ Planning Toolkit and Housing Agenda
+- **Type:** official NYC Council planning page
+- **Agency:** New York City Council
+- **URL:** https://council.nyc.gov/speaker-adams-planning-toolkit-and-housing-agenda
+- **What it supports:** The Council frames neighborhood planning as a needs-based exercise and argues against ad hoc decision-making untethered from community conditions.
+- **Why it matters for this benchmark:** It provides direct governance and planning support for turning overlapping burdens into a district-level prioritization screen for policy follow-up.
+
+### 7) New York City’s Environmental Justice for All Report Scope of Work
+- **Type:** official NYC environmental justice planning document
+- **Agency:** City of New York
+- **URL:** https://www.nyc.gov/assets/sustainability/downloads/pdf/EJ-Report-Scope.pdf
+- **What it supports:** The City calls for analyzing environmental concerns overlaid with social and economic vulnerability and for differentiating areas by priority of risk mitigation and management.
+- **Why it matters for this benchmark:** It provides direct official support for a multi-burden screening approach rather than treating each burden as an isolated policy issue.
+
 ## Suggested evaluation notes
 
 ### What a strong agent should do
@@ -270,4 +288,4 @@ A high-quality agent response would likely say that:
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the best upgrade would be adding one stronger official source specifically on council-district or district-level budgeting / prioritization practice in NYC, plus one explicit note about a preferred composite-construction strategy (for example, standardized z-scores versus tiered burden flags). The case is benchmark-usable now because the seed prompt is restored, the local metadata clearly supports the geometry warnings, and the official NYC poverty / air-quality / Vision Zero materials are sufficient to justify the compounded-burden framing.
+If this case gets one more pass later, the best upgrade would be adding one stronger official source specifically on council-district or district-level budgeting / prioritization practice in NYC, plus one explicit note about a preferred composite-construction strategy (for example, standardized z-scores versus tiered burden flags). The case now has direct official support for cumulative-burden logic; the remaining gap is a district-governance implementation source rather than whether the compounded-need framing is credible.

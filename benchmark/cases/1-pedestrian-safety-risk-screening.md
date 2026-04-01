@@ -4,11 +4,11 @@
 **Case ID:** 1  
 **Theme:** mobility / safety  
 **Language:** English  
-**Reviewed on:** 2026-03-22
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> Which NYC neighborhoods should be screened as higher-priority candidates for pedestrian safety follow-up when crash harm is interpreted together with pedestrian activity rather than from crash totals alone? Use the available UrbanTrace datalake to identify the datasets needed for a neighborhood-level screen, choose a neighborhood geography that planners would plausibly use, and explain how the resulting screen should guide later corridor- or intersection-level review.
+> A transportation-safety analyst wants to identify NYC neighborhoods that should be prioritized for pedestrian safety follow-up by interpreting crash harm together with pedestrian activity rather than crash totals alone. Using the available data catalog, identify the datasets needed for a neighborhood-level screen, choose a defensible neighborhood geography, and explain how the results should guide later corridor- or intersection-level review.
 
 ## Why this benchmark matters
 
@@ -21,13 +21,15 @@ A weak agent will stop at collision points or borough totals. A stronger agent s
 3. both point datasets need to be rolled up to a planning geography; and
 4. the resulting neighborhood screen is only a first-pass prioritization before corridor/intersection engineering review.
 
-That behavior is well aligned with the current backend design in `backend/llm_agent.py` and `backend/tool.py`, where the copilot is evaluated on selecting the right UrbanTrace datasets and proposing a coherent workflow over the local catalog rather than executing a full external analysis pipeline.
+That behavior is well aligned with the current backend design in `backend/llm_agent.py` and `backend/tool.py`, where the copilot is evaluated on selecting the right datasets and proposing a coherent workflow over the local catalog rather than executing a full external analysis pipeline.
 
 ## Source-grounded planning rationale
 
 NYC DOT's 2023 update to the Borough Pedestrian Safety Action Plans explicitly describes pedestrian safety prioritization as a **data-driven process** focused on **priority corridors and intersections** and reports that DOT ranked corridors using pedestrian **fatalities and severe injuries (KSI) per mile** while prioritizing intersections with the highest KSI burden. That is exactly the kind of policy context this benchmark should reflect: raw incidents alone are not the full decision rule, and screening is used to decide where deeper follow-up should happen.
 
-Within the UrbanTrace repository, the closest locally available denominator / exposure proxy is `NYC_pedestrian_counts`. It is not a complete citywide pedestrian exposure surface, but it is still the most defensible local dataset for distinguishing places with heavy pedestrian activity from places with little foot traffic. That makes it benchmark-credible as the expected companion to collision data.
+NYC DOT’s **Pedestrian Mobility Plan** strengthens the exposure side of the benchmark. The agency says it uses a data-driven framework based on anticipated pedestrian volumes and pedestrian generators such as transit, businesses, schools, parks, and attractions to classify street corridors. That is direct official support for treating pedestrian activity as an important companion to crash harm rather than relying on crash totals alone.
+
+Within the repository, the closest locally available denominator / exposure proxy is `NYC_pedestrian_counts`. It is not a complete citywide pedestrian exposure surface, but it is still the most defensible local dataset for distinguishing places with heavy pedestrian activity from places with little foot traffic. That makes it benchmark-credible as the expected companion to collision data.
 
 ## Recommended benchmark framing
 
@@ -45,7 +47,7 @@ A good gold-standard answer does **not** need to compute a perfect formal risk m
 - compare burden across neighborhoods using both signals together;
 - explain that the neighborhood screen is for triage, while engineering treatments still belong at corridor/intersection scale.
 
-## Expected UrbanTrace dataset mapping
+## Expected dataset mapping
 
 ### Core datasets
 
@@ -109,6 +111,13 @@ A good gold-standard answer does **not** need to compute a perfect formal risk m
 - **Why relevant:** Canonical city crash-event dataset and the clearest upstream source for the local `NYC_vehicle_collisions_crashes` table.
 - **Confidence:** high
 
+### 4) NYC DOT - Pedestrian Mobility Plan
+- **Type:** official NYC DOT planning page
+- **Agency:** NYC Department of Transportation
+- **URL:** https://www.nyc.gov/html/dot/html/pedestrians/pedestrian-mobility.shtml
+- **Why relevant:** The page explicitly says DOT uses a holistic, data-driven framework and anticipated pedestrian volumes to identify pedestrian needs, which directly supports the benchmark’s harm-plus-activity logic.
+- **Confidence:** high
+
 ## Data access points for reproducibility
 
 1. **Pedestrian crash harm**
@@ -154,8 +163,8 @@ A good gold-standard answer does **not** need to compute a perfect formal risk m
   - `NYC_vehicle_collisions_crashes`
   - `NYC_pedestrian_counts`
   - `NTA_Neighborhood_Tabulation_Areas`
-- This revised case is intentionally scoped to current UrbanTrace agent behavior: selecting source tables and articulating a credible neighborhood-screening workflow over the local datalake.
+- This revised case is intentionally scoped to current agent behavior: selecting source tables and articulating a credible neighborhood-screening workflow over the local datalake.
 
 ## Single-case next step if more rigor is wanted
 
-If this case gets one more pass later, the most useful upgrade would be to add one peer-reviewed transportation-safety citation showing why pedestrian injury burden should be interpreted against pedestrian exposure. The case is already benchmark-usable without that addition because the NYC DOT source and official Open Data sources are sufficient to justify the workflow.
+If this case gets one more pass later, the most useful upgrade would be adding a local source or layer with more complete pedestrian-volume coverage than the existing count sample. The case now already has direct official support for interpreting pedestrian harm together with pedestrian demand.

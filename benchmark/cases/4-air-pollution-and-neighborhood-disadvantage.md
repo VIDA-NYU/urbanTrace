@@ -4,11 +4,11 @@
 **Case ID:** 4  
 **Theme:** environment / equity  
 **Language:** English  
-**Reviewed on:** 2026-03-22
+**Reviewed on:** 2026-03-31
 
 ## Task
 
-> You are assisting a public-health / environmental justice analyst who needs to identify NYC neighborhoods where **higher ambient air pollution and socioeconomic disadvantage overlap**. The analyst wants a screening view that is credible for NYC health-equity reporting: it should use a real local air-pollution layer, pair it with neighborhood poverty and unemployment, state the geography used for comparison, and explain what the output can and cannot support. Using UrbanTrace, determine which datasets should be selected, what common geography or harmonization step is most defensible, and how the resulting analysis would support an environmental-justice narrative grounded in NYC Community Air Survey findings.
+> A public-health or environmental-justice analyst wants to identify NYC neighborhoods where higher ambient air pollution overlaps with socioeconomic disadvantage. Using the available data catalog, select the air-pollution, poverty, and unemployment datasets needed for a credible screening analysis, choose the most defensible common geography or harmonization step, and explain what the resulting screen can and cannot support for health-equity reporting.
 
 ## Why this benchmark matters
 
@@ -46,6 +46,8 @@ A strong answer should say, in substance:
 
 ## Source-grounded rationale
 
+This case is now grounded in multiple official NYC Health sources that explicitly connect neighborhood air-pollution burden to disadvantage. In addition to NYCCAS and the traffic-PM2.5 story, the City’s air-quality data explorer states that health impacts from several major pollutants are **higher in high-poverty neighborhoods**. That makes the “air pollution plus disadvantage” framing direct rather than inferred.
+
 ### 1) NYC Community Air Survey (NYCCAS)
 - **Type:** official NYC Health report / data feature
 - **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-features/nyccas/
@@ -63,6 +65,12 @@ A strong answer should say, in substance:
 - **URL:** https://www.nyc.gov/site/doh/data/data-sets/air-quality-nyc-community-air-survey.page
 - **What it supports:** The page explains that NYCCAS was created to evaluate how air quality differs across NYC neighborhoods and notes the addition of **environmental justice sites** to better understand emissions in low-income neighborhoods.
 - **Why it matters for this benchmark:** It reinforces that NYCCAS is intended for neighborhood-scale inequality analysis, not just for generic pollution mapping.
+
+### 4) Air quality data for NYC
+- **Type:** official NYC Health data explorer
+- **URL:** https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/air-quality/
+- **What it supports:** The page states that health impacts from fine particulate matter, black carbon, and sulfur dioxide are higher in high-poverty neighborhoods.
+- **Why it matters for this benchmark:** It is the clearest direct NYC statement that air-pollution burden and neighborhood disadvantage overlap in practice.
 
 ## Local dataset evidence from the repo
 
