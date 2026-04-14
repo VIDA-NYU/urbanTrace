@@ -112,3 +112,37 @@ For smaller debugging runs, the runner also supports `--max-cases`, `--start-fro
 - [`benchmark/scripts/run_dataset_discovery_benchmark.py`](./scripts/run_dataset_discovery_benchmark.py): discovery benchmark runner
 - [`benchmark/scripts/visualize_results.ipynb`](./scripts/visualize_results.ipynb): notebook for aggregating and plotting result CSVs
 - [`benchmark/results/`](./results/): saved benchmark outputs and rendered figures
+
+
+
+## Quantitative Ablation: Spatial Operator Selection
+
+The notebook [`benchmark/scripts/operator_selection/quantitative_ablation-operator_selection_accuracy.ipynb`](./scripts/operator_selection/quantitative_ablation-operator_selection_accuracy.ipynb) implements the quantitative ablation study described in Section 4.2, evaluating the UrbanTrace Copilot's automated spatial operator selection against four baselines across 100 real-world NYC spatial integration scenarios.
+
+## Pipeline Summary
+
+### Data & Artifacts Location
+All input and generated files (e.g., `dataset_metadata_map.json`) are stored in:
+[`input_output_operator_selection/`](./scripts/operator_selection/input_output_operator_selection/).
+
+**1. Build Dataset Registry** (`dataset_metadata_map.json`)
+Scans all GeoJSON datasets and their metadata to extract geometry types and semantically
+meaningful numeric columns, filtering out identifiers and boundary datasets.
+
+**2. Inspect Registry Statistics**
+Summarizes the corpus: dataset count, geometry type distribution, and target column counts.
+
+**3. LLM-Assisted Ground Truth Annotation** (`ground_truth_llm_annotation.json`)
+Uses GPT-4o-Mini via Portkey to classify each column by semantic class (`C_ext`, `C_int`,
+`C_ord`) and assign a default aggregation operator — producing a preliminary annotation
+for expert review. 
+
+**4. Generate Evaluation Scenarios** (`scenarios_from_benchmark.json`)
+Randomly pairs source dataset columns (from the human-curated ground truth (`ground_truth_curated.json`)) with target
+boundary datasets to produce 100 distinct spatial mapping scenarios.
+
+**5. Run Master Benchmark** (`benchmark_results_operator_selection.json`)
+Evaluates all 5 conditions — Rule-Based, GPT-4o-Mini, Claude Sonnet, Claude Opus, and the
+UrbanTrace Copilot — on every scenario, measuring **Geometric Validity** (correct mapping
+operator) and **Semantic Validity** (correct aggregation operator). Results are compiled into
+the accuracy table reported in the paper.

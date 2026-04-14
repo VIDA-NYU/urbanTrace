@@ -1,0 +1,4402 @@
+[
+  {
+    "scenario_id": "2014 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2014",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2010 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2010",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2015 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2015",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2010 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2010",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2012 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2012",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "DensityZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2005 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_median_household_income",
+      "source_column": "2005",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2022 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2022",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2021 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2021",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2020 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2020",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2009 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2009",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2024 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_students_performing_english_language_arts",
+      "source_column": "2024",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2000 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2000",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2005 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2005",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "DensityZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2024 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2024",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2015 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2015",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2012 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2012",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2006 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2006",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2007 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2007",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "NUMBER OF CYCLIST INJURED -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_vehicle_collisions_crashes",
+      "source_column": "NUMBER OF CYCLIST INJURED",
+      "source_geometry": "Point",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2010 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2010",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2020 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2020",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2014 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2014",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2016 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2016",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2005 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2005",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "capacity -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_libraries",
+      "source_column": "capacity",
+      "source_geometry": "Point",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "Outdoor Air Toxics - Benzene -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_air_pollution",
+      "source_column": "Outdoor Air Toxics - Benzene",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_median_household_income",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2022 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2022",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2013 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2013",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2007 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2007",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2022 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2022",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_students_performing_english_language_arts",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2014 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2014",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2017 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2017",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2017 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2017",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "student -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_Schools",
+      "source_column": "student",
+      "source_geometry": "Point",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "Outdoor Air Toxics - Benzene -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_air_pollution",
+      "source_column": "Outdoor Air Toxics - Benzene",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2015 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2015",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2010 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2010",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "NUMBER OF CYCLIST KILLED -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_vehicle_collisions_crashes",
+      "source_column": "NUMBER OF CYCLIST KILLED",
+      "source_geometry": "Point",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2017 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_median_household_income",
+      "source_column": "2017",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2000 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_median_household_income",
+      "source_column": "2000",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2016 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2016",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2016 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2016",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2009 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2009",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2016 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2016",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2016 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2016",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "LengthWeightedZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "student -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_Schools",
+      "source_column": "student",
+      "source_geometry": "Point",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "DensityZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2006 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2006",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2022 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_income_diversity_ratio",
+      "source_column": "2022",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2024 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2024",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2014 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2014",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2007 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2007",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2017 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2017",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "DensityZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2013 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2013",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2006 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2006",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2013 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2013",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2021 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2021",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2021 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_population",
+      "source_column": "2021",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "DensityZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "NUMBER OF PERSONS INJURED -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_vehicle_collisions_crashes",
+      "source_column": "NUMBER OF PERSONS INJURED",
+      "source_geometry": "Point",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2007 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2007",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2017 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2017",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2005 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_unemployment_rate",
+      "source_column": "2005",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2011 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2011",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> Community_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "Community_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2019 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_students_performing_math",
+      "source_column": "2019",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "count -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_pedestrian_counts",
+      "source_column": "count",
+      "source_geometry": "Point",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2024 -> NTA_Neighborhood_Tabulation_Areas",
+    "context": {
+      "source_dataset": "NYC_crime_rate_per_1000_residents",
+      "source_column": "2024",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2023 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_housing_units",
+      "source_column": "2023",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_ext",
+      "ground_truth_aggregation": "SumZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2013 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_poverty_rate",
+      "source_column": "2013",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2015 -> NYC_Bike_Routes",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2015",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "NYC_Bike_Routes",
+      "target_geometry": "MultiLineString",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> MODZCTA",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "MODZCTA",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "LengthWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2008 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_crime_rate_property",
+      "source_column": "2008",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": false,
+        "map_out": "CentroidZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  },
+  {
+    "scenario_id": "2018 -> City_Council_Districs",
+    "context": {
+      "source_dataset": "NYC_median_rent",
+      "source_column": "2018",
+      "source_geometry": "MultiPolygon",
+      "target_dataset": "City_Council_Districs",
+      "target_geometry": "MultiPolygon",
+      "ground_truth_semantic": "C_int",
+      "ground_truth_aggregation": "WeightedMeanZoning"
+    },
+    "predictions": {
+      "rule_based": {
+        "geom_correct": true,
+        "sem_correct": false,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "SumZoning"
+      },
+      "naive_mini": {
+        "geom_correct": false,
+        "sem_correct": true,
+        "map_out": "CentroidZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_sonnet": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "naive_opus": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      },
+      "copilot_api": {
+        "geom_correct": true,
+        "sem_correct": true,
+        "map_out": "AreaWeightedZoning",
+        "agg_out": "WeightedMeanZoning"
+      }
+    }
+  }
+]

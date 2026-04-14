@@ -1,0 +1,1102 @@
+[
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2014",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2010",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2015",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2010",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2012",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_household_income",
+            "source_geom": "MultiPolygon",
+            "column_name": "2005",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2022",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2021",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2020",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2009",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_english_language_arts",
+            "source_geom": "MultiPolygon",
+            "column_name": "2024",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2000",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2005",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2024",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2015",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2012",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2006",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2007",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_vehicle_collisions_crashes",
+            "source_geom": "Point",
+            "column_name": "NUMBER OF CYCLIST INJURED",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2010",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2020",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2014",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2016",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2005",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_libraries",
+            "source_geom": "Point",
+            "column_name": "capacity",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_air_pollution",
+            "source_geom": "MultiPolygon",
+            "column_name": "Outdoor Air Toxics - Benzene",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_household_income",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2022",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2013",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2007",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2022",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_english_language_arts",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2014",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2017",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2017",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_Schools",
+            "source_geom": "Point",
+            "column_name": "student",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_air_pollution",
+            "source_geom": "MultiPolygon",
+            "column_name": "Outdoor Air Toxics - Benzene",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2015",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2010",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_vehicle_collisions_crashes",
+            "source_geom": "Point",
+            "column_name": "NUMBER OF CYCLIST KILLED",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_household_income",
+            "source_geom": "MultiPolygon",
+            "column_name": "2017",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_household_income",
+            "source_geom": "MultiPolygon",
+            "column_name": "2000",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2016",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2016",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2009",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2016",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2016",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_Schools",
+            "source_geom": "Point",
+            "column_name": "student",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2006",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_income_diversity_ratio",
+            "source_geom": "MultiPolygon",
+            "column_name": "2022",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2024",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2014",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2007",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2017",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2013",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2006",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2013",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2021",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_population",
+            "source_geom": "MultiPolygon",
+            "column_name": "2021",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_vehicle_collisions_crashes",
+            "source_geom": "Point",
+            "column_name": "NUMBER OF PERSONS INJURED",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2007",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2017",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_unemployment_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2005",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2011",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "Community_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_students_performing_math",
+            "source_geom": "MultiPolygon",
+            "column_name": "2019",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_pedestrian_counts",
+            "source_geom": "Point",
+            "column_name": "count",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_per_1000_residents",
+            "source_geom": "MultiPolygon",
+            "column_name": "2024",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NTA_Neighborhood_Tabulation_Areas",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_housing_units",
+            "source_geom": "MultiPolygon",
+            "column_name": "2023",
+            "gt_semantic": "C_ext",
+            "gt_aggregation": "SumZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_poverty_rate",
+            "source_geom": "MultiPolygon",
+            "column_name": "2013",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2015",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "NYC_Bike_Routes",
+        "target_geom": "MultiLineString"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "MODZCTA",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_crime_rate_property",
+            "source_geom": "MultiPolygon",
+            "column_name": "2008",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    },
+    {
+        "source": {
+            "source_dataset": "NYC_median_rent",
+            "source_geom": "MultiPolygon",
+            "column_name": "2018",
+            "gt_semantic": "C_int",
+            "gt_aggregation": "WeightedMeanZoning"
+        },
+        "target_dataset": "City_Council_Districs",
+        "target_geom": "MultiPolygon"
+    }
+]

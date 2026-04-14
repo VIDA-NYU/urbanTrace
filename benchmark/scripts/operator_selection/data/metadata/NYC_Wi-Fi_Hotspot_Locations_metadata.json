@@ -1,0 +1,1970 @@
+{
+  "geometricType": "Point",
+  "name": "NYC_Wi-Fi_Hotspot_Locations",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "nb_rows": 3319,
+  "nb_profiled_rows": 3319,
+  "nb_columns": 31,
+  "columns": [
+    {
+      "name": "OBJECTID",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3319,
+      "mean": 11279.197348598975,
+      "stddev": 967.1690367704379,
+      "coverage": [
+        {
+          "range": {
+            "gte": 9656.0,
+            "lte": 10679.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10790.0,
+            "lte": 11795.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11905.0,
+            "lte": 12892.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Borough",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5,
+      "mean": 2.1175052726724917,
+      "stddev": 1.2696390872086014,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Type",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "Provider",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 17
+    },
+    {
+      "name": "Name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.0692979813196746,
+      "num_distinct_values": 2499
+    },
+    {
+      "name": "Location",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3023
+    },
+    {
+      "name": "Latitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/latitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.7417888151921,
+      "stddev": 0.06678848313124572,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.5726690002,
+            "lte": 40.681596
+          }
+        },
+        {
+          "range": {
+            "gte": 40.6893339998,
+            "lte": 40.7673089996
+          }
+        },
+        {
+          "range": {
+            "gte": 40.7795349999,
+            "lte": 40.8657295413
+          }
+        }
+      ]
+    },
+    {
+      "name": "Longitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/longitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": -73.95011210475472,
+      "stddev": 0.062099923189049305,
+      "coverage": [
+        {
+          "range": {
+            "gte": -74.0065562001,
+            "lte": -73.9185180002
+          }
+        },
+        {
+          "range": {
+            "gte": -73.9027725428,
+            "lte": -73.765364
+          }
+        }
+      ]
+    },
+    {
+      "name": "X",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3150
+    },
+    {
+      "name": "Y",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3148
+    },
+    {
+      "name": "Location_T",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 16
+    },
+    {
+      "name": "Remarks",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ],
+      "missing_values_ratio": 0.16510997288339863
+    },
+    {
+      "name": "City",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 44
+    },
+    {
+      "name": "SSID",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 16
+    },
+    {
+      "name": "SourceID",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.3199758963543236,
+      "num_distinct_values": 1871
+    },
+    {
+      "name": "Activated",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 416
+    },
+    {
+      "name": "BoroCode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5,
+      "mean": 2.1175052726724917,
+      "stddev": 1.2696390872086014,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Borough Name",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "Neighborhood Tabulation Area Code (NTACODE)",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 178
+    },
+    {
+      "name": "Neighborhood Tabulation Area (NTA)",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 179
+    },
+    {
+      "name": "Council Distrcit",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 51,
+      "mean": 17.21000301295571,
+      "stddev": 14.843571480999014,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 15.0
+          }
+        },
+        {
+          "range": {
+            "gte": 21.0,
+            "lte": 35.0
+          }
+        },
+        {
+          "range": {
+            "gte": 36.0,
+            "lte": 50.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Postcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 172,
+      "mean": 10535.245555890328,
+      "stddev": 583.3764085115355,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10003.0,
+            "lte": 10460.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11101.0,
+            "lte": 11238.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11358.0,
+            "lte": 11693.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "BoroCD",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 67,
+      "mean": 218.88098824947272,
+      "stddev": 128.07948438640162,
+      "coverage": [
+        {
+          "range": {
+            "gte": 101.0,
+            "lte": 112.0
+          }
+        },
+        {
+          "range": {
+            "gte": 201.0,
+            "lte": 316.0
+          }
+        },
+        {
+          "range": {
+            "gte": 401.0,
+            "lte": 502.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Census Tract",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 552,
+      "mean": 2353.7152756854475,
+      "stddev": 12474.348934688383,
+      "coverage": [
+        {
+          "range": {
+            "gte": 13.0,
+            "lte": 837.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "BCTCB2010",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 552,
+      "mean": 2353.7152756854475,
+      "stddev": 12474.348934688383,
+      "coverage": [
+        {
+          "range": {
+            "gte": 13.0,
+            "lte": 837.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "BIN",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2107,
+      "mean": 1581973.1898162097,
+      "stddev": 1453000.863418359,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1006096.0,
+            "lte": 2013798.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3000461.0,
+            "lte": 5048650.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "BBL",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2119,
+      "mean": 1751089201.0702019,
+      "stddev": 1415406802.5995295,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 0.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1001210001.0,
+            "lte": 2031550001.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3001510001.0,
+            "lte": 5033050010.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "DOITT_ID",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 3319,
+      "mean": 2679.8225369087077,
+      "stddev": 1598.677930787101,
+      "coverage": [
+        {
+          "range": {
+            "gte": 33.0,
+            "lte": 855.0
+          }
+        },
+        {
+          "range": {
+            "gte": 926.0,
+            "lte": 1735.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3106.0,
+            "lte": 4855.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location (Lat, Long)",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "point_format": "lat,long",
+      "unclean_values_ratio": 0.0
+    },
+    {
+      "name": "count",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/Boolean"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 1,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "geometry",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "point_format": "long,lat",
+      "unclean_values_ratio": 0.0
+    }
+  ],
+  "nb_spatial_columns": 4,
+  "nb_temporal_columns": 1,
+  "nb_categorical_columns": 8,
+  "nb_numerical_columns": 12,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial",
+    "temporal"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "latlong",
+      "column_names": [
+        "Latitude",
+        "Longitude"
+      ],
+      "column_indexes": [
+        6,
+        7
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302331013",
+          "number": 25
+        },
+        {
+          "hash": "1211302331011",
+          "number": 18
+        },
+        {
+          "hash": "1211302331010",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331110",
+          "number": 20
+        },
+        {
+          "hash": "1211302331111",
+          "number": 8
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331113",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100",
+          "number": 42
+        },
+        {
+          "hash": "1211302331103",
+          "number": 10
+        },
+        {
+          "hash": "1211302331101",
+          "number": 2
+        },
+        {
+          "hash": "1211302331102",
+          "number": 4
+        },
+        {
+          "hash": "1211302331130",
+          "number": 8
+        },
+        {
+          "hash": "1211302331131",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 2
+        },
+        {
+          "hash": "1211302331120",
+          "number": 1
+        },
+        {
+          "hash": "1211302330110",
+          "number": 10
+        },
+        {
+          "hash": "1211302330113",
+          "number": 12
+        },
+        {
+          "hash": "1211302330111",
+          "number": 9
+        },
+        {
+          "hash": "1211302313302",
+          "number": 52
+        },
+        {
+          "hash": "1211302313301",
+          "number": 172
+        },
+        {
+          "hash": "1211302313300",
+          "number": 107
+        },
+        {
+          "hash": "1211302313303",
+          "number": 28
+        },
+        {
+          "hash": "1211302313311",
+          "number": 236
+        },
+        {
+          "hash": "1211302313312",
+          "number": 88
+        },
+        {
+          "hash": "1211302313310",
+          "number": 432
+        },
+        {
+          "hash": "1211302313313",
+          "number": 95
+        },
+        {
+          "hash": "1211302313320",
+          "number": 6
+        },
+        {
+          "hash": "1211302313323",
+          "number": 40
+        },
+        {
+          "hash": "1211302313322",
+          "number": 37
+        },
+        {
+          "hash": "1211302313321",
+          "number": 21
+        },
+        {
+          "hash": "1211302313330",
+          "number": 79
+        },
+        {
+          "hash": "1211302313331",
+          "number": 11
+        },
+        {
+          "hash": "1211302313333",
+          "number": 1
+        },
+        {
+          "hash": "1211302313332",
+          "number": 11
+        },
+        {
+          "hash": "1211302313211",
+          "number": 177
+        },
+        {
+          "hash": "1211302313212",
+          "number": 45
+        },
+        {
+          "hash": "1211302313213",
+          "number": 59
+        },
+        {
+          "hash": "1211302313210",
+          "number": 51
+        },
+        {
+          "hash": "1211302313231",
+          "number": 26
+        },
+        {
+          "hash": "1211302313233",
+          "number": 22
+        },
+        {
+          "hash": "1211302313230",
+          "number": 17
+        },
+        {
+          "hash": "1211302313232",
+          "number": 1
+        },
+        {
+          "hash": "1211302313203",
+          "number": 18
+        },
+        {
+          "hash": "1211302313202",
+          "number": 4
+        },
+        {
+          "hash": "1211302313201",
+          "number": 6
+        },
+        {
+          "hash": "1211302313200",
+          "number": 10
+        },
+        {
+          "hash": "1211302313221",
+          "number": 2
+        },
+        {
+          "hash": "1211302313033",
+          "number": 44
+        },
+        {
+          "hash": "1211302313032",
+          "number": 4
+        },
+        {
+          "hash": "1211302313003",
+          "number": 16
+        },
+        {
+          "hash": "1211302313002",
+          "number": 10
+        },
+        {
+          "hash": "1211302313000",
+          "number": 1
+        },
+        {
+          "hash": "1211302313021",
+          "number": 2
+        },
+        {
+          "hash": "1211302313023",
+          "number": 9
+        },
+        {
+          "hash": "1211302313020",
+          "number": 4
+        },
+        {
+          "hash": "1211302313022",
+          "number": 10
+        },
+        {
+          "hash": "1211302313122",
+          "number": 58
+        },
+        {
+          "hash": "1211302313123",
+          "number": 35
+        },
+        {
+          "hash": "1211302313132",
+          "number": 35
+        },
+        {
+          "hash": "1211302312113",
+          "number": 8
+        },
+        {
+          "hash": "1211302312112",
+          "number": 24
+        },
+        {
+          "hash": "1211302312111",
+          "number": 5
+        },
+        {
+          "hash": "1211302312110",
+          "number": 1
+        },
+        {
+          "hash": "1211302312130",
+          "number": 15
+        },
+        {
+          "hash": "1211302312131",
+          "number": 6
+        },
+        {
+          "hash": "1211302312101",
+          "number": 1
+        },
+        {
+          "hash": "1211302312310",
+          "number": 33
+        },
+        {
+          "hash": "1211302312311",
+          "number": 10
+        },
+        {
+          "hash": "1211302312312",
+          "number": 15
+        },
+        {
+          "hash": "1211302312313",
+          "number": 8
+        },
+        {
+          "hash": "1211302312332",
+          "number": 6
+        },
+        {
+          "hash": "1211302310322",
+          "number": 3
+        },
+        {
+          "hash": "1211302310231",
+          "number": 1
+        },
+        {
+          "hash": "1211302310233",
+          "number": 3
+        },
+        {
+          "hash": "1211303202203",
+          "number": 264
+        },
+        {
+          "hash": "1211303202200",
+          "number": 154
+        },
+        {
+          "hash": "1211303202201",
+          "number": 19
+        },
+        {
+          "hash": "1211303202202",
+          "number": 96
+        },
+        {
+          "hash": "1211303202230",
+          "number": 55
+        },
+        {
+          "hash": "1211303202231",
+          "number": 67
+        },
+        {
+          "hash": "1211303202233",
+          "number": 4
+        },
+        {
+          "hash": "1211303202232",
+          "number": 8
+        },
+        {
+          "hash": "1211303202212",
+          "number": 116
+        },
+        {
+          "hash": "1211303202213",
+          "number": 35
+        },
+        {
+          "hash": "1211303202221",
+          "number": 39
+        },
+        {
+          "hash": "1211303202223",
+          "number": 5
+        },
+        {
+          "hash": "1211303202222",
+          "number": 1
+        },
+        {
+          "hash": "1211303202323",
+          "number": 1
+        },
+        {
+          "hash": "1211303202320",
+          "number": 16
+        },
+        {
+          "hash": "1211303202322",
+          "number": 16
+        },
+        {
+          "hash": "1211303202321",
+          "number": 3
+        },
+        {
+          "hash": "1211303220001",
+          "number": 7
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220010",
+          "number": 5
+        },
+        {
+          "hash": "1211303220011",
+          "number": 8
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.1008615799,
+                40.7471439998
+              ],
+              [
+                -73.9421692826,
+                40.5765409998
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9845468452,
+                40.8611743803
+              ],
+              [
+                -73.8929609999,
+                40.7496575497
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9026999998,
+                40.7624221297
+              ],
+              [
+                -73.7514020003,
+                40.5858394078
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 3319
+    },
+    {
+      "type": "point_latlong",
+      "column_names": [
+        "Location (Lat, Long)"
+      ],
+      "column_indexes": [
+        28
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302331013",
+          "number": 25
+        },
+        {
+          "hash": "1211302331011",
+          "number": 18
+        },
+        {
+          "hash": "1211302331010",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331110",
+          "number": 20
+        },
+        {
+          "hash": "1211302331111",
+          "number": 8
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331113",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100",
+          "number": 42
+        },
+        {
+          "hash": "1211302331103",
+          "number": 10
+        },
+        {
+          "hash": "1211302331101",
+          "number": 2
+        },
+        {
+          "hash": "1211302331102",
+          "number": 4
+        },
+        {
+          "hash": "1211302331130",
+          "number": 8
+        },
+        {
+          "hash": "1211302331131",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 2
+        },
+        {
+          "hash": "1211302331120",
+          "number": 1
+        },
+        {
+          "hash": "1211302330110",
+          "number": 10
+        },
+        {
+          "hash": "1211302330113",
+          "number": 12
+        },
+        {
+          "hash": "1211302330111",
+          "number": 9
+        },
+        {
+          "hash": "1211302313302",
+          "number": 52
+        },
+        {
+          "hash": "1211302313301",
+          "number": 172
+        },
+        {
+          "hash": "1211302313300",
+          "number": 107
+        },
+        {
+          "hash": "1211302313303",
+          "number": 28
+        },
+        {
+          "hash": "1211302313311",
+          "number": 236
+        },
+        {
+          "hash": "1211302313312",
+          "number": 88
+        },
+        {
+          "hash": "1211302313310",
+          "number": 432
+        },
+        {
+          "hash": "1211302313313",
+          "number": 95
+        },
+        {
+          "hash": "1211302313320",
+          "number": 6
+        },
+        {
+          "hash": "1211302313323",
+          "number": 40
+        },
+        {
+          "hash": "1211302313322",
+          "number": 37
+        },
+        {
+          "hash": "1211302313321",
+          "number": 21
+        },
+        {
+          "hash": "1211302313330",
+          "number": 79
+        },
+        {
+          "hash": "1211302313331",
+          "number": 11
+        },
+        {
+          "hash": "1211302313333",
+          "number": 1
+        },
+        {
+          "hash": "1211302313332",
+          "number": 11
+        },
+        {
+          "hash": "1211302313211",
+          "number": 177
+        },
+        {
+          "hash": "1211302313212",
+          "number": 45
+        },
+        {
+          "hash": "1211302313213",
+          "number": 59
+        },
+        {
+          "hash": "1211302313210",
+          "number": 51
+        },
+        {
+          "hash": "1211302313231",
+          "number": 26
+        },
+        {
+          "hash": "1211302313233",
+          "number": 22
+        },
+        {
+          "hash": "1211302313230",
+          "number": 17
+        },
+        {
+          "hash": "1211302313232",
+          "number": 1
+        },
+        {
+          "hash": "1211302313203",
+          "number": 18
+        },
+        {
+          "hash": "1211302313202",
+          "number": 4
+        },
+        {
+          "hash": "1211302313201",
+          "number": 6
+        },
+        {
+          "hash": "1211302313200",
+          "number": 10
+        },
+        {
+          "hash": "1211302313221",
+          "number": 2
+        },
+        {
+          "hash": "1211302313033",
+          "number": 44
+        },
+        {
+          "hash": "1211302313032",
+          "number": 4
+        },
+        {
+          "hash": "1211302313003",
+          "number": 16
+        },
+        {
+          "hash": "1211302313002",
+          "number": 10
+        },
+        {
+          "hash": "1211302313000",
+          "number": 1
+        },
+        {
+          "hash": "1211302313021",
+          "number": 2
+        },
+        {
+          "hash": "1211302313023",
+          "number": 9
+        },
+        {
+          "hash": "1211302313020",
+          "number": 4
+        },
+        {
+          "hash": "1211302313022",
+          "number": 10
+        },
+        {
+          "hash": "1211302313122",
+          "number": 58
+        },
+        {
+          "hash": "1211302313123",
+          "number": 35
+        },
+        {
+          "hash": "1211302313132",
+          "number": 35
+        },
+        {
+          "hash": "1211302312113",
+          "number": 8
+        },
+        {
+          "hash": "1211302312112",
+          "number": 24
+        },
+        {
+          "hash": "1211302312111",
+          "number": 5
+        },
+        {
+          "hash": "1211302312110",
+          "number": 1
+        },
+        {
+          "hash": "1211302312130",
+          "number": 15
+        },
+        {
+          "hash": "1211302312131",
+          "number": 6
+        },
+        {
+          "hash": "1211302312101",
+          "number": 1
+        },
+        {
+          "hash": "1211302312310",
+          "number": 33
+        },
+        {
+          "hash": "1211302312311",
+          "number": 10
+        },
+        {
+          "hash": "1211302312312",
+          "number": 15
+        },
+        {
+          "hash": "1211302312313",
+          "number": 8
+        },
+        {
+          "hash": "1211302312332",
+          "number": 6
+        },
+        {
+          "hash": "1211302310322",
+          "number": 3
+        },
+        {
+          "hash": "1211302310231",
+          "number": 1
+        },
+        {
+          "hash": "1211302310233",
+          "number": 3
+        },
+        {
+          "hash": "1211303202203",
+          "number": 264
+        },
+        {
+          "hash": "1211303202200",
+          "number": 154
+        },
+        {
+          "hash": "1211303202201",
+          "number": 19
+        },
+        {
+          "hash": "1211303202202",
+          "number": 96
+        },
+        {
+          "hash": "1211303202230",
+          "number": 55
+        },
+        {
+          "hash": "1211303202231",
+          "number": 67
+        },
+        {
+          "hash": "1211303202233",
+          "number": 4
+        },
+        {
+          "hash": "1211303202232",
+          "number": 8
+        },
+        {
+          "hash": "1211303202212",
+          "number": 116
+        },
+        {
+          "hash": "1211303202213",
+          "number": 35
+        },
+        {
+          "hash": "1211303202221",
+          "number": 39
+        },
+        {
+          "hash": "1211303202223",
+          "number": 5
+        },
+        {
+          "hash": "1211303202222",
+          "number": 1
+        },
+        {
+          "hash": "1211303202323",
+          "number": 1
+        },
+        {
+          "hash": "1211303202320",
+          "number": 16
+        },
+        {
+          "hash": "1211303202322",
+          "number": 16
+        },
+        {
+          "hash": "1211303202321",
+          "number": 3
+        },
+        {
+          "hash": "1211303220001",
+          "number": 7
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220010",
+          "number": 5
+        },
+        {
+          "hash": "1211303220011",
+          "number": 8
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.1008615799,
+                40.7471439998
+              ],
+              [
+                -73.9421692826,
+                40.5765409998
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9845468452,
+                40.8611743803
+              ],
+              [
+                -73.8929609999,
+                40.7496575497
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9026999998,
+                40.7624221297
+              ],
+              [
+                -73.7514020003,
+                40.5858394078
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 3319
+    },
+    {
+      "type": "point",
+      "column_names": [
+        "geometry"
+      ],
+      "column_indexes": [
+        30
+      ],
+      "geohashes4": [
+        {
+          "hash": "1211302331013",
+          "number": 25
+        },
+        {
+          "hash": "1211302331011",
+          "number": 18
+        },
+        {
+          "hash": "1211302331010",
+          "number": 2
+        },
+        {
+          "hash": "1211302331030",
+          "number": 1
+        },
+        {
+          "hash": "1211302331110",
+          "number": 20
+        },
+        {
+          "hash": "1211302331111",
+          "number": 8
+        },
+        {
+          "hash": "1211302331112",
+          "number": 1
+        },
+        {
+          "hash": "1211302331113",
+          "number": 1
+        },
+        {
+          "hash": "1211302331100",
+          "number": 42
+        },
+        {
+          "hash": "1211302331103",
+          "number": 10
+        },
+        {
+          "hash": "1211302331101",
+          "number": 2
+        },
+        {
+          "hash": "1211302331102",
+          "number": 4
+        },
+        {
+          "hash": "1211302331130",
+          "number": 8
+        },
+        {
+          "hash": "1211302331131",
+          "number": 1
+        },
+        {
+          "hash": "1211302331121",
+          "number": 2
+        },
+        {
+          "hash": "1211302331120",
+          "number": 1
+        },
+        {
+          "hash": "1211302330110",
+          "number": 10
+        },
+        {
+          "hash": "1211302330113",
+          "number": 12
+        },
+        {
+          "hash": "1211302330111",
+          "number": 9
+        },
+        {
+          "hash": "1211302313302",
+          "number": 52
+        },
+        {
+          "hash": "1211302313301",
+          "number": 172
+        },
+        {
+          "hash": "1211302313300",
+          "number": 107
+        },
+        {
+          "hash": "1211302313303",
+          "number": 28
+        },
+        {
+          "hash": "1211302313311",
+          "number": 236
+        },
+        {
+          "hash": "1211302313312",
+          "number": 88
+        },
+        {
+          "hash": "1211302313310",
+          "number": 432
+        },
+        {
+          "hash": "1211302313313",
+          "number": 95
+        },
+        {
+          "hash": "1211302313320",
+          "number": 6
+        },
+        {
+          "hash": "1211302313323",
+          "number": 40
+        },
+        {
+          "hash": "1211302313322",
+          "number": 37
+        },
+        {
+          "hash": "1211302313321",
+          "number": 21
+        },
+        {
+          "hash": "1211302313330",
+          "number": 79
+        },
+        {
+          "hash": "1211302313331",
+          "number": 11
+        },
+        {
+          "hash": "1211302313333",
+          "number": 1
+        },
+        {
+          "hash": "1211302313332",
+          "number": 11
+        },
+        {
+          "hash": "1211302313211",
+          "number": 177
+        },
+        {
+          "hash": "1211302313212",
+          "number": 45
+        },
+        {
+          "hash": "1211302313213",
+          "number": 59
+        },
+        {
+          "hash": "1211302313210",
+          "number": 51
+        },
+        {
+          "hash": "1211302313231",
+          "number": 26
+        },
+        {
+          "hash": "1211302313233",
+          "number": 22
+        },
+        {
+          "hash": "1211302313230",
+          "number": 17
+        },
+        {
+          "hash": "1211302313232",
+          "number": 1
+        },
+        {
+          "hash": "1211302313203",
+          "number": 18
+        },
+        {
+          "hash": "1211302313202",
+          "number": 4
+        },
+        {
+          "hash": "1211302313201",
+          "number": 6
+        },
+        {
+          "hash": "1211302313200",
+          "number": 10
+        },
+        {
+          "hash": "1211302313221",
+          "number": 2
+        },
+        {
+          "hash": "1211302313033",
+          "number": 44
+        },
+        {
+          "hash": "1211302313032",
+          "number": 4
+        },
+        {
+          "hash": "1211302313003",
+          "number": 16
+        },
+        {
+          "hash": "1211302313002",
+          "number": 10
+        },
+        {
+          "hash": "1211302313000",
+          "number": 1
+        },
+        {
+          "hash": "1211302313021",
+          "number": 2
+        },
+        {
+          "hash": "1211302313023",
+          "number": 9
+        },
+        {
+          "hash": "1211302313020",
+          "number": 4
+        },
+        {
+          "hash": "1211302313022",
+          "number": 10
+        },
+        {
+          "hash": "1211302313122",
+          "number": 58
+        },
+        {
+          "hash": "1211302313123",
+          "number": 35
+        },
+        {
+          "hash": "1211302313132",
+          "number": 35
+        },
+        {
+          "hash": "1211302312113",
+          "number": 8
+        },
+        {
+          "hash": "1211302312112",
+          "number": 24
+        },
+        {
+          "hash": "1211302312111",
+          "number": 5
+        },
+        {
+          "hash": "1211302312110",
+          "number": 1
+        },
+        {
+          "hash": "1211302312130",
+          "number": 15
+        },
+        {
+          "hash": "1211302312131",
+          "number": 6
+        },
+        {
+          "hash": "1211302312101",
+          "number": 1
+        },
+        {
+          "hash": "1211302312310",
+          "number": 33
+        },
+        {
+          "hash": "1211302312311",
+          "number": 10
+        },
+        {
+          "hash": "1211302312312",
+          "number": 15
+        },
+        {
+          "hash": "1211302312313",
+          "number": 8
+        },
+        {
+          "hash": "1211302312332",
+          "number": 6
+        },
+        {
+          "hash": "1211302310322",
+          "number": 3
+        },
+        {
+          "hash": "1211302310231",
+          "number": 1
+        },
+        {
+          "hash": "1211302310233",
+          "number": 3
+        },
+        {
+          "hash": "1211303202203",
+          "number": 264
+        },
+        {
+          "hash": "1211303202200",
+          "number": 154
+        },
+        {
+          "hash": "1211303202201",
+          "number": 19
+        },
+        {
+          "hash": "1211303202202",
+          "number": 96
+        },
+        {
+          "hash": "1211303202230",
+          "number": 55
+        },
+        {
+          "hash": "1211303202231",
+          "number": 67
+        },
+        {
+          "hash": "1211303202233",
+          "number": 4
+        },
+        {
+          "hash": "1211303202232",
+          "number": 8
+        },
+        {
+          "hash": "1211303202212",
+          "number": 116
+        },
+        {
+          "hash": "1211303202213",
+          "number": 35
+        },
+        {
+          "hash": "1211303202221",
+          "number": 39
+        },
+        {
+          "hash": "1211303202223",
+          "number": 5
+        },
+        {
+          "hash": "1211303202222",
+          "number": 1
+        },
+        {
+          "hash": "1211303202323",
+          "number": 1
+        },
+        {
+          "hash": "1211303202320",
+          "number": 16
+        },
+        {
+          "hash": "1211303202322",
+          "number": 16
+        },
+        {
+          "hash": "1211303202321",
+          "number": 3
+        },
+        {
+          "hash": "1211303220001",
+          "number": 7
+        },
+        {
+          "hash": "1211303220000",
+          "number": 1
+        },
+        {
+          "hash": "1211303220002",
+          "number": 1
+        },
+        {
+          "hash": "1211303220010",
+          "number": 5
+        },
+        {
+          "hash": "1211303220011",
+          "number": 8
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.100862,
+                40.747144
+              ],
+              [
+                -73.942169,
+                40.576541
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.984547,
+                40.861174
+              ],
+              [
+                -73.892961,
+                40.749658
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9027,
+                40.762422
+              ],
+              [
+                -73.751402,
+                40.585839
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 3319
+    }
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        "Activated"
+      ],
+      "column_indexes": [
+        15
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1458777600.0,
+            "lte": 1513296000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1508457600.0,
+            "lte": 1548201600.0
+          }
+        },
+        {
+          "range": {
+            "gte": 253392453632.0,
+            "lte": 253392453632.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    "OBJECTID",
+    "Borough",
+    "Type",
+    "Provider",
+    "Name",
+    "Location",
+    "Latitude",
+    "Longitude",
+    "X",
+    "Y",
+    "Location_T",
+    "Location",
+    "T",
+    "Remarks",
+    "City",
+    "SSID",
+    "SourceID",
+    "Source",
+    "ID",
+    "Activated",
+    "BoroCode",
+    "Boro",
+    "Code",
+    "Borough Name",
+    "Borough",
+    "Name",
+    "Neighborhood Tabulation Area Code (NTACODE)",
+    "Neighborhood",
+    "Tabulation",
+    "Area",
+    "Code",
+    "NTACODE",
+    "",
+    "Neighborhood Tabulation Area (NTA)",
+    "Neighborhood",
+    "Tabulation",
+    "Area",
+    "NTA",
+    "",
+    "Council Distrcit",
+    "Council",
+    "Distrcit",
+    "Postcode",
+    "BoroCD",
+    "Boro",
+    "CD",
+    "Census Tract",
+    "Census",
+    "Tract",
+    "BCTCB2010",
+    "BCTCB",
+    "2010",
+    "BIN",
+    "BBL",
+    "DOITT_ID",
+    "DOITT",
+    "ID",
+    "Location (Lat, Long)",
+    "Location",
+    "Lat",
+    "Long",
+    "",
+    "count",
+    "geometry"
+  ],
+  "sample": "OBJECTID,Borough,Type,Provider,Name,Location,Latitude,Longitude,X,Y,Location_T,Remarks,City,SSID,SourceID,Activated,BoroCode,Borough Name,Neighborhood Tabulation Area Code (NTACODE),Neighborhood Tabulation Area (NTA),Council Distrcit,Postcode,BoroCD,Census Tract,BCTCB2010,BIN,BBL,DOITT_ID,\"Location (Lat, Long)\",count,geometry\r\n10320,3,Free,LinkNYC - Citybridge,bk-05-145942,3368 FULTON STREET,40.6838205904,-73.8713797301,\"1,019,922.57726\",\"188,436.894173\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Brooklyn,LinkNYC Free Wi-Fi,LINK-021920,12/07/2017,3,Brooklyn,BK83,Cypress Hills-City Line,37,11208,305,184,184,3092807,3041470040,4725,\"(40.6838205904, -73.8713797301)\",1,POINT (-73.87138 40.683821)\r\n9695,3,Limited Free,ALTICEUSA,Prospect Park,\"NORTH BOAT HOUSE, ON THE LAWN ACROSS FROM M-200\",40.6611970004,-73.9652520003,\"993,890.561744\",\"180,170.198437\",Outdoor,3 free 10 min sessions,Brooklyn,GuestWiFi,,09/09/9999,3,Brooklyn,BK99,park-cemetery-etc-Brooklyn,39,11215,355,177,177,0,3011170001,892,\"(40.6611970004, -73.9652520003)\",1,POINT (-73.965252 40.661197)\r\n12354,1,Free,Transit Wireless,\"Chambers St (J,M,Z)/Bklyn Bridge-City Hall (4,5,6)\",\"Chambers St (J,M,Z)/Bklyn Bridge-City Hall (4,5,6)\",40.7132430002,-74.0034010005,\"983,307.155089\",\"199,130.180202\",Subway Station,SN 105,New York,TransitWirelessWiFi,,09/09/9999,1,Manhattan,MN27,Chinatown,1,10007,101,29,29,1001394,1001210001,1683,\"(40.7132430002, -74.0034010005)\",1,POINT (-74.003401 40.713243)\r\n11611,1,Limited Free,SPECTRUM,Thomas Jefferson Park,Multi Purpose Room,40.7936690002,-73.9368160005,\"1,001,745.09459\",\"228,438.271192\",Indoor,3 free 10 min sessions,New York,GuestWiFi,0,09/09/9999,1,Manhattan,MN34,East Harlem North,8,10029,111,178,178,1085632,1017050001,1165,\"(40.7936690002, -73.9368160005)\",1,POINT (-73.936816 40.793669)\r\n11281,1,Free,LinkNYC - Citybridge,mn-03-122246,2 ALLEN STREET,40.7145080596,-73.9924896103,\"986,332.033882\",\"199,591.150736\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",New York,LinkNYC Free Wi-Fi,LINK-010713,06/21/2017,1,Manhattan,MN27,Chinatown,1,10002,103,16,16,1088837,1002947500,3911,\"(40.7145080596, -73.9924896103)\",1,POINT (-73.99249 40.714508)\r\n11801,4,Free,LinkNYC - Citybridge,qu-04-111010,72-30 ROOSEVELT AVENUE,40.7466703704,-73.8924897106,\"1,014,039.6658\",\"211,327.076411\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Queens,LinkNYC Free Wi-Fi,LINK-014405,08/24/2017,4,Queens,QN50,Elmhurst-Maspeth,25,11377,404,265,265,4030419,4013040040,4421,\"(40.7466703704, -73.8924897106)\",1,POINT (-73.89249 40.74667)\r\n10070,3,Free,BPL,Macon - Brooklyn Public Library,361 LEWIS AVENUE,40.683004902,-73.9348054703,\"1,002,331.79978\",\"188,120.254715\",Library,,Brooklyn,BPLUNWIRED,,09/09/9999,3,Brooklyn,BK35,Stuyvesant Heights,36,11233,303,295,295,3046408,3016650001,494,\"(40.683004902, -73.9348054703)\",1,POINT (-73.934805 40.683005)\r\n10394,1,Free,Chelsea,,17th Caledonia,40.7436317201,-74.0059179066,\"982,610.15189\",\"210,201.773544\",Outdoor,,New York,CICFreeWiFi,,09/09/9999,1,Manhattan,MN13,Hudson Yards-Chelsea-Flatiron-Union Square,3,10011,104,83,83,0,0,250,\"(40.7436317201, -74.0059179066)\",1,POINT (-74.005918 40.743632)\r\n11692,3,Limited Free,ALTICEUSA,Coney Island Beach & Boardwalk,ROOF OF PAUL'S DAUGHTER,40.5734390003,-73.9782970003,\"990,279.249741\",\"148,196.486794\",Outdoor,3 free 10 min sessions,Brooklyn,GuestWiFi,,09/09/9999,3,Brooklyn,BK21,Seagate-Coney Island,47,11224,313,352,352,0,0,1249,\"(40.5734390003, -73.9782970003)\",1,POINT (-73.978297 40.573439)\r\n9678,2,Limited Free,ALTICEUSA,Pelham Bay Park,MIDDLETOWN RD 1/P/W/O KENNELLWORTH PL,40.8475960001,-73.82223,\"1,033,433.04959\",\"248,129.425707\",Outdoor,3 free 10 min sessions,Bronx,GuestWiFi,,09/09/9999,2,Bronx,BX99,park-cemetery-etc-Bronx,13,10465,228,276,276,0,0,875,\"(40.8475960001, -73.82223)\",1,POINT (-73.82223 40.847596)\r\n12008,2,Free,LinkNYC - Citybridge,bx-05-123186,1846 JEROME AVENUE,40.8487299999,-73.9114700003,\"1,008,742.9031\",\"248,505.055533\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Bronx,LinkNYC Free Wi-Fi,LINK-011874,07/13/2017,2,Bronx,BX41,Mount Hope,14,10453,205,233,233,2008218,2028510000,4095,\"(40.8487299999, -73.9114700003)\",1,POINT (-73.91147 40.84873)\r\n9896,3,Free,LinkNYC - Citybridge,bk-01-145864,1133 MANHATTAN AVENUE,40.7369134897,-73.9554531896,\"996,595.136715\",\"207,757.192803\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Brooklyn,LinkNYC Free Wi-Fi,LINK-020756,08/02/2017,3,Brooklyn,BK76,Greenpoint,33,11222,301,563,563,3063701,3024820030,4620,\"(40.7369134897, -73.9554531896)\",1,POINT (-73.955453 40.736913)\r\n12045,1,Free,LinkNYC - Citybridge,mn-08-135937,141 EAST 61 STREET,40.7634190001,-73.9669949995,\"993,392.94791\",\"217,412.587862\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",New York,LinkNYC Free Wi-Fi,LINK-012328,06/22/2017,1,Manhattan,MN40,Upper East Side-Carnegie Hill,4,10065,108,114,114,1041977,1013960020,4132,\"(40.7634190001, -73.9669949995)\",1,POINT (-73.966995 40.763419)\r\n9831,2,Free,LinkNYC - Citybridge,bx-01-146066,610 MELROSE AVE,40.8173798278,-73.9170781326,\"1,007,202.15782\",\"237,081.516372\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Bronx,LinkNYC Free Wi-Fi,LINK-020595,04/30/2018,2,Bronx,BX34,Melrose South-Mott Haven North,17,10455,201,65,65,2097082,2023740010,4608,\"(40.8173798278, -73.9170781326)\",1,POINT (-73.917078 40.81738)\r\n11268,1,Free,LinkNYC - Citybridge,mn-04-143655,260 11 AVENUE,40.7512339196,-74.0051459001,\"982,824.237092\",\"212,971.485196\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",New York,LinkNYC Free Wi-Fi,LINK-010618,10/06/2017,1,Manhattan,MN13,Hudson Yards-Chelsea-Flatiron-Union Square,3,10001,104,99,99,1012389,1006980000,3898,\"(40.7512339196, -74.0051459001)\",1,POINT (-74.005146 40.751234)\r\n10112,1,Free,Manhattan Down Alliance,27,\"79 Pearl Street, New York, NY 10004, USA\",40.7038994,-74.0103988997,\"981,366.75313\",\"195,726.177823\",Outdoor,,New York,#DwtwnAllianceFreeWiFi,,09/09/9999,1,Manhattan,MN25,Battery Park City-Lower Manhattan,1,10004,101,9,9,1000837,1000290023,538,\"(40.7038994, -74.0103988997)\",1,POINT (-74.010399 40.703899)\r\n11915,4,Free,LinkNYC - Citybridge,qu-06-145765,97-14 66 AVENUE,40.7274890097,-73.8560711597,\"1,024,142.23451\",\"204,353.193706\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Queens,LinkNYC Free Wi-Fi,LINK-018043,04/05/2017,4,Queens,QN17,Forest Hills,29,11374,406,713,713,4074783,4031597500,4463,\"(40.7274890097, -73.8560711597)\",1,POINT (-73.856071 40.727489)\r\n11810,2,Free,LinkNYC - Citybridge,bx-01-118942,2922 3 AVENUE,40.8174459997,-73.9155739995,\"1,007,618.46736\",\"237,106.022885\",Outdoor Kiosk,\"Tablet Internet -phone , Free 1 GB Wi-FI Service\",Bronx,LinkNYC Free Wi-Fi,LINK-014483,12/28/2016,2,Bronx,BX34,Melrose South-Mott Haven North,17,10455,201,71,71,2001166,2023620020,4430,\"(40.8174459997, -73.9155739995)\",1,POINT (-73.915574 40.817446)\r\n10368,2,Limited Free,ALTICEUSA,Macombs Dam Park,DOT POLE ON RIVER AVE C/O 158 ST ( WEST SIDE OF STREET),40.8265669999,-73.9267620006,\"1,004,518.93714\",\"240,426.345969\",Outdoor,3 free 10 min sessions,Bronx,GuestWiFi,,09/09/9999,2,Bronx,BX63,West Concourse,16,10451,204,63,63,0,0,223,\"(40.8265669999, -73.9267620006)\",1,POINT (-73.926762 40.826567)\r\n10946,1,Free,Harlem,,Pole 87 - LenWS1N134,40.8137129996,-73.9412620001,\"1,000,509.13971\",\"235,740.147008\",Outdoor,,New York,Harlem Wi-Fi,,09/09/9999,1,Manhattan,MN03,Central Harlem North-Polo Grounds,9,10030,110,228,228,0,0,780,\"(40.8137129996, -73.9412620001)\",1,POINT (-73.941262 40.813713)\r\n"
+}

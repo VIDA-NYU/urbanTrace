@@ -1,0 +1,1092 @@
+{
+  "geometricType": "Point",
+  "name": null,
+  "crs": null,
+  "nb_rows": 3103,
+  "nb_profiled_rows": 3103,
+  "nb_columns": 38,
+  "columns": [
+    {
+      "name": "facname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "addressnum",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.029648727038349983,
+      "num_distinct_values": 1575
+    },
+    {
+      "name": "streetname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.029648727038349983,
+      "num_distinct_values": 1292
+    },
+    {
+      "name": "address",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "missing_values_ratio": 0.0029004189494038026,
+      "num_distinct_values": 2459
+    },
+    {
+      "name": "city",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 44
+    },
+    {
+      "name": "zipcode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 179,
+      "mean": 10818.113760876571,
+      "stddev": 531.9400233827547,
+      "coverage": [
+        {
+          "range": {
+            "gte": 10002.0,
+            "lte": 10075.0
+          }
+        },
+        {
+          "range": {
+            "gte": 10303.0,
+            "lte": 10473.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11201.0,
+            "lte": 11433.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "factype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "facsubgrp",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "facgroup",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "facdomain",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "servarea",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "opname",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "opabbrev",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "optype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "overagency",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    },
+    {
+      "name": "overabbrev",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "overlevel",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "student",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 808,
+      "mean": 322.29519819529486,
+      "stddev": 427.1640571004596,
+      "coverage": [
+        {
+          "range": {
+            "gte": 0.0,
+            "lte": 264.0
+          }
+        },
+        {
+          "range": {
+            "gte": 337.0,
+            "lte": 972.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "captype",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.3980019336126329,
+      "num_distinct_values": 1
+    },
+    {
+      "name": "boro",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 5
+    },
+    {
+      "name": "bin",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2376,
+      "mean": 2801646.638736706,
+      "stddev": 1228583.3480433396,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1003375.0,
+            "lte": 2116211.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3012824.0,
+            "lte": 3398190.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4014094.0,
+            "lte": 5107624.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbl",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 2357,
+      "mean": 2728493601.8314533,
+      "stddev": 1155823921.5816016,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1000880014.0,
+            "lte": 1021800035.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2024460043.0,
+            "lte": 3075660006.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4005290002.0,
+            "lte": 5042440001.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "latitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/latitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": 40.72689347818494,
+      "stddev": 0.08642545993167246,
+      "coverage": [
+        {
+          "range": {
+            "gte": 40.5742642431,
+            "lte": 40.6673257559
+          }
+        },
+        {
+          "range": {
+            "gte": 40.675179975,
+            "lte": 40.7658422912
+          }
+        },
+        {
+          "range": {
+            "gte": 40.780662319,
+            "lte": 40.8833906739
+          }
+        }
+      ]
+    },
+    {
+      "name": "longitude",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [
+        "http://schema.org/longitude"
+      ],
+      "unclean_values_ratio": 0.0,
+      "mean": -73.92648880130828,
+      "stddev": 0.08106792209873777,
+      "coverage": [
+        {
+          "range": {
+            "gte": -74.0048662906,
+            "lte": -73.8973754935
+          }
+        },
+        {
+          "range": {
+            "gte": -73.8867270293,
+            "lte": -73.738643346
+          }
+        }
+      ]
+    },
+    {
+      "name": "xcoord",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 1004614.3411267714,
+      "stddev": 22479.07541697464,
+      "coverage": [
+        {
+          "range": {
+            "gte": 982900.222687,
+            "lte": 1012717.22132
+          }
+        },
+        {
+          "range": {
+            "gte": 1015746.63764,
+            "lte": 1056756.40259
+          }
+        }
+      ]
+    },
+    {
+      "name": "ycoord",
+      "structural_type": "http://schema.org/Float",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "mean": 204122.5834385961,
+      "stddev": 31487.54722173977,
+      "coverage": [
+        {
+          "range": {
+            "gte": 148496.48685,
+            "lte": 182446.826747
+          }
+        },
+        {
+          "range": {
+            "gte": 185334.429543,
+            "lte": 218308.561624
+          }
+        },
+        {
+          "range": {
+            "gte": 223757.839756,
+            "lte": 261160.882408
+          }
+        }
+      ]
+    },
+    {
+      "name": "cd",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 59,
+      "mean": 277.4157267160812,
+      "stddev": 113.48931204571552,
+      "coverage": [
+        {
+          "range": {
+            "gte": 102.0,
+            "lte": 211.0
+          }
+        },
+        {
+          "range": {
+            "gte": 301.0,
+            "lte": 318.0
+          }
+        },
+        {
+          "range": {
+            "gte": 401.0,
+            "lte": 502.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "nta2010",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 189
+    },
+    {
+      "name": "nta2020",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 205
+    },
+    {
+      "name": "council",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 51,
+      "mean": 25.72188204962939,
+      "stddev": 14.982006440607725,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 19.0
+          }
+        },
+        {
+          "range": {
+            "gte": 22.0,
+            "lte": 37.0
+          }
+        },
+        {
+          "range": {
+            "gte": 38.0,
+            "lte": 50.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ct2010",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 913,
+      "mean": 37626.22494360297,
+      "stddev": 33744.33967151022,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1501.0,
+            "lte": 29104.0
+          }
+        },
+        {
+          "range": {
+            "gte": 32600.0,
+            "lte": 67900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 77200.0,
+            "lte": 150200.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ct2020",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 999,
+      "mean": 37615.67515307767,
+      "stddev": 33744.30785348331,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1501.0,
+            "lte": 29105.0
+          }
+        },
+        {
+          "range": {
+            "gte": 32600.0,
+            "lte": 67900.0
+          }
+        },
+        {
+          "range": {
+            "gte": 77200.0,
+            "lte": 150200.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "borocode",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5,
+      "mean": 2.6938446664518207,
+      "stddev": 1.1363890594626351,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "schooldist",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 32,
+      "mean": 15.917821463100225,
+      "stddev": 9.252222637968446,
+      "coverage": [
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 10.0
+          }
+        },
+        {
+          "range": {
+            "gte": 11.0,
+            "lte": 21.0
+          }
+        },
+        {
+          "range": {
+            "gte": 22.0,
+            "lte": 31.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "policeprct",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 77,
+      "mean": 66.23009990331937,
+      "stddev": 32.85313224019829,
+      "coverage": [
+        {
+          "range": {
+            "gte": 6.0,
+            "lte": 49.0
+          }
+        },
+        {
+          "range": {
+            "gte": 60.0,
+            "lte": 90.0
+          }
+        },
+        {
+          "range": {
+            "gte": 101.0,
+            "lte": 122.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "datasource",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "uid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 3103
+    },
+    {
+      "name": "geometry",
+      "structural_type": "http://schema.org/GeoCoordinates",
+      "semantic_types": [],
+      "point_format": "long,lat",
+      "unclean_values_ratio": 0.0
+    }
+  ],
+  "nb_spatial_columns": 3,
+  "nb_categorical_columns": 13,
+  "nb_numerical_columns": 13,
+  "types": [
+    "categorical",
+    "numerical",
+    "spatial"
+  ],
+  "spatial_coverage": [
+    {
+      "type": "latlong",
+      "column_names": [
+        "latitude",
+        "longitude"
+      ],
+      "column_indexes": [
+        22,
+        23
+      ],
+      "geohashes4": [
+        {
+          "hash": "121130320221",
+          "number": 111
+        },
+        {
+          "hash": "121130320220",
+          "number": 281
+        },
+        {
+          "hash": "121130320222",
+          "number": 109
+        },
+        {
+          "hash": "121130320223",
+          "number": 276
+        },
+        {
+          "hash": "121130320232",
+          "number": 140
+        },
+        {
+          "hash": "121130320230",
+          "number": 3
+        },
+        {
+          "hash": "121130322000",
+          "number": 13
+        },
+        {
+          "hash": "121130322001",
+          "number": 15
+        },
+        {
+          "hash": "121130322010",
+          "number": 1
+        },
+        {
+          "hash": "121130231331",
+          "number": 221
+        },
+        {
+          "hash": "121130231330",
+          "number": 261
+        },
+        {
+          "hash": "121130231332",
+          "number": 104
+        },
+        {
+          "hash": "121130231333",
+          "number": 90
+        },
+        {
+          "hash": "121130231321",
+          "number": 289
+        },
+        {
+          "hash": "121130231323",
+          "number": 155
+        },
+        {
+          "hash": "121130231320",
+          "number": 291
+        },
+        {
+          "hash": "121130231322",
+          "number": 41
+        },
+        {
+          "hash": "121130231302",
+          "number": 77
+        },
+        {
+          "hash": "121130231303",
+          "number": 17
+        },
+        {
+          "hash": "121130231300",
+          "number": 45
+        },
+        {
+          "hash": "121130231312",
+          "number": 45
+        },
+        {
+          "hash": "121130231313",
+          "number": 3
+        },
+        {
+          "hash": "121130231231",
+          "number": 100
+        },
+        {
+          "hash": "121130231233",
+          "number": 6
+        },
+        {
+          "hash": "121130231210",
+          "number": 10
+        },
+        {
+          "hash": "121130231213",
+          "number": 14
+        },
+        {
+          "hash": "121130231211",
+          "number": 29
+        },
+        {
+          "hash": "121130231032",
+          "number": 14
+        },
+        {
+          "hash": "121130231033",
+          "number": 9
+        },
+        {
+          "hash": "121130231023",
+          "number": 6
+        },
+        {
+          "hash": "121130233110",
+          "number": 112
+        },
+        {
+          "hash": "121130233111",
+          "number": 66
+        },
+        {
+          "hash": "121130233112",
+          "number": 19
+        },
+        {
+          "hash": "121130233113",
+          "number": 16
+        },
+        {
+          "hash": "121130233101",
+          "number": 58
+        },
+        {
+          "hash": "121130233100",
+          "number": 5
+        },
+        {
+          "hash": "121130233103",
+          "number": 12
+        },
+        {
+          "hash": "121130233011",
+          "number": 38
+        },
+        {
+          "hash": "121130233013",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.1371076109,
+                40.7353274786
+              ],
+              [
+                -73.9096251453,
+                40.5818052519
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.9790549416,
+                40.8825572756
+              ],
+              [
+                -73.8396197994,
+                40.7560835476
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.8894873699,
+                40.7666530624
+              ],
+              [
+                -73.7344620402,
+                40.5997463494
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 3103
+    },
+    {
+      "type": "point",
+      "column_names": [
+        "geometry"
+      ],
+      "column_indexes": [
+        37
+      ],
+      "geohashes4": [
+        {
+          "hash": "121130320221",
+          "number": 111
+        },
+        {
+          "hash": "121130320220",
+          "number": 281
+        },
+        {
+          "hash": "121130320222",
+          "number": 109
+        },
+        {
+          "hash": "121130320223",
+          "number": 276
+        },
+        {
+          "hash": "121130320232",
+          "number": 140
+        },
+        {
+          "hash": "121130320230",
+          "number": 3
+        },
+        {
+          "hash": "121130322000",
+          "number": 13
+        },
+        {
+          "hash": "121130322001",
+          "number": 15
+        },
+        {
+          "hash": "121130322010",
+          "number": 1
+        },
+        {
+          "hash": "121130231331",
+          "number": 221
+        },
+        {
+          "hash": "121130231330",
+          "number": 261
+        },
+        {
+          "hash": "121130231332",
+          "number": 104
+        },
+        {
+          "hash": "121130231333",
+          "number": 90
+        },
+        {
+          "hash": "121130231321",
+          "number": 289
+        },
+        {
+          "hash": "121130231323",
+          "number": 155
+        },
+        {
+          "hash": "121130231320",
+          "number": 291
+        },
+        {
+          "hash": "121130231322",
+          "number": 41
+        },
+        {
+          "hash": "121130231302",
+          "number": 77
+        },
+        {
+          "hash": "121130231303",
+          "number": 17
+        },
+        {
+          "hash": "121130231300",
+          "number": 45
+        },
+        {
+          "hash": "121130231312",
+          "number": 45
+        },
+        {
+          "hash": "121130231313",
+          "number": 3
+        },
+        {
+          "hash": "121130231231",
+          "number": 100
+        },
+        {
+          "hash": "121130231233",
+          "number": 6
+        },
+        {
+          "hash": "121130231210",
+          "number": 10
+        },
+        {
+          "hash": "121130231213",
+          "number": 14
+        },
+        {
+          "hash": "121130231211",
+          "number": 29
+        },
+        {
+          "hash": "121130231032",
+          "number": 14
+        },
+        {
+          "hash": "121130231033",
+          "number": 9
+        },
+        {
+          "hash": "121130231023",
+          "number": 6
+        },
+        {
+          "hash": "121130233110",
+          "number": 112
+        },
+        {
+          "hash": "121130233111",
+          "number": 66
+        },
+        {
+          "hash": "121130233112",
+          "number": 19
+        },
+        {
+          "hash": "121130233113",
+          "number": 16
+        },
+        {
+          "hash": "121130233101",
+          "number": 58
+        },
+        {
+          "hash": "121130233100",
+          "number": 5
+        },
+        {
+          "hash": "121130233103",
+          "number": 12
+        },
+        {
+          "hash": "121130233011",
+          "number": 38
+        },
+        {
+          "hash": "121130233013",
+          "number": 1
+        }
+      ],
+      "ranges": [
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -74.137108,
+                40.735327
+              ],
+              [
+                -73.909625,
+                40.581805
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.979055,
+                40.882557
+              ],
+              [
+                -73.83962,
+                40.756084
+              ]
+            ]
+          }
+        },
+        {
+          "range": {
+            "type": "envelope",
+            "coordinates": [
+              [
+                -73.889487,
+                40.766653
+              ],
+              [
+                -73.734462,
+                40.599746
+              ]
+            ]
+          }
+        }
+      ],
+      "number": 3103
+    }
+  ],
+  "attribute_keywords": [
+    "facname",
+    "addressnum",
+    "streetname",
+    "address",
+    "city",
+    "zipcode",
+    "factype",
+    "facsubgrp",
+    "facgroup",
+    "facdomain",
+    "servarea",
+    "opname",
+    "opabbrev",
+    "optype",
+    "overagency",
+    "overabbrev",
+    "overlevel",
+    "student",
+    "captype",
+    "boro",
+    "bin",
+    "bbl",
+    "latitude",
+    "longitude",
+    "xcoord",
+    "ycoord",
+    "cd",
+    "nta2010",
+    "nta",
+    "2010",
+    "nta2020",
+    "nta",
+    "2020",
+    "council",
+    "ct2010",
+    "ct",
+    "2010",
+    "ct2020",
+    "ct",
+    "2020",
+    "borocode",
+    "schooldist",
+    "policeprct",
+    "datasource",
+    "uid",
+    "geometry"
+  ],
+  "sample": "facname,addressnum,streetname,address,city,zipcode,factype,facsubgrp,facgroup,facdomain,servarea,opname,opabbrev,optype,overagency,overabbrev,overlevel,capacity,captype,boro,bin,bbl,latitude,longitude,xcoord,ycoord,cd,nta2010,nta2020,council,ct2010,ct2020,borocode,schooldist,policeprct,datasource,uid,geometry\r\nP.S. 97 THE HIGHLAWN,1855,STILLWELL AVENUE,1855 STILLWELL AVENUE,BROOKLYN,11223,ELEMENTARY SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,1031,seats,BROOKLYN,3177680,3066670024,40.6011697925,-73.9856913427,988223.397848,158299.090192,311,BK29,BK1103,43,040400,040400,3,21,62,doe_lcgms,03d7e986661660cb62373919f451f4c0,POINT (-73.985691 40.60117)\r\nGAN YISROEL,13,CHURCH AVENUE,13 CHURCH AVENUE,BROOKLYN,11218,ELEMENTARY SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Gan Yisroel,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BROOKLYN,3389661,3053120032,40.6416525273,-73.9828127824,989019.856801,173048.163264,312,BK41,BK1203,39,049600,049600,3,15,66,nysed_activeinstitutions,1156d5512970abb50bd821afe5778578,POINT (-73.982813 40.641653)\r\nFREDERICK DOUGLASS ACADEMY VIII MIDDLE SCHOOL,1400,PENNSYLVANIA AVENUE,1400 PENNSYLVANIA AVENUE,BROOKLYN,11239,JUNIOR HIGH-INTERMEDIATE-MIDDLE SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,418,seats,BROOKLYN,3098294,3044520025,40.6467614994,-73.8818459225,1017038.01287,174931.146152,305,BK93,BK0504,42,105804,105804,3,19,75,doe_lcgms,2acac4a44d74b9916dc692f0c252c32d,POINT (-73.881846 40.646761)\r\nI.S. 117 JOSEPH H. WADE,1865,MORRIS AVENUE,1865 MORRIS AVENUE,BRONX,10453,JUNIOR HIGH-INTERMEDIATE-MIDDLE SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,604,seats,BRONX,2007902,2028270001,40.8486044377,-73.9088552414,1009466.35533,248460.050405,205,BX41,BX0502,14,023301,023301,2,09,46,doe_lcgms,2eba936075f057c2f979d3babf9fff9d,POINT (-73.908855 40.848604)\r\nASTOR LAWRENCE F. HICKEY CENTER,4010,DYRE AVENUE,4010 DYRE AVENUE,BRONX,10466,SATELLITE SITE FOR STUDENTS WITH DISABILITIES,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Astor Services For Children And Families,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BRONX,2067131,2049700010,40.8909548532,-73.8307325334,1031050.15846,263922.06837,212,BX03,BX1202,12,045600,045600,2,11,47,nysed_activeinstitutions,418e41c01f3abc8c1daf308609cc1671,POINT (-73.830733 40.890955)\r\nGED RESTART EDUCATIONAL ALLIANCE-AH,25,AVENUE D,25 AVENUE D,NEW YORK,10009,GED-ALTERNATIVE HIGH SCHOOL EQUIVALENCY PREP PROGRAMS,GED AND ALTERNATIVE HIGH SCHOOL EQUIVALENCY,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,0,,MANHATTAN,1084874,1003730038,40.7210400531,-73.978263265,990275.277669,201971.614083,103,MN28,MN0303,2,002601,002601,1,01,9,nysed_activeinstitutions,490cc823f8946050053a35ae1a9f3c16,POINT (-73.978263 40.72104)\r\nBRONX WRITING ACADEMY,270,EAST 167 STREET,270 EAST 167 STREET,BRONX,10456,JUNIOR HIGH-INTERMEDIATE-MIDDLE SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,549,seats,BRONX,2002410,2024380050,40.832263017,-73.9142009457,1007993.23039,242504.768867,204,BX14,BX0401,16,017500,017500,2,09,44,doe_lcgms,4c8d87623ebc2f3892f33b61c20da135,POINT (-73.914201 40.832263)\r\nWEST PREP ACADEMY,220,WEST 108 STREET,220 WEST 108 STREET,NEW YORK,10025,JUNIOR HIGH-INTERMEDIATE-MIDDLE SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,0,seats,MANHATTAN,1081589,1018790018,40.8021242971,-73.966140647,993624.167329,231514.332575,107,MN09,MN0703,7,019500,019500,1,03,24,doe_lcgms,548c1ad46458a8591f044e8132ea6034,POINT (-73.966141 40.802124)\r\nP.S. 020 PORT RICHMOND,161,PARK AVENUE,161 PARK AVENUE,STATEN ISLAND,10302,ELEMENTARY SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,227,seats,STATEN ISLAND,5106979,5010200001,40.636616698,-74.1324772954,947481.676294,171240.809463,501,SI28,SI0106,49,020700,020702,5,31,121,doe_lcgms,567f33a30b64a2411522ab0677772a21,POINT (-74.132477 40.636617)\r\nKIPP STAR HARLEM COLLEGE PREP ELEMENTARY SCHOOL,625,WEST 133 STREET,625 WEST 133 STREET,NEW YORK,10027,CHARTER SCHOOL,CHARTER K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,0,,MANHATTAN,1059942,1020010005,40.8197873243,-73.9570658499,996133.425673,237950.702836,109,MN06,MN0902,7,022302,022302,1,05,30,nysed_activeinstitutions,57177757913e80ae4f425a833a55070e,POINT (-73.957066 40.819787)\r\nHARLEM VILLAGE ACADEMY CHARTER ELEMENTARY SCHOOL,74,WEST 124 STREET,74 WEST 124 STREET,NEW YORK,10027,CHARTER SCHOOL,CHARTER K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,0,,MANHATTAN,1053438,1017210070,40.8067172335,-73.945593049,999311.854587,233190.566868,110,MN11,MN1001,9,020000,020000,1,05,28,nysed_activeinstitutions,58c871b5526a12b14351783b1fdbee5d,POINT (-73.945593 40.806717)\r\nBROOKLYN EXCELSIOR CHARTER SCHOOL,856,QUINCY STREET,856 QUINCY STREET,BROOKLYN,11221,K-8 SCHOOL - CHARTER,CHARTER K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Brooklyn Excelsior Charter School,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,seats,BROOKLYN,3044597,3016330058,40.6896984615,-73.9251266282,1005014.15597,190561.058611,303,BK35,BK0302,41,038700,038700,3,16,81,doe_lcgms,6c9dfa44d594bc3b32aea2b8c6070830,POINT (-73.925127 40.689698)\r\nXAVERIAN HIGH SCHOOL,7100,SHORE ROAD,7100 SHORE ROAD,BROOKLYN,11209,MIDDLE SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Xaverian High School,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BROOKLYN,3146153,3058830001,40.63673055,-74.0356087156,974367.01585,171256.494346,310,BK31,BK1001,47,003400,003400,3,20,68,nysed_activeinstitutions,862670781c328a6334eea836c1ba99ea,POINT (-74.035609 40.636731)\r\nBROOKLYN BROWNSTONE SCHOOL,272,MACDONOUGH STREET,272 MACDONOUGH STREET,BROOKLYN,11233,ELEMENTARY SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,240,seats,BROOKLYN,3047054,3016740011,40.6816579516,-73.9357489206,1002070.49242,187629.328482,303,BK35,BK0302,36,027300,027300,3,16,81,doe_lcgms,a037f36f69b834d9d203cbae01912799,POINT (-73.935749 40.681658)\r\nM.S. 180 DR. DANIEL HALE WILLIAMS,700,BAYCHESTER AVENUE,700 BAYCHESTER AVENUE,BRONX,10475,JUNIOR HIGH-INTERMEDIATE-MIDDLE SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,1338,seats,BRONX,2116158,2051410150,40.8732113617,-73.8317483195,1030781.72466,257456.873951,210,BX13,BX1004,12,046201,046205,2,11,45,doe_lcgms,a4829231ee3d2f4bf9f234f749f6d808,POINT (-73.831748 40.873211)\r\nMOSDOS SATMAR BP SCHOOL FOR GIRLS,4421,15 AVENUE,4421 15 AVENUE,BROOKLYN,11219,ELEMENTARY SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Mosdos Satmar Bp School For Girls,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BROOKLYN,3128285,3054310001,40.634622528,-73.9849452856,988428.47724,170486.835431,312,BK88,BK1202,44,023200,023200,3,20,66,nysed_activeinstitutions,c886f4d6bbd41dcc6617b749a8297c63,POINT (-73.984945 40.634623)\r\nNEFESH ACADEMY,2005,EAST 17 STREET,2005 EAST 17 STREET,BROOKLYN,11229,HIGH SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Nefesh Academy,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BROOKLYN,3198187,3073220001,40.6010905067,-73.9546917019,996831.760612,158273.133686,315,BK44,BK1502,48,058000,058000,3,22,61,nysed_activeinstitutions,d4fb5d15a1b4e90681674e3bbdffe689,POINT (-73.954692 40.601091)\r\nRIVER EAST ELEMENTARY,2351,FIRST AVENUE,2351 FIRST AVENUE,NEW YORK,10035,ELEMENTARY SCHOOL - PUBLIC,PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,NYC Department of Education,NYCDOE,Public,NYC Department of Education,NYCDOE,City,366,seats,MANHATTAN,1054786,1017970100,40.7992278666,-73.9337222526,1002600.19369,230464.191893,111,MN34,MN1102,8,019400,019400,1,04,25,doe_lcgms,e241a651aba8a6db328859c98d3bf267,POINT (-73.933722 40.799228)\r\nDARKEI TSHIVO OF DINOV,77,WALLABOUT STREET,77 WALLABOUT STREET,BROOKLYN,11249,HIGH SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Darkei Tshivo Of Dinov,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,BROOKLYN,3393823,3022307507,40.6996729104,-73.9584128675,995781.370668,194188.907744,301,BK72,BK0103,33,053700,053700,3,14,90,nysed_activeinstitutions,eb627d77662d771e85ae6be8bf1183cd,POINT (-73.958413 40.699673)\r\nST JOHN'S LUTHERAN SCHOOL,663,MANOR ROAD,663 MANOR ROAD,STATEN ISLAND,10314,ELEMENTARY SCHOOL - NON-PUBLIC,NON-PUBLIC K-12 SCHOOLS,SCHOOLS (K-12),\"EDUCATION, CHILD WELFARE, AND YOUTH\",Local,Saint John'S Lutheran School,Non-public,Non-public,NYC Department of Education,NYCDOE,City,0,,STATEN ISLAND,5106922,5007070243,40.6109180822,-74.1210838614,950630.915473,161873.554958,501,SI07,SI0105,49,016901,016901,5,31,120,nysed_activeinstitutions,f70170d166fead7587852a07167dc3d6,POINT (-74.121084 40.610918)\r\n"
+}

@@ -18,3 +18,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Jupyter
+.ipynb_checkpoints/
+benchmark/scripts/operator_selection/quantitative_ablation-operator_selection_accuracy-token.ipynb

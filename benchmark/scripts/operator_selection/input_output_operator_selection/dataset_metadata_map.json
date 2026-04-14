@@ -1,0 +1,412 @@
+{
+  "City_Council_Districs": {
+    "dataset": "City_Council_Districs",
+    "metadata": "City_Council_Districs_metadata",
+    "data_type": "boundary",
+    "geometry_type": "MultiPolygon",
+    "target_columns": []
+  },
+  "Community_Districs": {
+    "dataset": "Community_Districs",
+    "metadata": "Community_Districs_metadata",
+    "data_type": "boundary",
+    "geometry_type": "MultiPolygon",
+    "target_columns": []
+  },
+  "MODZCTA": {
+    "dataset": "MODZCTA",
+    "metadata": "MODZCTA_metadata",
+    "data_type": "boundary",
+    "geometry_type": "MultiPolygon",
+    "target_columns": []
+  },
+  "NTA_Neighborhood_Tabulation_Areas": {
+    "dataset": "NTA_Neighborhood_Tabulation_Areas",
+    "metadata": "NTA_Neighborhood_Tabulation_Areas_metadata",
+    "data_type": "boundary",
+    "geometry_type": "MultiPolygon",
+    "target_columns": []
+  },
+  "NYC_Bike_Routes": {
+    "dataset": "NYC_Bike_Routes",
+    "metadata": "NYC_Bike_Routes_metadata",
+    "data_type": "boundary",
+    "geometry_type": "MultiLineString",
+    "target_columns": []
+  },
+  "NYC_HVI": {
+    "dataset": "NYC_HVI",
+    "metadata": "NYC_HVI_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "Heat Vulnerability Index (HVI)"
+    ]
+  },
+  "NYC_Schools": {
+    "dataset": "NYC_Schools",
+    "metadata": "NYC_Schools_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "student"
+    ]
+  },
+  "NYC_Wi-Fi_Hotspot_Locations": {
+    "dataset": "NYC_Wi-Fi_Hotspot_Locations",
+    "metadata": "NYC_Wi-Fi_Hotspot_Locations_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "count"
+    ]
+  },
+  "NYC_air_pollution": {
+    "dataset": "NYC_air_pollution",
+    "metadata": "NYC_air_pollution_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "Annual vehicle miles traveled",
+      "Annual vehicle miles traveled (cars)",
+      "Annual vehicle miles traveled (trucks)",
+      "Fine particles (PM 2.5)",
+      "Nitrogen dioxide (NO2)",
+      "Outdoor Air Toxics - Benzene",
+      "Outdoor Air Toxics - Formaldehyde",
+      "Ozone (O3)"
+    ]
+  },
+  "NYC_automated_traffic_volume_counts": {
+    "dataset": "NYC_automated_traffic_volume_counts",
+    "metadata": "NYC_automated_traffic_volume_counts_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "Vol"
+    ]
+  },
+  "NYC_bicycle_counts": {
+    "dataset": "NYC_bicycle_counts",
+    "metadata": "NYC_bicycle_counts_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "counts"
+    ]
+  },
+  "NYC_crime_rate_per_1000_residents": {
+    "dataset": "NYC_crime_rate_per_1000_residents",
+    "metadata": "NYC_crime_rate_per_1000_residents_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022",
+      "2023",
+      "2024"
+    ]
+  },
+  "NYC_crime_rate_property": {
+    "dataset": "NYC_crime_rate_property",
+    "metadata": "NYC_crime_rate_property_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022",
+      "2023",
+      "2024"
+    ]
+  },
+  "NYC_housing_units": {
+    "dataset": "NYC_housing_units",
+    "metadata": "NYC_housing_units_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_income_diversity_ratio": {
+    "dataset": "NYC_income_diversity_ratio",
+    "metadata": "NYC_income_diversity_ratio_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_libraries": {
+    "dataset": "NYC_libraries",
+    "metadata": "NYC_libraries_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "capacity",
+      "count"
+    ]
+  },
+  "NYC_median_household_income": {
+    "dataset": "NYC_median_household_income",
+    "metadata": "NYC_median_household_income_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2000",
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_median_rent": {
+    "dataset": "NYC_median_rent",
+    "metadata": "NYC_median_rent_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2000",
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_pedestrian_counts": {
+    "dataset": "NYC_pedestrian_counts",
+    "metadata": "NYC_pedestrian_counts_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "count"
+    ]
+  },
+  "NYC_population": {
+    "dataset": "NYC_population",
+    "metadata": "NYC_population_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2000",
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_poverty_rate": {
+    "dataset": "NYC_poverty_rate",
+    "metadata": "NYC_poverty_rate_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2000",
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_students_performing_english_language_arts": {
+    "dataset": "NYC_students_performing_english_language_arts",
+    "metadata": "NYC_students_performing_english_language_arts_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2022",
+      "2023",
+      "2024"
+    ]
+  },
+  "NYC_students_performing_math": {
+    "dataset": "NYC_students_performing_math",
+    "metadata": "NYC_students_performing_math_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2022",
+      "2023",
+      "2024"
+    ]
+  },
+  "NYC_unemployment_rate": {
+    "dataset": "NYC_unemployment_rate",
+    "metadata": "NYC_unemployment_rate_metadata",
+    "data_type": "data",
+    "geometry_type": "MultiPolygon",
+    "target_columns": [
+      "2000",
+      "2005",
+      "2006",
+      "2007",
+      "2008",
+      "2009",
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2021",
+      "2022",
+      "2023"
+    ]
+  },
+  "NYC_vehicle_collisions_crashes": {
+    "dataset": "NYC_vehicle_collisions_crashes",
+    "metadata": "NYC_vehicle_collisions_crashes_metadata",
+    "data_type": "data",
+    "geometry_type": "Point",
+    "target_columns": [
+      "NUMBER OF PERSONS INJURED",
+      "NUMBER OF PERSONS KILLED",
+      "NUMBER OF PEDESTRIANS INJURED",
+      "NUMBER OF PEDESTRIANS KILLED",
+      "NUMBER OF CYCLIST INJURED",
+      "NUMBER OF CYCLIST KILLED",
+      "NUMBER OF MOTORIST INJURED",
+      "NUMBER OF MOTORIST KILLED"
+    ]
+  }
+}

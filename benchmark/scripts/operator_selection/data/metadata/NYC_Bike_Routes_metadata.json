@@ -1,0 +1,480 @@
+{
+  "geometricType": "MultiLineString",
+  "name": null,
+  "crs": null,
+  "nb_rows": 28983,
+  "nb_profiled_rows": 28983,
+  "nb_columns": 29,
+  "columns": [
+    {
+      "name": ":id",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 28983
+    },
+    {
+      "name": ":version",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [],
+      "num_distinct_values": 28983
+    },
+    {
+      "name": ":created_at",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": ":updated_at",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 1
+    },
+    {
+      "name": "segmentid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 24097,
+      "mean": 1026547.8885208571,
+      "stddev": 2641539.0677980864,
+      "coverage": [
+        {
+          "range": {
+            "gte": 18075.0,
+            "lte": 162715.0
+          }
+        },
+        {
+          "range": {
+            "gte": 177828.0,
+            "lte": 345625.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "bikeid",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [
+        "http://schema.org/identifier"
+      ],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5378,
+      "mean": 3343.167926025601,
+      "stddev": 2529.0813891618964,
+      "coverage": [
+        {
+          "range": {
+            "gte": 76.0,
+            "lte": 1981.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2155.0,
+            "lte": 4554.0
+          }
+        },
+        {
+          "range": {
+            "gte": 6074.0,
+            "lte": 8142.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "prevbikeid",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.05551530207362937,
+      "num_distinct_values": 761
+    },
+    {
+      "name": "status",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "boro",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 5,
+      "mean": 2.609150191491564,
+      "stddev": 1.2512210283017706,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 2.0
+          }
+        },
+        {
+          "range": {
+            "gte": 3.0,
+            "lte": 3.0
+          }
+        },
+        {
+          "range": {
+            "gte": 4.0,
+            "lte": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "street",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1572
+    },
+    {
+      "name": "fromstreet",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1991
+    },
+    {
+      "name": "tostreet",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 1997
+    },
+    {
+      "name": "onoffst",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 2
+    },
+    {
+      "name": "facilitycl",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 4
+    },
+    {
+      "name": "allclasses",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 15
+    },
+    {
+      "name": "bikedir",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "num_distinct_values": 3
+    },
+    {
+      "name": "lanecount",
+      "structural_type": "http://schema.org/Integer",
+      "semantic_types": [],
+      "unclean_values_ratio": 0.0,
+      "num_distinct_values": 4,
+      "mean": 1.4692405893109755,
+      "stddev": 0.5379157411337692,
+      "coverage": [
+        {
+          "range": {
+            "gte": 1.0,
+            "lte": 1.0
+          }
+        },
+        {
+          "range": {
+            "gte": 2.0,
+            "lte": 2.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "ft_facilit",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.24483317806990304,
+      "num_distinct_values": 14
+    },
+    {
+      "name": "tf_facilit",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.2516647690025187,
+      "num_distinct_values": 15
+    },
+    {
+      "name": "ft2facilit",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.9979643239140186,
+      "num_distinct_values": 5
+    },
+    {
+      "name": "tf2facilit",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.9974812821309044,
+      "num_distinct_values": 6
+    },
+    {
+      "name": "instdate",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "num_distinct_values": 741
+    },
+    {
+      "name": "ret_date",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration",
+        "http://schema.org/DateTime"
+      ],
+      "missing_values_ratio": 0.8215160611392885,
+      "num_distinct_values": 292
+    },
+    {
+      "name": "grnwy",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.7835282751958045,
+      "num_distinct_values": 1
+    },
+    {
+      "name": "gwsystem",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.818169271641997,
+      "num_distinct_values": 16
+    },
+    {
+      "name": "gwsys2",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.9981023358520512,
+      "num_distinct_values": 4
+    },
+    {
+      "name": "spur",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.8182382776110133,
+      "num_distinct_values": 36
+    },
+    {
+      "name": "gwyjuris",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Enumeration"
+      ],
+      "missing_values_ratio": 0.7835627781803126,
+      "num_distinct_values": 14
+    },
+    {
+      "name": "geometry",
+      "structural_type": "http://schema.org/Text",
+      "semantic_types": [
+        "http://schema.org/Text"
+      ]
+    }
+  ],
+  "nb_temporal_columns": 4,
+  "nb_categorical_columns": 18,
+  "nb_numerical_columns": 4,
+  "types": [
+    "categorical",
+    "numerical",
+    "temporal"
+  ],
+  "temporal_coverage": [
+    {
+      "type": "datetime",
+      "column_names": [
+        ":created_at"
+      ],
+      "column_indexes": [
+        2
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1755531904.0,
+            "lte": 1755531904.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        ":updated_at"
+      ],
+      "column_indexes": [
+        3
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1755531904.0,
+            "lte": 1755531904.0
+          }
+        }
+      ],
+      "temporal_resolution": "second"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "instdate"
+      ],
+      "column_indexes": [
+        21
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 946684800.0,
+            "lte": 1701993600.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    },
+    {
+      "type": "datetime",
+      "column_names": [
+        "ret_date"
+      ],
+      "column_indexes": [
+        22
+      ],
+      "column_types": [
+        "http://schema.org/DateTime"
+      ],
+      "ranges": [
+        {
+          "range": {
+            "gte": 1242950400.0,
+            "lte": 1514592000.0
+          }
+        },
+        {
+          "range": {
+            "gte": 1535673600.0,
+            "lte": 1733097600.0
+          }
+        }
+      ],
+      "temporal_resolution": "day"
+    }
+  ],
+  "attribute_keywords": [
+    ":id",
+    "id",
+    ":version",
+    "version",
+    ":created_at",
+    "created",
+    "at",
+    ":updated_at",
+    "updated",
+    "at",
+    "segmentid",
+    "bikeid",
+    "prevbikeid",
+    "status",
+    "boro",
+    "street",
+    "fromstreet",
+    "tostreet",
+    "onoffst",
+    "facilitycl",
+    "allclasses",
+    "bikedir",
+    "lanecount",
+    "ft_facilit",
+    "ft",
+    "facilit",
+    "tf_facilit",
+    "tf",
+    "facilit",
+    "ft2facilit",
+    "ft",
+    "2",
+    "facilit",
+    "tf2facilit",
+    "tf",
+    "2",
+    "facilit",
+    "instdate",
+    "ret_date",
+    "ret",
+    "date",
+    "grnwy",
+    "gwsystem",
+    "gwsys2",
+    "gwsys",
+    "2",
+    "spur",
+    "gwyjuris",
+    "geometry"
+  ],
+  "sample": ":id,:version,:created_at,:updated_at,segmentid,bikeid,prevbikeid,status,boro,street,fromstreet,tostreet,onoffst,facilitycl,allclasses,bikedir,lanecount,ft_facilit,tf_facilit,ft2facilit,tf2facilit,instdate,ret_date,grnwy,gwsystem,gwsys2,spur,gwyjuris,geometry\r\nrow-mtqk.tatm-j9g7,rv-b8ru-qkrz~nzsg,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,15732.0,2039.0,NA,Current,5,FRONT ST,MURRAY HULBERT AV,THOMPSON ST,ON,II,II,2,2,Conventional,Conventional,,,2014-09-15 00:00:00,,Greenway,Staten Island Waterfront,,Main Alignment,NYCDOT,\"MULTILINESTRING ((-74.07467 40.629809, -74.074571 40.629265))\"\r\nrow-3vp8_6xzd~347q,rv-tsp3-ij3e-c4r2,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,34874.0,1545.0,NA,Current,3,WYTHE AV,N 14 ST,DIVISION AV,ON,II,II,R,1,Conventional,,,,2008-08-19 00:00:00,,,,,,,\"MULTILINESTRING ((-73.963392 40.716765, -73.963852 40.716339))\"\r\nrow-hwbq-xgee.unrr,rv-d7zw.7sv8-nins,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,49307.0,1806.0,NA,Current,4,COOPER AV,66 ST,73 PL,ON,III,III,2,2,Signed Route,Signed Route,,,2000-01-01 00:00:00,,Greenway,Central Queens,,Main Alignment,NYCDOT,\"MULTILINESTRING ((-73.884922 40.700104, -73.884316 40.700201))\"\r\nrow-x7gp~kzzk~q2b7,rv-3a2y_med7~mwn2,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,67680.0,2289.0,NA,Retired,4,31 AVE,VERNON BLVD,CRESCENT ST,ON,III,III,2,2,Shared,Shared,,,2016-10-14 00:00:00,2024-12-31 00:00:00,,,,,,\"MULTILINESTRING ((-73.928556 40.766714, -73.926438 40.765733))\"\r\nrow-ewg2-f54q-abv4,rv-73z2.89ck_7tca,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,107669.0,1863.0,NA,Retired,4,HORATIO PKWY,50 AV,CLOVERDALE BLVD,ON,II,II,2,2,Conventional,Conventional,,,2002-06-01 00:00:00,2017-12-20 00:00:00,Greenway,,,,NYCDOT,\"MULTILINESTRING ((-73.755573 40.758281, -73.755517 40.758321, -73.755391 40.758389, -73.755256 40.758442, -73.755116 40.758479,...\"\r\nrow-b9rh_gnhh_sju3,rv-jiih_j8g3.ck9r,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,127268.0,2810.0,NA,Current,1,MONROE ST,CATHERINE ST,MARKET ST,ON,II,II,R,1,Conventional,,,,2019-08-09 00:00:00,,,,,,,\"MULTILINESTRING ((-73.994265 40.711593, -73.993349 40.711677))\"\r\nrow-3e32_yw5f~ve3r,rv-mduc-fzqg.ercj,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,155985.0,7230.0,NA,Current,4,SEAGIRT BOULEVARD,BEACH 19 ST,HIGHLAND CT,ON,I,I,R,1,Protected,,,,2023-04-06 00:00:00,,,,,,,\"MULTILINESTRING ((-73.757899 40.595462, -73.758248 40.595526))\"\r\nrow-jwa7.aidh.4wyw,rv-jvh9-jiwa_f3xs,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,156098.0,1587.0,NA,Current,4,164 ST,GRND CNTRL PKWY SR N,HOR HARDING EXWY SR N,ON,II,II,R,1,Conventional,,,,2007-08-01 00:00:00,,,,,,,\"MULTILINESTRING ((-73.804737 40.738113, -73.804832 40.736777))\"\r\nrow-quhp~79ge.zv5b,rv-vydm_izub-jpvs,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,156856.0,2356.0,NA,Current,4,QUEENS BLVD,ELIOT AVE,YELLOWSTONE BLVD,ON,I,I,R,1,Protected,,,,2017-12-11 00:00:00,,,,,,,\"MULTILINESTRING ((-73.851908 40.725978, -73.851782 40.725908))\"\r\nrow-77bq~fh5h~725f,rv-s77y.ym57_mwws,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,161481.0,3026.0,NA,Current,3,17 AV PED OVPS,SHORE PKWY,SHORE PKWY GREENWAY,OFF,L,L,2,0,Link,Link,,,2018-10-09 00:00:00,,,,,,,\"MULTILINESTRING ((-74.011779 40.601629, -74.011645 40.601825))\"\r\nrow-f2gz_jjcp.qgta,rv-sa27_wj86.sfyd,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,196607.0,4461.0,1171,Current,3,FLUSHING AV,OXFORD ST,CUMBERLAND ST,OFF,I,\"III,I,I\",2,3,Protected,Protected,Shared,,2022-06-02 00:00:00,,Greenway,Brooklyn Waterfront,,Main Alignment,NYCDOT,\"MULTILINESTRING ((-73.975783 40.698048, -73.975193 40.698022))\"\r\nrow-ma44_d296~8app,rv-gtvn_k9bj-7abt,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,235128.0,3021.0,NA,Retired,4,CROSS BAY VET MEM BR,CROSS BAY BL,BEACH CHANNEL DR,OFF,L,L,2,0,Link,Link,,,1953-01-01 00:00:00,2022-10-10 00:00:00,Greenway,,,,MTA,\"MULTILINESTRING ((-73.820729 40.596795, -73.82075 40.596701, -73.820766 40.596607, -73.820778 40.596512, -73.820784 40.596416,...\"\r\nrow-8ge6~2g7b~k9v8,rv-pnvm-itgv-buhw,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,243595.0,331.0,NA,Retired,1,EAST RIVER ESPLANADE,E 13 ST,JOHN ST,OFF,I,I,2,2,Protected,Protected,,,1998-01-01 00:00:00,2016-07-01 00:00:00,Greenway,,,,DPR,\"MULTILINESTRING ((-74.001008 40.707078, -74.000994 40.707081, -74.000981 40.707084, -74.000968 40.707088, -74.000956 40.707093,...\"\r\nrow-bjzw_jyra~dwbs,rv-pmga-ccpr.wv9k,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,313088.0,381.0,NA,Current,1,GREENWICH ST,CANAL ST,CHRISTOPHER ST,ON,II,II,R,1,Conventional Buffered,,,,2008-04-01 00:00:00,,,,,,,\"MULTILINESTRING ((-74.009194 40.72541, -74.009107 40.725914))\"\r\nrow-9zne_x5vm_f8ib,rv-tnet_8pd2~uh5z,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,331987.0,758.0,NA,Retired,2,GRAND CONCOURSE,E 161 ST,VAN CORTLANDT AVE E,ON,II,II,L,1,,Conventional,,,2008-11-01 00:00:00,2021-08-05 00:00:00,,,,,,\"MULTILINESTRING ((-73.922468 40.827692, -73.922416 40.827785))\"\r\nrow-xh8q~ktbp.i2an,rv-quwr-eyvm~cima,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,343465.0,889.0,NA,Retired,2,WESTCHESTER AV,BRYANT AV,BRONX RIVER GREENWAY,ON,II,II,2,2,Curbside,Curbside,,,2013-09-06 00:00:00,2013-09-06 00:00:00,Greenway,,,,NYCDOT,\"MULTILINESTRING ((-73.88534 40.828048, -73.885026 40.828187))\"\r\nrow-i3bf.nevy_3i6b,rv-v4ay~vc46_dt3r,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,346596.0,6249.0,1147,Current,3,EAST DR,EAST DR,WEST DR,OFF,I,I,L,1,,Protected,,,2018-01-02 00:00:00,,Greenway,Historic Brooklyn,,Main Alignment,DPR,\"MULTILINESTRING ((-73.969112 40.671103, -73.969006 40.671044))\"\r\nrow-8g2k~jsh3.3u84,rv-rsv9_hjbz.knsd,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,10000049.0,7314.0,NA,Retired,1,PIKE SLIP,EAST RIVER ESPLANADE,SOUTH ST,ON,II,II,L,1,,Conventional,,,2004-06-01 00:00:00,2009-08-01 00:00:00,Greenway,Manhattan Waterfront,,Pike/Allen Malls,NYCDOT,\"MULTILINESTRING ((-73.991743 40.709619, -73.991737 40.709584))\"\r\nrow-5q98-gswx.smdt,rv-65hc-cruq_bg97,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,29684.0,7440.0,998,Current,3,BEDFORD AVE,ATLANTIC AV,HALSEY ST,ON,I,I,L,1,,Protected,,,2024-12-06 00:00:00,,,,,,,\"MULTILINESTRING ((-73.95337 40.680641, -73.953282 40.6802))\"\r\nrow-wtjc.v6fd-vx3p,rv-7xk9~3t67.up9z,2025-08-18 15:45:55.457000+00:00,2025-08-18 15:45:55.457000+00:00,33713.0,7494.0,NA,Current,1,10 AVENUE,WEST 38 STREET,WEST 40 STREET,ON,I,I,R,1,Protected,,,,2024-11-15 00:00:00,,,,,,,\"MULTILINESTRING ((-73.996635 40.758013, -73.996409 40.758339))\"\r\n"
+}
