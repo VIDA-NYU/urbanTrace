@@ -32,7 +32,7 @@ const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs, onCleanUp }
           justifyContent: 'space-between'
         }}>
             <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: '600', color: '#475569', textTransform: 'uppercase' }}>
-                Integration Topology
+                Integration Provenance
             </h3>
             {/* --- NEW: Grouped Badge and Clean Up Button --- */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

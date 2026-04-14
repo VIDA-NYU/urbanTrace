@@ -490,8 +490,8 @@ const ResultMapNode = memo(({ id, data }) => {
     <div style={{
       width: '100%',
       height: '100%',
-      minWidth: '240px',
-      minHeight: '240px',
+      minWidth: '540px',
+      minHeight: '540px',
       borderRadius: '8px',
       backgroundColor: '#fff', 
       border: isHighlighted ? `2px solid #0d9488` : `1px solid ${colorHex}`,
@@ -645,14 +645,14 @@ const ResultMapNode = memo(({ id, data }) => {
               <div style={{ fontWeight: 700, fontSize: '10px', color: '#991b1b' }}>
                 🎯 Hotspot Priority{tweakGoal ? ` · ${tweakGoal}` : ''}
               </div>
-              <button
+              {/* <button
                 className="nodrag"
                 onClick={() => setCardVisible(false)}
                 title="Dismiss"
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1, color: '#9ca3af', fontSize: '11px', fontWeight: 700 }}
               >
                 ✕
-              </button>
+              </button> */}
             </div>
             {(tweakAudits || hotspotAudit.variables).map((v, idx) => {
               const totalW = (tweakAudits || hotspotAudit.variables).reduce((s, a) => s + (a.weight || 0), 0) || 1;

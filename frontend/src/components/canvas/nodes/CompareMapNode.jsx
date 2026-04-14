@@ -282,8 +282,8 @@ const CompareMapNode = memo(({ id, data }) => {
     <div style={{
       width: '100%',
       height: '100%',
-      minWidth: '260px',
-      minHeight: '240px',
+      minWidth: '560px',
+      minHeight: '540px',
       borderRadius: '8px',
       backgroundColor: '#fff',
       border: '1px solid #4b5563',
@@ -379,7 +379,9 @@ const CompareMapNode = memo(({ id, data }) => {
                   {showDirectionIcons ? <Eye size={12} /> : <EyeOff size={12} />}
                 </button>
               </div>
-              <div style={{ marginBottom: '4px' }}><strong>{leftInput?.label || 'Map 1'}</strong> → <strong>{rightInput?.label || 'Map 2'}</strong></div>
+              {/* <div style={{ marginBottom: '4px' }}><strong>{leftInput?.label || 'Map 1'}</strong> → <strong>{rightInput?.label || 'Map 2'}</strong></div> */}
+              <div style={{ marginBottom: '4px' }}><strong>Compare how priority scores differ between the two maps. </strong></div>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
                 <ArrowUp size={10} color="#374151" /> Higher in Map 2
               </div>

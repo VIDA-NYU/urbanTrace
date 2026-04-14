@@ -519,7 +519,7 @@ const H3PreviewDeckGL = ({
         </div>
       )}
 
-      <button
+      {/* <button
         onClick={handleToggleMode}
         title={is3D ? "Switch to 2D Density Map" : "Switch to 3D Extruded Map"}
         style={{
@@ -532,7 +532,7 @@ const H3PreviewDeckGL = ({
       >
         <Layers size={14} />
         {is3D ? '3D' : '2D'}
-      </button>
+      </button> */}
     </div>
   );
 };
