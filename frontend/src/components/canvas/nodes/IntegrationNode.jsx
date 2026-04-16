@@ -424,7 +424,7 @@ const IntegrationNode = memo(({ id, data }) => {
       setCopilotState('success');
 
       // 4. AUTO-RUN THE PIPELINE with the newly generated configs
-      await executeIntegration(Object.values(nextConfigs, reasoningMap));
+      await executeIntegration(Object.values(nextConfigs), reasoningMap);
 
     } catch (error) {
       console.error('Copilot Error:', error);
