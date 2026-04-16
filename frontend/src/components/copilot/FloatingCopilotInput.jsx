@@ -7,6 +7,7 @@ import {
   Database,
   Lightbulb,
   Layers,
+  Loader2,
   Terminal,
   Trash2,
   X,
@@ -751,13 +752,15 @@ const FloatingCopilotInput = ({
           <button
             onClick={sendCopilotMessage}
             disabled={isSending || !chatInput.trim()}
+            title={isSending ? 'Searching datasets...' : 'Send message'}
             style={{
-              width: '34px',
+              gap: '6px',
+              width: isSending ? 'auto' : '34px',
               height: '34px',
-              padding: 0,
+              padding: isSending ? '0 10px' : 0,
               border: 'none',
               borderRadius: '999px',
-              backgroundColor: isSending ? '#94a3b8' : '#0f172a',
+              backgroundColor: isSending ? '#0ea5e9' : '#0f172a',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -766,11 +769,27 @@ const FloatingCopilotInput = ({
               flexShrink: 0,
               outline: 'none',
               lineHeight: 0,
+              transition: 'all 0.2s ease-in-out',
+              fontSize: '12px',
+              fontWeight: '500',
             }}
-            aria-label="Send message to Copilot"
+            aria-label={isSending ? 'Processing request' : 'Send message to Copilot'}
           >
-            <ArrowRight size={17} strokeWidth={2.6} color="#ffffff" style={{ display: 'block' }} />
+            {isSending ? (
+              <>
+                <Loader2 size={16} strokeWidth={2.4} style={{ animation: 'spin 0.8s linear infinite' }} />
+                <span>Searching…</span>
+              </>
+            ) : (
+              <ArrowRight size={17} strokeWidth={2.6} color="#ffffff" style={{ display: 'block' }} />
+            )}
           </button>
+          <style>{`
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
         </div>
       </div>
     </>
