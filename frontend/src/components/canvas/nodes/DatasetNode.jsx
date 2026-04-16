@@ -149,7 +149,7 @@ const DatasetNode = memo(({ id, data }) => {
         {/* Selector */}
         <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '11px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-               <Palette size={11} /> Color by
+               <Palette size={11} /> Column
             </label>
             <select 
                 value={selectedColumn} 

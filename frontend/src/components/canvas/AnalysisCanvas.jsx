@@ -234,7 +234,60 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
   const handleDeleteNode = useCallback((nodeId) => {
     setEdges(eds => eds.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
-    setNodes(nds => nds.filter(node => node.id !== nodeId));
+    setNodes(nds => {
+      const deletedNode = nds.find(node => node.id === nodeId);
+
+      return nds
+        .filter(node => node.id !== nodeId)
+        .map(node => {
+          if (!deletedNode || !node?.data) return node;
+
+          // Keep IntegrationNode in sync when a dataset node is deleted.
+          if (node.type === 'integrationNode' && deletedNode.type === 'datasetNode') {
+            const nextConnectedDatasets = Array.isArray(node.data.connectedDatasets)
+              ? node.data.connectedDatasets.filter(dataset => dataset.nodeId !== nodeId)
+              : [];
+
+            const nextData = {
+              ...node.data,
+              connectedDatasets: nextConnectedDatasets
+            };
+
+            const deletedFilename = deletedNode.data?.filename;
+            if (nextConnectedDatasets.length === 0) {
+              nextData.connectedDatasetFilename = null;
+              nextData.connectedDatasetMetadata = null;
+            }
+
+            if (deletedFilename && node.data.connectedZoneFilename === deletedFilename) {
+              nextData.connectedZoneFilename = null;
+              nextData.connectedZoneMetadata = null;
+            }
+
+            return {
+              ...node,
+              data: nextData
+            };
+          }
+
+          // Keep CompareMapNode in sync when a result map node is deleted.
+          if (node.type === 'compareMapNode' && deletedNode.type === 'resultMapNode') {
+            const nextConnectedResults = Array.isArray(node.data.connectedResults)
+              ? node.data.connectedResults.filter(result => result.nodeId !== nodeId)
+              : [];
+
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                connectedResults: nextConnectedResults
+              }
+            };
+          }
+
+          return node;
+        });
+    });
   }, []);
 
   const hydrateCompareNodes = useCallback((nodeList, edgeList) => {
