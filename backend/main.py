@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
@@ -264,10 +264,101 @@ class HotspotSynthesisRequest(BaseModel):
 # 3. DATASET MANAGEMENT ENDPOINTS
 # ==========================================
 
+def _bbox_intersects(a: tuple[float, float, float, float], b: tuple[float, float, float, float]) -> bool:
+    a_min_lng, a_min_lat, a_max_lng, a_max_lat = a
+    b_min_lng, b_min_lat, b_max_lng, b_max_lat = b
+    return not (
+        a_max_lng < b_min_lng
+        or a_min_lng > b_max_lng
+        or a_max_lat < b_min_lat
+        or a_min_lat > b_max_lat
+    )
+
+
+def _extract_dataset_bboxes(metadata: dict[str, Any] | None) -> list[tuple[float, float, float, float]]:
+    if not isinstance(metadata, dict):
+        return []
+
+    spatial_coverage = metadata.get("spatial_coverage")
+    if not isinstance(spatial_coverage, list):
+        return []
+
+    bboxes: list[tuple[float, float, float, float]] = []
+
+    for coverage in spatial_coverage:
+        ranges = coverage.get("ranges") if isinstance(coverage, dict) else None
+        if not isinstance(ranges, list):
+            continue
+
+        for range_item in ranges:
+            range_obj = range_item.get("range") if isinstance(range_item, dict) else None
+            coords = range_obj.get("coordinates") if isinstance(range_obj, dict) else None
+            if not isinstance(coords, list) or len(coords) < 2:
+                continue
+
+            pt_a, pt_b = coords[0], coords[1]
+            if (
+                not isinstance(pt_a, list)
+                or not isinstance(pt_b, list)
+                or len(pt_a) < 2
+                or len(pt_b) < 2
+            ):
+                continue
+
+            try:
+                lng1, lat1 = float(pt_a[0]), float(pt_a[1])
+                lng2, lat2 = float(pt_b[0]), float(pt_b[1])
+            except Exception:
+                continue
+
+            min_lng = min(lng1, lng2)
+            max_lng = max(lng1, lng2)
+            min_lat = min(lat1, lat2)
+            max_lat = max(lat1, lat2)
+            bboxes.append((min_lng, min_lat, max_lng, max_lat))
+
+    return bboxes
+
+
+def _dataset_intersects_query_bbox(
+    metadata: dict[str, Any] | None,
+    query_bbox: tuple[float, float, float, float] | None,
+) -> bool:
+    if query_bbox is None:
+        return True
+
+    dataset_bboxes = _extract_dataset_bboxes(metadata)
+    if not dataset_bboxes:
+        return False
+
+    return any(_bbox_intersects(ds_bbox, query_bbox) for ds_bbox in dataset_bboxes)
+
 @app.get("/datasets")
-async def list_datasets():
+async def list_datasets(
+    min_lng: float | None = Query(default=None),
+    min_lat: float | None = Query(default=None),
+    max_lng: float | None = Query(default=None),
+    max_lat: float | None = Query(default=None),
+):
     """Lists available datasets and their metadata for the frontend Node Library."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
+
+    bbox_values = [min_lng, min_lat, max_lng, max_lat]
+    has_bbox_filter = all(value is not None for value in bbox_values)
+    if any(value is not None for value in bbox_values) and not has_bbox_filter:
+        raise HTTPException(
+            status_code=400,
+            detail="To apply spatial filtering, min_lng, min_lat, max_lng, and max_lat are all required.",
+        )
+
+    query_bbox: tuple[float, float, float, float] | None = None
+    if has_bbox_filter:
+        query_bbox = (
+            min(float(min_lng), float(max_lng)),
+            min(float(min_lat), float(max_lat)),
+            max(float(min_lng), float(max_lng)),
+            max(float(min_lat), float(max_lat)),
+        )
     
     datasets = []
     
@@ -289,6 +380,9 @@ async def list_datasets():
             if os.path.exists(meta_path):
                 with open(meta_path, 'r') as meta_file:
                     dataset_info["metadata"] = json.load(meta_file)
+
+            if not _dataset_intersects_query_bbox(dataset_info["metadata"], query_bbox):
+                continue
             
             datasets.append(dataset_info)
             
