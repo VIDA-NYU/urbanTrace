@@ -9,6 +9,7 @@ import csv
 import io
 import re
 import asyncio
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -333,12 +334,112 @@ def _dataset_intersects_query_bbox(
 
     return any(_bbox_intersects(ds_bbox, query_bbox) for ds_bbox in dataset_bboxes)
 
+
+def _parse_timestamp_value(raw_value: Any) -> float | None:
+    if raw_value is None:
+        return None
+
+    if isinstance(raw_value, (int, float)):
+        return float(raw_value)
+
+    if isinstance(raw_value, str):
+        value = raw_value.strip()
+        if not value:
+            return None
+
+        try:
+            return float(value)
+        except Exception:
+            pass
+
+        iso_value = value.replace("Z", "+00:00")
+        try:
+            parsed = datetime.fromisoformat(iso_value)
+        except Exception:
+            return None
+
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.timestamp()
+
+    return None
+
+
+def _extract_dataset_time_ranges(metadata: dict[str, Any] | None) -> list[tuple[float, float]]:
+    if not isinstance(metadata, dict):
+        return []
+
+    temporal_coverage = metadata.get("temporal_coverage")
+    if not isinstance(temporal_coverage, list):
+        return []
+
+    ranges: list[tuple[float, float]] = []
+
+    for coverage in temporal_coverage:
+        coverage_ranges = coverage.get("ranges") if isinstance(coverage, dict) else None
+        if not isinstance(coverage_ranges, list):
+            continue
+
+        for item in coverage_ranges:
+            range_obj = item.get("range") if isinstance(item, dict) else None
+            if not isinstance(range_obj, dict):
+                continue
+
+            start_raw = range_obj.get("gte")
+            end_raw = range_obj.get("lte")
+            start_value = _parse_timestamp_value(start_raw)
+            end_value = _parse_timestamp_value(end_raw)
+
+            if start_value is None or end_value is None:
+                continue
+
+            ranges.append((min(start_value, end_value), max(start_value, end_value)))
+
+    return ranges
+
+
+def _dataset_intersects_query_time(
+    metadata: dict[str, Any] | None,
+    query_time_range: tuple[float, float] | None,
+) -> bool:
+    if query_time_range is None:
+        return True
+
+    dataset_ranges = _extract_dataset_time_ranges(metadata)
+    if not dataset_ranges:
+        return False
+
+    query_start, query_end = query_time_range
+    for dataset_start, dataset_end in dataset_ranges:
+        overlaps = not (dataset_end < query_start or dataset_start > query_end)
+        if overlaps:
+            return True
+
+    return False
+
+
+def _parse_date_query_param(value: str, *, end_of_day: bool = False) -> float:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {value}. Use YYYY-MM-DD.") from exc
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    timestamp = parsed.timestamp()
+    if end_of_day and "T" not in value:
+        timestamp += 86399.999
+    return timestamp
+
 @app.get("/datasets")
 async def list_datasets(
     min_lng: float | None = Query(default=None),
     min_lat: float | None = Query(default=None),
     max_lng: float | None = Query(default=None),
     max_lat: float | None = Query(default=None),
+    start_date: str | None = Query(default=None),
+    end_date: str | None = Query(default=None),
 ):
     """Lists available datasets and their metadata for the frontend Node Library."""
     geojson_dir = os.path.join(DATA_DIR, "geojson")
@@ -359,6 +460,20 @@ async def list_datasets(
             max(float(min_lng), float(max_lng)),
             max(float(min_lat), float(max_lat)),
         )
+
+    has_start_date = start_date is not None and start_date.strip() != ""
+    has_end_date = end_date is not None and end_date.strip() != ""
+    if has_start_date != has_end_date:
+        raise HTTPException(
+            status_code=400,
+            detail="To apply temporal filtering, both start_date and end_date are required.",
+        )
+
+    query_time_range: tuple[float, float] | None = None
+    if has_start_date and has_end_date:
+        start_ts = _parse_date_query_param(start_date.strip(), end_of_day=False)
+        end_ts = _parse_date_query_param(end_date.strip(), end_of_day=True)
+        query_time_range = (min(start_ts, end_ts), max(start_ts, end_ts))
     
     datasets = []
     
@@ -382,6 +497,8 @@ async def list_datasets(
                     dataset_info["metadata"] = json.load(meta_file)
 
             if not _dataset_intersects_query_bbox(dataset_info["metadata"], query_bbox):
+                continue
+            if not _dataset_intersects_query_time(dataset_info["metadata"], query_time_range):
                 continue
             
             datasets.append(dataset_info)

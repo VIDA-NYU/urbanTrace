@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { MapPin, RefreshCw, Map, Search, X } from 'lucide-react';
+import { CalendarDays, MapPin, RefreshCw, Map, Search, X } from 'lucide-react';
 import DatasetCard from '../catalog/DatasetCard'; 
 
 const toBBoxPolygonFeature = (bbox) => {
@@ -35,6 +35,30 @@ const normalizeBBox = (a, b) => {
     maxLat: Math.max(a.lat, b.lat),
   };
 };
+
+const normalizeDateRange = (startDate, endDate) => {
+  if (!startDate || !endDate) return null;
+  if (startDate <= endDate) {
+    return { startDate, endDate };
+  }
+  return { startDate: endDate, endDate: startDate };
+};
+
+const toDateInputValue = (date) => date.toISOString().slice(0, 10);
+
+const dateDaysAgo = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return toDateInputValue(date);
+};
+
+const dateYearsAgo = (years) => {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - years);
+  return toDateInputValue(date);
+};
+
+const TODAY_DATE = toDateInputValue(new Date());
 
 const SpatialFilterMap = ({ draftBBox, onDraftBBoxChange }) => {
   const mapContainerRef = useRef(null);
@@ -252,21 +276,35 @@ const DatasetSidebar = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLocationFilterOpen, setIsLocationFilterOpen] = useState(false);
+  const [isTimeFilterOpen, setIsTimeFilterOpen] = useState(false);
   const [draftBBox, setDraftBBox] = useState(null);
   const [appliedBBox, setAppliedBBox] = useState(null);
+  const [draftTimeRange, setDraftTimeRange] = useState({ startDate: '', endDate: '' });
+  const [appliedTimeRange, setAppliedTimeRange] = useState(null);
 
-  const fetchDatasets = (bbox = null) => {
+  const fetchDatasets = ({ bbox = null, timeRange = null } = {}) => {
     setLoading(true);
-    const params = bbox
-      ? {
+    const params = {};
+
+    if (bbox) {
+      Object.assign(params, {
           min_lng: bbox.minLng,
           min_lat: bbox.minLat,
           max_lng: bbox.maxLng,
           max_lat: bbox.maxLat,
-        }
-      : undefined;
+        });
+    }
 
-    axios.get('http://localhost:8000/datasets', { params })
+    if (timeRange?.startDate && timeRange?.endDate) {
+      Object.assign(params, {
+        start_date: timeRange.startDate,
+        end_date: timeRange.endDate,
+      });
+    }
+
+    const requestParams = Object.keys(params).length > 0 ? params : undefined;
+
+    axios.get('http://localhost:8000/datasets', { params: requestParams })
       .then(res => {
         setDatasets(res.data.datasets);
         setLoading(false);
@@ -278,12 +316,21 @@ const DatasetSidebar = () => {
   };
 
   useEffect(() => {
-    fetchDatasets();
+    fetchDatasets({ bbox: null, timeRange: null });
   }, []);
 
   useEffect(() => {
     setDraftBBox(appliedBBox);
   }, [appliedBBox]);
+
+  useEffect(() => {
+    if (!appliedTimeRange) {
+      setDraftTimeRange({ startDate: '', endDate: '' });
+      return;
+    }
+
+    setDraftTimeRange(appliedTimeRange);
+  }, [appliedTimeRange]);
 
   const handleDragStart = (event, dataset) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(dataset));
@@ -297,13 +344,56 @@ const DatasetSidebar = () => {
   const applyLocationFilter = () => {
     if (!draftBBox) return;
     setAppliedBBox(draftBBox);
-    fetchDatasets(draftBBox);
+    fetchDatasets({ bbox: draftBBox, timeRange: appliedTimeRange });
   };
 
   const clearLocationFilter = () => {
     setDraftBBox(null);
     setAppliedBBox(null);
-    fetchDatasets(null);
+    fetchDatasets({ bbox: null, timeRange: appliedTimeRange });
+  };
+
+  const applyTimeFilter = () => {
+    const normalizedRange = normalizeDateRange(draftTimeRange.startDate, draftTimeRange.endDate);
+    if (!normalizedRange) return;
+
+    setAppliedTimeRange(normalizedRange);
+    setDraftTimeRange(normalizedRange);
+    fetchDatasets({ bbox: appliedBBox, timeRange: normalizedRange });
+  };
+
+  const clearTimeFilter = () => {
+    setDraftTimeRange({ startDate: '', endDate: '' });
+    setAppliedTimeRange(null);
+    fetchDatasets({ bbox: appliedBBox, timeRange: null });
+  };
+
+  const resetTimeDraft = () => {
+    setDraftTimeRange(appliedTimeRange || { startDate: '', endDate: '' });
+  };
+
+  const applyPresetRange = (preset) => {
+    if (preset === 'all') {
+      clearTimeFilter();
+      return;
+    }
+
+    let nextRange = null;
+    if (preset === 'last7') {
+      nextRange = { startDate: dateDaysAgo(7), endDate: TODAY_DATE };
+    } else if (preset === 'lastMonth') {
+      nextRange = { startDate: dateDaysAgo(30), endDate: TODAY_DATE };
+    } else if (preset === 'lastYear') {
+      nextRange = { startDate: dateYearsAgo(1), endDate: TODAY_DATE };
+    } else if (preset === 'last5Years') {
+      nextRange = { startDate: dateYearsAgo(5), endDate: TODAY_DATE };
+    }
+
+    if (!nextRange) return;
+
+    setDraftTimeRange(nextRange);
+    setAppliedTimeRange(nextRange);
+    fetchDatasets({ bbox: appliedBBox, timeRange: nextRange });
   };
 
   const bboxLabel = useMemo(() => {
@@ -311,6 +401,11 @@ const DatasetSidebar = () => {
     const { minLng, minLat, maxLng, maxLat } = appliedBBox;
     return `${minLat.toFixed(3)}, ${minLng.toFixed(3)} → ${maxLat.toFixed(3)}, ${maxLng.toFixed(3)}`;
   }, [appliedBBox]);
+
+  const timeRangeLabel = useMemo(() => {
+    if (!appliedTimeRange) return '';
+    return `${appliedTimeRange.startDate} → ${appliedTimeRange.endDate}`;
+  }, [appliedTimeRange]);
 
   const filteredDatasets = datasets.filter(ds => {
     const name = ds.metadata?.name || ds.name || "";
@@ -333,7 +428,7 @@ const DatasetSidebar = () => {
             <Map size={24} color="#2563eb" /> UrbanTrace
           </h2>
           <button 
-            onClick={fetchDatasets} 
+            onClick={() => fetchDatasets({ bbox: appliedBBox, timeRange: appliedTimeRange })}
             title="Refresh Library"
             style={{ 
               background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
@@ -501,6 +596,148 @@ const DatasetSidebar = () => {
               </div>
             </div>
           )}
+
+          <button
+            onClick={() => setIsTimeFilterOpen((prev) => !prev)}
+            style={{
+              width: '100%',
+              border: '1px solid #d1fae5',
+              background: '#ecfdf5',
+              color: '#047857',
+              borderRadius: '6px',
+              padding: '8px 10px',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+            }}
+          >
+            <CalendarDays size={14} />
+            {isTimeFilterOpen ? 'Hide Time Filter' : 'Filter by Time'}
+          </button>
+
+          {appliedTimeRange && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                border: '1px solid #a7f3d0',
+                background: '#ecfdf5',
+                color: '#065f46',
+                borderRadius: '999px',
+                padding: '5px 10px',
+                fontSize: '11px',
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Time filter active · {timeRangeLabel}
+              </span>
+              <button
+                onClick={clearTimeFilter}
+                title="Clear time filter"
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#065f46',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {isTimeFilterOpen && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                border: '1px solid #d1fae5',
+                borderRadius: '8px',
+                padding: '10px',
+                background: '#f0fdf4',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ flex: 1, minWidth: '110px'}}>
+                  <label style={{ display: 'block', fontSize: '11px', color: '#065f46', marginBottom: '4px', fontWeight: 600 }}>
+                    Start date
+                  </label>
+                  <input
+                    type="date"
+                    value={draftTimeRange.startDate}
+                    onChange={(e) => setDraftTimeRange((prev) => ({ ...prev, startDate: e.target.value }))}
+                    style={{ width: '100%',  boxSizing: 'border-box', border: '1px solid #a7f3d0', borderRadius: '6px', padding: '6px 8px', fontSize: '12px', color: '#065f46', background: '#fff' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '11px', color: '#065f46', marginBottom: '4px', fontWeight: 600 }}>
+                    End date
+                  </label>
+                  <input
+                    type="date"
+                    value={draftTimeRange.endDate}
+                    onChange={(e) => setDraftTimeRange((prev) => ({ ...prev, endDate: e.target.value }))}
+                    style={{ width: '100%',  boxSizing: 'border-box', border: '1px solid #a7f3d0', borderRadius: '6px', padding: '6px 8px', fontSize: '12px', color: '#065f46', background: '#fff' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <button onClick={() => applyPresetRange('last7')} style={{ border: '1px solid #a7f3d0', background: '#fff', color: '#065f46', borderRadius: '999px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}>Last 7 days</button>
+                <button onClick={() => applyPresetRange('lastMonth')} style={{ border: '1px solid #a7f3d0', background: '#fff', color: '#065f46', borderRadius: '999px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}>Last month</button>
+                <button onClick={() => applyPresetRange('lastYear')} style={{ border: '1px solid #a7f3d0', background: '#fff', color: '#065f46', borderRadius: '999px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}>Last year</button>
+                <button onClick={() => applyPresetRange('last5Years')} style={{ border: '1px solid #a7f3d0', background: '#fff', color: '#065f46', borderRadius: '999px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}>Last 5 years</button>
+                <button onClick={() => applyPresetRange('all')} style={{ border: '1px solid #a7f3d0', background: '#fff', color: '#065f46', borderRadius: '999px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}>All time</button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={applyTimeFilter}
+                  disabled={!draftTimeRange.startDate || !draftTimeRange.endDate || loading}
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px',
+                    background: !draftTimeRange.startDate || !draftTimeRange.endDate || loading ? '#a7f3d0' : '#059669',
+                    color: '#fff',
+                    cursor: !draftTimeRange.startDate || !draftTimeRange.endDate || loading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Apply time filter
+                </button>
+                <button
+                  onClick={resetTimeDraft}
+                  disabled={loading}
+                  style={{
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    background: '#fff',
+                    color: '#065f46',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -510,7 +747,7 @@ const DatasetSidebar = () => {
         
         {!loading && filteredDatasets.length === 0 && (
           <div style={{ textAlign: 'center', color: '#9ca3af', marginTop: '20px', fontSize: '0.9rem' }}>
-            {searchTerm ? 'No matching datasets' : 'No datasets found'}
+            {searchTerm || appliedBBox || appliedTimeRange ? 'No datasets match current filters' : 'No datasets found'}
           </div>
         )}
 
