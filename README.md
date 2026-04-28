@@ -77,18 +77,9 @@ urbanTrace/
 ### Backend
 ```bash
 cd backend
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
-pip install fastapi uvicorn python-dotenv
-uvicorn main:app --reload --port 8000
-```
-
-Additional backend dependencies used by UrbanTrace (profiling, uploads, and spatial I/O):
-
-```bash
-# (inside the activated virtualenv)
-pip install python-multipart geopandas pandas datamart-profiler
-# then run the app
+pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 

@@ -1,7 +1,20 @@
-h3
-geopandas
+# Core backend
 fastapi
 uvicorn
-portkey-ai
-openai
 python-dotenv
+python-multipart
+
+# Geo stack
+geopandas
+shapely
+h3
+pandas
+numpy
+
+# Profiling
+datamart-profiler
+
+# LLM / external APIs
+# openai
+# portkey-ai
+# pydantic
