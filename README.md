@@ -83,6 +83,15 @@ pip install fastapi uvicorn python-dotenv
 uvicorn main:app --reload --port 8000
 ```
 
+Additional backend dependencies used by UrbanTrace (profiling, uploads, and spatial I/O):
+
+```bash
+# (inside the activated virtualenv)
+pip install python-multipart geopandas pandas datamart-profiler
+# then run the app
+uvicorn main:app --reload --port 8000
+```
+
 Optional for LLM-backed copilot recommendations:
 ```bash
 cp .env.example .env
