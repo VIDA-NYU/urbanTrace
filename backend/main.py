@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import geopandas as gpd
+import pandas as pd
 import json
 import os
 import csv
@@ -264,6 +265,8 @@ class HotspotSynthesisRequest(BaseModel):
 # 3. DATASET MANAGEMENT ENDPOINTS
 # ==========================================
 
+from upload_new_data import process_uploaded_geojson
+
 @app.get("/datasets")
 async def list_datasets():
     """Lists available datasets and their metadata for the frontend Node Library."""
@@ -293,6 +296,21 @@ async def list_datasets():
             datasets.append(dataset_info)
             
     return {"datasets": datasets}
+
+
+@app.post("/datasets/upload")
+async def upload_geojson(file: UploadFile = File(...)):
+    """
+    Upload a .geojson file with full metadata generation pipeline:
+    1. Save GeoJSON to /data/geojson
+    2. Compute geometricType
+    3. Profile dataset (columns, statistics, spatial coverage)
+    4. Generate enriched metadata
+    5. Save metadata to /data/metadata
+    """
+    # Delegate processing to upload_new_data module (profiles + saves metadata)
+    result = await process_uploaded_geojson(file, DATA_DIR)
+    return result
 
 @app.get("/dataset/{filename}")
 async def get_geojson(filename: str, simplify: bool = False):
