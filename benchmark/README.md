@@ -6,6 +6,8 @@ Dataset discovery is the first and most open-ended step in UrbanTrace. This benc
 
 The benchmark is designed as a controlled ablation over the dataset context shown to the agent at inference time. The central question is whether richer metadata grounding helps the agent map a high-level planning or policy objective to the right local data layers.
 
+The earlier `No profile` setting did not provide a clean test of removing the profiler, because AutoDDG-generated descriptions can already contain information derived from dataset profiles. We therefore add a **Source description only** condition that uses the original NYC OpenData page descriptions — authored without profiles — so the benefit of profiling can be assessed directly. The runner keeps AutoDDG/profile-derived descriptions and source catalog descriptions as separate evidence channels: the `Source description only` condition reads from a dedicated CSV of source-authored descriptions and includes no explicit profile fields such as geometry type, column types, semantic labels, value ranges, or column counts.
+
 ## Benchmark Tasks and Data Lake Scope
 
 The benchmark contains **28 real-world urban research scenarios** built over a curated NYC OpenData lake of **112 profiled geospatial datasets**. Each case consists of:
@@ -28,16 +30,17 @@ Detailed task rationales, gold mappings, and references are maintained in [`benc
 
 ## Ablation Conditions
 
-For each benchmark task, the discovery agent receives the task prompt together with an ablation-specific view of the local dataset catalog and returns a set of recommended dataset identifiers.
+For each benchmark task, the discovery agent receives the task prompt together with an ablation-specific view of the local dataset catalog and returns a set of recommended dataset identifiers. We evaluate **five conditions**. Dataset names are included in every condition because the benchmark requires a reference handle for the agent to identify and return candidate datasets.
 
-| Condition | Context shown to the agent |
-| --- | --- |
-| `name_only` | Dataset identifiers / names only |
-| `no_profile` | Names plus dataset descriptions |
-| `no_description` | Names plus structured profile metadata |
-| `full` | Names, descriptions, and structured profile metadata |
+| Condition | Runner id | Context shown to the agent |
+| --- | --- | --- |
+| **Name only** | `name_only` | Dataset names only |
+| **Source description only** | `no_profile` | Names plus original NYC OpenData source descriptions, with blanks where no source description exists |
+| **Profile only** | `no_description` | Names plus explicit profile metadata (geometry type, column types, semantic labels, value ranges, column counts), without descriptions |
+| **AutoDDG description only** | `profiled_description` | Names plus AutoDDG descriptions derived from profiles, with no explicit profile metadata at inference time |
+| **Full** | `full` | Names, AutoDDG profile-derived descriptions, and explicit profile metadata (no original source description) |
 
-This isolates the contribution of lexical names, structured profiles, and dataset-level semantic descriptions to urban dataset discovery.
+This comparison isolates the contribution of lexical names, source-authored descriptions, structured profiles, and profile-derived semantic descriptions to urban dataset discovery. **Source description only** provides a clean test of removing the profiler: the original NYC OpenData descriptions are authored without profiles, so contrasting them with **AutoDDG description only** (profile-derived) directly measures the profiler's contribution. The comparison between **AutoDDG description only** and **Full** estimates the additional value of also providing profiles explicitly.
 
 ## Evaluation Protocol
 
@@ -52,23 +55,16 @@ Predictions are scored against the manually validated gold dataset set using **p
 
 ## Main Results
 
-The paper reports strong performance for the full discovery configuration across both model families:
+Both **Full** and **AutoDDG description only** achieve strong retrieval performance across models. The largest gains come from profile-derived AutoDDG descriptions: contrasting the source-authored descriptions with AutoDDG descriptions isolates the profiler's contribution.
 
-- **Gemini 3 Pro**: precision `0.779`, recall `0.569`, F1 `0.648`
-- **GPT-5 mini**: precision `0.693`, recall `0.596`, F1 `0.632`
+- **Gemini 3 Pro**: F1 rises from `0.426` (**Source description only**) to `0.654` (**AutoDDG description only**)
+- **GPT-5 mini**: F1 rises from `0.403` to `0.651`
 
-The main ablation finding is that **dataset descriptions are the dominant source of retrieval gain**. Removing descriptions causes large drops in F1:
-
-- **Gemini 3 Pro**: `0.648 -> 0.424`
-- **GPT-5 mini**: `0.632 -> 0.365`
-
-At the other extreme, the **`name_only`** condition performs near zero across metrics, showing that realistic urban dataset discovery cannot be solved from dataset names alone.
-
-Removing explicit profile context changes performance far less than removing descriptions, which is consistent with the paper's interpretation that much of the useful profile signal has already been distilled into the descriptions shown at inference time.
+This shows that the profiler contributes substantial value when its structured profiles are used by AutoDDG to generate richer dataset descriptions. Explicit profiles alone (**Profile only**) also improve substantially over **Name only**, but do not match the performance of profile-derived natural-language descriptions. Adding explicit profiles on top of AutoDDG descriptions (**Full**) does not consistently improve over **AutoDDG description only**, suggesting partial redundancy between the generated descriptions and the structured profile metadata. At the other extreme, **Name only** performs near zero across all metrics, confirming that dataset names alone provide almost no useful signal for realistic urban data discovery.
 
 ![Dataset discovery ablation barplots](./results/ablation1_results.png)
 
-The result barplots are stored under [`benchmark/results/`](./results/), with the current checked-in figure at [`benchmark/results/ablation1_results.png`](./results/ablation1_results.png).
+The result barplots are stored under [`benchmark/results/`](./results/). The checked-in figure at [`benchmark/results/ablation1_results.png`](./results/ablation1_results.png) is regenerated from the result CSVs by [`benchmark/scripts/visualize_results.ipynb`](./scripts/visualize_results.ipynb) across the five conditions above.
 
 
 ## Reproducing the Benchmark
@@ -83,7 +79,26 @@ pip install -r backend/requirements.txt
 
 The runner loads `backend/.env` first and then `.env`. Configure the backend model provider as needed, including `LLM_PROVIDER` and the matching credential/model variables for either Portkey or OpenAI.
 
-To reproduce the paper-style ablation, run all four conditions with five repeated trials per case and write to a fresh output path:
+Before running the **Source description only** condition (`no_profile`), create the source-description file, by default:
+
+```text
+data/descriptions_profile_free.csv
+```
+
+It should contain `dataset`, `description`, and `dataset_raw` columns. Descriptions should be copied from the original NYC OpenData page metadata where available. For source pages whose metadata has no accessible description, the scraper can use conservative OSCUR Hugging Face dataset-card fallbacks; rows without a clear fallback keep `description` empty.
+
+The repository includes a scraper for this file. It reads raw Socrata IDs from `data/geojson_raw`, fetches `https://data.cityofnewyork.us/api/views/{dataset_raw_id}.json`, copies only the API `description` field, and fills selected blanks from `https://huggingface.co/oscur/datasets` when there is a clear matching OSCUR dataset. It then writes the CSV expected by the benchmark:
+
+```bash
+python3 benchmark/scripts/scrape_nyc_opendata_descriptions.py \
+  --geojson-dir data/geojson_raw \
+  --output data/descriptions_profile_free.csv
+```
+
+HTTP 403/404 responses and missing `description` fields are written as blank descriptions.
+Use `--no-hf-fallback` to keep strictly to NYC OpenData metadata and leave all missing source descriptions blank.
+
+To reproduce the revised ablation, run all canonical conditions with five repeated trials per case and write to a fresh output path:
 
 ```bash
 python3 benchmark/scripts/run_dataset_discovery_benchmark.py \
@@ -103,7 +118,7 @@ python3 benchmark/scripts/run_dataset_discovery_benchmark.py \
 
 The runner appends to the target CSV, so use a new `--output` path for clean benchmark runs. Each row records the case, ablation, run index, predicted dataset IDs, and the resulting precision/recall/F1 scores.
 
-For smaller debugging runs, the runner also supports `--max-cases`, `--start-from`, and single-ablation execution via `--ablation`.
+For smaller debugging runs, the runner also supports `--max-cases`, `--start-from`, and single-ablation execution via `--ablation`. Each condition accepts a paper-aligned alias in addition to its runner id: `name_only`, `source_description_only` (= `no_profile`, also `no_profiler`), `profile_only` (= `no_description`), `autoddg_description_only` (= `profiled_description`), and `full`.
 
 ## Benchmark Assets
 

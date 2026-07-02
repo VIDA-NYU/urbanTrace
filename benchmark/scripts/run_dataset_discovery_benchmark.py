@@ -59,13 +59,27 @@ def _load_datalake(repo_root: Path) -> list[dict[str, Any]]:
             }
         )
     return nodes
-def _load_descriptions_raw(repo_root: Path) -> tuple[dict[str, str], dict[str, str]]:
-    """Load data/descriptions_raw.csv and return (descriptions_by_stem, rawid_to_stem).
 
-    descriptions_by_stem: dataset_stem -> description
-    rawid_to_stem: raw_dataset_id (no extension) -> dataset_stem
+
+def _normalize_dataset_id(name: str) -> str:
+    dataset_id = name.strip()
+    for suffix in (".geojson", ".json"):
+        if dataset_id.endswith(suffix):
+            return dataset_id[: -len(suffix)].strip()
+    return dataset_id
+
+
+def _load_description_csv(desc_path: Path) -> tuple[dict[str, str], dict[str, str]]:
+    """Load a description CSV and return (descriptions_by_id, rawid_to_stem).
+
+    Expected columns:
+      - dataset: canonical dataset id/name, with or without .geojson
+      - description: dataset-level text
+      - dataset_raw: optional raw/provider id, with or without .geojson
+
+    Descriptions are indexed by every available id so callers can use either the
+    raw Socrata id used by data/geojson_raw or the canonical UrbanTrace stem.
     """
-    desc_path = repo_root / "data" / "descriptions_raw.csv"
     descriptions: dict[str, str] = {}
     rawmap: dict[str, str] = {}
     if not desc_path.exists():
@@ -74,29 +88,42 @@ def _load_descriptions_raw(repo_root: Path) -> tuple[dict[str, str], dict[str, s
     with desc_path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            raw_id_field = (row.get("dataset_raw") or "").strip()
-            if raw_id_field.endswith(".geojson"):
-                raw_id_field = raw_id_field[:-len(".geojson")]
-            raw_id_field = raw_id_field.strip()
-
-            raw_dataset_field = (row.get("dataset") or "").strip()
-
             description = (row.get("description") or "").strip()
-            if raw_id_field:
-                descriptions[raw_id_field] = description
-            
-            # normalize stem from 'dataset' column (may include .geojson)
-            stem = raw_dataset_field
-            if stem.endswith(".geojson"):
-                stem = stem[:-len(".geojson")]
-            stem = stem.strip()
+            if not description:
+                continue
 
-            # map raw socrata id / provider id to stem using dataset_raw column
-            if raw_id_field and stem:
-                rawmap[raw_id_field] = stem
-            
+            stem = _normalize_dataset_id(row.get("dataset") or "")
+            raw_id = _normalize_dataset_id(row.get("dataset_raw") or "")
+
+            if stem:
+                descriptions[stem] = description
+            if raw_id:
+                descriptions[raw_id] = description
+            if raw_id and stem:
+                rawmap[raw_id] = stem
 
     return descriptions, rawmap
+
+
+def _load_descriptions_raw(repo_root: Path) -> tuple[dict[str, str], dict[str, str]]:
+    return _load_description_csv(repo_root / "data" / "descriptions_raw.csv")
+
+
+def _lookup_description(
+    descriptions: dict[str, str],
+    dataset_id: str,
+    rawid_to_stem: dict[str, str] | None = None,
+) -> str:
+    description = descriptions.get(dataset_id, "")
+    if description:
+        return description
+
+    if rawid_to_stem:
+        stem = rawid_to_stem.get(dataset_id, "")
+        if stem:
+            return descriptions.get(stem, "")
+
+    return ""
 
 
 
@@ -111,6 +138,7 @@ def _build_context_for_ablation(
     nodes: list[dict[str, Any]],
     ablation: str,
     descriptions: dict[str, str],
+    rawid_to_stem: dict[str, str] | None = None,
 ) -> str:
     """
     Build the dataset catalog system-message string with ablation-controlled depth.
@@ -118,11 +146,12 @@ def _build_context_for_ablation(
       - each dataset entry is capped to its fair share of the token budget
       - ablation decides which metadata fields are included
 
-    Hierarchy (most → least information):
-      full           – description + per-column schema
-      no_description – per-column schema  (no text description)
-      no_profile     – description  (no column schema)
-      name_only      – dataset id only
+    Ablation contract (paper condition -> runner id):
+      Full                     -> full                 : AutoDDG (profile-derived) description + explicit profile metadata
+      Profile only             -> no_description       : explicit profile metadata only
+      AutoDDG description only  -> profiled_description : AutoDDG profile-derived description only
+      Source description only  -> no_profile           : source-authored (profile-free) description only
+      Name only                -> name_only            : dataset id only
 
     Token budget: (_TOKEN_LIMIT - _OVERHEAD_TOKENS) * _CHARS_PER_TOKEN / num_datasets
     """
@@ -140,17 +169,16 @@ def _build_context_for_ablation(
         data = node.get("data", {})
         dataset_id = data.get("id") or node.get("id", "")
         meta = data.get("metadata") or {}
-        description = descriptions.get(dataset_id, "")
+        description = _lookup_description(descriptions, dataset_id, rawid_to_stem)
 
         if ablation == "name_only":
             lines.append(f"- id={dataset_id}")
             continue
 
-        parts: list[str] = [
-            f"geometry={meta.get('geometricType', 'unknown')}",
-        ]
+        parts: list[str] = []
 
         if ablation in ("full", "no_description"):
+            parts.append(f"geometry={meta.get('geometricType', 'unknown')}")
             nb_columns = meta.get("nb_columns")
             if nb_columns is not None:
                 parts.append(f"nb_columns={nb_columns}")
@@ -173,8 +201,11 @@ def _build_context_for_ablation(
                 if col_summaries:
                     parts.append(f"columns=[{'; '.join(col_summaries)}]")
 
-        if ablation in ("full", "no_profile") and description:
+        if ablation in ("full", "no_profile", "profiled_description") and description:
             parts.append(f"description={description}")
+
+        if not parts:
+            parts.append("description=")
 
         entry = f"- id={dataset_id}: {'; '.join(parts)}"
         if len(entry) > max_chars_per_entry:
@@ -236,7 +267,22 @@ def _metrics(expected: set[str], predicted: set[str]) -> tuple[float, float, flo
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-ABLATION_LEVELS = ["full", "no_description", "no_profile", "name_only"]
+ABLATION_LEVELS = [
+    "full",
+    "no_description",
+    "profiled_description",
+    "no_profile",
+    "name_only",
+]
+ABLATION_ALIASES = {
+    # Paper-facing condition names alias onto the runner ids.
+    "source_description_only": "no_profile",
+    "no_profiler": "no_profile",
+    "profile_only": "no_description",
+    "autoddg_description_only": "profiled_description",
+}
+PROFILED_DESCRIPTION_ABLATIONS = {"full", "profiled_description"}
+PROFILE_FREE_DESCRIPTION_ABLATIONS = {"no_profile"}
 
 
 def main() -> None:
@@ -256,13 +302,25 @@ def main() -> None:
     )
     parser.add_argument(
         "--ablation",
-        choices=ABLATION_LEVELS + ["all"],
+        choices=ABLATION_LEVELS + sorted(ABLATION_ALIASES) + ["all"],
         default="full",
         help=(
-            "Metadata ablation level. "
-            "'full'=baseline, 'no_description'=strip description text fields, "
-            "'no_profile'=strip per-column stats and sample data, "
-            "'name_only'=no metadata. Use 'all' to run every level in one pass."
+            "Metadata ablation condition (paper name -> runner id): "
+            "'full' (Full) = AutoDDG profile-derived descriptions plus explicit "
+            "profile metadata; 'no_description' (Profile only) = explicit profile "
+            "metadata only; 'profiled_description' (AutoDDG description only) = "
+            "AutoDDG profile-derived descriptions only; 'no_profile' "
+            "(Source description only) = source-authored, profile-free descriptions "
+            "only; 'name_only' (Name only) = ids only. "
+            "Use 'all' to run every canonical condition in one pass."
+        ),
+    )
+    parser.add_argument(
+        "--profile-free-descriptions",
+        default="data/descriptions_profile_free.csv",
+        help=(
+            "CSV of dataset descriptions generated without profiler/profile input. "
+            "Required for the no_profile/no_profiler ablation."
         ),
     )
     parser.add_argument("--max-cases", type=int, default=0)
@@ -306,16 +364,32 @@ def main() -> None:
 
     base_nodes = _load_datalake(repo_root)
 
-    levels_to_run = ABLATION_LEVELS if args.ablation == "all" else [args.ablation]
+    requested_ablation = ABLATION_ALIASES.get(args.ablation, args.ablation)
+    levels_to_run = ABLATION_LEVELS if requested_ablation == "all" else [requested_ablation]
+
+    # Profiled descriptions are the current AutoDDG-style descriptions. They may
+    # encode profiler-derived details, so they must not be used for no_profile.
+    profiled_descriptions, rawid_to_stem = _load_descriptions_raw(repo_root)
+    if not profiled_descriptions:
+        profiled_descriptions, _ = _load_description_csv(repo_root / "data" / "descriptions.csv")
+
+    profile_free_path = (repo_root / args.profile_free_descriptions).resolve()
+    profile_free_descriptions, profile_free_rawmap = _load_description_csv(profile_free_path)
+    rawid_to_stem.update(profile_free_rawmap)
+
+    if any(level in PROFILE_FREE_DESCRIPTION_ABLATIONS for level in levels_to_run):
+        if not profile_free_path.exists():
+            raise FileNotFoundError(
+                "The no_profile/no_profiler ablation requires descriptions generated "
+                f"without profiler input. Missing: {profile_free_path}"
+            )
+        if not profile_free_descriptions:
+            raise ValueError(
+                "The no_profile/no_profiler ablation requires a non-empty "
+                f"profile-free description CSV: {profile_free_path}"
+            )
+
     copilot = UrbanTraceCopilot(llm_model=args.llm_model)
-    # Prefer descriptions_raw.csv if available (map raw ids -> stems)
-    descriptions_raw, rawid_to_stem = _load_descriptions_raw(repo_root)
-    if descriptions_raw:
-        descriptions = descriptions_raw
-        # also update copilot cache so downstream code that inspects it sees the same descriptions
-        copilot.dataset_descriptions = descriptions_raw
-    else:
-        descriptions = copilot.dataset_descriptions
 
     fieldnames = [
         "llm_model", "ablation", "case_id", "slug", "run",
@@ -332,9 +406,28 @@ def main() -> None:
     rows_for_summary: list[dict[str, Any]] = []
 
     for ablation in levels_to_run:
+        if ablation in PROFILED_DESCRIPTION_ABLATIONS:
+            descriptions = profiled_descriptions
+            description_source = "profiled"
+        elif ablation in PROFILE_FREE_DESCRIPTION_ABLATIONS:
+            descriptions = profile_free_descriptions
+            description_source = f"profile-free:{profile_free_path}"
+        else:
+            descriptions = {}
+            description_source = "none"
+
+        # Keep dashboard/tool-side description resolution aligned with the active
+        # ablation, so profile-derived descriptions cannot leak through another
+        # system-message section.
+        copilot.dataset_descriptions = descriptions
         # Inject the ablated catalog into the system message; dashboard stays empty.
-        copilot.dataset_context = _build_context_for_ablation(base_nodes, ablation, descriptions)
-        print(f"\n=== Ablation: {ablation} ===")
+        copilot.dataset_context = _build_context_for_ablation(
+            base_nodes,
+            ablation,
+            descriptions,
+            rawid_to_stem,
+        )
+        print(f"\n=== Ablation: {ablation} | descriptions: {description_source} ===")
 
         for case in cases:
             case_id = case.get("id")
