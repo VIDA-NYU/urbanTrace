@@ -79,11 +79,16 @@ pip install -r backend/requirements.txt
 
 The runner loads `backend/.env` first and then `.env`. Configure the backend model provider as needed, including `LLM_PROVIDER` and the matching credential/model variables for either Portkey or OpenAI.
 
-Before running the **Source description only** condition (`no_profile`), create the source-description file, by default:
+The benchmark uses exactly two description catalogs. Both have the columns
+`dataset`, `description`, and `dataset_raw`:
 
 ```text
-data/descriptions_profile_free.csv
+data/descriptions_ddg.csv     # AutoDDG descriptions generated from Atlas profiles
+data/descriptions_origin.csv  # descriptions copied from original dataset sources
 ```
+
+Blank descriptions are allowed in `descriptions_origin.csv` when the original
+provider does not publish a dataset description.
 
 To reproduce the revised ablation, run all canonical conditions with five repeated trials per case and write to a fresh output path:
 
