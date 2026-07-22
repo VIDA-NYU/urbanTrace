@@ -1,0 +1,264 @@
+{
+    "geometricType": "Polygon",
+    "name": "nyc-zip-code-tabulation-areas-polygons",
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        }
+    },
+    "nb_rows": 262,
+    "nb_profiled_rows": 262,
+    "nb_columns": 12,
+    "columns": [
+        {
+            "name": "OBJECTID",
+            "structural_type": "http://schema.org/Integer",
+            "semantic_types": [
+                "http://schema.org/identifier"
+            ],
+            "unclean_values_ratio": 0.0,
+            "num_distinct_values": 262,
+            "mean": 131.5,
+            "stddev": 75.63233435508916,
+            "coverage": [
+                {
+                    "range": {
+                        "gte": 5.0,
+                        "lte": 84.0
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 93.0,
+                        "lte": 172.0
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 181.0,
+                        "lte": 258.0
+                    }
+                }
+            ]
+        },
+        {
+            "name": "postalCode",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [
+                "http://schema.org/address"
+            ],
+            "geo_classifier": {
+                "label": "zip5",
+                "confidence": 0.9335692524909973,
+                "source": "ml+validated"
+            }
+        },
+        {
+            "name": "PO_NAME",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [],
+            "num_distinct_values": 48
+        },
+        {
+            "name": "STATE",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [
+                "http://schema.org/AdministrativeArea"
+            ],
+            "geo_classifier": {
+                "label": "state_code",
+                "confidence": 0.9817020893096924,
+                "source": "ml+validated"
+            }
+        },
+        {
+            "name": "borough",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [
+                "http://schema.org/AdministrativeArea"
+            ],
+            "geo_classifier": {
+                "label": "borough",
+                "confidence": 0.937115490436554,
+                "source": "ml+validated"
+            }
+        },
+        {
+            "name": "ST_FIPS",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [
+                "http://schema.org/AdministrativeArea"
+            ],
+            "geo_classifier": {
+                "label": "state_code",
+                "confidence": 0.8780412077903748,
+                "source": "ml+validated"
+            }
+        },
+        {
+            "name": "CTY_FIPS",
+            "structural_type": "http://schema.org/Integer",
+            "semantic_types": [],
+            "unclean_values_ratio": 0.0,
+            "num_distinct_values": 5,
+            "mean": 59.3206106870229,
+            "stddev": 22.25983517958924,
+            "coverage": [
+                {
+                    "range": {
+                        "gte": 5.0,
+                        "lte": 5.0
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 47.0,
+                        "lte": 61.0
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 81.0,
+                        "lte": 85.0
+                    }
+                }
+            ]
+        },
+        {
+            "name": "BLDGpostalCode",
+            "structural_type": "http://schema.org/Integer",
+            "semantic_types": [
+                "http://schema.org/Boolean"
+            ],
+            "unclean_values_ratio": 0.0,
+            "num_distinct_values": 2,
+            "mean": 0.21755725190839695,
+            "stddev": 0.4125846507693464,
+            "coverage": [
+                {
+                    "range": {
+                        "gte": 0.0,
+                        "lte": 0.0
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 1.0,
+                        "lte": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Shape_Leng",
+            "structural_type": "http://schema.org/Float",
+            "semantic_types": [],
+            "unclean_values_ratio": 0.0,
+            "mean": 25078.357811935362,
+            "stddev": 21976.779839786366,
+            "coverage": [
+                {
+                    "range": {
+                        "gte": 544.562515041,
+                        "lte": 17087.4012693
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 20734.09171,
+                        "lte": 51118.00128
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Shape_Area",
+            "structural_type": "http://schema.org/Float",
+            "semantic_types": [],
+            "unclean_values_ratio": 0.0,
+            "mean": 31937429.358944718,
+            "stddev": 44648106.47014243,
+            "coverage": [
+                {
+                    "range": {
+                        "gte": 21034.8869204,
+                        "lte": 41094887.0403
+                    }
+                },
+                {
+                    "range": {
+                        "gte": 46687803.7023,
+                        "lte": 174102872.047
+                    }
+                }
+            ]
+        },
+        {
+            "name": "@id",
+            "structural_type": "http://schema.org/Text",
+            "semantic_types": [
+                "http://schema.org/URL"
+            ],
+            "num_distinct_values": 247
+        },
+        {
+            "name": "geometry",
+            "structural_type": "http://schema.org/GeoShape",
+            "semantic_types": [],
+            "geo_classifier": {
+                "label": "polygon",
+                "confidence": 0.9402768015861511,
+                "source": "ml+validated"
+            }
+        }
+    ],
+    "nb_spatial_columns": 5,
+    "nb_numerical_columns": 5,
+    "types": [
+        "numerical",
+        "spatial"
+    ],
+    "attribute_keywords": [
+        "OBJECTID",
+        "postalCode",
+        "postal",
+        "Code",
+        "PO_NAME",
+        "PO",
+        "NAME",
+        "STATE",
+        "borough",
+        "ST_FIPS",
+        "ST",
+        "FIPS",
+        "CTY_FIPS",
+        "CTY",
+        "FIPS",
+        "BLDGpostalCode",
+        "BLDGpostal",
+        "Code",
+        "Shape_Leng",
+        "Shape",
+        "Leng",
+        "Shape_Area",
+        "Shape",
+        "Area",
+        "@id",
+        "id",
+        "geometry"
+    ],
+    "sample": "OBJECTID,postalCode,PO_NAME,STATE,borough,ST_FIPS,CTY_FIPS,BLDGpostalCode,Shape_Leng,Shape_Area,@id,geometry\r\n15,11379,Middle Village,NY,Queens,36,081,0,33527.9439425,57537331.4936,http://nyc.pediacities.com/Resource/PostalCode/11379,\"POLYGON ((-73.871901 40.726858, -73.871815 40.726794, -73.871018 40.727979, -73.869293 40.724436, -73.863018 40.717708, -73.860038...\"\r\n35,11219,Brooklyn,NY,Brooklyn,36,047,0,29464.1953052,42002738.4672,http://nyc.pediacities.com/Resource/PostalCode/11219,\"POLYGON ((-73.989059 40.644119, -73.991928 40.642205, -73.98085 40.635516, -73.997285 40.619711, -74.012703 40.629024, -74.008537...\"\r\n45,10464,Bronx,NY,Bronx,36,005,0,95375.5460772,76257484.8965,http://nyc.pediacities.com/Resource/PostalCode/10464,\"POLYGON ((-73.815387 40.889395, -73.813647 40.88882, -73.809174 40.88778, -73.805396 40.88646, -73.804949 40.88673, -73.804909...\"\r\n46,10469,Bronx,NY,Bronx,36,005,0,34900.7255644,68040887.07,http://nyc.pediacities.com/Resource/PostalCode/10469,\"POLYGON ((-73.855884 40.883862, -73.850112 40.88202, -73.843241 40.879109, -73.841278 40.880318, -73.838743 40.881266, -73.836238...\"\r\n67,10459,Bronx,NY,Bronx,36,005,0,24993.6303403,22551940.5373,http://nyc.pediacities.com/Resource/PostalCode/10459,\"POLYGON ((-73.896302 40.833543, -73.894771 40.834311, -73.893622 40.835396, -73.892997 40.835643, -73.891737 40.832664, -73.891627...\"\r\n70,10030,New York,NY,Manhattan,36,061,0,11274.1138302,7757661.45487,http://nyc.pediacities.com/Resource/PostalCode/10030,\"POLYGON ((-73.936232 40.820436, -73.941803 40.812815, -73.948677 40.815692, -73.944756 40.824032, -73.936232 40.820436))\"\r\n76,10454,Bronx,NY,Bronx,36,005,0,25984.0268411,31063613.3255,http://nyc.pediacities.com/Resource/PostalCode/10454,\"POLYGON ((-73.931756 40.807935, -73.930623 40.808509, -73.928806 40.809899, -73.928135 40.809622, -73.927191 40.810862, -73.927223...\"\r\n88,10128,New York,NY,Manhattan,36,061,0,15005.0963232,11011681.5568,http://nyc.pediacities.com/Resource/PostalCode/10128,\"POLYGON ((-73.943592 40.782832, -73.943879 40.781278, -73.943212 40.779276, -73.942971 40.779622, -73.942711 40.779524, -73.942713...\"\r\n91,11363,Little Neck,NY,Queens,36,081,0,27323.2391659,24242790.0243,http://nyc.pediacities.com/Resource/PostalCode/11363,\"POLYGON ((-73.755055 40.776457, -73.754831 40.776876, -73.7547 40.77753, -73.754814 40.777632, -73.754489 40.777861, -73.75465 40.77799,...\"\r\n93,11354,Flushing,NY,Queens,36,081,0,44428.747165,61985147.4503,http://nyc.pediacities.com/Resource/PostalCode/11354,\"POLYGON ((-73.842821 40.766151, -73.842868 40.765937, -73.843947 40.765495, -73.844913 40.765528, -73.846352 40.766253, -73.847231...\"\r\n97,11361,Bayside,NY,Queens,36,081,0,33141.1074855,50163518.2437,http://nyc.pediacities.com/Resource/PostalCode/11361,\"POLYGON ((-73.766417 40.775953, -73.765745 40.774605, -73.764869 40.773532, -73.761139 40.770283, -73.759675 40.76878, -73.759074...\"\r\n120,11367,Flushing,NY,Queens,36,081,0,33506.1266045,72810151.5885,http://nyc.pediacities.com/Resource/PostalCode/11367,\"POLYGON ((-73.837608 40.743238, -73.835162 40.743338, -73.827537 40.74259, -73.825355 40.742174, -73.825442 40.742599, -73.815096...\"\r\n128,10013,New York,NY,Manhattan,36,061,0,19248.0155384,15580577.9879,http://nyc.pediacities.com/Resource/PostalCode/10013,\"POLYGON ((-74.00373 40.72625, -74.004575 40.724173, -73.999697 40.721715, -73.994398 40.719457, -73.995105 40.717835, -73.996148...\"\r\n168,10302,Staten Island,NY,Staten Island,36,085,0,27432.5693758,29555323.0234,http://nyc.pediacities.com/Resource/PostalCode/10302,\"POLYGON ((-74.139257 40.640736, -74.139016 40.640892, -74.137576 40.641001, -74.137342 40.641137, -74.13737 40.641295, -74.134499...\"\r\n194,10280,New York,NY,Manhattan,36,061,0,8192.12492629,2234113.99487,http://nyc.pediacities.com/Resource/PostalCode/10280,\"POLYGON ((-74.016639 40.712168, -74.015676 40.711805, -74.01638 40.710082, -74.014683 40.709797, -74.016416 40.705219, -74.01649...\"\r\n212,10174,New York,NY,Manhattan,36,061,1,841.826840295,44203.2255484,http://nyc.pediacities.com/Resource/PostalCode/10174,\"POLYGON ((-73.975739 40.751655, -73.975494 40.751993, -73.974801 40.751703, -73.975151 40.751218, -73.975845 40.751509, -73.975739...\"\r\n222,10104,New York,NY,Manhattan,36,061,1,1294.59643948,89721.8525423,http://nyc.pediacities.com/Resource/PostalCode/10104,\"POLYGON ((-73.978262 40.760052, -73.978349 40.759932, -73.979758 40.760526, -73.979406 40.761009, -73.977997 40.760415, -73.978262...\"\r\n239,10022,New York,NY,Manhattan,36,061,0,14672.45315,12728335.6232,http://nyc.pediacities.com/Resource/PostalCode/10022,\"POLYGON ((-73.972554 40.764898, -73.962675 40.760718, -73.96162 40.760095, -73.961521 40.760231, -73.958516 40.758932, -73.959167...\"\r\n254,10260,New York,NY,Manhattan,36,061,1,980.356289437,52514.7350789,http://nyc.pediacities.com/Resource/PostalCode/10260,\"POLYGON ((-74.009085 40.706261, -74.008696 40.706688, -74.007966 40.70628, -74.008222 40.705771, -74.009085 40.706261))\"\r\n260,10069,New York,NY,Manhattan,36,061,0,7780.63213312,2372365.88899,http://nyc.pediacities.com/Resource/PostalCode/10069,\"POLYGON ((-73.988211 40.781225, -73.986746 40.780584, -73.98715 40.779287, -73.988234 40.777162, -73.987045 40.776605, -73.989638...\"\r\n",
+    "_profiling_times": {
+        "steps": {
+            "1_load_data": 0.12373345799278468,
+            "2_geo_batch_predict": 0.4481243750778958,
+            "3_process_columns": 0.09408579103183001,
+            "4_latlong_pairing": 4.337495192885399e-05,
+            "5_spatial_coverage": 7.6669966802001e-06,
+            "6_temporal_coverage": 1.8749851733446121e-06,
+            "sample_extraction": 0.011751667014323175
+        },
+        "total": 7.803144500008784
+    }
+}

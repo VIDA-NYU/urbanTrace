@@ -39,7 +39,7 @@ load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_METADATA_DIR = PROJECT_ROOT / "data" / "metadata"
-DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions.csv"
+DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions_ddg.csv"
 
 
 class UrbanTraceCopilot:

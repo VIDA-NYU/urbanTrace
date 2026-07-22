@@ -75,7 +75,7 @@ def _load_description_csv(desc_path: Path) -> tuple[dict[str, str], dict[str, st
     Expected columns:
       - dataset: canonical dataset id/name, with or without .geojson
       - description: dataset-level text
-      - dataset_raw: optional raw/provider id, with or without .geojson
+      - dataset_raw: raw/provider id, with or without .geojson
 
     Descriptions are indexed by every available id so callers can use either the
     raw Socrata id used by data/geojson_raw or the canonical UrbanTrace stem.
@@ -87,26 +87,27 @@ def _load_description_csv(desc_path: Path) -> tuple[dict[str, str], dict[str, st
 
     with desc_path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
+        required_columns = {"dataset", "description", "dataset_raw"}
+        if not reader.fieldnames or not required_columns.issubset(reader.fieldnames):
+            raise ValueError(
+                f"Description CSV must contain {sorted(required_columns)}: {desc_path}"
+            )
         for row in reader:
             description = (row.get("description") or "").strip()
-            if not description:
-                continue
-
             stem = _normalize_dataset_id(row.get("dataset") or "")
             raw_id = _normalize_dataset_id(row.get("dataset_raw") or "")
+
+            if raw_id and stem:
+                rawmap[raw_id] = stem
+            if not description:
+                continue
 
             if stem:
                 descriptions[stem] = description
             if raw_id:
                 descriptions[raw_id] = description
-            if raw_id and stem:
-                rawmap[raw_id] = stem
 
     return descriptions, rawmap
-
-
-def _load_descriptions_raw(repo_root: Path) -> tuple[dict[str, str], dict[str, str]]:
-    return _load_description_csv(repo_root / "data" / "descriptions_raw.csv")
 
 
 def _lookup_description(
@@ -150,7 +151,7 @@ def _build_context_for_ablation(
       Full                     -> full                 : AutoDDG (profile-derived) description + explicit profile metadata
       Profile only             -> no_description       : explicit profile metadata only
       AutoDDG description only  -> profiled_description : AutoDDG profile-derived description only
-      Source description only  -> no_profile           : source-authored (profile-free) description only
+      Source description only  -> no_profile           : origin-source description only
       Name only                -> name_only            : dataset id only
 
     Token budget: (_TOKEN_LIMIT - _OVERHEAD_TOKENS) * _CHARS_PER_TOKEN / num_datasets
@@ -281,8 +282,8 @@ ABLATION_ALIASES = {
     "profile_only": "no_description",
     "autoddg_description_only": "profiled_description",
 }
-PROFILED_DESCRIPTION_ABLATIONS = {"full", "profiled_description"}
-PROFILE_FREE_DESCRIPTION_ABLATIONS = {"no_profile"}
+DDG_DESCRIPTION_ABLATIONS = {"full", "profiled_description"}
+ORIGIN_DESCRIPTION_ABLATIONS = {"no_profile"}
 
 
 def main() -> None:
@@ -310,16 +311,16 @@ def main() -> None:
             "profile metadata; 'no_description' (Profile only) = explicit profile "
             "metadata only; 'profiled_description' (AutoDDG description only) = "
             "AutoDDG profile-derived descriptions only; 'no_profile' "
-            "(Source description only) = source-authored, profile-free descriptions "
+            "(Source description only) = origin-source descriptions "
             "only; 'name_only' (Name only) = ids only. "
             "Use 'all' to run every canonical condition in one pass."
         ),
     )
     parser.add_argument(
-        "--profile-free-descriptions",
-        default="data/descriptions_profile_free.csv",
+        "--origin-descriptions",
+        default="data/descriptions_origin.csv",
         help=(
-            "CSV of dataset descriptions generated without profiler/profile input. "
+            "CSV of descriptions obtained from each dataset's origin source. "
             "Required for the no_profile/no_profiler ablation."
         ),
     )
@@ -367,26 +368,29 @@ def main() -> None:
     requested_ablation = ABLATION_ALIASES.get(args.ablation, args.ablation)
     levels_to_run = ABLATION_LEVELS if requested_ablation == "all" else [requested_ablation]
 
-    # Profiled descriptions are the current AutoDDG-style descriptions. They may
-    # encode profiler-derived details, so they must not be used for no_profile.
-    profiled_descriptions, rawid_to_stem = _load_descriptions_raw(repo_root)
-    if not profiled_descriptions:
-        profiled_descriptions, _ = _load_description_csv(repo_root / "data" / "descriptions.csv")
+    ddg_path = repo_root / "data" / "descriptions_ddg.csv"
+    ddg_descriptions, rawid_to_stem = _load_description_csv(ddg_path)
 
-    profile_free_path = (repo_root / args.profile_free_descriptions).resolve()
-    profile_free_descriptions, profile_free_rawmap = _load_description_csv(profile_free_path)
-    rawid_to_stem.update(profile_free_rawmap)
+    origin_path = (repo_root / args.origin_descriptions).resolve()
+    origin_descriptions, origin_rawmap = _load_description_csv(origin_path)
+    rawid_to_stem.update(origin_rawmap)
 
-    if any(level in PROFILE_FREE_DESCRIPTION_ABLATIONS for level in levels_to_run):
-        if not profile_free_path.exists():
+    if any(level in DDG_DESCRIPTION_ABLATIONS for level in levels_to_run):
+        if not ddg_path.exists():
+            raise FileNotFoundError(f"Missing AutoDDG description CSV: {ddg_path}")
+        if not ddg_descriptions:
+            raise ValueError(f"AutoDDG description CSV is empty: {ddg_path}")
+
+    if any(level in ORIGIN_DESCRIPTION_ABLATIONS for level in levels_to_run):
+        if not origin_path.exists():
             raise FileNotFoundError(
-                "The no_profile/no_profiler ablation requires descriptions generated "
-                f"without profiler input. Missing: {profile_free_path}"
+                "The no_profile/no_profiler ablation requires origin-source "
+                f"descriptions. Missing: {origin_path}"
             )
-        if not profile_free_descriptions:
+        if not origin_descriptions:
             raise ValueError(
                 "The no_profile/no_profiler ablation requires a non-empty "
-                f"profile-free description CSV: {profile_free_path}"
+                f"origin description CSV: {origin_path}"
             )
 
     copilot = UrbanTraceCopilot(llm_model=args.llm_model)
@@ -406,12 +410,12 @@ def main() -> None:
     rows_for_summary: list[dict[str, Any]] = []
 
     for ablation in levels_to_run:
-        if ablation in PROFILED_DESCRIPTION_ABLATIONS:
-            descriptions = profiled_descriptions
-            description_source = "profiled"
-        elif ablation in PROFILE_FREE_DESCRIPTION_ABLATIONS:
-            descriptions = profile_free_descriptions
-            description_source = f"profile-free:{profile_free_path}"
+        if ablation in DDG_DESCRIPTION_ABLATIONS:
+            descriptions = ddg_descriptions
+            description_source = f"ddg:{ddg_path}"
+        elif ablation in ORIGIN_DESCRIPTION_ABLATIONS:
+            descriptions = origin_descriptions
+            description_source = f"origin:{origin_path}"
         else:
             descriptions = {}
             description_source = "none"
