@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useEffect, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
 import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
-import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL'; 
+import H3PreviewMap from '../../visualization/H3PreviewMap'; 
 
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
@@ -605,7 +605,7 @@ const ResultMapNode = memo(({ id, data }) => {
       }}>
         {(resultMapData || zoneGeoJson) && (
           <div style={{ position: 'absolute', inset: 0, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
-            <H3PreviewDeckGL 
+            <H3PreviewMap 
               hexData={showHex ? (hotspotHexData || resultMapData) : null} 
               geojsonData={showZones ? (hotspotZoneGeoJson || zoneGeoJson) : null}
               color={rgbColor}

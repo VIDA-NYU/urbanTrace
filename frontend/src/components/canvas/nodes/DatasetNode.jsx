@@ -2,7 +2,7 @@
 import React, { memo, useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Database, Layers, Palette, Info, X } from 'lucide-react'; // Added Info icon
-import VectorPreviewDeckGL from '../../visualization/VectorPreviewDeckGL'; // Up 2 levels
+import VectorPreviewMap from '../../visualization/VectorPreviewMap';
 
 const DatasetNode = memo(({ id, data }) => {
   const meta = data.metadata || {};
@@ -53,19 +53,20 @@ const DatasetNode = memo(({ id, data }) => {
     }}>
       {/* 1. Header */}
       <div style={{
-        backgroundColor: '#eff6ff', 
-        padding: '8px 12px',
+        backgroundColor: '#eff6ff',
+        padding: '3px 4px 3px 8px',
         borderBottom: '1px solid #e2e8f0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between', // Pushes items to edges
-        gap: '8px'
+        gap: '4px'
       }}>
         {/* Left: Icon + Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-          <Database size={13} color="#2563eb" />
-          <span style={{ 
-            fontWeight: '600', 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflow: 'hidden' }}>
+          <Database size={11} color="#2563eb" style={{ flexShrink: 0 }} />
+          <span title={name} style={{
+            fontSize: '11px',
+            fontWeight: '600',
             color: '#1e3a8a', 
             whiteSpace: 'nowrap', 
             overflow: 'hidden', 
@@ -76,7 +77,7 @@ const DatasetNode = memo(({ id, data }) => {
         </div>
 
         {/* Right: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0px', flexShrink: 0 }}>
           <button 
             className="nodrag" // Crucial: Prevents dragging when clicking button
             onClick={(e) => {
@@ -93,7 +94,7 @@ const DatasetNode = memo(({ id, data }) => {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '3px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -104,7 +105,7 @@ const DatasetNode = memo(({ id, data }) => {
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#dbeafe'; e.currentTarget.style.color = '#2563eb'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
           >
-            <Info size={14} />
+            <Info size={12} />
           </button>
 
           <button
@@ -118,7 +119,7 @@ const DatasetNode = memo(({ id, data }) => {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '3px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -129,13 +130,14 @@ const DatasetNode = memo(({ id, data }) => {
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fee2e2'; e.currentTarget.style.color = '#b91c1c'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
           >
-            <X size={14} />
+            <X size={12} />
           </button>
         </div>
       </div>
 
       {/* 2. Map Preview */}
-      <VectorPreviewDeckGL 
+      <VectorPreviewMap
+        height={150}
         filename={filename} 
         selectedColumn={selectedColumn}
         isMapSyncEnabled={isMapSyncEnabled}
@@ -143,49 +145,40 @@ const DatasetNode = memo(({ id, data }) => {
         onGlobalViewStateChange={onGlobalViewStateChange}
       />
 
-      {/* 3. Controls Section */}
-      <div style={{ padding: '10px 12px', backgroundColor: '#fff', borderTop: '1px solid #f1f5f9' }}>
-        
-        {/* Selector */}
-        <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '11px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-               <Palette size={11} /> Column
-            </label>
-            <select 
-                value={selectedColumn} 
-                onChange={(e) => handleColumnChange(e.target.value)}
-                className="nodrag" 
-                style={{
-                    flexGrow: 1, 
-                    width: '0',  
-                    padding: '2px 4px',
-                    fontSize: '11px',
-                    borderRadius: '4px',
-                    border: '1px solid #cbd5e1', 
-                    backgroundColor: '#fff',
-                    color: '#334155', 
-                    outline: 'none',
-                    cursor: 'pointer',
-                    height: '24px'
-                }}
-            >
-                <option value="" style={{ color: '#64748b' }}>Default (Blue)</option>
-                {numericColumns.map(col => (
-                    <option key={col.name} value={col.name} style={{ color: '#0f172a' }}>
-                        {col.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-
-        {/* Info Row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '10px', paddingTop: '4px', borderTop: '1px dashed #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Layers size={10} /> {meta.geometricType || 'Unknown'}
-          </div>
-          <div>
-            {meta.nb_rows?.toLocaleString() || 0} rows
-          </div>
+      {/* 3. Controls: column picker, then geometry type and row count, on one row */}
+      <div style={{ padding: '4px 8px', backgroundColor: '#fff', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <Palette size={10} color="#64748b" style={{ flexShrink: 0 }} aria-label="Color by column" />
+        <select
+          value={selectedColumn}
+          onChange={(e) => handleColumnChange(e.target.value)}
+          className="nodrag"
+          title="Color by column"
+          style={{
+            flexGrow: 1,
+            width: '0',
+            padding: '0 2px',
+            fontSize: '10px',
+            borderRadius: '3px',
+            border: '1px solid #cbd5e1',
+            backgroundColor: '#fff',
+            color: '#334155',
+            outline: 'none',
+            cursor: 'pointer',
+            height: '18px'
+          }}
+        >
+          <option value="" style={{ color: '#64748b' }}>Default (Blue)</option>
+          {numericColumns.map(col => (
+            <option key={col.name} value={col.name} style={{ color: '#0f172a' }}>
+              {col.name}
+            </option>
+          ))}
+        </select>
+        <div
+          title={`${meta.geometricType || 'Unknown'} · ${meta.nb_rows?.toLocaleString() || 0} rows`}
+          style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#94a3b8', fontSize: '9px', whiteSpace: 'nowrap', flexShrink: 0 }}
+        >
+          <Layers size={9} /> {meta.geometricType || 'Unknown'} · {meta.nb_rows?.toLocaleString() || 0}
         </div>
       </div>
 

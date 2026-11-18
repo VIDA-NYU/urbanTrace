@@ -66,3 +66,20 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Autark map previews are small: shrink Autark's tile attribution and watermark so they do not
+   cover the data. The attribution stays visible, as the tile provider requires. */
+.ut-autark-map .autk-map-attribution {
+  font-size: 8px !important;
+  line-height: 1.2 !important;
+  right: 2px !important;
+  bottom: 2px !important;
+  padding: 0 3px !important;
+  max-width: calc(100% - 4px) !important;
+}
+.ut-autark-map .autk-map-credit {
+  font-size: 8px !important;
+  top: 2px !important;
+  right: 4px !important;
+  bottom: auto !important;
+}

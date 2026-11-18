@@ -10,10 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deck.gl/core": "^9.2.9",
-    "@deck.gl/geo-layers": "^9.2.10",
-    "@deck.gl/layers": "^9.2.9",
-    "@deck.gl/react": "^9.2.9",
+    "@urban-toolkit/autk-map": "file:../../autark/autk-map",
     "@xyflow/react": "^12.10.1",
     "axios": "^1.13.6",
     "d3-geo": "^3.1.1",

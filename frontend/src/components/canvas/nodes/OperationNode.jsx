@@ -2,7 +2,7 @@ import React, { memo, useState, useEffect } from 'react';
 import { Handle, Position, useReactFlow, NodeResizeControl } from '@xyflow/react';
 import { Settings, Play, Loader2, AlertCircle, Download, SlidersHorizontal } from 'lucide-react';
 import axios from 'axios';
-import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL';
+import H3PreviewMap from '../../visualization/H3PreviewMap';
 
 const OperationNode = memo(({ id, data }) => {
   const [isRunning, setIsRunning] = useState(false);
@@ -198,7 +198,7 @@ const OperationNode = memo(({ id, data }) => {
         {resultData && !error && !isRunning && (
           // 👇 Wrap the map and button in an absolutely positioned container
           <div style={{ position: 'absolute', inset: 0, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
-            <H3PreviewDeckGL hexData={resultData} color={hexToRgb(colorHex)} />
+            <H3PreviewMap hexData={resultData} color={hexToRgb(colorHex)} />
             
             {/* Download Button */}
             <button
