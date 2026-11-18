@@ -243,8 +243,15 @@ class CopilotChatRequest(BaseModel):
     log_stream: bool = True
 
 
+def copilot_disabled() -> bool:
+    """COPILOT_DISABLED=1 (in .env) turns off every LLM call; endpoints with heuristics fall back to them."""
+    return os.getenv("COPILOT_DISABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def get_copilot_agent() -> UrbanTraceCopilot:
     """Lazy singleton so missing API keys do not crash app startup."""
+    if copilot_disabled():
+        raise RuntimeError("Copilot is disabled (COPILOT_DISABLED is set)")
     global _COPILOT_AGENT
     if _COPILOT_AGENT is None:
         _COPILOT_AGENT = UrbanTraceCopilot()
@@ -1273,6 +1280,9 @@ async def copilot_chat(request: CopilotChatRequest):
     """
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="`message` cannot be empty")
+
+    if copilot_disabled():
+        raise HTTPException(status_code=503, detail="Copilot is disabled (COPILOT_DISABLED is set in backend/.env).")
 
     try:
         copilot = get_copilot_agent()

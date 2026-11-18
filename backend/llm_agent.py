@@ -43,11 +43,16 @@ DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions_ddg.csv"
 
 
 class UrbanTraceCopilot:
-    """Very small helper around Portkey/OpenAI chat.completions for UrbanTrace."""
+    """Very small helper around Portkey/OpenAI/Hugging Face chat.completions for UrbanTrace."""
 
-    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai"}
+    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai", "huggingface"}
     _DEFAULT_PORTKEY_MODEL = "@vertexai/gemini-3-pro-preview"
     _DEFAULT_OPENAI_MODEL = "gpt-5-mini"
+    # Hugging Face Inference Providers: an OpenAI-compatible router in front of many open models.
+    # The model must support tool calling and a context window above ~100k tokens, since every
+    # request carries the full dataset catalog. Append ":<provider>" to pin an inference provider.
+    _DEFAULT_HUGGINGFACE_MODEL = "openai/gpt-oss-120b"
+    _DEFAULT_HUGGINGFACE_BASE_URL = "https://router.huggingface.co/v1"
     _DEFAULT_PORTKEY_BASE_URL = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1/"
     _REQUEST_TIMEOUT_SECONDS = 60
 
@@ -66,15 +71,19 @@ class UrbanTraceCopilot:
 
         self.portkey_api_key = os.getenv("PORTKEY_API_KEY")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.huggingface_api_key = os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
         self.request_timeout = self._REQUEST_TIMEOUT_SECONDS
 
         if self.provider == "portkey":
             self.model = llm_model or os.getenv("PORTKEY_MODEL") or self._DEFAULT_PORTKEY_MODEL
+        elif self.provider == "huggingface":
+            self.model = llm_model or os.getenv("HF_MODEL") or self._DEFAULT_HUGGINGFACE_MODEL
         else:
             self.model = llm_model or os.getenv("OPENAI_MODEL") or self._DEFAULT_OPENAI_MODEL
 
         self.portkey: Any | None = None
         self.openai: Any | None = None
+        self.huggingface: Any | None = None
         self._ensure_provider_client()
 
         self.metadata_dir = Path(metadata_dir)
@@ -136,11 +145,32 @@ class UrbanTraceCopilot:
         self.openai = OpenAI(**client_kwargs)
         return self.openai
 
+    def _get_huggingface_client(self) -> Any:
+        if self.huggingface is not None:
+            return self.huggingface
+
+        if OpenAI is None:
+            raise ImportError(
+                "Hugging Face provider requested but 'openai' is not installed "
+                "(the Hugging Face router is OpenAI-compatible). Install it with `pip install openai`."
+            )
+        if not self.huggingface_api_key:
+            raise ValueError("Missing Hugging Face token. Set HF_TOKEN.")
+
+        self.huggingface = OpenAI(
+            base_url=os.getenv("HF_BASE_URL") or self._DEFAULT_HUGGINGFACE_BASE_URL,
+            api_key=self.huggingface_api_key,
+            timeout=self.request_timeout,
+        )
+        return self.huggingface
+
     def _ensure_provider_client(self) -> Any:
         if self.provider == "portkey":
             return self._get_portkey_client()
         if self.provider == "openai":
             return self._get_openai_client()
+        if self.provider == "huggingface":
+            return self._get_huggingface_client()
         raise ValueError(f"Unsupported llm provider '{self.provider}'.")
 
     @staticmethod
@@ -308,11 +338,15 @@ class UrbanTraceCopilot:
                         **payload,
                         timeout=self.request_timeout * 1000,
                     )
-                if self.provider == "openai":
-                    client = self._get_openai_client()
+                if self.provider in ("openai", "huggingface"):
+                    client = (
+                        self._get_openai_client() if self.provider == "openai"
+                        else self._get_huggingface_client()
+                    )
+                    # The OpenAI SDK takes seconds (Portkey above takes milliseconds).
                     return client.chat.completions.create(
                         **payload,
-                        timeout=self.request_timeout * 1000,
+                        timeout=self.request_timeout,
                     )
                 raise ValueError(f"Unsupported llm provider '{self.provider}'.")
             except Exception as exc:
