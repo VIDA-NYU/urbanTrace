@@ -166,8 +166,9 @@ The backend loads `backend/.env` automatically. The copilot is optional; without
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to turn off every LLM call |
+| `COPILOT_CATALOG` | How the dataset catalog is sent to the model: `index` (default), `compact` or `full` |
 
-Each copilot request includes the full dataset catalog as context, roughly 86k tokens with the current 121 datasets, so the model needs a context window well above that and support for tool calling.
+The copilot needs a model that supports tool calling. With the default `index` catalog, each request carries one line per dataset (about 5k tokens for the 121 datasets), and the model reads the full description and columns of the datasets it is considering through a `get_dataset_details` tool. `compact` sends every dataset's description and columns tersely (about 42k tokens), and `full` sends the complete metadata (about 86k tokens, which needs a context window well above that). The formats are defined in `backend/catalog_format.py`; the dataset-discovery benchmark can compare them with `--ablation catalog_compact` or `--ablation catalog_index`.
 
 ### Frontend
 ```bash

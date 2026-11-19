@@ -19,6 +19,12 @@ try:
 except ImportError:  # pragma: no cover
     Portkey = None
 
+from catalog_format import (
+    CATALOG_MODES,
+    GET_DATASET_DETAILS_TOOL,
+    dataset_details,
+    render_catalog,
+)
 from tool import (
     HOTSPOT_SYNTHESIS_FIELDS,
     HOTSPOT_SYNTHESIS_PROMPT,
@@ -49,8 +55,9 @@ class UrbanTraceCopilot:
     _DEFAULT_PORTKEY_MODEL = "@vertexai/gemini-3-pro-preview"
     _DEFAULT_OPENAI_MODEL = "gpt-5-mini"
     # Hugging Face Inference Providers: an OpenAI-compatible router in front of many open models.
-    # The model must support tool calling and a context window above ~100k tokens, since every
-    # request carries the full dataset catalog. Append ":<provider>" to pin an inference provider.
+    # The model must support tool calling. With COPILOT_CATALOG=full, every request carries the
+    # whole catalog (~86k tokens), so it also needs a context window above ~100k tokens.
+    # Append ":<provider>" to pin an inference provider.
     _DEFAULT_HUGGINGFACE_MODEL = "openai/gpt-oss-120b"
     _DEFAULT_HUGGINGFACE_BASE_URL = "https://router.huggingface.co/v1"
     _DEFAULT_PORTKEY_BASE_URL = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1/"
@@ -62,6 +69,7 @@ class UrbanTraceCopilot:
         llm_model: str | None = None,
         metadata_dir: str | Path = DEFAULT_METADATA_DIR,
         descriptions_csv: str | Path = DEFAULT_DESCRIPTIONS_CSV,
+        catalog_mode: str | None = None,
     ) -> None:
         self.provider = self._normalize_provider(
             llm_provider or os.getenv("LLM_PROVIDER") or "portkey"
@@ -85,6 +93,12 @@ class UrbanTraceCopilot:
         self.openai: Any | None = None
         self.huggingface: Any | None = None
         self._ensure_provider_client()
+
+        # How the dataset catalog is written into the prompt: full, compact or index (catalog_format.py)
+        self.catalog_mode = (catalog_mode or os.getenv("COPILOT_CATALOG") or "index").strip().lower()
+        if self.catalog_mode not in CATALOG_MODES:
+            raise ValueError(f"Unknown catalog mode '{self.catalog_mode}'. Choose one of: {', '.join(CATALOG_MODES)}.")
+        self.catalog: dict[str, dict[str, Any]] = {}
 
         self.metadata_dir = Path(metadata_dir)
         self.descriptions_csv = Path(descriptions_csv)
@@ -242,6 +256,13 @@ class UrbanTraceCopilot:
 
         if not dataset_ids:
             return "No dataset descriptions or metadata were found."
+
+        self.catalog = {
+            dataset_id: {"meta": metadata.get(dataset_id, {}), "description": descriptions.get(dataset_id, "")}
+            for dataset_id in dataset_ids
+        }
+        if self.catalog_mode != "full":
+            return render_catalog(self.catalog_mode, self.catalog)
 
         max_chars_per_entry: int = (
             (self._TOKEN_LIMIT - self._OVERHEAD_TOKENS) * self._CHARS_PER_TOKEN
@@ -687,6 +708,10 @@ class UrbanTraceCopilot:
         )
 
         effective_round_limit = max(1, max_tool_rounds)
+        if self.catalog_mode == "index" and tools:
+            # The model reads dataset details first, which takes one more round
+            tools = list(tools) + [GET_DATASET_DETAILS_TOOL]
+            effective_round_limit += 1
         all_tool_calls: list[dict[str, Any]] = []
         all_tool_responses: list[dict[str, Any]] = []
         all_suggestions: list[dict[str, Any]] = []
@@ -719,6 +744,10 @@ class UrbanTraceCopilot:
             all_tool_calls.extend(round_tool_calls)
 
             round_tool_responses = build_tool_responses_from_tool_calls(round_tool_calls)
+            for call, item in zip(round_tool_calls, round_tool_responses):
+                if call.get("name") == "get_dataset_details":   # answered here, not by the frontend
+                    args = call.get("arguments") if isinstance(call.get("arguments"), dict) else {}
+                    item["response"] = dataset_details(self.catalog, args.get("dataset_ids"))
             all_tool_responses.extend(round_tool_responses)
 
             round_suggestions = build_suggestions_from_tool_calls(round_tool_calls)
