@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import geopandas as gpd
@@ -318,6 +319,59 @@ async def upload_geojson(file: UploadFile = File(...)):
     # Delegate processing to upload_new_data module (profiles + saves metadata)
     result = await process_uploaded_geojson(file, DATA_DIR)
     return result
+
+# Profiles made by atlas-profiler 0.1.0 (data/metadata_v2), their HTML reports (data/reports_v2)
+# and the dataset descriptions, for the dataset info box. The rest of the app still reads
+# data/metadata.
+PROFILE_V2_DIR = os.path.join(DATA_DIR, "metadata_v2")
+REPORTS_V2_DIR = os.path.join(DATA_DIR, "reports_v2")
+DESCRIPTIONS_CSV = os.path.join(DATA_DIR, "descriptions_ddg.csv")
+# Bulky spatial summaries the info box does not draw
+_PROFILE_HEAVY_KEYS = ("geohashes4", "kdtree", "grid")
+
+
+def _dataset_description(stem: str) -> str:
+    if not os.path.exists(DESCRIPTIONS_CSV):
+        return ""
+    with open(DESCRIPTIONS_CSV, encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            if _normalize_dataset_stem(row.get("dataset")) == stem:
+                return (row.get("description") or "").strip()
+    return ""
+
+
+@app.get("/datasets/{dataset_id}/details")
+async def get_dataset_details(dataset_id: str):
+    """Description and newest profile of one dataset, for the dataset info box."""
+    stem = _normalize_dataset_stem(dataset_id)
+    if not re.fullmatch(r"\w[\w.\-]*", stem):
+        raise HTTPException(status_code=400, detail="Invalid dataset id")
+    profile = None
+    path = os.path.join(PROFILE_V2_DIR, f"{stem}.json")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            profile = json.load(f)
+        profile.pop("_profiling_times", None)
+        for entry in profile.get("spatial_coverage", []):
+            for key in _PROFILE_HEAVY_KEYS:
+                entry.pop(key, None)
+    return {
+        "id": stem,
+        "description": _dataset_description(stem),
+        "profile": profile,
+        "report_url": f"/reports/{stem}" if os.path.exists(os.path.join(REPORTS_V2_DIR, f"{stem}.html")) else None,
+    }
+
+
+@app.get("/reports/{dataset_id}")
+async def get_dataset_report(dataset_id: str):
+    """The dataset's HTML profile report (atlas-profiler)."""
+    stem = _normalize_dataset_stem(dataset_id)
+    path = os.path.join(REPORTS_V2_DIR, f"{stem}.html")
+    if not re.fullmatch(r"\w[\w.\-]*", stem) or not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Report not found")
+    return FileResponse(path, media_type="text/html")
+
 
 @app.get("/dataset/{filename}")
 async def get_geojson(filename: str, simplify: bool = False):

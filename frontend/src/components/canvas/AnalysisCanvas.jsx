@@ -981,6 +981,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           onConnect={onConnect}
           edgesReconnectable={false}
           fitView
+          // Fitting a single small node would zoom in (1.7x) and blow up its text; never fit past 100%
+          fitViewOptions={{ maxZoom: 1 }}
         >
           <Background variant="dots" gap={20} size={1} color="#cbd5e1" />
           <Controls />
