@@ -3,6 +3,8 @@ import { Handle, Position, NodeResizeControl } from '@xyflow/react';
 import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
 import H3PreviewMap from '../../visualization/H3PreviewMap'; 
 import { API_BASE } from '../../../config/api';
+import { cellToBoundary } from 'h3-js';
+import { exportResult } from '../../../lib/collections';
 
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
@@ -447,44 +449,54 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [id, comparePayload, data?.onCompareDataReady]);
 
   // ==========================================================================
-  // GEOJSON EXPORT LOGIC
+  // EXPORT: the shown result (zones, or grid cells) with its provenance, as GeoParquet,
+  // GeoPackage and GeoJSON in one zip (redesign section 2.3)
   // ==========================================================================
-  const handleDownloadGeoJson = (e) => {
+  const [downloading, setDownloading] = useState(false);
+  const buildExportGeoJson = () => {
+    if (showZones && (zoneGeoJson || hotspotZoneGeoJson)) {
+      return (usingHotspot && hotspotZoneGeoJson) ? hotspotZoneGeoJson : zoneGeoJson;
+    }
+    if (resultMapData && Object.keys(resultMapData).length > 0) {
+      return {
+        type: 'FeatureCollection',
+        features: Object.entries(resultMapData).map(([cellId, cell]) => ({
+          type: 'Feature',
+          properties: { cell_id: cellId, ...(cell?.variables || {}) },
+          geometry: { type: 'Polygon', coordinates: [cellToBoundary(cellId, true)] },
+        })),
+      };
+    }
+    return null;
+  };
+
+  const handleDownloadGeoJson = async (e) => {
     e.stopPropagation(); // Prevent React Flow from dragging the node
-
-    // Export the hotspot version if active, otherwise fallback to the raw zoned output
-    const geoDataToDownload = (usingHotspot && hotspotZoneGeoJson) 
-      ? hotspotZoneGeoJson 
-      : zoneGeoJson;
-
-    if (!geoDataToDownload) {
-      console.warn('No GeoJSON data available to download.');
+    const geojson = buildExportGeoJson();
+    if (!geojson) {
+      console.warn('No result data available to download.');
       return;
     }
-
-    // 1. Convert the GeoJSON object to a string
-    const dataStr = JSON.stringify(geoDataToDownload, null, 2);
-    
-    // 2. Create a Blob from the string
-    const blob = new Blob([dataStr], { type: 'application/geo+json' });
-    
-    // 3. Create a temporary object URL
-    const url = URL.createObjectURL(blob);
-    
-    // 4. Create a hidden <a> tag, click it, and remove it
-    const link = document.createElement('a');
-    link.href = url;
-    
-    // Create a clean filename based on the node title
-    const cleanName = nodeTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    link.download = `${cleanName}_export.geojson`;
-    
-    document.body.appendChild(link);
-    link.click();
-    
-    // 5. Clean up the URL to prevent memory leaks
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    setDownloading(true);
+    try {
+      await exportResult({
+        name: nodeTitle,
+        geojson,
+        provenance: {
+          ...(provenance || {}),
+          request: data?.spatialData?.request || null,
+          reports: data?.spatialData?.reports || null,
+          changes: data?.spatialData?.changes || null,
+          engine: data?.spatialData?.engine || null,
+          hotspot: usingHotspot ? (hotspotAudit || null) : null,
+        },
+      });
+    } catch (error) {
+      console.error('Result export failed:', error);
+      alert(`Export failed: ${error.message}`);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -527,16 +539,17 @@ const ResultMapNode = memo(({ id, data }) => {
           )}
 
           {/* --- NEW: DOWNLOAD BUTTON --- */}
-          {(showZones && (zoneGeoJson || hotspotZoneGeoJson)) && (
+          {((showZones && (zoneGeoJson || hotspotZoneGeoJson)) || (resultMapData && Object.keys(resultMapData).length > 0)) && (
             <button
               onClick={handleDownloadGeoJson}
+              disabled={downloading}
               className="nodrag"
               style={{
                 background: 'rgba(255,255,255,0.2)',
                 border: 'none', borderRadius: '4px', padding: '2px 4px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', transition: 'background 0.15s ease'
               }}
-              title="Download GeoJSON mapping"
+              title="Download this result with its provenance (GeoParquet, GeoPackage, GeoJSON)"
             >
               <Download size={12} />
             </button>

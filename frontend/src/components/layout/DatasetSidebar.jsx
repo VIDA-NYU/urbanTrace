@@ -14,6 +14,8 @@ const DatasetSidebar = () => {
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  // Where the uploaded data came from, recorded in the catalog's origin record (redesign section 2.2)
+  const [uploadOrigin, setUploadOrigin] = useState({ source_url: '', license: '', publisher: '' });
   const uploadInputRef = useRef(null);
 
   const fetchDatasets = () => {
@@ -77,6 +79,9 @@ const DatasetSidebar = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedUploadFile);
+      Object.entries(uploadOrigin).forEach(([key, value]) => {
+        if (value.trim()) formData.append(key, value.trim());
+      });
 
       const response = await axios.post(`${API_BASE}/datasets/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -86,6 +91,7 @@ const DatasetSidebar = () => {
       const geoType = response?.data?.geometricType || 'Unknown';
       setUploadSuccess(`Uploaded ${uploadedName} (geometricType: ${geoType})`);
       setSelectedUploadFile(null);
+      setUploadOrigin({ source_url: '', license: '', publisher: '' });
       if (uploadInputRef.current) {
         uploadInputRef.current.value = '';
       }
@@ -271,6 +277,24 @@ const DatasetSidebar = () => {
             >
               <Upload size={24} />
               <div style={{ fontSize: '0.9rem', marginTop: '8px' }}>{selectedUploadFile ? selectedUploadFile.name : 'Click or drop a .geojson file here'}</div>
+            </div>
+
+            <div style={{ fontSize: '0.8rem', color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Where does this data come from?</div>
+            {[
+              ['source_url', 'Source URL (dataset page or download link)'],
+              ['publisher', 'Publisher (e.g. NYC Department of Education)'],
+              ['license', 'License or terms (e.g. CC-BY-4.0)'],
+            ].map(([key, placeholder]) => (
+              <input
+                key={key}
+                value={uploadOrigin[key]}
+                onChange={(e) => setUploadOrigin((o) => ({ ...o, [key]: e.target.value }))}
+                placeholder={placeholder}
+                style={{ width: '100%', boxSizing: 'border-box', marginBottom: '6px', padding: '6px 8px', fontSize: '0.8rem', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+              />
+            ))}
+            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '12px' }}>
+              Recorded with the dataset and included in exports. Without a source, the dataset is exported as of unknown origin.
             </div>
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>

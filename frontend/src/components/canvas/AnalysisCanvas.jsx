@@ -15,6 +15,15 @@ import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
 import CompareMapNode from './nodes/CompareMapNode';
 import FloatingCopilotInput from '../copilot/FloatingCopilotInput';
 import { API_BASE } from '../../config/api';
+import CollectionBar from '../collection/CollectionBar';
+import {
+  getCollection, createCollection, updateCollection, exportCollection,
+  serializeCanvas, collectionDatasets, collectionIntegrations,
+} from '../../lib/collections';
+
+const EMPTY_COLLECTION = {
+  id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
+};
 
 const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => {
   const [nodes, setNodes] = useState([]);
@@ -35,6 +44,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const [availableDatasets, setAvailableDatasets] = useState([]);
   const [copilotSuggestions, setCopilotSuggestions] = useState([]);
   const [autoSuggestRequest, setAutoSuggestRequest] = useState(null);
+
+  // COLLECTION (redesign section 2.1): what is saved, reopened and exported
+  const [collection, setCollection] = useState(EMPTY_COLLECTION);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
+  const [collectionStatus, setCollectionStatus] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   
@@ -720,7 +735,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     );
   }, [getEdges]);
 
-  const addDatasetNodeById = useCallback(async (datasetId, colorBy) => {
+  const addDatasetNodeById = useCallback(async (datasetId, colorBy, provenance = {}) => {
     const normalizedId = normalizeDatasetId(datasetId);
     if (!normalizedId) {
       console.warn(`[Copilot] add_dataset_node ignored: invalid dataset_id='${datasetId}'`);
@@ -784,6 +799,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           onShowInfo: handleShowInfo,
           onColumnChange: handleDatasetColumnChange,
           ...(resolvedColorBy ? { selectedColumn: resolvedColorBy, colorBy: resolvedColorBy } : {}),
+          ...(provenance.addedBy ? { addedBy: provenance.addedBy } : {}),
+          ...(provenance.reason ? { copilotReason: provenance.reason } : {}),
         },
       };
 
@@ -847,7 +864,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       return false;
     }
 
-    const wasApplied = await addDatasetNodeById(action.datasetId, action.colorBy);
+    const wasApplied = await addDatasetNodeById(action.datasetId, action.colorBy, {
+      addedBy: 'copilot',
+      reason: suggestion.reason || '',
+    });
     if (wasApplied) {
       removeCopilotSuggestion(suggestion);
     }
@@ -869,6 +889,161 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     return exists;
   }, [copilotSuggestions, getSuggestionKey, removeCopilotSuggestion]);
 
+  const attachCallbacks = useCallback((type, data) => {
+    const next = { ...data };
+    if (type === 'operationNode') {
+      next.color = data.opType === 'buffer' ? '#ec4899' : '#8b5cf6';
+    } else if (type === 'integrationNode') {
+      next.onIntegrationComplete = handleIntegrationComplete;
+      next.onLogActivity = onLogActivity;
+      next.onDeleteNode = handleDeleteNode;
+    } else if (type === 'compareMapNode') {
+      next.onCompareHover = handleCompareHover;
+      next.connectedResults = next.connectedResults || [];
+      next.isMapSyncEnabled = isMapSyncEnabled;
+      next.globalViewState = globalViewState;
+      next.onGlobalViewStateChange = setGlobalViewState;
+      next.onDeleteNode = handleDeleteNode;
+    } else if (type === 'datasetNode') {
+      next.onShowInfo = handleShowInfo;
+      next.onColumnChange = handleDatasetColumnChange;
+      next.isMapSyncEnabled = isMapSyncEnabled;
+      next.globalViewState = globalViewState;
+      next.onGlobalViewStateChange = setGlobalViewState;
+      next.onDeleteNode = handleDeleteNode;
+    }
+    return next;
+  }, [globalViewState, handleCompareHover, handleDatasetColumnChange, handleDeleteNode, handleIntegrationComplete,
+      handleShowInfo, isMapSyncEnabled, onLogActivity]);
+
+  // ---------------------------------------------------------------------------------------------
+  // COLLECTION: build the document from the canvas, save it, reopen it, export it
+
+  const collectionDoc = useMemo(() => ({
+    name: collection.name,
+    goal: collection.goal,
+    notes: collection.notes,
+    study_area: collection.study_area,
+    analyses: collection.analyses,
+    datasets: collectionDatasets(nodes),
+    // Integrations saved earlier stay while their integration node is on the canvas; results on
+    // the canvas add or replace them.
+    integrations: (() => {
+      const current = collectionIntegrations(nodes, edges);
+      const nodeIds = new Set(nodes.map((n) => n.id));
+      const currentIds = new Set(current.map((i) => i.id));
+      const kept = (collection.integrations || []).filter((i) => !currentIds.has(i.id) && nodeIds.has(i.node_id));
+      return [...kept, ...current];
+    })(),
+    canvas: serializeCanvas(nodes, edges),
+  }), [collection, nodes, edges]);
+  const collectionJson = useMemo(() => JSON.stringify(collectionDoc), [collectionDoc]);
+  const collectionDirty = savedSnapshot === null
+    ? (nodes.length > 0 || collection.goal !== '' || collection.name !== EMPTY_COLLECTION.name)
+    : collectionJson !== savedSnapshot;
+
+  const saveCollection = useCallback(async () => {
+    setCollectionStatus('Saving…');
+    try {
+      const saved = collection.id
+        ? await updateCollection(collection.id, collectionDoc)
+        : await createCollection(collectionDoc);
+      setCollection((c) => ({ ...c, id: saved.id }));
+      setSavedSnapshot(collectionJson);
+      setCollectionStatus('');
+      return saved.id;
+    } catch (error) {
+      setCollectionStatus(`Save failed: ${error.message}`);
+      return null;
+    }
+  }, [collection.id, collectionDoc, collectionJson]);
+
+  const confirmDiscard = useCallback(() => (
+    !collectionDirty || window.confirm('Discard unsaved changes to this collection?')
+  ), [collectionDirty]);
+
+  const newCollection = useCallback(() => {
+    if (!confirmDiscard()) return;
+    setNodes([]);
+    setEdges([]);
+    setCollection(EMPTY_COLLECTION);
+    setSavedSnapshot(null);
+    setCollectionStatus('');
+  }, [confirmDiscard]);
+
+  const openCollection = useCallback(async (id) => {
+    if (!confirmDiscard()) return;
+    setCollectionStatus('Opening…');
+    try {
+      const doc = await getCollection(id);
+      const datasets = await fetchAvailableDatasets();
+      const savedNodes = doc.canvas?.nodes || [];
+      const savedEdges = doc.canvas?.edges || [];
+      const byNodeId = new Map(savedNodes.map((n) => [n.id, n]));
+      const restored = savedNodes.map((n) => {
+        let data = { ...n.data };
+        if (n.type === 'datasetNode') {
+          const dataset = findDatasetById(data.id || data.filename, datasets);
+          data = { ...(dataset || {}), ...data, metadata: dataset?.metadata || null };
+        }
+        if (n.type === 'integrationNode') {
+          // Re-link the inputs from the edges, with fresh dataset metadata.
+          const connectedDatasets = [];
+          data.connectedZoneFilename = null;
+          data.connectedZoneMetadata = null;
+          for (const e of savedEdges.filter((edge) => edge.target === n.id)) {
+            const src = byNodeId.get(e.source);
+            const dataset = src ? findDatasetById(src.data?.id || src.data?.filename, datasets) : null;
+            if (!src || !dataset) continue;
+            if (e.targetHandle === 'zones') {
+              data.connectedZoneFilename = dataset.filename;
+              data.connectedZoneMetadata = dataset.metadata;
+            } else {
+              connectedDatasets.push({
+                id: `var_${e.source}`, nodeId: e.source, filename: dataset.filename, metadata: dataset.metadata,
+                inheritedColumn: src.data?.selectedColumn || '',
+              });
+            }
+          }
+          data.connectedDatasets = connectedDatasets;
+          data.connectedDatasetFilename = connectedDatasets[0]?.filename || null;
+          data.connectedDatasetMetadata = connectedDatasets[0]?.metadata || null;
+        }
+        return { id: n.id, type: n.type, position: n.position, data: attachCallbacks(n.type, data) };
+      });
+      setNodes(restored);
+      setEdges(savedEdges);
+      const loaded = {
+        id: doc.id, name: doc.name, goal: doc.goal || '', notes: doc.notes || '',
+        study_area: doc.study_area || null, analyses: doc.analyses || [], integrations: doc.integrations || [],
+      };
+      setCollection(loaded);
+      // The snapshot is taken from the restored canvas on the next render (see effect below).
+      setSavedSnapshot('__pending__');
+      setCollectionStatus(doc.integrations?.length ? 'Opened: run integrations to see results' : '');
+    } catch (error) {
+      setCollectionStatus(`Open failed: ${error.message}`);
+    }
+  }, [attachCallbacks, confirmDiscard, fetchAvailableDatasets, findDatasetById]);
+
+  useEffect(() => {
+    if (savedSnapshot === '__pending__') setSavedSnapshot(collectionJson);
+  }, [savedSnapshot, collectionJson]);
+
+  const handleExport = useCallback(async (options) => {
+    setExporting(true);
+    try {
+      const id = collectionDirty || !collection.id ? await saveCollection() : collection.id;
+      if (!id) return;
+      await exportCollection(id, options);
+      setCollectionStatus('');
+    } catch (error) {
+      setCollectionStatus(`Export failed: ${error.message}`);
+    } finally {
+      setExporting(false);
+    }
+  }, [collection.id, collectionDirty, saveCollection]);
+
   const onDragOver = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -886,33 +1061,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       // Determine type dynamically based on what was dragged from the sidebar
       const newNodeType = dataItem.type || 'datasetNode';
       const nodeId = `node_${Date.now()}`;
-      let newNodeData = { ...dataItem };
-
-      // 5. Inject specific handlers based on the node type
-      if (newNodeType === 'operationNode') {
-          newNodeData.color = dataItem.opType === 'buffer' ? '#ec4899' : '#8b5cf6';
-      } else if (newNodeType === 'integrationNode') {
-          // Inject the callback so the node can talk back to the canvas when the API finishes
-          newNodeData.onIntegrationComplete = handleIntegrationComplete;
-          newNodeData.onLogActivity = onLogActivity; // ACTIVITY LOG: Pass audit trail callback
-          newNodeData.onDeleteNode = handleDeleteNode;
-        } else if (newNodeType === 'compareMapNode') {
-          newNodeData.onCompareHover = handleCompareHover;
-          newNodeData.connectedResults = [];
-          newNodeData.isMapSyncEnabled = isMapSyncEnabled;
-          newNodeData.globalViewState = globalViewState;
-          newNodeData.onGlobalViewStateChange = setGlobalViewState;
-          newNodeData.onDeleteNode = handleDeleteNode;
-      } else {
-          // DatasetNode: inject column select callback for state inheritance
-          // Also include sync props for viewport linking
-          newNodeData.onShowInfo = handleShowInfo;
-          newNodeData.onColumnChange = handleDatasetColumnChange;
-          newNodeData.isMapSyncEnabled = isMapSyncEnabled;
-          newNodeData.globalViewState = globalViewState;
-          newNodeData.onGlobalViewStateChange = setGlobalViewState;
-          newNodeData.onDeleteNode = handleDeleteNode;
-      }
+      // Inject the handlers each node type needs to talk back to the canvas
+      const newNodeData = attachCallbacks(newNodeType, { ...dataItem });
 
       const newNode = {
         id: nodeId,
@@ -921,25 +1071,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         data: newNodeData,
       };
 
-      console.log('Adding new node:', newNode);
-
       setNodes((nds) => nds.concat(newNode));
       if (newNodeType === 'datasetNode') {
         queueAutoSuggestRequest(dataItem);
       }
     },
-    [
-      globalViewState,
-      handleDatasetColumnChange,
-      handleIntegrationComplete,
-      handleShowInfo,
-      isMapSyncEnabled,
-      onLogActivity,
-      screenToFlowPosition,
-      handleCompareHover,
-      handleDeleteNode,
-      queueAutoSuggestRequest,
-    ]
+    [attachCallbacks, screenToFlowPosition, queueAutoSuggestRequest]
   );
 
   return (
@@ -971,6 +1108,19 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         {isMapSyncEnabled ? <Link size={14} /> : <Unlink size={14} />}
         {isMapSyncEnabled ? 'Maps Linked' : 'Link Maps'}
       </button>
+
+      <CollectionBar
+        collection={collection}
+        dirty={collectionDirty}
+        status={collectionStatus}
+        exporting={exporting}
+        onRename={(name) => setCollection((c) => ({ ...c, name }))}
+        onGoalChange={(goal) => setCollection((c) => ({ ...c, goal }))}
+        onNew={newCollection}
+        onOpen={openCollection}
+        onSave={saveCollection}
+        onExport={handleExport}
+      />
 
       <div style={{ width: '100%', height: '100%' }} onDrop={onDrop} onDragOver={onDragOver}>
         <ReactFlow

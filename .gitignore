@@ -22,3 +22,6 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 benchmark/scripts/operator_selection/quantitative_ablation-operator_selection_accuracy-token.ipynb
+# Local state written by the backend
+data/collections/
+data/.hash_cache.json

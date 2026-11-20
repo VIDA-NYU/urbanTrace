@@ -206,23 +206,24 @@ const IntegrationNode = memo(({ id, data }) => {
         };
       });
 
+      const requestBody = {
+        variables: withOutputNames.map(v => ({
+          dataset_path: v.filename,
+          target_column: v.targetColumn,
+          output_name: v.outputName,
+          allocation_operator: v.allocation,
+          grid_aggregation_operator: v.aggregation,
+          zoning_mapping_operator: v.zoningMapping,
+          zoning_aggregation_operator: v.zoningAggregation
+        })),
+        zones_path: zoningEnabled ? data.connectedZoneFilename : null,
+        resolution: parseInt(resolution),
+        output_mode: zoningEnabled ? outputMode : 'grid'  // Default to grid when no zoning
+      };
       const response = await fetch(`${API_BASE}/api/integrate_multivariate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          variables: withOutputNames.map(v => ({
-            dataset_path: v.filename,
-            target_column: v.targetColumn,
-            output_name: v.outputName,
-            allocation_operator: v.allocation,
-            grid_aggregation_operator: v.aggregation,
-            zoning_mapping_operator: v.zoningMapping,
-            zoning_aggregation_operator: v.zoningAggregation
-          })),
-          zones_path: zoningEnabled ? data.connectedZoneFilename : null,
-          resolution: parseInt(resolution),
-          output_mode: zoningEnabled ? outputMode : 'grid'  // Default to grid when no zoning
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -234,6 +235,8 @@ const IntegrationNode = memo(({ id, data }) => {
       }
 
       const resultData = await response.json();
+      // The request, so a collection can record and rerun this integration (redesign section 2.1)
+      resultData.request = requestBody;
       resultData.isMultivariate = configsArray.length > 1;
       resultData.isZoned = zoningEnabled;
       resultData.outputMode = zoningEnabled ? outputMode : 'grid';

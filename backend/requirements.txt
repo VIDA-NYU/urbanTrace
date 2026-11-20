@@ -13,6 +13,7 @@ shapely
 h3
 pandas
 numpy
+pyarrow
 
 # Profiling
 datamart-profiler

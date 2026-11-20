@@ -1,0 +1,2347 @@
+{
+ "2009_yellow_taxi_trip_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "f9tw-8p66",
+  "source_url": "https://data.cityofnewyork.us/d/f9tw-8p66",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2015-12-08T00:31:16+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/f9tw-8p66.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2009 Yellow Taxi Trip Data",
+  "category": "Transportation"
+ },
+ "2010_yellow_taxi_trip_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "74wj-s5ij",
+  "source_url": "https://data.cityofnewyork.us/d/74wj-s5ij",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2015-12-07T01:41:47+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/74wj-s5ij.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2010 Yellow Taxi Trip Data",
+  "category": "Transportation"
+ },
+ "2011_yellow_taxi_trip_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "uwyp-dntv",
+  "source_url": "https://data.cityofnewyork.us/d/uwyp-dntv",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2015-12-06T23:16:09+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uwyp-dntv.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2011 Yellow Taxi Trip Data",
+  "category": "Transportation"
+ },
+ "2012_yellow_taxi_trip_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "kerk-3eby",
+  "source_url": "https://data.cityofnewyork.us/d/kerk-3eby",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2015-12-08T17:23:23+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/kerk-3eby.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2012 Yellow Taxi Trip Data",
+  "category": "Transportation"
+ },
+ "2013_yellow_taxi_trip_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "t7ny-aygi",
+  "source_url": "https://data.cityofnewyork.us/d/t7ny-aygi",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2015-11-12T18:38:36+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/t7ny-aygi.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2013 Yellow Taxi Trip Data",
+  "category": "Transportation"
+ },
+ "2017_2018_schools_nypd_crime_data_report": {
+  "portal": "NYC Open Data",
+  "portal_id": "kwvk-z7i9",
+  "source_url": "https://data.cityofnewyork.us/d/kwvk-z7i9",
+  "publisher": "Department of Education (DOE)",
+  "license": null,
+  "source_updated_at": "2019-04-29T14:04:12+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/kwvk-z7i9.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2017 - 2018 Schools NYPD Crime Data Report",
+  "category": "Education"
+ },
+ "2018_2019_school_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "9ck8-hj3u",
+  "source_url": "https://data.cityofnewyork.us/d/9ck8-hj3u",
+  "publisher": "Department of Education (DOE)",
+  "license": null,
+  "source_updated_at": "2019-05-15T17:37:03+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/9ck8-hj3u.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2018 - 2019 School Locations",
+  "category": "Education"
+ },
+ "2018_central_park_squirrel_census_squirrel_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "vfnx-vebw",
+  "source_url": "https://data.cityofnewyork.us/d/vfnx-vebw",
+  "publisher": "The Squirrel Census",
+  "license": null,
+  "source_updated_at": "2019-10-18T17:54:51+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/vfnx-vebw.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2018 Central Park Squirrel Census - Squirrel Data",
+  "category": "Environment"
+ },
+ "2019_2020_school_point_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "a3nt-yts4",
+  "source_url": "https://data.cityofnewyork.us/d/a3nt-yts4",
+  "publisher": "Department of Education (DOE)",
+  "license": null,
+  "source_updated_at": "2019-09-04T13:59:55+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/a3nt-yts4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2019 - 2020 School Point Locations",
+  "category": "Education"
+ },
+ "2020_doe_high_school_directory": {
+  "portal": "NYC Open Data",
+  "portal_id": "23z9-6uk9",
+  "source_url": "https://data.cityofnewyork.us/d/23z9-6uk9",
+  "publisher": "Department of Education (DOE)",
+  "license": null,
+  "source_updated_at": "2019-10-23T22:15:58+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/23z9-6uk9.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2020 DOE High School Directory",
+  "category": "Education"
+ },
+ "City_Council_Districs": {
+  "portal": "NYC Open Data",
+  "portal_id": "mkqi-d8x3",
+  "source_url": "https://data.cityofnewyork.us/d/mkqi-d8x3",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2026-11-02T19:36:57+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mkqi-d8x3.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "City Council Districts (Water Areas Included)",
+  "category": "City Government"
+ },
+ "Community_Districs": {
+  "portal": "NYC Open Data",
+  "portal_id": "5crt-au7u",
+  "source_url": "https://data.cityofnewyork.us/d/5crt-au7u",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2026-11-02T19:40:00+00:00",
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5crt-au7u.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Community Districts",
+  "category": "City Government"
+ },
+ "MODZCTA": {
+  "portal": "NYC Open Data",
+  "portal_id": "pri4-ifjk",
+  "source_url": "https://data.cityofnewyork.us/d/pri4-ifjk",
+  "publisher": "Department of Health and Mental Hygiene (DOHMH)",
+  "license": null,
+  "source_updated_at": "2020-05-13T23:28:12+00:00",
+  "catalog_added_at": "2026-03-09",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/pri4-ifjk.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Modified Zip Code Tabulation Areas (MODZCTA)",
+  "category": "Health"
+ },
+ "NTA_Neighborhood_Tabulation_Areas": {
+  "portal": "NYC Open Data",
+  "portal_id": "9nt8-h7nd",
+  "source_url": "https://data.cityofnewyork.us/d/9nt8-h7nd",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2026-11-02T19:20:21+00:00",
+  "catalog_added_at": "2026-03-16",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/9nt8-h7nd.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "2020 Neighborhood Tabulation Areas (NTAs)",
+  "category": "City Government"
+ },
+ "NYC_Bike_Routes": {
+  "portal": "NYC Open Data",
+  "portal_id": "mzxg-pwib",
+  "source_url": "https://data.cityofnewyork.us/d/mzxg-pwib",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-07-24T17:01:06+00:00",
+  "catalog_added_at": "2026-03-16",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mzxg-pwib.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "New York City Bike Routes",
+  "category": null
+ },
+ "NYC_HVI": {
+  "portal": null,
+  "portal_id": "2ztn-w637",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/2ztn-w637.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "2ztn-w637 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_Issued_Licenses": {
+  "portal": null,
+  "portal_id": "1yod-q658",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/1yod-q658.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "1yod-q658 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_Schools": {
+  "portal": null,
+  "portal_id": "dk6a-vimn",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-16",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/dk6a-vimn.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "dk6a-vimn not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_Wi-Fi_Hotspot_Locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "yjub-udmw",
+  "source_url": "https://data.cityofnewyork.us/d/yjub-udmw",
+  "publisher": "Office of Technology and Innovation (OTI)",
+  "license": null,
+  "source_updated_at": "2019-09-26T16:24:40+00:00",
+  "catalog_added_at": "2026-03-16",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/yjub-udmw.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Wi-Fi Hotspot Locations",
+  "category": "City Government"
+ },
+ "NYC_air_pollution": {
+  "portal": null,
+  "portal_id": "bclm-y564",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/bclm-y564.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "bclm-y564 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_automated_traffic_volume_counts": {
+  "portal": null,
+  "portal_id": "8hca-m742",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/8hca-m742.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "8hca-m742 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_bicycle_counts": {
+  "portal": null,
+  "portal_id": "9h6s-2g4c",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/9h6s-2g4c.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "9h6s-2g4c not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_crime_rate_per_1000_residents": {
+  "portal": null,
+  "portal_id": "qvna-w243",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/qvna-w243.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "qvna-w243 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_crime_rate_property": {
+  "portal": null,
+  "portal_id": "mtek-r581",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mtek-r581.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "mtek-r581 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_housing_units": {
+  "portal": null,
+  "portal_id": "7kqm-p184",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/7kqm-p184.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "7kqm-p184 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_income_diversity_ratio": {
+  "portal": null,
+  "portal_id": "y8ud-rvh9",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/y8ud-rvh9.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "y8ud-rvh9 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_libraries": {
+  "portal": null,
+  "portal_id": "7q5i-si2o",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-16",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/7q5i-si2o.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "7q5i-si2o not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_median_household_income": {
+  "portal": null,
+  "portal_id": "cazf-j392",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/cazf-j392.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "cazf-j392 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_median_rent": {
+  "portal": null,
+  "portal_id": "ybrk-n615",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ybrk-n615.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "ybrk-n615 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_pedestrian_counts": {
+  "portal": null,
+  "portal_id": "9rle-x521",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/9rle-x521.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "9rle-x521 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_population": {
+  "portal": null,
+  "portal_id": "yodf-k658",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/yodf-k658.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "yodf-k658 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_poverty_rate": {
+  "portal": null,
+  "portal_id": "5h9s-2g4c",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5h9s-2g4c.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "5h9s-2g4c not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_students_performing_english_language_arts": {
+  "portal": null,
+  "portal_id": "sdom-v847",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/sdom-v847.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "sdom-v847 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_students_performing_math": {
+  "portal": null,
+  "portal_id": "lqhe-p529",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-19",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/lqhe-p529.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "lqhe-p529 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_unemployment_rate": {
+  "portal": null,
+  "portal_id": "uawg-n271",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uawg-n271.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "uawg-n271 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYC_vehicle_collisions_crashes": {
+  "portal": null,
+  "portal_id": "4vub-j903",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/4vub-j903.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "4vub-j903 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "NYPD_arrests_data": {
+  "portal": null,
+  "portal_id": "mhrs-p190",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-02",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mhrs-p190.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "mhrs-p190 not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "accessible_pedestrian_signal_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "de3m-c5p4",
+  "source_url": "https://data.cityofnewyork.us/d/de3m-c5p4",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-19T17:42:59+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/de3m-c5p4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Accessible Pedestrian Signal Locations",
+  "category": "Transportation"
+ },
+ "archived_nypd_shooting_incident_data_historic": {
+  "portal": "NYC Open Data",
+  "portal_id": "833y-fsy8",
+  "source_url": "https://data.cityofnewyork.us/d/833y-fsy8",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2025-04-15T18:16:42+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/833y-fsy8.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "ARCHIVED_NYPD Shooting Incident Data (Historic)",
+  "category": "Public Safety"
+ },
+ "building_elevation_and_subgrade_bes": {
+  "portal": "NYC Open Data",
+  "portal_id": "bsin-59hv",
+  "source_url": "https://data.cityofnewyork.us/d/bsin-59hv",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2023-09-19T16:07:13+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/bsin-59hv.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Building Elevation and Subgrade (BES)",
+  "category": "City Government"
+ },
+ "canine_waste_dispensers": {
+  "portal": "NYC Open Data",
+  "portal_id": "5npv-j6gn",
+  "source_url": "https://data.cityofnewyork.us/d/5npv-j6gn",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-11-02T14:04:03+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5npv-j6gn.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Canine Waste Dispensers",
+  "category": "Recreation"
+ },
+ "capital_projects_database_cpdb_projects_polygons": {
+  "portal": "NYC Open Data",
+  "portal_id": "9jkp-n57r",
+  "source_url": "https://data.cityofnewyork.us/d/9jkp-n57r",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2026-08-24T15:51:07+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/9jkp-n57r.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Capital Projects Database (CPDB) - Projects (Polygons)",
+  "category": "City Government"
+ },
+ "childrens_play_areas_cpas": {
+  "portal": "NYC Open Data",
+  "portal_id": "j55h-3upk",
+  "source_url": "https://data.cityofnewyork.us/d/j55h-3upk",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-11-06T14:11:00+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/j55h-3upk.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Playgrounds with Dedicated Children's Areas (DCAs)",
+  "category": "Recreation"
+ },
+ "city_bench_locations_historical": {
+  "portal": "NYC Open Data",
+  "portal_id": "kuxa-tauh",
+  "source_url": "https://data.cityofnewyork.us/d/kuxa-tauh",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2020-12-22T20:20:27+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/kuxa-tauh.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "City Bench Locations (Historical)",
+  "category": "Transportation"
+ },
+ "citywide_public_computer_centers": {
+  "portal": null,
+  "portal_id": "cuzb-dmcd",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/cuzb-dmcd.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "cuzb-dmcd not found on NYC Open Data (HTTP 403); origin unknown"
+  ]
+ },
+ "dcas_managed_public_buildings": {
+  "portal": "NYC Open Data",
+  "portal_id": "xx2p-4jnq",
+  "source_url": "https://data.cityofnewyork.us/d/xx2p-4jnq",
+  "publisher": "Department of Citywide Administrative Services (DCAS)",
+  "license": null,
+  "source_updated_at": "2024-05-07T14:15:59+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/xx2p-4jnq.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DCAS Managed Public Buildings",
+  "category": "City Government"
+ },
+ "department_for_the_aging_nyc_aging_all_contracted_providers": {
+  "portal": "NYC Open Data",
+  "portal_id": "cqc8-am9x",
+  "source_url": "https://data.cityofnewyork.us/d/cqc8-am9x",
+  "publisher": "Department for the Aging (NYC Aging)",
+  "license": null,
+  "source_updated_at": "2026-11-15T08:30:23+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/cqc8-am9x.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Department for the Aging (NYC Aging) - All Contracted Providers",
+  "category": "Social Services"
+ },
+ "designated_and_calendared_buildings_and_sites": {
+  "portal": "NYC Open Data",
+  "portal_id": "ncre-qhxs",
+  "source_url": "https://data.cityofnewyork.us/d/ncre-qhxs",
+  "publisher": "Landmarks Preservation Commission (LPC)",
+  "license": null,
+  "source_updated_at": "2026-11-09T20:44:55+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ncre-qhxs.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Designated and Calendared Buildings and Sites",
+  "category": "Housing & Development"
+ },
+ "dob_now_certificate_of_occupancy": {
+  "portal": "NYC Open Data",
+  "portal_id": "pkdm-hqz6",
+  "source_url": "https://data.cityofnewyork.us/d/pkdm-hqz6",
+  "publisher": "Department of Buildings (DOB)",
+  "license": null,
+  "source_updated_at": "2026-11-19T21:02:33+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/pkdm-hqz6.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DOB NOW: Certificate of Occupancy",
+  "category": "Housing & Development"
+ },
+ "dohmh_covid_19_antibody_by_modified_zip_code_tabulation_area": {
+  "portal": "NYC Open Data",
+  "portal_id": "6qs8-44ki",
+  "source_url": "https://data.cityofnewyork.us/d/6qs8-44ki",
+  "publisher": "Department of Health and Mental Hygiene (DOHMH)",
+  "license": null,
+  "source_updated_at": "2024-07-03T04:10:41+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/6qs8-44ki.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DOHMH COVID-19 Antibody-by-Modified ZIP Code Tabulation Area",
+  "category": null
+ },
+ "dsny_disposal_vendors": {
+  "portal": "NYC Open Data",
+  "portal_id": "mf9g-zhbw",
+  "source_url": "https://data.cityofnewyork.us/d/mf9g-zhbw",
+  "publisher": "Department of Sanitation (DSNY)",
+  "license": null,
+  "source_updated_at": "2026-01-28T21:59:06+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mf9g-zhbw.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DSNY Disposal Vendors",
+  "category": "City Government"
+ },
+ "dsny_donatenyc_directory": {
+  "portal": "NYC Open Data",
+  "portal_id": "gkgs-za6m",
+  "source_url": "https://data.cityofnewyork.us/d/gkgs-za6m",
+  "publisher": "Department of Sanitation (DSNY)",
+  "license": null,
+  "source_updated_at": "2026-11-19T10:40:31+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/gkgs-za6m.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DSNY DonateNYC Directory",
+  "category": "Environment"
+ },
+ "dsny_garages": {
+  "portal": "NYC Open Data",
+  "portal_id": "xw3j-2yxf",
+  "source_url": "https://data.cityofnewyork.us/d/xw3j-2yxf",
+  "publisher": "Department of Sanitation",
+  "license": null,
+  "source_updated_at": "2026-11-19T11:08:43+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/xw3j-2yxf.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DSNY Garages",
+  "category": "Environment"
+ },
+ "dsny_litter_basket_inventory": {
+  "portal": "NYC Open Data",
+  "portal_id": "8znf-7b2c",
+  "source_url": "https://data.cityofnewyork.us/d/8znf-7b2c",
+  "publisher": "NYC Department of Sanitation",
+  "license": null,
+  "source_updated_at": "2026-11-15T17:09:15+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/8znf-7b2c.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DSNY Litter Basket Inventory",
+  "category": "Environment"
+ },
+ "dsny_special_waste_drop_off_sites": {
+  "portal": "NYC Open Data",
+  "portal_id": "242c-ru4i",
+  "source_url": "https://data.cityofnewyork.us/d/242c-ru4i",
+  "publisher": "Department of Sanitation",
+  "license": null,
+  "source_updated_at": "2026-11-19T11:15:22+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/242c-ru4i.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DSNY Special Waste Drop-off Sites",
+  "category": "Environment"
+ },
+ "dycd_program_sites": {
+  "portal": "NYC Open Data",
+  "portal_id": "ebkm-iyma",
+  "source_url": "https://data.cityofnewyork.us/d/ebkm-iyma",
+  "publisher": "Department of Youth and Community Development (DYCD)",
+  "license": null,
+  "source_updated_at": "2026-09-24T13:52:59+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ebkm-iyma.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "DYCD Program Sites",
+  "category": "Social Services"
+ },
+ "electronics_drop_off_locations_in_nyc": {
+  "portal": "NYC Open Data",
+  "portal_id": "wshr-5vic",
+  "source_url": "https://data.cityofnewyork.us/d/wshr-5vic",
+  "publisher": "Department of Sanitation",
+  "license": null,
+  "source_updated_at": "2026-11-19T11:01:39+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/wshr-5vic.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Electronics Drop Off Locations in NYC",
+  "category": "Environment"
+ },
+ "exclusive_pedestrian_signal_barnes_dance_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "8kuj-2n3u",
+  "source_url": "https://data.cityofnewyork.us/d/8kuj-2n3u",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-09-24T19:49:14+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/8kuj-2n3u.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Exclusive Pedestrian Signal (Barnes Dance) Locations",
+  "category": "Transportation"
+ },
+ "food_scrap_drop_off_locations_in_nyc": {
+  "portal": "NYC Open Data",
+  "portal_id": "if26-z6xq",
+  "source_url": "https://data.cityofnewyork.us/d/if26-z6xq",
+  "publisher": "Department of Sanitation",
+  "license": null,
+  "source_updated_at": "2026-11-19T20:12:55+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/if26-z6xq.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Food Scrap Drop-Off Locations in NYC",
+  "category": "Environment"
+ },
+ "forestry_inspections": {
+  "portal": "NYC Open Data",
+  "portal_id": "4pt5-3vv4",
+  "source_url": "https://data.cityofnewyork.us/d/4pt5-3vv4",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-11-05T15:21:50+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/4pt5-3vv4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Forestry Inspections",
+  "category": "Environment"
+ },
+ "forestry_planting_spaces": {
+  "portal": "NYC Open Data",
+  "portal_id": "82zj-84is",
+  "source_url": "https://data.cityofnewyork.us/d/82zj-84is",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-10-22T18:44:25+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/82zj-84is.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Forestry Planting Spaces",
+  "category": "Environment"
+ },
+ "forestry_service_requests": {
+  "portal": "NYC Open Data",
+  "portal_id": "mu46-p9is",
+  "source_url": "https://data.cityofnewyork.us/d/mu46-p9is",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-11-09T14:34:47+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mu46-p9is.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Forestry Service Requests",
+  "category": "Environment"
+ },
+ "forestry_tree_points": {
+  "portal": "NYC Open Data",
+  "portal_id": "hn5i-inap",
+  "source_url": "https://data.cityofnewyork.us/d/hn5i-inap",
+  "publisher": "Department of Parks and Recreation",
+  "license": null,
+  "source_updated_at": "2026-11-04T14:36:42+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/hn5i-inap.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Forestry Tree Points",
+  "category": "Environment"
+ },
+ "forestry_work_orders": {
+  "portal": "NYC Open Data",
+  "portal_id": "bdjm-n7q4",
+  "source_url": "https://data.cityofnewyork.us/d/bdjm-n7q4",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-11-08T16:58:27+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/bdjm-n7q4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Forestry Work Orders",
+  "category": "Environment"
+ },
+ "historic_districts": {
+  "portal": "NYC Open Data",
+  "portal_id": "skyk-mpzq",
+  "source_url": "https://data.cityofnewyork.us/d/skyk-mpzq",
+  "publisher": "Landmarks Preservation Commission (LPC)",
+  "license": null,
+  "source_updated_at": "2026-06-18T14:56:21+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/skyk-mpzq.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Historic Districts",
+  "category": "Housing & Development"
+ },
+ "holiday_construction_embargo_intersection": {
+  "portal": "NYC Open Data",
+  "portal_id": "jr6f-nsuv",
+  "source_url": "https://data.cityofnewyork.us/d/jr6f-nsuv",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2025-12-08T20:25:18+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/jr6f-nsuv.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Holiday Construction Embargo- Intersection",
+  "category": null
+ },
+ "housing_database_project_level_files": {
+  "portal": null,
+  "portal_id": "uxt4-ugwr",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uxt4-ugwr.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "uxt4-ugwr not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "hurricane_evacuation_centers": {
+  "portal": "NYC Open Data",
+  "portal_id": "p5md-weyf",
+  "source_url": "https://data.cityofnewyork.us/d/p5md-weyf",
+  "publisher": "NYC Emergency Management (NYCEM)",
+  "license": null,
+  "source_updated_at": "2026-09-01T17:03:37+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/p5md-weyf.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Hurricane Evacuation Centers",
+  "category": "Public Safety"
+ },
+ "in_service_alarm_box_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "v57i-gtxb",
+  "source_url": "https://data.cityofnewyork.us/d/v57i-gtxb",
+  "publisher": "New York City Fire Department",
+  "license": null,
+  "source_updated_at": "2019-10-25T17:54:52+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/v57i-gtxb.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "In-Service Alarm Box Locations",
+  "category": "Public Safety"
+ },
+ "individual_landmark_sites": {
+  "portal": "NYC Open Data",
+  "portal_id": "buis-pvji",
+  "source_url": "https://data.cityofnewyork.us/d/buis-pvji",
+  "publisher": "Landmarks Preservation Commission (LPC)",
+  "license": null,
+  "source_updated_at": "2026-06-30T13:45:46+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/buis-pvji.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Individual Landmark Sites",
+  "category": "Housing & Development"
+ },
+ "leaf_drop_off_locations_in_nyc": {
+  "portal": null,
+  "portal_id": "8i9k-4gi5",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/8i9k-4gi5.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "8i9k-4gi5 not found on NYC Open Data (HTTP 403); origin unknown"
+  ]
+ },
+ "local_law_8_of_2020_complaints_of_illegal_parking_of_vehicles_operated_on_behalf_of_the_city": {
+  "portal": "NYC Open Data",
+  "portal_id": "cwy2-px8b",
+  "source_url": "https://data.cityofnewyork.us/d/cwy2-px8b",
+  "publisher": "311",
+  "license": null,
+  "source_updated_at": "2026-11-18T14:42:06+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/cwy2-px8b.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Local Law 8 of 2020 \u2013 Complaints of Illegal Parking of Vehicles Operated on Behalf of the City",
+  "category": "City Government"
+ },
+ "moving_violation_b_summons_historic": {
+  "portal": "NYC Open Data",
+  "portal_id": "bme5-7ty4",
+  "source_url": "https://data.cityofnewyork.us/d/bme5-7ty4",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-04-28T15:11:13+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/bme5-7ty4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Moving Violation B Summons (Historic)",
+  "category": "Public Safety"
+ },
+ "moving_violation_b_summons_year_to_date": {
+  "portal": "NYC Open Data",
+  "portal_id": "57p3-pdcj",
+  "source_url": "https://data.cityofnewyork.us/d/57p3-pdcj",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-11-05T21:09:50+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/57p3-pdcj.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Moving Violation B Summons (Year to Date)",
+  "category": "Public Safety"
+ },
+ "nyc-zip-code-tabulation-areas-polygons": {
+  "portal": null,
+  "portal_id": "s3k2-6t4m",
+  "source_url": null,
+  "publisher": null,
+  "license": null,
+  "source_updated_at": null,
+  "catalog_added_at": "2026-03-06",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/s3k2-6t4m.geojson"
+  },
+  "status": "not_found",
+  "notes": [
+   "s3k2-6t4m not found on NYC Open Data (HTTP 404); origin unknown"
+  ]
+ },
+ "nyc_bridge_strike_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "jdn9-td9w",
+  "source_url": "https://data.cityofnewyork.us/d/jdn9-td9w",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-02T12:00:17+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/jdn9-td9w.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Bridge Strike Data",
+  "category": "Transportation"
+ },
+ "nyc_clean_soil_bank_generating_and_receiving_sites": {
+  "portal": "NYC Open Data",
+  "portal_id": "b4dv-8mq4",
+  "source_url": "https://data.cityofnewyork.us/d/b4dv-8mq4",
+  "publisher": "Mayor's Office of Environmental Remediation (OER)",
+  "license": null,
+  "source_updated_at": "2024-09-23T15:21:10+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/b4dv-8mq4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Clean Soil Bank Generating and Receiving Sites",
+  "category": "Environment"
+ },
+ "nyc_community_boards": {
+  "portal": "NYC Open Data",
+  "portal_id": "ruf7-3wgc",
+  "source_url": "https://data.cityofnewyork.us/d/ruf7-3wgc",
+  "publisher": "Mayor's Community Affairs Unit (CAU)",
+  "license": null,
+  "source_updated_at": "2025-12-26T20:28:32+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ruf7-3wgc.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Community Boards",
+  "category": "City Government"
+ },
+ "nyc_dot_pedestrian_plazas_point_feature": {
+  "portal": "NYC Open Data",
+  "portal_id": "5dck-9m6g",
+  "source_url": "https://data.cityofnewyork.us/d/5dck-9m6g",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2025-12-05T21:33:01+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5dck-9m6g.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC DOT Pedestrian Plazas - Point Feature",
+  "category": "Transportation"
+ },
+ "nyc_parks_drinking_fountains": {
+  "portal": "NYC Open Data",
+  "portal_id": "qnv7-p7a2",
+  "source_url": "https://data.cityofnewyork.us/d/qnv7-p7a2",
+  "publisher": "NYC Parks",
+  "license": null,
+  "source_updated_at": "2024-07-15T14:41:58+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/qnv7-p7a2.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Parks Drinking Fountains",
+  "category": "Recreation"
+ },
+ "nyc_parks_spray_showers": {
+  "portal": "NYC Open Data",
+  "portal_id": "ckaz-6gaa",
+  "source_url": "https://data.cityofnewyork.us/d/ckaz-6gaa",
+  "publisher": "NYC Parks",
+  "license": null,
+  "source_updated_at": "2026-11-02T14:54:57+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ckaz-6gaa.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Parks Spray Showers",
+  "category": "Recreation"
+ },
+ "nyc_veteran_owned_businesses": {
+  "portal": "NYC Open Data",
+  "portal_id": "ybdk-jmnn",
+  "source_url": "https://data.cityofnewyork.us/d/ybdk-jmnn",
+  "publisher": "Department of Veterans' Services (DVS)",
+  "license": null,
+  "source_updated_at": "2022-12-29T18:59:10+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ybdk-jmnn.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYC Veteran Owned Businesses",
+  "category": "City Government"
+ },
+ "nypd_arrest_data_year_to_date": {
+  "portal": "NYC Open Data",
+  "portal_id": "uip8-fykc",
+  "source_url": "https://data.cityofnewyork.us/d/uip8-fykc",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-11-05T21:08:05+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uip8-fykc.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Arrest Data (Year to Date)",
+  "category": "Public Safety"
+ },
+ "nypd_arrests_data_historic": {
+  "portal": "NYC Open Data",
+  "portal_id": "8h9b-rp9u",
+  "source_url": "https://data.cityofnewyork.us/d/8h9b-rp9u",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-04-28T15:56:20+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/8h9b-rp9u.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Arrests Data (Historic)",
+  "category": "Public Safety"
+ },
+ "nypd_calls_for_service_historic": {
+  "portal": "NYC Open Data",
+  "portal_id": "d6zx-ckhd",
+  "source_url": "https://data.cityofnewyork.us/d/d6zx-ckhd",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-08-11T15:44:20+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/d6zx-ckhd.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Calls for Service (Historic)",
+  "category": "Public Safety"
+ },
+ "nypd_complaint_data_current_year_to_date": {
+  "portal": "NYC Open Data",
+  "portal_id": "5uac-w243",
+  "source_url": "https://data.cityofnewyork.us/d/5uac-w243",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-11-05T21:20:50+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5uac-w243.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Complaint Data Current (Year To Date)",
+  "category": "Public Safety"
+ },
+ "nypd_criminal_court_summons_historic": {
+  "portal": "NYC Open Data",
+  "portal_id": "sv2w-rv3k",
+  "source_url": "https://data.cityofnewyork.us/d/sv2w-rv3k",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-04-28T14:54:00+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/sv2w-rv3k.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Criminal Court Summons (Historic)",
+  "category": "Public Safety"
+ },
+ "nypd_criminal_court_summons_incident_level_data_year_to_date": {
+  "portal": "NYC Open Data",
+  "portal_id": "mv4k-y93f",
+  "source_url": "https://data.cityofnewyork.us/d/mv4k-y93f",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-11-05T21:20:39+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/mv4k-y93f.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "NYPD Criminal Court Summons Incident Level Data (Year To Date)",
+  "category": "Public Safety"
+ },
+ "open_storefronts_applications_historical": {
+  "portal": "NYC Open Data",
+  "portal_id": "d54t-ywim",
+  "source_url": "https://data.cityofnewyork.us/d/d54t-ywim",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2022-11-04T19:51:12+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/d54t-ywim.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Open Storefronts Applications (Historical)",
+  "category": "Transportation"
+ },
+ "open_streets_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "uiay-nctu",
+  "source_url": "https://data.cityofnewyork.us/d/uiay-nctu",
+  "publisher": "Department of Transportation",
+  "license": null,
+  "source_updated_at": "2026-11-01T11:22:40+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uiay-nctu.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Open Streets Locations",
+  "category": "Health"
+ },
+ "outdoor_learning_streets_locations_historical": {
+  "portal": "NYC Open Data",
+  "portal_id": "vtjm-ngnu",
+  "source_url": "https://data.cityofnewyork.us/d/vtjm-ngnu",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2021-06-07T18:21:19+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/vtjm-ngnu.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Outdoor Learning - Streets Locations (Historical)",
+  "category": "Transportation"
+ },
+ "overhead_electronic_signs": {
+  "portal": "NYC Open Data",
+  "portal_id": "yhdx-itry",
+  "source_url": "https://data.cityofnewyork.us/d/yhdx-itry",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2025-12-05T20:51:30+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/yhdx-itry.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Overhead Electronic Signs",
+  "category": "Transportation"
+ },
+ "parking_meters_locations_and_status": {
+  "portal": "NYC Open Data",
+  "portal_id": "693u-uax6",
+  "source_url": "https://data.cityofnewyork.us/d/693u-uax6",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-16T13:16:29+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/693u-uax6.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parking Meters Locations and Status",
+  "category": "Transportation"
+ },
+ "parks_closure_status_due_to_covid_19_adult_exercise_equipment": {
+  "portal": "NYC Open Data",
+  "portal_id": "tkzt-zfpz",
+  "source_url": "https://data.cityofnewyork.us/d/tkzt-zfpz",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2021-11-22T14:48:57+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/tkzt-zfpz.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Adult Exercise Equipment",
+  "category": "City Government"
+ },
+ "parks_closure_status_due_to_covid_19_athletic_facilities": {
+  "portal": "NYC Open Data",
+  "portal_id": "g3xg-qtbc",
+  "source_url": "https://data.cityofnewyork.us/d/g3xg-qtbc",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2021-11-22T14:49:31+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/g3xg-qtbc.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Athletic Facilities",
+  "category": null
+ },
+ "parks_closure_status_due_to_covid_19_comfort_stations": {
+  "portal": "NYC Open Data",
+  "portal_id": "i5n2-q8ck",
+  "source_url": "https://data.cityofnewyork.us/d/i5n2-q8ck",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2021-11-22T14:55:05+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/i5n2-q8ck.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Comfort Stations",
+  "category": null
+ },
+ "parks_closure_status_due_to_covid_19_dog_runs": {
+  "portal": "NYC Open Data",
+  "portal_id": "wswf-9pts",
+  "source_url": "https://data.cityofnewyork.us/d/wswf-9pts",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2021-11-22T14:49:49+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/wswf-9pts.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Dog Runs",
+  "category": null
+ },
+ "parks_closure_status_due_to_covid_19_playgrounds": {
+  "portal": "NYC Open Data",
+  "portal_id": "a4qt-mpr5",
+  "source_url": "https://data.cityofnewyork.us/d/a4qt-mpr5",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2024-04-03T16:41:24+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/a4qt-mpr5.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Playgrounds",
+  "category": null
+ },
+ "parks_closure_status_due_to_covid_19_skate_parks": {
+  "portal": "NYC Open Data",
+  "portal_id": "pvvr-75zk",
+  "source_url": "https://data.cityofnewyork.us/d/pvvr-75zk",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2021-11-22T14:50:19+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/pvvr-75zk.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Closure Status Due to COVID-19: Skate Parks",
+  "category": null
+ },
+ "parks_signs": {
+  "portal": "NYC Open Data",
+  "portal_id": "hv9n-xgy4",
+  "source_url": "https://data.cityofnewyork.us/d/hv9n-xgy4",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-10-15T13:04:50+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/hv9n-xgy4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Signs",
+  "category": "Recreation"
+ },
+ "parks_syringe_disposal_kiosks": {
+  "portal": "NYC Open Data",
+  "portal_id": "r465-fr2q",
+  "source_url": "https://data.cityofnewyork.us/d/r465-fr2q",
+  "publisher": "Department of Parks and Recreation (DPR)",
+  "license": null,
+  "source_updated_at": "2026-10-31T13:03:07+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/r465-fr2q.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Parks Syringe Disposal Kiosks",
+  "category": "Public Safety"
+ },
+ "pedestrian_ramp_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "ufzp-rrqu",
+  "source_url": "https://data.cityofnewyork.us/d/ufzp-rrqu",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2021-10-27T15:26:30+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ufzp-rrqu.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Pedestrian Ramp Locations",
+  "category": "Transportation"
+ },
+ "pharmaceutical_and_syringe_drop_off_locations_in_nyc": {
+  "portal": "NYC Open Data",
+  "portal_id": "edk2-vkjh",
+  "source_url": "https://data.cityofnewyork.us/d/edk2-vkjh",
+  "publisher": "Department of Sanitation (DSNY)",
+  "license": null,
+  "source_updated_at": "2026-11-19T11:00:05+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/edk2-vkjh.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Pharmaceutical and Syringe Drop-Off Locations in NYC",
+  "category": "Environment"
+ },
+ "privately_owned_public_spaces_pops": {
+  "portal": "NYC Open Data",
+  "portal_id": "rvih-nhyn",
+  "source_url": "https://data.cityofnewyork.us/d/rvih-nhyn",
+  "publisher": "Department of City Planning (DCP)",
+  "license": null,
+  "source_updated_at": "2026-11-05T17:54:22+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/rvih-nhyn.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Privately Owned Public Spaces (POPS)",
+  "category": "City Government"
+ },
+ "property_valuation_and_assessment_data": {
+  "portal": "NYC Open Data",
+  "portal_id": "yjxr-fw8i",
+  "source_url": "https://data.cityofnewyork.us/d/yjxr-fw8i",
+  "publisher": "Department of Finance (DOF)",
+  "license": null,
+  "source_updated_at": "2020-05-26T20:59:44+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/yjxr-fw8i.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Property Valuation and Assessment Data",
+  "category": "City Government"
+ },
+ "protected_streets_map_block_dataset": {
+  "portal": "NYC Open Data",
+  "portal_id": "wyih-3nzf",
+  "source_url": "https://data.cityofnewyork.us/d/wyih-3nzf",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-16T13:17:53+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/wyih-3nzf.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Protected Streets Block (Dataset)",
+  "category": "Transportation"
+ },
+ "raised_crosswalk_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "uh2s-ftgh",
+  "source_url": "https://data.cityofnewyork.us/d/uh2s-ftgh",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-04T15:01:35+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/uh2s-ftgh.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Raised Crosswalk Locations",
+  "category": "Transportation"
+ },
+ "real_time_passenger_information_sign_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "g9jx-npbk",
+  "source_url": "https://data.cityofnewyork.us/d/g9jx-npbk",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-03-05T20:35:22+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/g9jx-npbk.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Real Time Passenger Information Sign Locations",
+  "category": "Transportation"
+ },
+ "scenic_landmarks": {
+  "portal": "NYC Open Data",
+  "portal_id": "qexa-qpj6",
+  "source_url": "https://data.cityofnewyork.us/d/qexa-qpj6",
+  "publisher": "Landmarks Preservation Commission (LPC)",
+  "license": null,
+  "source_updated_at": "2026-06-18T15:13:39+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/qexa-qpj6.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Scenic Landmarks",
+  "category": "Housing & Development"
+ },
+ "seating_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "esmy-s8q5",
+  "source_url": "https://data.cityofnewyork.us/d/esmy-s8q5",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-04T20:28:14+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/esmy-s8q5.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Seating Locations",
+  "category": "Transportation"
+ },
+ "shootings_2006_present": {
+  "portal": "NYC Open Data",
+  "portal_id": "5ucz-vwe8",
+  "source_url": "https://data.cityofnewyork.us/d/5ucz-vwe8",
+  "publisher": "Police Department (NYPD)",
+  "license": null,
+  "source_updated_at": "2026-11-05T20:59:39+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/5ucz-vwe8.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Shootings (2006-Present)",
+  "category": "Public Safety"
+ },
+ "street_and_highway_capital_reconstruction_projects_block": {
+  "portal": "NYC Open Data",
+  "portal_id": "jvk9-k4re",
+  "source_url": "https://data.cityofnewyork.us/d/jvk9-k4re",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-01T11:02:34+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/jvk9-k4re.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Street and Highway Capital Reconstruction Projects - Block",
+  "category": "Transportation"
+ },
+ "street_closures_due_to_construction_activities_by_intersection": {
+  "portal": "NYC Open Data",
+  "portal_id": "478a-yykk",
+  "source_url": "https://data.cityofnewyork.us/d/478a-yykk",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-16T13:19:40+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/478a-yykk.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Street Closures due to Construction Activities by Intersection",
+  "category": "Transportation"
+ },
+ "street_pavement_rating": {
+  "portal": "NYC Open Data",
+  "portal_id": "6yyb-pb25",
+  "source_url": "https://data.cityofnewyork.us/d/6yyb-pb25",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-11-01T11:19:08+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/6yyb-pb25.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Street Pavement Ratings",
+  "category": "Transportation"
+ },
+ "street_pothole_work_orders_closed_dataset": {
+  "portal": "NYC Open Data",
+  "portal_id": "x9wy-ing4",
+  "source_url": "https://data.cityofnewyork.us/d/x9wy-ing4",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2026-10-30T15:29:09+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/x9wy-ing4.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Street Pothole Work Orders - Closed (Dataset)",
+  "category": "Transportation"
+ },
+ "street_seats_2014_2019": {
+  "portal": "NYC Open Data",
+  "portal_id": "d83i-6us7",
+  "source_url": "https://data.cityofnewyork.us/d/d83i-6us7",
+  "publisher": "Department of Transportation (DOT)",
+  "license": null,
+  "source_updated_at": "2019-12-23T14:18:40+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/d83i-6us7.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Street Seats (2014 - 2019)",
+  "category": "Transportation"
+ },
+ "taxicab_partition_manufacturers_and_installers": {
+  "portal": "NYC Open Data",
+  "portal_id": "y9b6-624z",
+  "source_url": "https://data.cityofnewyork.us/d/y9b6-624z",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2026-10-30T15:00:20+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/y9b6-624z.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "Taxicab Partition Manufacturers and Installers",
+  "category": "Transportation"
+ },
+ "tlc_approved_labcorp_patient_services_drug_test_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "pe54-wf39",
+  "source_url": "https://data.cityofnewyork.us/d/pe54-wf39",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2026-07-29T19:18:17+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/pe54-wf39.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "TLC Approved LabCorp Patient Services Drug Test Locations",
+  "category": "Transportation"
+ },
+ "tlc_authorized_wheelchair_passenger_assistance_training_providers": {
+  "portal": "NYC Open Data",
+  "portal_id": "ayeb-p4mv",
+  "source_url": "https://data.cityofnewyork.us/d/ayeb-p4mv",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2026-10-30T14:30:29+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/ayeb-p4mv.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "TLC Authorized Wheelchair Passenger Assistance Training Providers",
+  "category": "Transportation"
+ },
+ "tlc_driver_education_24_hour_course_providers": {
+  "portal": "NYC Open Data",
+  "portal_id": "wzur-rhz9",
+  "source_url": "https://data.cityofnewyork.us/d/wzur-rhz9",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2026-10-30T14:15:13+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/wzur-rhz9.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "TLC Driver Education 24 Hour Course Providers",
+  "category": "Transportation"
+ },
+ "tlc_driver_exam_testing_center_locations": {
+  "portal": "NYC Open Data",
+  "portal_id": "h922-d8e5",
+  "source_url": "https://data.cityofnewyork.us/d/h922-d8e5",
+  "publisher": "Taxi and Limousine Commission (TLC)",
+  "license": null,
+  "source_updated_at": "2026-10-30T14:45:21+00:00",
+  "catalog_added_at": "2026-03-17",
+  "retrieved_at": null,
+  "derived_from": {
+   "raw_file": "data/geojson_raw/h922-d8e5.geojson"
+  },
+  "status": "found",
+  "notes": [
+   "license not stated in portal metadata; the portal's terms of use apply",
+   "retrieval date not recorded; catalog_added_at is when the file entered this repository"
+  ],
+  "title": "TLC Driver Exam Testing Center Locations",
+  "category": "Transportation"
+ }
+}

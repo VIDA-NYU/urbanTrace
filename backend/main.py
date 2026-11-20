@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import geopandas as gpd
@@ -32,6 +33,9 @@ import urbanweave as uw
 from urbanweave.compat import urbantrace as uw_legacy
 
 import weave_engine
+import catalog
+import collections_store
+import export as exporter
 from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
 from grids.h3_grid import H3GridSystem
 
@@ -317,7 +321,12 @@ async def list_datasets():
 
 
 @app.post("/datasets/upload")
-async def upload_geojson(file: UploadFile = File(...)):
+async def upload_geojson(
+    file: UploadFile = File(...),
+    source_url: Optional[str] = Form(None),
+    license: Optional[str] = Form(None),
+    publisher: Optional[str] = Form(None),
+):
     """
     Upload a .geojson file with full metadata generation pipeline:
     1. Save GeoJSON to /data/geojson
@@ -328,6 +337,18 @@ async def upload_geojson(file: UploadFile = File(...)):
     """
     # Delegate processing to upload_new_data module (profiles + saves metadata)
     result = await process_uploaded_geojson(file, DATA_DIR)
+    stem = catalog.stem_of(result.get("filename") or file.filename)
+    if catalog.valid_stem(stem):
+        from datetime import datetime, timezone
+        catalog.set_origin(DATA_DIR, stem, {
+            "portal": None, "portal_id": None, "source_url": (source_url or "").strip() or None,
+            "publisher": (publisher or "").strip() or None, "license": (license or "").strip() or None,
+            "source_updated_at": None, "retrieved_at": None,
+            "catalog_added_at": datetime.now(timezone.utc).date().isoformat(),
+            "derived_from": None, "status": "uploaded",
+            "notes": [] if source_url else ["uploaded without a source URL; origin unknown"],
+        })
+        result["origin"] = catalog.origin(DATA_DIR, stem)
     return result
 
 # Profiles made by atlas-profiler 0.1.0 (data/metadata_v2), their HTML reports (data/reports_v2)
@@ -410,9 +431,12 @@ async def get_geojson(filename: str, simplify: bool = False):
 # ==========================================
 
 def _load_catalog_geojson(name: str, label: str) -> gpd.GeoDataFrame:
-    path = os.path.join(DATA_DIR, "geojson", _geojson_filename(name))
+    """A catalog dataset (GeoParquet when converted, else GeoJSON); 404 when it cannot be read."""
+    stem = catalog.stem_of(name)
     try:
-        return gpd.read_file(path)
+        if not catalog.valid_stem(stem):
+            raise FileNotFoundError(f"invalid dataset name {name!r}")
+        return catalog.load(DATA_DIR, stem)
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Could not load {label}: {str(e)}")
 
@@ -1363,6 +1387,136 @@ async def run_operation(request: OperationRequest):
 
 
 
+
+
+# ==========================================
+# COLLECTIONS AND EXPORT (docs/REDESIGN.md, section 2)
+# ==========================================
+
+def _collections() -> collections_store.Store:
+    root = os.getenv("URBANTRACE_COLLECTIONS_DIR") or os.path.join(DATA_DIR, "collections")
+    return collections_store.Store(root)
+
+
+class CollectionBody(BaseModel):
+    name: Optional[str] = None
+    goal: Optional[str] = None
+    notes: Optional[str] = None
+    datasets: Optional[List[Dict[str, Any]]] = None
+    integrations: Optional[List[Dict[str, Any]]] = None
+    analyses: Optional[List[Dict[str, Any]]] = None
+    study_area: Optional[Dict[str, Any]] = None
+    canvas: Optional[Dict[str, Any]] = None
+
+
+class ExportOptions(BaseModel):
+    embed: str = "auto"                      # "auto" | "always" | "never"
+    formats: List[str] = Field(default_factory=lambda: ["parquet", "gpkg"])
+    include_results: bool = True
+
+
+def _get_collection(cid: str) -> Dict[str, Any]:
+    try:
+        return _collections().get(cid)
+    except collections_store.NotFound:
+        raise HTTPException(status_code=404, detail=f"Collection {cid} not found")
+
+
+@app.get("/api/collections")
+async def list_collections():
+    return {"collections": _collections().list()}
+
+
+@app.post("/api/collections")
+async def create_collection(body: CollectionBody):
+    return _collections().create(body.model_dump(exclude_none=True))
+
+
+@app.get("/api/collections/{cid}")
+async def get_collection(cid: str):
+    return _get_collection(cid)
+
+
+@app.put("/api/collections/{cid}")
+async def update_collection(cid: str, body: CollectionBody):
+    _get_collection(cid)
+    return _collections().update(cid, body.model_dump(exclude_unset=True))
+
+
+@app.delete("/api/collections/{cid}")
+async def delete_collection(cid: str):
+    _get_collection(cid)
+    _collections().delete(cid)
+    return {"status": "deleted", "id": cid}
+
+
+def _zip_response(path: str, filename: str) -> FileResponse:
+    return FileResponse(path, media_type="application/zip", filename=filename,
+                        background=BackgroundTask(lambda: os.path.exists(path) and os.remove(path)))
+
+
+def _temp_zip() -> str:
+    import tempfile
+    fd, path = tempfile.mkstemp(suffix=".zip")
+    os.close(fd)
+    return path
+
+
+def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any]:
+    """Results, plans and other parts later phases add to an export (none yet)."""
+    return {}
+
+
+@app.post("/api/collections/{cid}/export")
+def export_collection(cid: str, options: ExportOptions = ExportOptions()):
+    """The collection as a zip: datapackage.json, data files and a README (redesign section 2.3)."""
+    doc = _get_collection(cid)
+    path = _temp_zip()
+    try:
+        exporter.build(DATA_DIR, doc, Path(path), embed=options.embed, formats=tuple(options.formats),
+                       **_export_extras(doc, options))
+    except ValueError as e:
+        os.remove(path)
+        raise HTTPException(status_code=400, detail=str(e))
+    name = exporter._slug(doc.get("name"))
+    return _zip_response(path, f"{name}.zip")
+
+
+class ResultExportBody(BaseModel):
+    name: str = "result"
+    geojson: Dict[str, Any]
+    provenance: Optional[Dict[str, Any]] = None
+    formats: List[str] = Field(default_factory=lambda: ["parquet", "gpkg", "geojson"])
+
+
+@app.post("/api/results/export")
+def export_result(body: ResultExportBody):
+    """One result map as a zip: the data in the requested formats, its provenance and a README."""
+    features = body.geojson.get("features") or []
+    if not features:
+        raise HTTPException(status_code=400, detail="The result has no features to export")
+    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+    collection = {"name": body.name, "goal": "", "datasets": []}
+    result = {"name": body.name, "frames": {"result": gdf},
+              "description": "A result exported from a Result Map node.",
+              "request": (body.provenance or {}).get("request"), "reports": (body.provenance or {}).get("reports")}
+    extra = {"provenance.json": json.dumps(body.provenance or {}, indent=1, default=str).encode()}
+    path = _temp_zip()
+    try:
+        exporter.build(DATA_DIR, collection, Path(path), formats=tuple(body.formats), results=[result],
+                       extra_files=extra)
+    except ValueError as e:
+        os.remove(path)
+        raise HTTPException(status_code=400, detail=str(e))
+    return _zip_response(path, f"{exporter._slug(body.name, 'result')}.zip")
+
+
+@app.get("/datasets/{dataset_id}/origin")
+async def get_dataset_origin(dataset_id: str):
+    stem = catalog.stem_of(dataset_id)
+    if not catalog.valid_stem(stem):
+        raise HTTPException(status_code=400, detail="Invalid dataset id")
+    return catalog.origin(DATA_DIR, stem)
 
 # ==========================================
 # 7. LLM COPILOT ENDPOINTS
