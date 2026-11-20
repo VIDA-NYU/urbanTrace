@@ -96,7 +96,7 @@ An integration composes four operator families (`backend/integration_engine.py`)
 
 Each allocation operator declares the geometry types it supports. Multivariate integrations run one track per variable and then merge them on the shared grid or zones.
 
-The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original engine is kept for now and selected with `URBANTRACE_ENGINE=legacy`; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md).
+The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original engine is kept for now and selected with `URBANTRACE_ENGINE=legacy`; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md), with progress in [PLAN.md](PLAN.md).
 
 ---
 
