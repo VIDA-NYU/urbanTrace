@@ -1,0 +1,111 @@
+"""Study area, coverage and time (redesign phase 2), on the synthetic catalog."""
+import io
+import json
+import zipfile
+
+import geopandas as gpd
+import pytest
+
+import main
+
+WEST = {"kind": "zones", "dataset": "test_zones", "column": "zone", "values": ["west"], "name": "West"}
+
+
+@pytest.fixture(autouse=True)
+def urbanweave_engine(monkeypatch, tmp_path):
+    monkeypatch.setattr(main, "ENGINE", "urbanweave")
+    monkeypatch.setenv("URBANTRACE_COLLECTIONS_DIR", str(tmp_path / "collections"))
+
+
+def _points(**extra):
+    return {"dataset_path": "test_points.geojson", "target_column": "count", "output_name": "c",
+            "allocation_operator": "BinaryContainment", "grid_aggregation_operator": "SumAggregation", **extra}
+
+
+def _total(body):
+    return sum(cell["variables"]["c"] for cell in body["data"].values())
+
+
+def test_study_area_clips_sources(client, catalog):
+    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": WEST})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert _total(body) == 10                                    # the three western points: 3 + 5 + 2
+    assert body["reports"]["c"]["study_area"] == {"features": 6, "kept": 3, "outside_study_area": 3}
+    assert body["study_area"]["name"] == "West"
+
+
+def test_bbox_study_area(client, catalog):
+    area = {"kind": "bbox", "bbox": [-73.98, 40.75, -73.96, 40.76]}
+    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": area})
+    assert r.status_code == 200, r.text
+    assert _total(r.json()) == 12                                # 7 + 1 + 4
+
+
+def test_bad_study_area_is_a_400(client, catalog):
+    area = {"kind": "zones", "dataset": "test_zones", "column": "zone", "values": ["north"]}
+    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": area})
+    assert r.status_code == 400 and "empty" in r.json()["detail"]
+
+
+def test_time_window_filters_rows(client, catalog):
+    window = {"time_column": "date", "time_start": "2020-01-01", "time_end": "2020-12-31"}
+    r = client.post("/api/integrate_multivariate", json={"variables": [_points(**window)], "resolution": 9})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert _total(body) == 12                                    # 2020-06-15 (5) and 2020-02-02 (7)
+    assert body["reports"]["c"]["time_window"]["kept"] == 2
+
+
+def test_time_window_with_no_rows_is_a_400(client, catalog):
+    window = {"time_column": "date", "time_start": "2030-01-01"}
+    r = client.post("/api/integrate_multivariate", json={"variables": [_points(**window)], "resolution": 9})
+    assert r.status_code == 400 and "time window" in r.json()["detail"]
+
+
+def test_study_area_options_and_resolve(client, catalog):
+    opts = client.get("/api/study-area/options/test_zones").json()
+    assert {"name": "zone", "values": ["east", "west"]} in opts["columns"]
+    summary = client.post("/api/study-area/resolve", json=WEST).json()
+    assert summary["bbox"] == pytest.approx([-74.0, 40.75, -73.98, 40.76])
+    assert 1.5 < summary["area_km2"] < 2.5
+
+
+def test_catalog_index_has_time_and_bbox(client, catalog):
+    rows = {d["id"]: d for d in client.get("/api/catalog/index").json()["datasets"]}
+    assert rows["test_points"]["time"]["start"] == "2019-03-01"
+    assert rows["test_points"]["bbox"] == pytest.approx([-74.0, 40.75, -73.96, 40.76])
+    assert rows["test_zones"]["time"] is None
+
+
+def test_coverage_shares_of_the_study_area(client, catalog):
+    whole = {"kind": "bbox", "bbox": [-74.0, 40.75, -73.96, 40.76]}
+    out = client.post("/api/coverage", json={"datasets": ["test_points", "test_rates"], "study_area": whole}).json()
+    assert out["datasets"]["test_rates"]["share_of_area"] == 1.0
+    assert out["datasets"]["test_points"]["share_of_area"] == pytest.approx(0.5)
+    assert {f["properties"]["n"] for f in out["features"]} == {1, 2}
+
+
+def test_checks_warn_about_time_and_coverage(client, catalog):
+    doc = {"datasets": [{"id": "test_points"}, {"id": "test_rates"}],
+           "study_area": {"kind": "bbox", "bbox": [-73.98, 40.75, -73.96, 40.76]}}
+    kinds = {w["kind"]: w for w in client.post("/api/collections/check", json=doc).json()["warnings"]}
+    assert "time_no_overlap" in kinds and "2010-12-31" in kinds["time_no_overlap"]["message"]
+    assert kinds["coverage_partial"]["datasets"] == ["test_points"]
+    # A time window on the rates that reaches 2019 removes the period warning.
+    doc["datasets"][1]["time_window"] = {"start": "2005-01-01", "end": "2020-01-01"}
+    kinds = {w["kind"] for w in client.post("/api/collections/check", json=doc).json()["warnings"]}
+    assert "time_no_overlap" not in kinds
+
+
+def test_export_clips_to_the_study_area_and_lists_warnings(client, catalog):
+    doc = client.post("/api/collections", json={"name": "West side", "study_area": WEST,
+                                                "datasets": [{"id": "test_points"}, {"id": "test_rates"}]}).json()
+    r = client.post(f"/api/collections/{doc['id']}/export", json={"embed": "always", "formats": ["gpkg"]})
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    gdf = gpd.read_file(io.BytesIO(z.read("data/sources/test_points.gpkg")))
+    assert len(gdf) == 3
+    readme = z.read("README.md").decode()
+    assert "## Study area" in readme and "The periods do not overlap" in readme
+    package = json.loads(z.read("datapackage.json"))
+    assert package["urbantrace:export"]["clipped"] is True

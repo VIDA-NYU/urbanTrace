@@ -114,6 +114,7 @@ export function collectionDatasets(nodes) {
     }
     if (node.data?.addedBy === 'copilot') entry.added_by = 'copilot';
     if (node.data?.copilotReason) entry.rationale = node.data.copilotReason;
+    if (node.data?.timeWindow) entry.time_window = node.data.timeWindow;
     Object.assign(entry.value_kinds, node.data?.valueKinds || {});
   }
   for (const node of nodes) {

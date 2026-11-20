@@ -51,6 +51,8 @@ from shapely.geometry import MultiPolygon, Polygon
 import urbanweave as uw
 from urbanweave.compat import urbantrace as legacy
 
+import scope
+
 CHANGES = legacy.CHANGES + ("grid_covers_sources", "own_zoning_mapping", "own_cells_only")
 
 #: Allowed allocation operators per geometry type, generated from urbanweave's registry.
@@ -64,7 +66,7 @@ class Track:
     """One variable of a multivariate request."""
 
     def __init__(self, source_gdf, target_column, output_name, allocation, grid_aggregation,
-                 zoning_mapping=None, zoning_aggregation=None):
+                 zoning_mapping=None, zoning_aggregation=None, time_window=None):
         if allocation not in legacy.ALLOCATION:
             raise uw.InputError(f"Unknown allocation operator: {allocation}")
         if grid_aggregation not in legacy.GRID_AGGREGATION:
@@ -75,7 +77,18 @@ class Track:
             raise uw.InputError(f"Unknown zoning aggregation operator: {zoning_aggregation}")
         if target_column not in source_gdf.columns:
             raise uw.InputError(f"Column {target_column!r} is not in the dataset for {output_name!r}.")
+        self.time_report = None
+        if time_window and time_window.get("column"):
+            try:
+                source_gdf, self.time_report = scope.filter_by_time(
+                    source_gdf, time_window["column"], time_window.get("start"), time_window.get("end"))
+            except scope.ScopeError as e:
+                raise uw.InputError(f"{e} ({output_name})")
+            if len(source_gdf) == 0:
+                raise uw.InputError(f"No rows of {output_name!r} fall in the time window "
+                                    f"{time_window.get('start') or '…'} to {time_window.get('end') or '…'}.")
         self.source, self.repairs = _prepare(source_gdf, "source_id", f"Source dataset for {output_name!r}")
+        self.area_report = None
         self.column = target_column
         self.name = output_name
         self.allocation = allocation
@@ -211,20 +224,32 @@ def _padded_extent(bounds: np.ndarray, resolution: int) -> tuple:
 
 
 def run(tracks: list[Track], resolution: int, zones_gdf: gpd.GeoDataFrame | None = None,
-        output_mode: str = "grid") -> dict:
+        output_mode: str = "grid", study_area=None) -> dict:
     """Run a multivariate integration; the result has ``grid`` and/or ``zones`` frames, as the
-    legacy pipeline returned them, and ``reports`` with urbanweave's report of every step."""
+    legacy pipeline returned them, and ``reports`` with urbanweave's report of every step.
+
+    With a *study_area* (a shapely geometry in EPSG:4326), sources are clipped to it, the grid
+    covers it (padded by one cell, as for a bounding box), and only zones that touch it are kept."""
     if not tracks:
         raise uw.InputError("At least one variable track is required")
 
-    bounds = np.array([t.source.total_bounds for t in tracks])
-    cells = uw.targets.h3_cells(_padded_extent(bounds, resolution), int(resolution))
+    pad_m = 1.5 * h3.average_hexagon_edge_length(int(resolution), unit="m")
+    if study_area is not None:
+        for track in tracks:
+            track.source, track.area_report = scope.clip_to_area(track.source, study_area)
+            if len(track.source) == 0:
+                raise uw.InputError(f"No features of {track.name!r} fall in the study area.")
+        cells = uw.targets.h3_cells(scope.padded_area(study_area, pad_m), int(resolution), cover="geometry")
+    else:
+        bounds = np.array([t.source.total_bounds for t in tracks])
+        cells = uw.targets.h3_cells(_padded_extent(bounds, resolution), int(resolution))
 
     grids, reports, area = {}, {}, None
     for track in tracks:
         grid, m, report = _grid_track(track, cells)
         grids[track.name] = grid
-        reports[track.name] = {"allocation": report, "repaired_geometries": track.repairs}
+        reports[track.name] = {"allocation": report, "repaired_geometries": track.repairs,
+                               "time_window": track.time_report, "study_area": track.area_report}
         if area is None:
             size, _ = m.target_sizes()  # km², in the local UTM zone
             area = pd.DataFrame({"cell_id": cells["target_id"].to_numpy(), "area": size * 1e6})
@@ -248,6 +273,10 @@ def run(tracks: list[Track], resolution: int, zones_gdf: gpd.GeoDataFrame | None
         if not zoned:
             raise uw.InputError("No tracks have zoning configuration for zone output")
         zones, zone_repairs = _prepare(zones_gdf, "zone_id", "Zones dataset")
+        if study_area is not None:
+            zones = zones[zones.intersects(study_area)]
+            if len(zones) == 0:
+                raise uw.InputError("No zones touch the study area.")
         result["zone_repairs"] = zone_repairs
         unified_zones = zones[["zone_id", "geometry"]].copy()
         for track in zoned:

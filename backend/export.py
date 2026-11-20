@@ -126,7 +126,8 @@ def _clean(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
 def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
           formats: tuple[str, ...] = ("parquet", "gpkg"), results: list[dict] | None = None,
-          extra_files: dict[str, bytes] | None = None, readme_sections: list[str] | None = None) -> dict:
+          extra_files: dict[str, bytes] | None = None, readme_sections: list[str] | None = None,
+          area=None, warnings: list[dict] | None = None) -> dict:
     """Write the export zip for *collection* to *out_path*; return the data package descriptor.
 
     *results* are integration results to include, each ``{"name", "frames": {"grid": gdf, "zones":
@@ -169,6 +170,11 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
                 if columns:
                     keep = [c for c in columns if c in gdf.columns]
                     gdf = gdf[keep + [gdf.geometry.name]]
+                if area is not None:
+                    import scope
+                    gdf, clip_report = scope.clip_to_area(gdf, area)
+                    info = {**info, "urbantrace:clipped_to_study_area": clip_report}
+                    row["status"] += "; clipped to the study area"
                 gdf = _clean(gdf)
                 row["rows"] = len(gdf)
                 schema = _schema(gdf, value_kinds)
@@ -208,7 +214,8 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
             "urbantrace:collection": {k: collection.get(k) for k in ("id", "goal", "notes", "study_area", "analyses")},
             "urbantrace:references": references,
             "urbantrace:not_included": not_included,
-            "urbantrace:export": {"embed": embed, "formats": list(formats)},
+            "urbantrace:export": {"embed": embed, "formats": list(formats), "clipped": area is not None},
+            "urbantrace:warnings": warnings or [],
         }
         (root / "datapackage.json").write_text(json.dumps(package, indent=1, default=str))
         (root / "README.md").write_text(_readme(collection, rows, results or [], package, readme_sections or []))
@@ -239,6 +246,15 @@ def _readme(collection: dict, rows: list[dict], results: list[dict], package: di
               "(a [Frictionless Data Package](https://datapackage.org/)).", ""]
     if collection.get("notes"):
         lines += ["## Notes", "", collection["notes"], ""]
+    area = collection.get("study_area")
+    if area:
+        if area.get("kind") == "zones":
+            sel = f" where {area['column']} is {', '.join(map(str, area.get('values') or []))}" if area.get("column") else ""
+            desc = f"the zones of `{area.get('dataset')}`{sel}"
+        else:
+            desc = f"the box {area.get('bbox')}"
+        lines += ["## Study area", "", f"{area.get('name') or 'Study area'}: {desc}."
+                  + (" Embedded datasets are clipped to it." if package["urbantrace:export"].get("clipped") else ""), ""]
 
     lines += ["## Datasets", "", "| Dataset | Rows | Geometry | Columns used | Source | In this package |",
               "|---|---|---|---|---|---|"]
@@ -280,6 +296,7 @@ def _readme(collection: dict, rows: list[dict], results: list[dict], package: di
                        "updated them since).")
     for res in results:
         caveats += res.get("caveats", [])
+    caveats += [w["message"] for w in package.get("urbantrace:warnings") or []]
     if caveats:
         lines += ["## Caveats", ""] + [f"- {c}" for c in caveats] + [""]
 

@@ -4,8 +4,9 @@ import axios from 'axios';
 import { RefreshCw, Map, Search, Upload, X } from 'lucide-react'; // Added X here
 import DatasetCard from '../catalog/DatasetCard'; 
 import { API_BASE } from '../../config/api';
+import { getCatalogIndex, bboxIntersects, overlapsPeriod } from '../../lib/scope';
 
-const DatasetSidebar = () => {
+const DatasetSidebar = ({ studyArea = null }) => {
   const [datasets, setDatasets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +18,12 @@ const DatasetSidebar = () => {
   // Where the uploaded data came from, recorded in the catalog's origin record (redesign section 2.2)
   const [uploadOrigin, setUploadOrigin] = useState({ source_url: '', license: '', publisher: '' });
   const uploadInputRef = useRef(null);
+  // Search filters (redesign phase 2): datasets that reach the study area, or cover a period
+  const [catalogIndex, setCatalogIndex] = useState({});
+  const [inStudyArea, setInStudyArea] = useState(false);
+  const [fromYear, setFromYear] = useState('');
+  const [toYear, setToYear] = useState('');
+  useEffect(() => { getCatalogIndex().then(setCatalogIndex); }, []);
 
   const fetchDatasets = () => {
     setLoading(true);
@@ -106,7 +113,11 @@ const DatasetSidebar = () => {
 
   const filteredDatasets = datasets.filter(ds => {
     const name = ds.metadata?.name || ds.name || "";
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    const info = catalogIndex[ds.id];
+    if (inStudyArea && studyArea && info?.bbox && !bboxIntersects(info.bbox, studyArea.bbox)) return false;
+    if ((fromYear || toYear) && !overlapsPeriod(info?.time, fromYear, toYear)) return false;
+    return true;
   });
 
   return (
@@ -213,6 +224,22 @@ const DatasetSidebar = () => {
               <X size={16} />
             </button>
           )}
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginTop: '8px', fontSize: '0.75rem', color: '#4b5563' }}>
+          <label title={studyArea ? 'Only datasets whose extent reaches the study area' : 'Set a study area in the collection bar first'}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: studyArea ? 'pointer' : 'not-allowed', opacity: studyArea ? 1 : 0.5 }}>
+            <input type="checkbox" disabled={!studyArea} checked={inStudyArea && !!studyArea} onChange={(e) => setInStudyArea(e.target.checked)} />
+            In study area
+          </label>
+          <span title="Only datasets with data in these years (datasets without dates are kept)" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            Years
+            <input value={fromYear} onChange={(e) => setFromYear(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="from"
+              style={{ width: '42px', fontSize: '0.75rem', padding: '2px 4px', border: '1px solid #e5e7eb', borderRadius: '4px' }} />
+            –
+            <input value={toYear} onChange={(e) => setToYear(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="to"
+              style={{ width: '42px', fontSize: '0.75rem', padding: '2px 4px', border: '1px solid #e5e7eb', borderRadius: '4px' }} />
+          </span>
         </div>
 
         {/* Upload controls moved to modal — keeps sidebar clean */}

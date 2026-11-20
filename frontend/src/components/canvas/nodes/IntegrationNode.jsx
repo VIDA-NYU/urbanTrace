@@ -207,18 +207,28 @@ const IntegrationNode = memo(({ id, data }) => {
       });
 
       const requestBody = {
-        variables: withOutputNames.map(v => ({
-          dataset_path: v.filename,
-          target_column: v.targetColumn,
-          output_name: v.outputName,
-          allocation_operator: v.allocation,
-          grid_aggregation_operator: v.aggregation,
-          zoning_mapping_operator: v.zoningMapping,
-          zoning_aggregation_operator: v.zoningAggregation
-        })),
+        variables: withOutputNames.map(v => {
+          // Time window set on the source dataset node (redesign section 4.1)
+          const timeWindow = (data.connectedDatasets || []).find(d => d.id === v.id)?.timeWindow;
+          return {
+            dataset_path: v.filename,
+            target_column: v.targetColumn,
+            output_name: v.outputName,
+            allocation_operator: v.allocation,
+            grid_aggregation_operator: v.aggregation,
+            zoning_mapping_operator: v.zoningMapping,
+            zoning_aggregation_operator: v.zoningAggregation,
+            ...(timeWindow?.column ? {
+              time_column: timeWindow.column,
+              time_start: timeWindow.start || null,
+              time_end: timeWindow.end || null,
+            } : {}),
+          };
+        }),
         zones_path: zoningEnabled ? data.connectedZoneFilename : null,
         resolution: parseInt(resolution),
-        output_mode: zoningEnabled ? outputMode : 'grid'  // Default to grid when no zoning
+        output_mode: zoningEnabled ? outputMode : 'grid',  // Default to grid when no zoning
+        study_area: data.studyArea || null,                 // the collection's study area
       };
       const response = await fetch(`${API_BASE}/api/integrate_multivariate`, {
         method: 'POST',

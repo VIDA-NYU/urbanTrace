@@ -36,6 +36,7 @@ import weave_engine
 import catalog
 import collections_store
 import export as exporter
+import scope
 from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
 from grids.h3_grid import H3GridSystem
 
@@ -217,6 +218,10 @@ class VariableConfigRequest(BaseModel):
     grid_aggregation_operator: str # A_1: cell-level aggregation
     zoning_mapping_operator: Optional[str] = None   # Z_map: cell-to-zone mapping
     zoning_aggregation_operator: Optional[str] = None  # A_2: zone-level aggregation
+    # Time window on the source (redesign section 4.1): rows whose time_column falls in [start, end]
+    time_column: Optional[str] = None
+    time_start: Optional[str] = None
+    time_end: Optional[str] = None
 
 
 class MultivariateIntegrationRequest(BaseModel):
@@ -230,6 +235,7 @@ class MultivariateIntegrationRequest(BaseModel):
     zones_path: Optional[str] = None        # Optional reporting zones
     resolution: int = 9                     # H3 grid resolution
     output_mode: str = "grid"               # "grid" | "zones" | "both"
+    study_area: Optional[Dict[str, Any]] = None  # a study area spec (scope.py); urbanweave engine only
 
 
 class CopilotTargetZoning(BaseModel):
@@ -454,20 +460,30 @@ def _integrate_with_urbanweave(request: "MultivariateIntegrationRequest") -> Dic
                     detail=f"Operator '{var.allocation_operator}' not valid for {geom_type} in {var.dataset_path}",
                 )
         zoned = bool(var.zoning_mapping_operator and var.zoning_aggregation_operator)
+        window = ({"column": var.time_column, "start": var.time_start, "end": var.time_end}
+                  if var.time_column else None)
         try:
             tracks.append(weave_engine.Track(
                 source_gdf, var.target_column, var.output_name or var.target_column,
                 var.allocation_operator, var.grid_aggregation_operator,
                 var.zoning_mapping_operator if zoned else None,
                 var.zoning_aggregation_operator if zoned else None,
+                time_window=window,
             ))
         except uw.UrbanweaveError as e:
             raise HTTPException(status_code=400, detail=str(e))
     zones_gdf = _load_catalog_geojson(request.zones_path, "zones") if request.zones_path else None
     try:
-        return weave_engine.run(tracks, request.resolution, zones_gdf, request.output_mode)
+        area = scope.study_area_geometry(DATA_DIR, request.study_area)
+    except scope.ScopeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    try:
+        result = weave_engine.run(tracks, request.resolution, zones_gdf, request.output_mode, study_area=area)
     except uw.UrbanweaveError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    if area is not None:
+        result["study_area"] = request.study_area
+    return result
 
 
 def _multivariate_response(request: "MultivariateIntegrationRequest", result: Dict[str, Any]) -> Dict[str, Any]:
@@ -479,6 +495,8 @@ def _multivariate_response(request: "MultivariateIntegrationRequest", result: Di
         "resolution": request.resolution,
         "variables": [v.output_name or v.target_column for v in request.variables]
     }
+    if result.get("study_area"):
+        response["study_area"] = result["study_area"]
     if "reports" in result:
         response["reports"] = result["reports"]
         response["changes"] = result.get("changes", [])
@@ -1413,6 +1431,7 @@ class ExportOptions(BaseModel):
     embed: str = "auto"                      # "auto" | "always" | "never"
     formats: List[str] = Field(default_factory=lambda: ["parquet", "gpkg"])
     include_results: bool = True
+    clip: bool = True                        # clip sources to the collection's study area
 
 
 def _get_collection(cid: str) -> Dict[str, Any]:
@@ -1463,8 +1482,12 @@ def _temp_zip() -> str:
 
 
 def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any]:
-    """Results, plans and other parts later phases add to an export (none yet)."""
-    return {}
+    """The parts of an export beyond the datasets: study area, checks (phase 2)."""
+    try:
+        area = scope.study_area_geometry(DATA_DIR, doc.get("study_area"))
+    except scope.ScopeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"area": area if options.clip else None, "warnings": scope.checks(DATA_DIR, doc)}
 
 
 @app.post("/api/collections/{cid}/export")
@@ -1517,6 +1540,57 @@ async def get_dataset_origin(dataset_id: str):
     if not catalog.valid_stem(stem):
         raise HTTPException(status_code=400, detail="Invalid dataset id")
     return catalog.origin(DATA_DIR, stem)
+
+
+# ==========================================
+# STUDY AREA, COVERAGE AND TIME (docs/REDESIGN.md, phase 2)
+# ==========================================
+
+@app.get("/api/catalog/index")
+async def get_catalog_index():
+    """One row per dataset (bbox, time range, geometry, rows) for search filters."""
+    return {"datasets": scope.catalog_index(DATA_DIR)}
+
+
+@app.get("/api/study-area/options/{dataset_id}")
+async def get_study_area_options(dataset_id: str):
+    stem = catalog.stem_of(dataset_id)
+    if not catalog.valid_stem(stem) or catalog.dataset_path(DATA_DIR, stem) is None:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return scope.study_area_options(DATA_DIR, stem)
+
+
+@app.post("/api/study-area/resolve")
+async def resolve_study_area(spec: Dict[str, Any]):
+    """The study area's geometry, bbox and area, for display."""
+    try:
+        return scope.study_area_summary(scope.study_area_geometry(DATA_DIR, spec))
+    except scope.ScopeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+class CoverageRequest(BaseModel):
+    datasets: List[str]
+    study_area: Optional[Dict[str, Any]] = None
+
+
+@app.post("/api/coverage")
+async def get_coverage(body: CoverageRequest):
+    """Where the datasets have data, on a common ~500 m lattice, and how much of the study area each reaches."""
+    try:
+        area = scope.study_area_geometry(DATA_DIR, body.study_area)
+    except scope.ScopeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    stems = [catalog.stem_of(d) for d in body.datasets if catalog.valid_stem(catalog.stem_of(d))]
+    out = scope.coverage(DATA_DIR, stems, area)
+    out["study_area"] = scope.study_area_summary(area)
+    return out
+
+
+@app.post("/api/collections/check")
+async def check_collection(body: CollectionBody):
+    """Warnings for a collection as it stands (saved or not): periods, coverage of the study area."""
+    return {"warnings": scope.checks(DATA_DIR, body.model_dump(exclude_none=True))}
 
 # ==========================================
 # 7. LLM COPILOT ENDPOINTS

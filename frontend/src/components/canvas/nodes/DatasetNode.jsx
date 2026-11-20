@@ -1,8 +1,40 @@
 // frontend/src/components/DatasetNode.jsx
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Database, Layers, Palette, Info, X } from 'lucide-react'; // Added Info icon
+import { Database, Layers, Palette, Info, X, Clock } from 'lucide-react'; // Added Info icon
 import VectorPreviewMap from '../../visualization/VectorPreviewMap';
+import { getCatalogIndex } from '../../../lib/scope';
+
+// Time window on the source (redesign section 4.1): integrations use only rows in [start, end].
+function TimeWindow({ nodeId, datasetId, value, onChange }) {
+  const [time, setTime] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    getCatalogIndex().then((idx) => { if (alive) setTime(idx[datasetId]?.time || null); });
+    return () => { alive = false; };
+  }, [datasetId]);
+  if (!time || !time.columns?.length) return null;
+  const w = value || {};
+  const set = (patch) => {
+    const next = { column: w.column || time.columns[0], start: w.start || '', end: w.end || '', ...patch };
+    onChange?.(nodeId, next.start || next.end ? next : null);
+  };
+  const inputStyle = { fontSize: '9px', border: '1px solid #cbd5e1', borderRadius: '3px', padding: '0 2px', height: '16px', minWidth: 0 };
+  return (
+    <div className="nodrag" title={`Data from ${time.start} to ${time.end}. Set a window to integrate only those rows.`}
+      style={{ padding: '3px 8px 4px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', color: w.start || w.end ? '#1d4ed8' : '#64748b' }}>
+      <Clock size={10} style={{ flexShrink: 0 }} />
+      {time.columns.length > 1 && (
+        <select value={w.column || time.columns[0]} onChange={(e) => set({ column: e.target.value })} style={{ ...inputStyle, width: '52px' }}>
+          {time.columns.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      )}
+      <input type="date" value={w.start || ''} min={time.start} max={time.end} onChange={(e) => set({ start: e.target.value })} style={{ ...inputStyle, flex: 1 }} />
+      –
+      <input type="date" value={w.end || ''} min={time.start} max={time.end} onChange={(e) => set({ end: e.target.value })} style={{ ...inputStyle, flex: 1 }} />
+    </div>
+  );
+}
 
 const DatasetNode = memo(({ id, data }) => {
   const meta = data.metadata || {};
@@ -181,6 +213,9 @@ const DatasetNode = memo(({ id, data }) => {
           <Layers size={9} /> {meta.geometricType || 'Unknown'} · {meta.nb_rows?.toLocaleString() || 0}
         </div>
       </div>
+
+      <TimeWindow nodeId={id} datasetId={(data.id || filename).replace(/\.geojson$/i, '')}
+        value={data.timeWindow} onChange={data.onTimeWindowChange} />
 
       {/* Connector */}
       <Handle type="source" position={Position.Right} style={{ background: '#2563eb', width: '8px', height: '8px', right: '-4px', border: '2px solid white' }} />

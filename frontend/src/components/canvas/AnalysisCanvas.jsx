@@ -20,12 +20,13 @@ import {
   getCollection, createCollection, updateCollection, exportCollection,
   serializeCanvas, collectionDatasets, collectionIntegrations,
 } from '../../lib/collections';
+import { checkCollection, resolveStudyArea } from '../../lib/scope';
 
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
 };
 
-const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => {
+const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange, onStudyAreaResolved }) => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [viewingDataset, setViewingDataset] = useState(null);
@@ -50,6 +51,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const [savedSnapshot, setSavedSnapshot] = useState(null);
   const [collectionStatus, setCollectionStatus] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [warnings, setWarnings] = useState([]);
 
   const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   
@@ -652,7 +654,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         nodeId: sourceNode.id,
         filename: sourceNode.data.filename,
         metadata: sourceNode.data.metadata,
-        inheritedColumn: inheritedColumn
+        inheritedColumn: inheritedColumn,
+        timeWindow: sourceNode.data.timeWindow || null
       };
       
       setNodes((nds) => nds.map(node => {
@@ -735,6 +738,27 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     );
   }, [getEdges]);
 
+  // TIME WINDOW (redesign section 4.1): set on a dataset node, carried to the integrations it feeds
+  const handleDatasetTimeWindowChange = useCallback((nodeId, timeWindow) => {
+    setNodes((nds) => nds.map((node) => {
+      if (node.id === nodeId && node.type === 'datasetNode') {
+        return { ...node, data: { ...node.data, timeWindow: timeWindow || null } };
+      }
+      if (node.type === 'integrationNode' && Array.isArray(node.data?.connectedDatasets)
+          && node.data.connectedDatasets.some((d) => d.nodeId === nodeId)) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            connectedDatasets: node.data.connectedDatasets.map((d) => (
+              d.nodeId === nodeId ? { ...d, timeWindow: timeWindow || null } : d)),
+          },
+        };
+      }
+      return node;
+    }));
+  }, []);
+
   const addDatasetNodeById = useCallback(async (datasetId, colorBy, provenance = {}) => {
     const normalizedId = normalizeDatasetId(datasetId);
     if (!normalizedId) {
@@ -798,6 +822,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           ...dataset,
           onShowInfo: handleShowInfo,
           onColumnChange: handleDatasetColumnChange,
+          onTimeWindowChange: handleDatasetTimeWindowChange,
           ...(resolvedColorBy ? { selectedColumn: resolvedColorBy, colorBy: resolvedColorBy } : {}),
           ...(provenance.addedBy ? { addedBy: provenance.addedBy } : {}),
           ...(provenance.reason ? { copilotReason: provenance.reason } : {}),
@@ -812,6 +837,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     fetchAvailableDatasets,
     findDatasetById,
     handleDatasetColumnChange,
+    handleDatasetTimeWindowChange,
     handleShowInfo,
     normalizeDatasetId,
     resolveValidColorByForDataset,
@@ -894,6 +920,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     if (type === 'operationNode') {
       next.color = data.opType === 'buffer' ? '#ec4899' : '#8b5cf6';
     } else if (type === 'integrationNode') {
+      next.studyArea = collection.study_area || null;
       next.onIntegrationComplete = handleIntegrationComplete;
       next.onLogActivity = onLogActivity;
       next.onDeleteNode = handleDeleteNode;
@@ -907,14 +934,15 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     } else if (type === 'datasetNode') {
       next.onShowInfo = handleShowInfo;
       next.onColumnChange = handleDatasetColumnChange;
+      next.onTimeWindowChange = handleDatasetTimeWindowChange;
       next.isMapSyncEnabled = isMapSyncEnabled;
       next.globalViewState = globalViewState;
       next.onGlobalViewStateChange = setGlobalViewState;
       next.onDeleteNode = handleDeleteNode;
     }
     return next;
-  }, [globalViewState, handleCompareHover, handleDatasetColumnChange, handleDeleteNode, handleIntegrationComplete,
-      handleShowInfo, isMapSyncEnabled, onLogActivity]);
+  }, [collection.study_area, globalViewState, handleCompareHover, handleDatasetColumnChange, handleDatasetTimeWindowChange,
+      handleDeleteNode, handleIntegrationComplete, handleShowInfo, isMapSyncEnabled, onLogActivity]);
 
   // ---------------------------------------------------------------------------------------------
   // COLLECTION: build the document from the canvas, save it, reopen it, export it
@@ -1001,7 +1029,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             } else {
               connectedDatasets.push({
                 id: `var_${e.source}`, nodeId: e.source, filename: dataset.filename, metadata: dataset.metadata,
-                inheritedColumn: src.data?.selectedColumn || '',
+                inheritedColumn: src.data?.selectedColumn || '', timeWindow: src.data?.timeWindow || null,
               });
             }
           }
@@ -1029,6 +1057,44 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   useEffect(() => {
     if (savedSnapshot === '__pending__') setSavedSnapshot(collectionJson);
   }, [savedSnapshot, collectionJson]);
+
+  // STUDY AREA (redesign phase 2): integrations use it; the sidebar filters search by its extent.
+  useEffect(() => {
+    const area = collection.study_area || null;
+    setNodes((nds) => {
+      let changed = false;
+      const next = nds.map((node) => {
+        if (node.type !== 'integrationNode' || node.data?.studyArea === area) return node;
+        changed = true;
+        return { ...node, data: { ...node.data, studyArea: area } };
+      });
+      return changed ? next : nds;
+    });
+    if (!onStudyAreaResolved) return;
+    if (!area) { onStudyAreaResolved(null); return; }
+    let alive = true;
+    resolveStudyArea(area).then((summary) => alive && onStudyAreaResolved(summary)).catch(() => alive && onStudyAreaResolved(null));
+    return () => { alive = false; };
+  }, [collection.study_area, onStudyAreaResolved]);
+
+  // CHECKS: periods that do not overlap, datasets that miss the study area (debounced)
+  const checksKey = useMemo(() => JSON.stringify({
+    datasets: collectionDoc.datasets.map(({ id, time_window }) => ({ id, time_window })),
+    study_area: collectionDoc.study_area,
+  }), [collectionDoc.datasets, collectionDoc.study_area]);
+  useEffect(() => {
+    const body = JSON.parse(checksKey);
+    if (!body.datasets.length) { setWarnings([]); return; }
+    const t = setTimeout(() => {
+      checkCollection(body).then((r) => setWarnings(r.warnings || [])).catch(() => setWarnings([]));
+    }, 500);
+    return () => clearTimeout(t);
+  }, [checksKey]);
+
+  const zoneDatasets = useMemo(() => availableDatasets
+    .filter((d) => /Polygon/.test(d?.metadata?.geometricType || ''))
+    .map((d) => ({ id: normalizeDatasetId(d.id || d.filename), name: d.metadata?.name || d.name }))
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '')), [availableDatasets, normalizeDatasetId]);
 
   const handleExport = useCallback(async (options) => {
     setExporting(true);
@@ -1120,6 +1186,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         onOpen={openCollection}
         onSave={saveCollection}
         onExport={handleExport}
+        zoneDatasets={zoneDatasets}
+        onStudyAreaChange={(study_area) => setCollection((c) => ({ ...c, study_area }))}
+        coverageDatasets={collectionDoc.datasets.map((d) => d.id)}
+        warnings={warnings}
       />
 
       <div style={{ width: '100%', height: '100%' }} onDrop={onDrop} onDragOver={onDragOver}>
@@ -1161,7 +1231,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   );
 };
 
-const AnalysisCanvas = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => (
+const AnalysisCanvas = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange, onStudyAreaResolved }) => (
   <ReactFlowProvider>
     <CanvasInner
       sidebarCollapsed={sidebarCollapsed}
@@ -1170,6 +1240,7 @@ const AnalysisCanvas = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, foc
       focusedLogTs={focusedLogTs}
       onTraceLineage={onTraceLineage}
       onActiveLogTimestampsChange={onActiveLogTimestampsChange}
+      onStudyAreaResolved={onStudyAreaResolved}
     />
   </ReactFlowProvider>
 );

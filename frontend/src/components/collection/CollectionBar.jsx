@@ -1,8 +1,9 @@
 // The collection bar (docs/REDESIGN.md, section 2.1): name and goal of the collection on the canvas,
 // with new, open, save and export.
 import React, { useEffect, useRef, useState } from 'react';
-import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X } from 'lucide-react';
+import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X, MapPinned, Grid3x3, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { listCollections, deleteCollection } from '../../lib/collections';
+import { StudyAreaPanel, CoverageModal, WarningsPanel } from './ScopePanels';
 
 const bar = {
   position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 100,
@@ -89,8 +90,12 @@ function ExportPanel({ onExport, onClose, busy }) {
   );
 }
 
-export default function CollectionBar({ collection, dirty, status, onRename, onGoalChange, onNew, onOpen, onSave, onExport, exporting }) {
-  const [open, setOpen] = useState(null); // 'open' | 'export' | 'goal'
+export default function CollectionBar({
+  collection, dirty, status, onRename, onGoalChange, onNew, onOpen, onSave, onExport, exporting,
+  zoneDatasets = [], onStudyAreaChange, coverageDatasets = [], warnings = [],
+}) {
+  const [open, setOpen] = useState(null); // 'open' | 'export' | 'goal' | 'area' | 'checks'
+  const [coverageOpen, setCoverageOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
     const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(null); };
@@ -104,6 +109,18 @@ export default function CollectionBar({ collection, dirty, status, onRename, onG
       <button style={{ ...iconButton, fontWeight: 500, maxWidth: 220, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
         onClick={() => setOpen(open === 'goal' ? null : 'goal')} title={collection.goal || 'Describe what this collection is for'}>
         {collection.goal ? `Goal: ${collection.goal}` : 'Add a goal'}
+      </button>
+      <button style={{ ...iconButton, fontWeight: 500 }} onClick={() => setOpen(open === 'area' ? null : 'area')}
+        title="Study area: limits integrations, search and exports">
+        <MapPinned size={13} /> {collection.study_area ? (collection.study_area.name || 'Study area') : 'No study area'}
+      </button>
+      <button style={iconButton} onClick={() => setCoverageOpen(true)} title="Where the datasets on the canvas have data">
+        <Grid3x3 size={13} />
+      </button>
+      <button style={{ ...iconButton, color: warnings.length ? '#b45309' : '#16a34a' }}
+        onClick={() => setOpen(open === 'checks' ? null : 'checks')}
+        title={warnings.length ? `${warnings.length} warning(s)` : 'No problems found'}>
+        {warnings.length ? <AlertTriangle size={13} /> : <CheckCircle2 size={13} />}{warnings.length || ''}
       </button>
       <span style={{ color: dirty ? '#b45309' : '#16a34a', fontSize: 11, minWidth: 64 }}>{status || (dirty ? 'Unsaved' : 'Saved')}</span>
       <button style={iconButton} onClick={onNew} title="New collection"><FilePlus size={13} /></button>
@@ -120,6 +137,12 @@ export default function CollectionBar({ collection, dirty, status, onRename, onG
       )}
       {open === 'open' && <OpenPanel onClose={() => setOpen(null)} onOpen={(id) => { setOpen(null); onOpen(id); }} />}
       {open === 'export' && <ExportPanel busy={exporting} onClose={() => setOpen(null)} onExport={onExport} />}
+      {open === 'area' && (
+        <StudyAreaPanel value={collection.study_area} zoneDatasets={zoneDatasets} onClose={() => setOpen(null)}
+          onApply={(spec) => { onStudyAreaChange(spec); setOpen(null); }} />
+      )}
+      {open === 'checks' && <WarningsPanel warnings={warnings} onClose={() => setOpen(null)} />}
+      {coverageOpen && <CoverageModal datasets={coverageDatasets} studyArea={collection.study_area} onClose={() => setCoverageOpen(false)} />}
     </div>
   );
 }

@@ -7,6 +7,8 @@ import RightSidebar from './components/layout/RightSidebar';
 
 function App() {
   const [leftOpen, setLeftOpen] = useState(true);
+  // The collection's study area, resolved (bbox, area), for the search filter in the sidebar
+  const [studyArea, setStudyArea] = useState(null);
   
   // GLOBAL ACTIVITY LOG: Track all pipeline executions for audit trail
   const [activityLogs, setActivityLogs] = useState([]);
@@ -69,7 +71,7 @@ function App() {
             pointerEvents: leftOpen ? 'auto' : 'none', // CRITICAL: Disable interactions when collapsed
             transition: 'opacity 0.2s'
         }}>
-           <DatasetSidebar />
+           <DatasetSidebar studyArea={studyArea} />
         </div>
 
         {/* Toggle Button */}
@@ -110,6 +112,7 @@ function App() {
           focusedLogTs={focusedLogTs}
           onTraceLineage={setFocusedLogTs}
           onActiveLogTimestampsChange={setActiveLogTimestamps}
+          onStudyAreaResolved={setStudyArea}
         />
       </main>
 
