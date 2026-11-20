@@ -18,9 +18,20 @@ import { API_BASE } from '../../config/api';
 import CollectionBar from '../collection/CollectionBar';
 import {
   getCollection, createCollection, updateCollection, exportCollection,
-  serializeCanvas, collectionDatasets, collectionIntegrations,
+  serializeCanvas, collectionDatasets, collectionIntegrations, downloadBlob,
 } from '../../lib/collections';
 import { checkCollection, resolveStudyArea } from '../../lib/scope';
+import { GridNode, StepNode, CalculateNode } from './nodes/PlanNodes';
+import {
+  buildPlan, buildDerived, validatePlan, runPlan, replayRun, toSpatialData, inputsOf, stepIdOf, valueKindOf,
+  getValueKindSuggestions,
+} from '../../lib/plans';
+
+// Value kind of a step's output column, from the reduction that made it (as urbanweave assigns it)
+const OUTPUT_KIND = {
+  count: 'extensive', weighted_count: 'extensive', density: 'intensive', mean: 'intensive', weighted_mean: 'intensive',
+  median: 'intensive', weighted_median: 'intensive', majority: 'categorical', shares: 'intensive',
+};
 
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
@@ -52,6 +63,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const [collectionStatus, setCollectionStatus] = useState('');
   const [exporting, setExporting] = useState(false);
   const [warnings, setWarnings] = useState([]);
+  const [planProblems, setPlanProblems] = useState({});
+  const [lastManifestPath, setLastManifestPath] = useState(null);
 
   const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   
@@ -242,7 +255,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     operationNode: OperationNode,
     integrationNode: IntegrationNode, // <--- NEW Registration
     resultMapNode: ResultMapNode,
-    compareMapNode: CompareMapNode
+    compareMapNode: CompareMapNode,
+    gridNode: GridNode,
+    stepNode: StepNode,
+    calculateNode: CalculateNode,
   }), []);
 
   const handleCompareHover = useCallback((featureId, featureType) => {
@@ -602,6 +618,23 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       return;
     }
 
+    // PLAN NODES (redesign phase 4): a step takes one source and one target; Calculate takes steps.
+    if (targetNode?.type === 'stepNode' || targetNode?.type === 'calculateNode') {
+      const handle = params.targetHandle;
+      let ok = false;
+      if (targetNode.type === 'stepNode' && handle === 'source') ok = ['datasetNode', 'stepNode'].includes(sourceNode?.type) && sourceNode.id !== targetNode.id;
+      if (targetNode.type === 'stepNode' && handle === 'target') ok = ['datasetNode', 'gridNode'].includes(sourceNode?.type);
+      if (targetNode.type === 'calculateNode') ok = sourceNode?.type === 'stepNode';
+      if (!ok) return;
+      setEdges((eds) => {
+        const kept = targetNode.type === 'stepNode'
+          ? eds.filter((e) => !(e.target === params.target && e.targetHandle === handle)) // one per handle
+          : eds.filter((e) => !(e.target === params.target && e.source === params.source));
+        return addEdge({ ...params, animated: false, style: { stroke: handle === 'target' ? '#0ea5e9' : '#6366f1', strokeWidth: 2 } }, kept);
+      });
+      return;
+    }
+
     // Early return if not a valid connection to IntegrationNode
     if (targetNode?.type !== 'integrationNode' || !sourceNode?.data?.filename) {
       return;
@@ -915,6 +948,16 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     return exists;
   }, [copilotSuggestions, getSuggestionKey, removeCopilotSuggestion]);
 
+  // PLAN NODE STATE (redesign phase 4)
+  const handlePlanNodeChange = useCallback((nodeId, patch) => {
+    setNodes((nds) => nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, ...patch } } : n)));
+  }, []);
+  const handleValueKindChange = useCallback((datasetNodeId, column, kind) => {
+    setNodes((nds) => nds.map((n) => (n.id === datasetNodeId
+      ? { ...n, data: { ...n.data, valueKinds: { ...(n.data?.valueKinds || {}), [column]: kind } } } : n)));
+  }, []);
+  const runPlanNodeRef = React.useRef(null);
+
   const attachCallbacks = useCallback((type, data) => {
     const next = { ...data };
     if (type === 'operationNode') {
@@ -931,6 +974,18 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       next.globalViewState = globalViewState;
       next.onGlobalViewStateChange = setGlobalViewState;
       next.onDeleteNode = handleDeleteNode;
+    } else if (type === 'stepNode' || type === 'calculateNode' || type === 'gridNode') {
+      next.onChange = handlePlanNodeChange;
+      next.onRun = type === 'calculateNode' ? (nodeId) => runPlanNodeRef.current?.(nodeId, 'calculate')
+        : (nodeId) => runPlanNodeRef.current?.(nodeId, 'step');
+      next.onValueKindChange = handleValueKindChange;
+      next.onDeleteNode = handleDeleteNode;
+      if (type === 'stepNode' && !next.stepId) {
+        next.method = next.method || 'contain';
+        next.reductions = next.reductions || [{ method: 'count', column: '', as: 'count', fillEmpty: true }];
+      }
+      if (type === 'gridNode' && !next.resolution) next.resolution = 9;
+      if (type === 'calculateNode') { next.as = next.as || 'derived'; next.kind = next.kind || 'intensive'; }
     } else if (type === 'datasetNode') {
       next.onShowInfo = handleShowInfo;
       next.onColumnChange = handleDatasetColumnChange;
@@ -942,7 +997,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }
     return next;
   }, [collection.study_area, globalViewState, handleCompareHover, handleDatasetColumnChange, handleDatasetTimeWindowChange,
-      handleDeleteNode, handleIntegrationComplete, handleShowInfo, isMapSyncEnabled, onLogActivity]);
+      handleDeleteNode, handleIntegrationComplete, handleShowInfo, isMapSyncEnabled, onLogActivity, handlePlanNodeChange,
+      handleValueKindChange]);
 
   // ---------------------------------------------------------------------------------------------
   // COLLECTION: build the document from the canvas, save it, reopen it, export it
@@ -953,7 +1009,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     notes: collection.notes,
     study_area: collection.study_area,
     analyses: collection.analyses,
-    datasets: collectionDatasets(nodes),
+    datasets: collectionDatasets(nodes, edges),
+    plan: (() => {
+      const { plan } = buildPlan(nodes, edges);
+      return plan.steps.length ? plan : null;
+    })(),
+    derived: buildDerived(nodes, edges).filter((d) => d.inputs.length),
     // Integrations saved earlier stay while their integration node is on the canvas; results on
     // the canvas add or replace them.
     integrations: (() => {
@@ -1091,6 +1152,164 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     return () => clearTimeout(t);
   }, [checksKey]);
 
+  // VALUE KIND SUGGESTIONS for dataset nodes, from their profiles (redesign section 3.3)
+  useEffect(() => {
+    nodes.filter((n) => n.type === 'datasetNode' && !n.data?.valueKindSuggestions).forEach((n) => {
+      const stem = normalizeDatasetId(n.data?.id || n.data?.filename);
+      if (!stem) return;
+      getValueKindSuggestions(stem).then((suggestions) => {
+        setNodes((nds) => nds.map((m) => (m.id === n.id && !m.data?.valueKindSuggestions
+          ? { ...m, data: { ...m.data, valueKindSuggestions: suggestions } } : m)));
+      });
+    });
+  }, [nodes, normalizeDatasetId]);
+
+  // PLAN VALIDATION (debounced): problems by step, shown on the step nodes
+  const planKey = useMemo(() => JSON.stringify(buildPlan(nodes, edges).plan), [nodes, edges]);
+  useEffect(() => {
+    const plan = JSON.parse(planKey);
+    if (!plan.steps.length) { setPlanProblems({}); return undefined; }
+    const t = setTimeout(() => {
+      validatePlan(plan, collection.study_area).then((r) => setPlanProblems(r.problems || {})).catch(() => {});
+    }, 600);
+    return () => clearTimeout(t);
+  }, [planKey, collection.study_area]);
+
+  // CONTEXT of each plan node: what is connected, columns with value kinds, problems
+  useEffect(() => {
+    const { problems: localProblems } = buildPlan(nodes, edges);
+    const columnsOfStep = (stepNode) => (stepNode.data?.reductions || []).filter((r) => r.method).map((r) => {
+      const alias = r.as || [r.method, r.column].filter(Boolean).join('_');
+      let kind = OUTPUT_KIND[r.method] || null;
+      if (!kind) {
+        const { source } = inputsOf(stepNode.id, nodes, edges);
+        kind = source?.type === 'datasetNode' ? valueKindOf(source.data, r.column) : null;
+      }
+      return { name: alias, kind };
+    });
+    const describeTarget = (t) => {
+      if (!t) return null;
+      if (t.type === 'gridNode') return { kind: 'h3', label: `H3 grid, resolution ${t.data?.resolution || 9}`, geometry: 'Polygon' };
+      return { kind: 'zones', label: t.data?.metadata?.name || t.data?.name || t.data?.id, geometry: t.data?.metadata?.geometricType || 'Polygon' };
+    };
+    const contexts = {};
+    for (const n of nodes) {
+      if (n.type === 'stepNode') {
+        const { source, target } = inputsOf(n.id, nodes, edges);
+        let src = null;
+        if (source?.type === 'datasetNode') {
+          const cols = (source.data?.metadata?.columns || []).map((c) => c.name).filter(Boolean);
+          src = {
+            label: source.data?.metadata?.name || source.data?.name || source.data?.id, geometry: source.data?.metadata?.geometricType,
+            columns: cols.map((name) => ({ name, kind: valueKindOf(source.data, name) })), datasetNodeId: source.id,
+          };
+        } else if (source?.type === 'stepNode') {
+          const upTarget = describeTarget(inputsOf(source.id, nodes, edges).target);
+          src = { label: `@${stepIdOf(source)}`, geometry: upTarget?.geometry || 'Polygon', columns: columnsOfStep(source), isStep: true };
+        }
+        const sid = stepIdOf(n);
+        contexts[n.id] = { source: src, target: describeTarget(target), problems: [...(localProblems[sid] || []), ...(planProblems[sid] || [])] };
+      } else if (n.type === 'calculateNode') {
+        const { inputs } = inputsOf(n.id, nodes, edges);
+        const steps = inputs.filter((i) => i.type === 'stepNode');
+        const targetIds = new Set(steps.map((s) => inputsOf(s.id, nodes, edges).target?.id).filter(Boolean));
+        contexts[n.id] = {
+          inputs: steps.map((s) => ({ stepId: stepIdOf(s), columns: columnsOfStep(s) })),
+          problems: targetIds.size > 1 ? ['The connected steps must share one target.'] : [],
+        };
+      }
+    }
+    setNodes((nds) => {
+      let changed = false;
+      const next = nds.map((n) => {
+        const ctx = contexts[n.id];
+        if (!ctx || JSON.stringify(ctx) === JSON.stringify(n.data?.context)) return n;
+        changed = true;
+        return { ...n, data: { ...n.data, context: ctx } };
+      });
+      return changed ? next : nds;
+    });
+  }, [nodes, edges, planProblems]);
+
+  // RUNNING a step or a calculation: results in columns, shown in a Result Map connected to the node
+  const showPlanResult = useCallback((nodeId, spatialData, name) => {
+    const resultEdge = getEdges().find((e) => e.source === nodeId && getNodes().find((n) => n.id === e.target)?.type === 'resultMapNode');
+    if (resultEdge) {
+      setNodes((nds) => nds.map((n) => (n.id === resultEdge.target ? { ...n, data: { ...n.data, name, spatialData } } : n)));
+      return;
+    }
+    const resultNodeId = `result_${(crypto.randomUUID?.() || String(Date.now())).slice(0, 8)}`;
+    setNodes((nds) => {
+      const src = nds.find((n) => n.id === nodeId);
+      if (!src) return nds;
+      return [...nds, {
+        id: resultNodeId, type: 'resultMapNode', position: { x: src.position.x + 360, y: src.position.y },
+        data: { name, isResult: true, spatialData, isMapSyncEnabled, globalViewState, onGlobalViewStateChange: setGlobalViewState, onDeleteNode: handleDeleteNode },
+      }];
+    });
+    setEdges((eds) => [...eds, { id: `e-${nodeId}-${resultNodeId}`, source: nodeId, target: resultNodeId, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }]);
+  }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled]);
+
+  const runPlanNode = useCallback(async (nodeId, mode) => {
+    const all = getNodes();
+    const allEdges = getEdges();
+    const node = all.find((n) => n.id === nodeId);
+    if (!node) return;
+    const setRun = (lastRun) => handlePlanNodeChange(nodeId, { lastRun });
+    const started = performance.now();
+    setRun({ running: true });
+    try {
+      let stepNodeIds = [nodeId];
+      let derived = null;
+      if (mode === 'calculate') {
+        const steps = inputsOf(nodeId, all, allEdges).inputs.filter((i) => i.type === 'stepNode');
+        stepNodeIds = steps.map((s) => s.id);
+        derived = buildDerived(all, allEdges).filter((d) => d.node === nodeId);
+      }
+      const { plan, problems, byStepNode } = buildPlan(all, allEdges, stepNodeIds);
+      const own = mode === 'step' ? problems[byStepNode[nodeId] || stepIdOf(node)] : null;
+      if (own?.length) throw new Error(own.join(' '));
+      const outputs = mode === 'step' ? [byStepNode[nodeId]] : [];
+      const out = await runPlan({ plan, study_area: collection.study_area || null, outputs, derived });
+      const key = mode === 'step' ? byStepNode[nodeId] : derived[0].id;
+      const payload = out.steps[key];
+      const step = plan.steps.find((s) => s.id === key);
+      const srcInfo = step ? out.inputs?.[step.source] : null;
+      const spatialData = toSpatialData(payload, {
+        stepId: key, plan, reports: out.reports?.[key] || null,
+        sourceLabel: srcInfo?.dataset || (mode === 'calculate' ? `derived from ${derived[0].inputs.join(', ')}` : key),
+        methodLabel: step?.match?.method || 'combine',
+        reductionsByColumn: Object.fromEntries((step?.aggregate || []).map((r) => [r.as, r.method])),
+        durationMs: Math.round(performance.now() - started),
+      });
+      const reports = mode === 'step' ? { [key]: { allocation: out.reports?.[key], ...(srcInfo?.time_window ? { time_window: srcInfo.time_window } : {}),
+        ...(srcInfo?.study_area ? { study_area: srcInfo.study_area } : {}), ...(srcInfo?.repaired_geometries ? { repaired_geometries: srcInfo.repaired_geometries } : {}) } } : null;
+      setRun({ running: false, reports, durationMs: spatialData.provenance.durationMs });
+      showPlanResult(nodeId, { ...spatialData, reports: reports || spatialData.reports }, mode === 'step' ? `Step ${key}` : `Derived: ${derived[0].as}`);
+      onLogActivity?.({ status: 'success', ...spatialData.provenance, reports: reports || spatialData.reports });
+    } catch (error) {
+      setRun({ running: false, error: error.message });
+    }
+  }, [collection.study_area, getEdges, getNodes, handlePlanNodeChange, onLogActivity, showPlanResult]);
+  useEffect(() => { runPlanNodeRef.current = runPlanNode; }, [runPlanNode]);
+
+  // RUN ALL and record a manifest (for replay and for the export), from the collection bar
+  const runAllRecorded = useCallback(async () => {
+    const { plan } = buildPlan(nodes, edges);
+    if (!plan.steps.length) { setCollectionStatus('No steps to run'); return; }
+    const id = await saveCollection();
+    if (!id) return;
+    setCollectionStatus('Running the plan…');
+    try {
+      const out = await runPlan({ plan, study_area: collection.study_area || null, outputs: plan.steps.map((s) => s.id),
+        derived: buildDerived(nodes, edges).filter((d) => d.inputs.length), record: true, collection_id: id });
+      setLastManifestPath(out.manifest_path);
+      setCollectionStatus(`Ran ${plan.steps.length} step(s); run recorded`);
+    } catch (error) {
+      setCollectionStatus(`Run failed: ${error.message}`);
+    }
+  }, [collection.study_area, edges, nodes, saveCollection]);
+
   const zoneDatasets = useMemo(() => availableDatasets
     .filter((d) => /Polygon/.test(d?.metadata?.geometricType || ''))
     .map((d) => ({ id: normalizeDatasetId(d.id || d.filename), name: d.metadata?.name || d.name }))
@@ -1128,7 +1347,16 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const newNodeType = dataItem.type || 'datasetNode';
       const nodeId = `node_${Date.now()}`;
       // Inject the handlers each node type needs to talk back to the canvas
-      const newNodeData = attachCallbacks(newNodeType, { ...dataItem });
+      const seed = { ...dataItem };
+      if (newNodeType === 'stepNode') {
+        const taken = new Set(getNodes().filter((n) => n.type === 'stepNode').map((n) => n.data?.stepId));
+        let k = 1;
+        while (taken.has(`step_${k}`)) k += 1;
+        seed.stepId = `step_${k}`;
+        seed.method = 'contain';
+        seed.reductions = [{ method: 'count', column: '', as: 'count', fillEmpty: true }];
+      }
+      const newNodeData = attachCallbacks(newNodeType, seed);
 
       const newNode = {
         id: nodeId,
@@ -1142,7 +1370,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         queueAutoSuggestRequest(dataItem);
       }
     },
-    [attachCallbacks, screenToFlowPosition, queueAutoSuggestRequest]
+    [attachCallbacks, getNodes, screenToFlowPosition, queueAutoSuggestRequest]
   );
 
   return (
@@ -1189,7 +1417,20 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         zoneDatasets={zoneDatasets}
         onStudyAreaChange={(study_area) => setCollection((c) => ({ ...c, study_area }))}
         coverageDatasets={collectionDoc.datasets.map((d) => d.id)}
-        warnings={warnings}
+        warnings={[...warnings, ...(planProblems._plan || []).map((message) => ({ kind: 'plan', message }))]}
+        hasPlan={!!collectionDoc.plan}
+        onRunAll={runAllRecorded}
+        canReplay={!!lastManifestPath}
+        onReplay={async () => {
+          setCollectionStatus('Replaying…');
+          try {
+            const r = await replayRun(lastManifestPath);
+            setCollectionStatus(r.ok ? 'Replay matched every input' : `Replay: ${r.message}`);
+          } catch (error) {
+            setCollectionStatus(`Replay failed: ${error.message}`);
+          }
+        }}
+        onDownloadPlan={() => downloadBlob(new Blob([JSON.stringify(collectionDoc.plan, null, 1)], { type: 'application/json' }), 'plan.json')}
       />
 
       <div style={{ width: '100%', height: '100%' }} onDrop={onDrop} onDragOver={onDragOver}>

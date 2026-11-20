@@ -7,20 +7,31 @@ import {
   Filter, 
   Calculator,
   Network,    // Perfect for our Integration Pipeline
+  Workflow,
   Hexagon     // Good for H3 operations if available, otherwise use Grid/Map
 } from 'lucide-react';
 
 export const OPERATION_CATEGORIES = [
   {
+    id: 'plan',
+    title: 'Plan (urbanweave)',
+    color: '#6366f1',
+    items: [
+      { type: 'step', label: 'Step', icon: Workflow, desc: 'Match a source onto a target and aggregate' },
+      { type: 'grid', label: 'H3 Grid', icon: Hexagon, desc: 'A grid target at a chosen resolution' },
+      { type: 'calculate', label: 'Combine & Calculate', icon: Calculator, desc: 'Join steps on a target; derive a variable' },
+    ]
+  },
+  {
     id: 'h3_grid',
-    title: 'H3 Grid Integration',
+    title: 'Classic integration',
     color: '#3b82f6', // Blue to match the integration node
     items: [
       { 
         type: 'integrate', 
         label: 'Spatial Integration', 
         icon: Network, 
-        desc: 'Formal allocation & aggregation (I = A₁ ∘ R)' 
+        desc: 'Grid then zones, with copilot operator suggestions' 
       },
       // { 
       //   type: 'intersect', 

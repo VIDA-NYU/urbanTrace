@@ -12,7 +12,10 @@ A collection is a JSON document stored as ``<collections dir>/<id>.json``:
                         "rationale": {...}, "created_at": "..."}],
       "analyses": [],
       "study_area": null,
-      "canvas": {"nodes": [...], "edges": [...]}
+      "canvas": {"nodes": [...], "edges": [...]},
+      "plan": {<urbanweave plan, version 1>} | null,     # built from the canvas (phase 4)
+      "derived": [{"id", "inputs": [step ids], "expression", "as", "kind"}],
+      "runs": [{"manifest_path", "created"}]
     }
 
 The server owns ``schema``, ``id``, ``created_at`` and ``updated_at``; everything else is what the
@@ -29,9 +32,11 @@ from pathlib import Path
 
 SCHEMA = "urbantrace.collection/1"
 _ID = re.compile(r"c_[0-9a-f]{12}")
-_FIELDS = ("name", "goal", "notes", "datasets", "integrations", "analyses", "study_area", "canvas")
+_FIELDS = ("name", "goal", "notes", "datasets", "integrations", "analyses", "study_area", "canvas", "plan",
+           "derived", "runs")
 _DEFAULTS = {"name": "Untitled collection", "goal": "", "notes": "", "datasets": [], "integrations": [],
-             "analyses": [], "study_area": None, "canvas": {"nodes": [], "edges": []}}
+             "analyses": [], "study_area": None, "canvas": {"nodes": [], "edges": []}, "plan": None,
+             "derived": [], "runs": []}
 
 
 class NotFound(KeyError):

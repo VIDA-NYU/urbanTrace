@@ -50,7 +50,7 @@ function Card({ resolved, figures, problem, name }) {
   );
 }
 
-export default function OperatorSelect({ kind, value, onChange, options, sourceGeometry, zoneGeometry, disabled, title, accent = '#cbd5e1', compact }) {
+export default function OperatorSelect({ kind, value, onChange, options, sourceGeometry, zoneGeometry, targetKind, targetGeometry, method, valueKind, column, disabled, title, accent = '#cbd5e1', compact }) {
   const { payload, figures } = useRegistry();
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(null);
@@ -73,9 +73,14 @@ export default function OperatorSelect({ kind, value, onChange, options, sourceG
     return () => { document.removeEventListener('mousedown', close); window.removeEventListener('wheel', onScroll); };
   }, [open]);
 
-  const ctx = { sourceGeometry, zoneGeometry };
+  const ctx = { sourceGeometry, zoneGeometry, targetKind, targetGeometry, method, valueKind, column };
   // The registry's own list when it has loaded; the passed list is only a fallback.
-  const choices = payload?.[kind] || options;
+  const registryKeys = kind === 'matching' ? Object.keys(payload?.registry?.matching || {})
+    : kind === 'reduction' ? Object.keys(payload?.registry?.aggregation || {}).filter((k) => payload.registry.aggregation[k].serializable !== false)
+      : payload?.[kind];
+  // Legacy operator names: the registry's list wins. Plan steps may narrow the list with *options*.
+  const native = kind === 'matching' || kind === 'reduction';
+  const choices = (native ? (options || registryKeys) : (registryKeys || options)) || [];
   const current = resolveOperator(payload, kind, value);
   const currentProblem = operatorProblem(payload, kind, value, ctx);
   const height = compact ? 20 : 22;
@@ -130,9 +135,9 @@ export default function OperatorSelect({ kind, value, onChange, options, sourceG
 }
 
 // The parameters of a matching method, from the registry (types, units, defaults, choices).
-export function ParamForm({ allocation, values = {}, onChange }) {
+export function ParamForm({ allocation, method, values = {}, onChange }) {
   const { payload } = useRegistry();
-  const resolved = resolveOperator(payload, 'allocation', allocation);
+  const resolved = method ? resolveOperator(payload, 'matching', method) : resolveOperator(payload, 'allocation', allocation);
   const params = resolved?.spec?.params || {};
   const fixed = resolved?.info?.fixed_params || {};
   const entries = Object.entries(params).filter(([name]) => !(name in fixed) || name === 'bandwidth');
@@ -141,7 +146,7 @@ export function ParamForm({ allocation, values = {}, onChange }) {
   return (
     <div className="nodrag" style={{ display: 'grid', gap: 4, marginTop: 4 }}>
       {entries.map(([name, spec]) => {
-        const shown = values[name] ?? (name === 'bandwidth' ? 1000 : spec.default ?? '');
+        const shown = values[name] ?? (name === 'bandwidth' && !method ? 1000 : spec.default ?? '');
         const set = (v) => onChange({ ...values, [name]: v });
         return (
           <label key={name} title={spec.summary || ''} style={{ fontSize: 8, color: '#64748b', fontWeight: 600 }}>

@@ -284,7 +284,7 @@ def run(tracks: list[Track], resolution: int, zones_gdf: gpd.GeoDataFrame | None
             raise uw.InputError("No tracks have zoning configuration for zone output")
         zones, zone_repairs = _prepare(zones_gdf, "zone_id", "Zones dataset")
         if study_area is not None:
-            zones = zones[zones.intersects(study_area)]
+            zones = zones[zones.intersects(study_area) & ~zones.touches(study_area)]
             if len(zones) == 0:
                 raise uw.InputError("No zones touch the study area.")
         result["zone_repairs"] = zone_repairs

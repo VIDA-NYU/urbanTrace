@@ -1,0 +1,134 @@
+{
+ "plan": {
+  "version": 1,
+  "sources": {
+   "test_points": {
+    "kind": "vector",
+    "columns": {
+     "count": {
+      "kind": "extensive"
+     }
+    },
+    "urbantrace": {
+     "dataset": "test_points",
+     "node": "n_pts",
+     "time_window": {
+      "column": "date",
+      "start": "2020-01-01",
+      "end": "2020-12-31"
+     }
+    }
+   },
+   "test_rates": {
+    "kind": "vector",
+    "columns": {
+     "rate": {
+      "kind": "intensive"
+     }
+    },
+    "urbantrace": {
+     "dataset": "test_rates",
+     "node": "n_rates"
+    }
+   }
+  },
+  "targets": {
+   "zones_test_zones": {
+    "kind": "zones",
+    "urbantrace": {
+     "dataset": "test_zones",
+     "node": "n_zones"
+    }
+   },
+   "h3_9_grid": {
+    "kind": "h3",
+    "resolution": 9
+   }
+  },
+  "steps": [
+   {
+    "id": "pts_zones",
+    "source": "test_points",
+    "match": {
+     "method": "contain",
+     "target": "zones_test_zones"
+    },
+    "aggregate": [
+     {
+      "method": "count",
+      "as": "sites",
+      "fill_empty": 0
+     },
+     {
+      "method": "sum",
+      "as": "total",
+      "column": "count",
+      "where": {
+       "column": "count",
+       "op": ">=",
+       "value": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "rate_zones",
+    "source": "test_rates",
+    "match": {
+     "method": "area_overlap",
+     "target": "zones_test_zones"
+    },
+    "aggregate": [
+     {
+      "method": "weighted_mean",
+      "as": "rate",
+      "column": "rate"
+     }
+    ]
+   },
+   {
+    "id": "grid_then",
+    "source": "test_points",
+    "match": {
+     "method": "contain",
+     "target": "h3_9_grid"
+    },
+    "aggregate": [
+     {
+      "method": "sum",
+      "as": "g",
+      "column": "count"
+     }
+    ]
+   },
+   {
+    "id": "chained",
+    "source": "@grid_then",
+    "match": {
+     "method": "area_overlap",
+     "target": "zones_test_zones"
+    },
+    "aggregate": [
+     {
+      "method": "sum",
+      "as": "g",
+      "column": "g"
+     }
+    ]
+   }
+  ]
+ },
+ "derived": [
+  {
+   "id": "n_calc",
+   "node": "n_calc",
+   "inputs": [
+    "pts_zones",
+    "rate_zones"
+   ],
+   "expression": "total / rate",
+   "as": "per_rate",
+   "kind": "intensive"
+  }
+ ]
+}

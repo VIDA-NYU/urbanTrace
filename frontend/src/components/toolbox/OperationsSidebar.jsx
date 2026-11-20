@@ -9,11 +9,14 @@ const OperationsSidebar = () => {
     // 1. Route the tool to the correct custom React Flow node component
     let reactFlowType = 'operationNode'; // Default for generic tools
     
-    if (opType === 'integrate') {
-      reactFlowType = 'integrationNode'; // Trigger our custom Integration Engine UI
-    } else if (opType === 'compare') {
-      reactFlowType = 'compareMapNode';
-    }
+    const NODE_TYPES = {
+      integrate: 'integrationNode', // the classic integration node (copilot operator recommendation)
+      compare: 'compareMapNode',
+      grid: 'gridNode',             // plan nodes (redesign phase 4)
+      step: 'stepNode',
+      calculate: 'calculateNode',
+    };
+    if (NODE_TYPES[opType]) reactFlowType = NODE_TYPES[opType];
 
     // 2. Set the payload
     const nodeData = {

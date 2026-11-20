@@ -1,8 +1,8 @@
 // The collection bar (docs/REDESIGN.md, section 2.1): name and goal of the collection on the canvas,
 // with new, open, save and export.
 import React, { useEffect, useRef, useState } from 'react';
-import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X, MapPinned, Grid3x3, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { listCollections, deleteCollection } from '../../lib/collections';
+import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X, MapPinned, Grid3x3, AlertTriangle, CheckCircle2, Workflow, Upload } from 'lucide-react';
+import { listCollections, deleteCollection, importPackage } from '../../lib/collections';
 import { StudyAreaPanel, CoverageModal, WarningsPanel } from './ScopePanels';
 
 const bar = {
@@ -23,6 +23,19 @@ const panel = {
 function OpenPanel({ onOpen, onClose }) {
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
+  const fileRef = useRef(null);
+  const onImport = async (file) => {
+    if (!file) return;
+    try {
+      const out = await importPackage(file);
+      if (out.missing_datasets?.length) {
+        setError(`Imported; not in this catalog: ${out.missing_datasets.join(', ')}`);
+      }
+      onOpen(out.collection.id);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
   const load = () => listCollections().then(setItems).catch((e) => setError(e.message));
   useEffect(() => { load(); }, []);
   return (
@@ -30,6 +43,10 @@ function OpenPanel({ onOpen, onClose }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontWeight: 700 }}>
         Open a collection <X size={14} style={{ cursor: 'pointer' }} onClick={onClose} />
       </div>
+      <input ref={fileRef} type="file" accept=".zip" style={{ display: 'none' }} onChange={(e) => onImport(e.target.files?.[0])} />
+      <button onClick={() => fileRef.current?.click()} style={{ ...iconButton, width: '100%', justifyContent: 'center', marginBottom: 8 }}>
+        <Upload size={13} /> Import an exported package (.zip)
+      </button>
       {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
       {!items && !error && <Loader2 size={14} className="spin" />}
       {items && items.length === 0 && <div style={{ color: '#64748b' }}>No saved collections yet.</div>}
@@ -93,6 +110,7 @@ function ExportPanel({ onExport, onClose, busy }) {
 export default function CollectionBar({
   collection, dirty, status, onRename, onGoalChange, onNew, onOpen, onSave, onExport, exporting,
   zoneDatasets = [], onStudyAreaChange, coverageDatasets = [], warnings = [],
+  hasPlan = false, onRunAll, onReplay, canReplay = false, onDownloadPlan,
 }) {
   const [open, setOpen] = useState(null); // 'open' | 'export' | 'goal' | 'area' | 'checks'
   const [coverageOpen, setCoverageOpen] = useState(false);
@@ -126,6 +144,11 @@ export default function CollectionBar({
       <button style={iconButton} onClick={onNew} title="New collection"><FilePlus size={13} /></button>
       <button style={iconButton} onClick={() => setOpen(open === 'open' ? null : 'open')} title="Open a collection"><FolderOpen size={13} /></button>
       <button style={iconButton} onClick={onSave} title="Save the collection"><Save size={13} /> Save</button>
+      {hasPlan && (
+        <button style={iconButton} onClick={() => setOpen(open === 'plan' ? null : 'plan')} title="The plan built from the canvas">
+          <Workflow size={13} /> Plan
+        </button>
+      )}
       <button style={iconButton} onClick={() => setOpen(open === 'export' ? null : 'export')} title="Export the collection"><Download size={13} /> Export</button>
       {open === 'goal' && (
         <div style={panel}>
@@ -142,6 +165,20 @@ export default function CollectionBar({
           onApply={(spec) => { onStudyAreaChange(spec); setOpen(null); }} />
       )}
       {open === 'checks' && <WarningsPanel warnings={warnings} onClose={() => setOpen(null)} />}
+      {open === 'plan' && (
+        <div style={{ ...panel, left: 'auto', right: 0, width: 300, display: 'grid', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+            Plan <X size={14} style={{ cursor: 'pointer' }} onClick={() => setOpen(null)} />
+          </div>
+          <div style={{ color: '#475569', lineHeight: 1.4 }}>
+            The steps on the canvas form an urbanweave plan. Recording a run stores its inputs by fingerprint, so it can be replayed and checked later.
+          </div>
+          <button style={iconButton} onClick={() => { setOpen(null); onRunAll(); }}>Run all steps and record the run</button>
+          <button style={{ ...iconButton, opacity: canReplay ? 1 : 0.5 }} disabled={!canReplay} onClick={() => { setOpen(null); onReplay(); }}
+            title={canReplay ? 'Rerun the last recorded run from its pinned inputs' : 'Record a run first'}>Replay the last recorded run</button>
+          <button style={iconButton} onClick={() => { setOpen(null); onDownloadPlan(); }}>Download plan.json</button>
+        </div>
+      )}
       {coverageOpen && <CoverageModal datasets={coverageDatasets} studyArea={collection.study_area} onClose={() => setCoverageOpen(false)} />}
     </div>
   );

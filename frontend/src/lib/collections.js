@@ -50,6 +50,15 @@ export async function exportCollection(id, options) {
   downloadBlob(await response.blob(), filenameFrom(response, 'collection.zip'));
 }
 
+export async function importPackage(file) {
+  const form = new FormData();
+  form.append('file', file);
+  const response = await fetch(`${API_BASE}/api/collections/import`, { method: 'POST', body: form });
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof json.detail === 'string' ? json.detail : `HTTP ${response.status}`);
+  return json;
+}
+
 export async function exportResult(body) {
   const response = await request('/api/results/export', { method: 'POST', body: JSON.stringify(body) });
   downloadBlob(await response.blob(), filenameFrom(response, 'result.zip'));
@@ -68,6 +77,7 @@ const TRANSIENT_KEYS = new Set([
   'spatialData', 'comparePayload', 'connectedResults', 'metadata', 'connectedDatasetMetadata',
   'connectedZoneMetadata', 'globalViewState', 'isMapSyncEnabled', 'highlightedLogTs', 'focusedLogTs',
   'hoveredCompareFeatureId', 'hoveredCompareFeatureType',
+  'context', 'lastRun', 'valueKindSuggestions', // plan node state, recomputed on load
 ]);
 // Outputs are not saved as nodes; they are recomputed from the saved integrations.
 const OUTPUT_NODE_TYPES = new Set(['resultMapNode', 'compareMapNode']);
@@ -98,7 +108,7 @@ export function serializeCanvas(nodes, edges) {
 
 // The datasets of the collection: every dataset node, with the columns it is colored by or
 // integrated on, and who added it and why.
-export function collectionDatasets(nodes) {
+export function collectionDatasets(nodes, edges = []) {
   const byId = new Map();
   const ensure = (id) => {
     if (!byId.has(id)) byId.set(id, { id, columns: [], value_kinds: {}, added_by: 'user', rationale: null });
@@ -117,6 +127,20 @@ export function collectionDatasets(nodes) {
     if (node.data?.timeWindow) entry.time_window = node.data.timeWindow;
     Object.assign(entry.value_kinds, node.data?.valueKinds || {});
   }
+  // Columns that plan steps read from their source datasets (redesign phase 4)
+  const byNode = new Map(nodes.map((n) => [n.id, n]));
+  for (const step of nodes.filter((n) => n.type === 'stepNode')) {
+    const edge = edges.find((e) => e.target === step.id && e.targetHandle === 'source');
+    const src = edge && byNode.get(edge.source);
+    if (src?.type !== 'datasetNode') continue;
+    const entry = byId.get(normalizeDatasetId(src.data?.id || src.data?.filename));
+    if (!entry) continue;
+    for (const r of step.data?.reductions || []) {
+      for (const col of [r.column, r.where?.column].filter(Boolean)) {
+        if (!entry.columns.includes(col)) entry.columns.push(col);
+      }
+    }
+  }
   for (const node of nodes) {
     const variables = node.type === 'resultMapNode' ? node.data?.spatialData?.request?.variables || [] : [];
     for (const v of variables) {
@@ -132,7 +156,8 @@ export function collectionDatasets(nodes) {
 // The integrations of the collection: one per result on the canvas, with its request and rationale.
 export function collectionIntegrations(nodes, edges) {
   return nodes
-    .filter((n) => n.type === 'resultMapNode' && n.data?.spatialData?.request)
+    // Classic integrations only; plan results are described by the collection's plan.
+    .filter((n) => n.type === 'resultMapNode' && n.data?.spatialData?.request?.variables)
     .map((n) => {
       const sd = n.data.spatialData;
       const sourceEdge = edges.find((e) => e.target === n.id);

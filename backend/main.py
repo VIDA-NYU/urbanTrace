@@ -37,6 +37,7 @@ import catalog
 import collections_store
 import export as exporter
 import scope
+import plans
 from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
 from grids.h3_grid import H3GridSystem
 
@@ -1454,6 +1455,9 @@ class CollectionBody(BaseModel):
     analyses: Optional[List[Dict[str, Any]]] = None
     study_area: Optional[Dict[str, Any]] = None
     canvas: Optional[Dict[str, Any]] = None
+    plan: Optional[Dict[str, Any]] = None
+    derived: Optional[List[Dict[str, Any]]] = None
+    runs: Optional[List[Dict[str, Any]]] = None
 
 
 class ExportOptions(BaseModel):
@@ -1519,7 +1523,98 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
     extras = {"area": area if options.clip else None, "warnings": scope.checks(DATA_DIR, doc)}
     if options.include_results and ENGINE != "legacy":
         extras["results"] = _rerun_integrations(doc)
+    files = {"collection.json": json.dumps({k: v for k, v in doc.items() if k != "runs"}, indent=1, default=str).encode()}
+    if options.include_results and doc.get("plan") and doc["plan"].get("steps"):
+        plan_results, plan_files, plan_readme = _export_plan(doc, options)
+        extras["results"] = (extras.get("results") or []) + plan_results
+        files.update(plan_files)
+        extras["readme_sections"] = plan_readme
+    extras["extra_files"] = files
     return extras
+
+
+def _plan_cache() -> str:
+    return os.getenv("URBANTRACE_PLAN_CACHE") or os.path.join(DATA_DIR, "plan_cache")
+
+
+def _export_plan(doc: Dict[str, Any], options: "ExportOptions"):
+    """Run the collection's plan with a manifest; return its results, plan.json/manifest.json, and
+    README lines on rerunning it in a notebook."""
+    import tempfile
+    spec = doc["plan"]
+    step_ids = [s["id"] for s in spec.get("steps", [])]
+    with tempfile.TemporaryDirectory() as tmp:
+        manifest_file = Path(tmp) / "manifest.json"
+        try:
+            out = plans.run(DATA_DIR, spec, doc.get("study_area"), tmp, outputs=step_ids,
+                            derived=doc.get("derived") or [], record=True, manifest_path=manifest_file)
+        except (plans.PlanInputError, uw.UrbanweaveError) as e:
+            return [{"name": "Plan", "frames": {}, "caveats": [f"The plan could not be run: {e}"]}], {}, []
+        manifest = json.loads(manifest_file.read_text()) if manifest_file.exists() else None
+        files = {}
+        # The plan as a notebook would run it: zones targets read from the package, sources bound by name.
+        portable = json.loads(json.dumps(out["plan"]))
+        for name, t in (portable.get("targets") or {}).items():
+            if t.get("kind") == "zones" and t.get("path"):
+                local = Path(t["path"])
+                stem = catalog.stem_of((t.get("urbantrace") or {}).get("dataset"))
+                origin = catalog.origin(DATA_DIR, stem)
+                src_path = catalog.dataset_path(DATA_DIR, stem)
+                embed, why = exporter._embed_decision(options.embed, origin, src_path.stat().st_size if src_path else 0)
+                t["path"] = f"data/targets/{local.name}"
+                if embed and local.exists():
+                    files[t["path"]] = local.read_bytes()
+                else:
+                    t.setdefault("urbantrace", {})["not_included"] = why
+        files["plan.json"] = json.dumps(portable, indent=1).encode()
+        if manifest:
+            manifest.pop("base_dir", None)
+            files["manifest.json"] = json.dumps(manifest, indent=1, default=str).encode()
+    results = []
+    for sid, payload in out["steps"].items():
+        ids = payload["target_ids"]
+        frame = pd.DataFrame({"target_id": ids, **payload["columns"]})
+        if payload.get("geojson"):
+            geo = gpd.GeoDataFrame.from_features(payload["geojson"]["features"], crs="EPSG:4326")
+            frame = geo
+        elif payload["target"].get("kind") == "h3":
+            import h3 as _h3
+            from shapely.geometry import Polygon as _Poly
+            frame = gpd.GeoDataFrame(frame, geometry=[_Poly([(lng, lat) for lat, lng in _h3.cell_to_boundary(c)]) for c in ids],
+                                     crs="EPSG:4326")
+        reports = {sid: out["reports"].get(sid)} if sid in out["reports"] else None
+        results.append({"name": f"plan {sid}", "frames": {"output": frame}, "value_kinds": payload.get("kinds"),
+                        "request": {"plan_step": sid, **({"derived": payload["derived"]} if payload.get("derived") else {})},
+                        "reports": reports, "description": f"Output of plan step `{sid}`" +
+                        (f": {payload['derived']['expression']}" if payload.get("derived", {}).get("expression") else "") + ".",
+                        "summary_lines": _plan_report_lines(sid, out["reports"].get(sid))})
+    bindings = ", ".join(f'"{n}": gpd.read_parquet("data/sources/{catalog.stem_of((d.get("urbantrace") or {}).get("dataset"))}.parquet")'
+                         for n, d in (spec.get("sources") or {}).items())
+    readme = ["## Rerunning the plan", "",
+              "`plan.json` is an [urbanweave](https://github.com/VIDA-NYU/urbanweave) plan and `manifest.json` "
+              "records the run that produced `data/results/` (inputs by fingerprint, engine versions, each step's report).",
+              "Sources are bound by name when the plan runs. Each source's dataset, time window and study area are "
+              "recorded under `urbantrace` in `plan.json`; apply them to the files in `data/sources/` (or to the "
+              "published datasets), then:", "", "```python", "import geopandas as gpd", "import urbanweave as uw",
+              'plan = uw.Plan.from_json("plan.json")', f"run = plan.run({{{bindings}}})", "```", ""]
+    if doc.get("derived"):
+        readme += ["Derived variables are computed from the joined step outputs after the plan runs:", ""]
+        readme += [f"- `{d.get('as')}` = `{d.get('expression')}` on {', '.join(d.get('inputs') or [])}" for d in doc["derived"] if d.get("expression")]
+        readme.append("")
+    return results, files, readme
+
+
+def _plan_report_lines(step_id: str, report: Optional[Dict[str, Any]]) -> List[str]:
+    match = (report or {}).get("match") or {}
+    src = match.get("sources") or {}
+    if not src:
+        return []
+    line = f"`{step_id}`: {src.get('matched')} of {src.get('total')} features matched by {match.get('method')}"
+    unmatched = ", ".join(f"{v.get('count')} {k.replace('_', ' ')}" for k, v in (src.get("unmatched") or {}).items())
+    if unmatched:
+        line += f"; unmatched: {unmatched}"
+    crs = (match.get("measurement") or {}).get("crs_name")
+    return [line + (f"; measured in {crs}" if crs else "") + "."]
 
 
 def _report_lines(reports: Dict[str, Any]) -> List[str]:
@@ -1595,8 +1690,8 @@ def export_collection(cid: str, options: ExportOptions = ExportOptions()):
     doc = _get_collection(cid)
     path = _temp_zip()
     try:
-        exporter.build(DATA_DIR, doc, Path(path), embed=options.embed, formats=tuple(options.formats),
-                       **_export_extras(doc, options))
+        extras = _export_extras(doc, options)
+        exporter.build(DATA_DIR, doc, Path(path), embed=options.embed, formats=tuple(options.formats), **extras)
     except ValueError as e:
         os.remove(path)
         raise HTTPException(status_code=400, detail=str(e))
@@ -1690,6 +1785,93 @@ async def get_coverage(body: CoverageRequest):
 async def check_collection(body: CollectionBody):
     """Warnings for a collection as it stands (saved or not): periods, coverage of the study area."""
     return {"warnings": scope.checks(DATA_DIR, body.model_dump(exclude_none=True))}
+
+
+# ==========================================
+# PLANS (docs/REDESIGN.md, phase 4)
+# ==========================================
+
+class PlanRequest(BaseModel):
+    plan: Dict[str, Any]
+    study_area: Optional[Dict[str, Any]] = None
+    outputs: Optional[List[str]] = None
+    derived: Optional[List[Dict[str, Any]]] = None
+    record: bool = False                     # write a manifest under the plan cache, for replay
+    collection_id: Optional[str] = None      # with record, the run is listed on this collection
+
+
+@app.post("/api/plan/validate")
+def validate_plan(body: PlanRequest):
+    """Problems with a plan before it runs, by step ID."""
+    return plans.validate(DATA_DIR, body.plan, body.study_area, _plan_cache())
+
+
+@app.post("/api/plan/run")
+def run_plan(body: PlanRequest):
+    """Run a plan: results in columns for the requested steps (and derived variables), every report."""
+    try:
+        out = plans.run(DATA_DIR, body.plan, body.study_area, _plan_cache(), outputs=body.outputs,
+                        derived=body.derived, record=body.record)
+    except plans.PlanInputError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except uw.UrbanweaveError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if body.record and body.collection_id and out.get("manifest_path"):
+        try:
+            doc = _collections().get(body.collection_id)
+            runs = (doc.get("runs") or [])[-19:] + [{"manifest_path": out["manifest_path"],
+                                                     "created": pd.Timestamp.now(tz="UTC").isoformat()}]
+            _collections().update(body.collection_id, {"runs": runs})
+        except collections_store.NotFound:
+            pass
+    return out
+
+
+class ReplayRequest(BaseModel):
+    manifest_path: str
+
+
+@app.post("/api/plan/replay")
+def replay_plan(body: ReplayRequest):
+    """Rerun a recorded plan run from its pinned inputs; name any input that changed."""
+    from urbanweave.plan import replay
+    cache = Path(_plan_cache()).resolve()
+    path = Path(body.manifest_path).resolve()
+    if cache not in path.parents or not path.exists():
+        raise HTTPException(status_code=404, detail="Manifest not found in the plan cache")
+    try:
+        run = replay(json.loads(path.read_text()), cache=cache / "artifacts")
+    except uw.UrbanweaveError as e:
+        return {"ok": False, "message": str(e)}
+    return {"ok": True, "message": "Replayed from the pinned inputs; every fingerprint matched.",
+            "steps": list(run.outputs)}
+
+
+@app.get("/api/datasets/{dataset_id}/value-kinds")
+async def get_value_kinds(dataset_id: str):
+    """A suggested value kind for each column (extensive, intensive, categorical), with the reason."""
+    stem = catalog.stem_of(dataset_id)
+    if not catalog.valid_stem(stem):
+        raise HTTPException(status_code=400, detail="Invalid dataset id")
+    return {"dataset": stem, "columns": plans.suggest_value_kinds(DATA_DIR, stem)}
+
+
+@app.post("/api/collections/import")
+async def import_collection(file: UploadFile = File(...)):
+    """A collection from an exported package (its collection.json); lists datasets not in the catalog."""
+    import zipfile
+    data = await file.read()
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            doc = json.loads(z.read("collection.json"))
+    except (zipfile.BadZipFile, KeyError, json.JSONDecodeError):
+        raise HTTPException(status_code=400, detail="Not an UrbanTrace export (no collection.json)")
+    fields = {k: v for k, v in doc.items() if k not in ("id", "schema", "created_at", "updated_at", "runs")}
+    fields["name"] = (fields.get("name") or "Imported collection")
+    created = _collections().create(fields)
+    missing = [d.get("id") for d in doc.get("datasets", [])
+               if catalog.dataset_path(DATA_DIR, catalog.stem_of(d.get("id"))) is None]
+    return {"collection": created, "missing_datasets": missing}
 
 # ==========================================
 # 7. LLM COPILOT ENDPOINTS

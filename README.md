@@ -51,12 +51,21 @@ Built on React Flow. The workflow is made of nodes:
 
 | Node | What it does |
 |---|---|
-| **Dataset** | A source dataset with a map preview; color it by any numeric column. |
-| **Spatial Integration** | Brings one or more variables onto an H3 grid and, optionally, into reporting zones, using the operators below. |
+| **Dataset** | A source dataset with a map preview; color it by any numeric column, and set a time window on its dates. Also serves as zones for a step. |
+| **H3 Grid** | A grid target at a chosen resolution, sized to the study area or to its sources. |
+| **Step** | Matches a source (a dataset or another step) onto a target (zones or an H3 grid) and aggregates: an [urbanweave](https://github.com/VIDA-NYU/urbanweave) method chosen from its registry, its parameters, and one or more reductions, each with a value kind (extensive, intensive, categorical) and an optional filter. Problems are marked on the step before it runs; after it runs, a report says what matched and what was left out. |
+| **Combine & Calculate** | Joins the outputs of steps that share a target and, optionally, adds a column computed from them (e.g. a rate per 1,000 residents). |
+| **Spatial Integration** (classic) | The original node: variables onto an H3 grid and optionally into zones, with the copilot's operator suggestions. |
 | **Result Map** | Shows an integration result as H3 cells or zones, with hotspot palettes. |
 | **Compare Maps** | Takes two hotspot result maps and shows where values went up or down, with direction symbols. |
 
 **Link Maps** syncs the camera across every map on the canvas.
+
+### 📦 Collections, study area and export (top bar)
+- A **collection** holds the goal, the datasets and why each was chosen, the steps (an urbanweave plan) and the canvas; save, open, or start a new one.
+- A **study area** (zones from a dataset, optionally filtered, or a box) limits integrations, search and exports. **Coverage** shows where the datasets have data; **checks** warn when periods do not overlap or a dataset misses most of the study area.
+- **Plan**: run every step and record the run (inputs by fingerprint), replay it later, or download `plan.json`.
+- **Export** writes a zip: a Frictionless `datapackage.json`, the datasets (embedded when their license is recorded, otherwise referenced by source), the results, `plan.json` and `manifest.json` to rerun in a notebook, and a README with the rationale and caveats. Exported packages can be imported back.
 
 ### 🧭 Integration provenance (right sidebar)
 Shows which datasets, variables and operators produced each result, so every number on a map can be traced back to its inputs and choices. Hovering or focusing a row highlights the result map it produced.
@@ -201,8 +210,14 @@ The maps use Autark's `autk-map`. On this branch it is linked from a local Autar
 | GET | `/datasets` | Catalog: datasets with their metadata |
 | GET | `/dataset/{name}?simplify=` | A dataset as GeoJSON (WGS84), optionally simplified |
 | POST | `/datasets/upload` | Upload and profile a GeoJSON file |
-| GET | `/api/operators` | Available operators and geometry constraints |
-| POST | `/api/integrate_multivariate` | Run a multivariate integration |
+| GET | `/api/operators` | Operators from urbanweave's registry, with descriptions |
+| POST | `/api/integrate_multivariate` | Run a multivariate integration (classic node) |
+| POST | `/api/plan/validate`, `/api/plan/run`, `/api/plan/replay` | Check, run (results in columns) and replay an urbanweave plan |
+| GET | `/api/datasets/{id}/value-kinds`, `/datasets/{id}/origin` | Suggested value kinds; where a dataset came from |
+| GET/POST/PUT/DELETE | `/api/collections[/{id}]` | Collections |
+| POST | `/api/collections/{id}/export`, `/api/collections/import` | Export a collection as a zip; import one |
+| POST | `/api/results/export` | One result map as a zip with its provenance |
+| GET/POST | `/api/catalog/index`, `/api/coverage`, `/api/study-area/*`, `/api/collections/check` | Search filters, coverage, study area, checks |
 | POST | `/run-operation` | Quick H3 preview, union or intersection |
 | POST | `/api/copilot/chat` | Copilot chat with the current canvas as context |
 | POST | `/api/v1/copilot/recommend-operators` | Zoning operator recommendations |
