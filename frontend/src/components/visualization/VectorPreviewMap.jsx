@@ -5,6 +5,7 @@ import {
   BASEMAP_SOURCE, SCHEMES, applyViewState, cameraToViewState, colorMapFor, fitMercBounds, hitTest,
   layerTypeFor, metresPerPixel, projectCollection, screenToMerc, useAutarkMap,
 } from './autark/autarkMap';
+import { API_BASE } from '../../config/api';
 
 const DATA_LAYER = 'data';
 const VALUE_KEY = '__ut_value';
@@ -90,7 +91,7 @@ const VectorPreviewMap = ({
   // 1. Fetch data
   useEffect(() => {
     let cancelled = false;
-    axios.get(`http://localhost:8000/dataset/${filename}?simplify=true`)
+    axios.get(`${API_BASE}/dataset/${filename}?simplify=true`)
       .then(res => !cancelled && setLoaded({ filename, data: res.data }))
       .catch(err => {
         console.error('Preview load error', err);

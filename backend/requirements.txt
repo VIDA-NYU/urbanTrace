@@ -4,6 +4,9 @@ uvicorn
 python-dotenv
 python-multipart
 
+# Spatial integration (prerelease; see docs/REDESIGN.md, phase 0)
+urbanweave==0.1.0a1
+
 # Geo stack
 geopandas
 shapely

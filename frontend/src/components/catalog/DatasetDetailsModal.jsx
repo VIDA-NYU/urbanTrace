@@ -5,8 +5,9 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Layers, Type, Calendar, AlertCircle, FileText, MapPin, ExternalLink } from 'lucide-react';
+import { API_BASE } from '../../config/api';
 
-const API = 'http://localhost:8000';
+const API = API_BASE;
 
 // Helper to parse CSV lines while respecting quotes (for geometry strings)
 const parseCSVLine = (line) => {

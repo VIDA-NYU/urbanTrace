@@ -2,6 +2,7 @@ import React, { memo, useMemo, useEffect, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
 import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
 import H3PreviewMap from '../../visualization/H3PreviewMap'; 
+import { API_BASE } from '../../../config/api';
 
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
@@ -177,7 +178,7 @@ const ResultMapNode = memo(({ id, data }) => {
           }))
         };
 
-        const response = await fetch('http://localhost:8000/api/v1/copilot/synthesize-hotspot', {
+        const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -217,7 +218,7 @@ const ResultMapNode = memo(({ id, data }) => {
         })),
         ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : {})
       };
-      const response = await fetch('http://localhost:8000/api/v1/copilot/synthesize-hotspot', {
+      const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

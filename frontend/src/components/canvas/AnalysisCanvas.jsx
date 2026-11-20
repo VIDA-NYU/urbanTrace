@@ -14,6 +14,7 @@ import DatasetDetailsModal from '../catalog/DatasetDetailsModal';
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
 import CompareMapNode from './nodes/CompareMapNode';
 import FloatingCopilotInput from '../copilot/FloatingCopilotInput';
+import { API_BASE } from '../../config/api';
 
 const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange }) => {
   const [nodes, setNodes] = useState([]);
@@ -65,7 +66,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
   const fetchAvailableDatasets = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8000/datasets');
+      const response = await fetch(`${API_BASE}/datasets`);
       if (!response.ok) {
         throw new Error(`Failed to fetch datasets: HTTP ${response.status}`);
       }

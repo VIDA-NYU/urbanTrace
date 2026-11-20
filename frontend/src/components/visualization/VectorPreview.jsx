@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { geoMercator, geoPath } from 'd3-geo';
+import { API_BASE } from '../../config/api';
 
 const VectorPreview = ({ filename }) => {
   const [data, setData] = useState(null);
@@ -10,7 +11,7 @@ const VectorPreview = ({ filename }) => {
 
   useEffect(() => {
     // Fetch simplified version for the node
-    axios.get(`http://localhost:8000/dataset/${filename}?simplify=true`)
+    axios.get(`${API_BASE}/dataset/${filename}?simplify=true`)
       .then(res => {
         setData(res.data);
         setLoading(false);

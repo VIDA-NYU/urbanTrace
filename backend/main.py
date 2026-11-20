@@ -28,6 +28,10 @@ if load_dotenv:
             break
 
 # --- Imports for Formal Integration Engine ---
+import urbanweave as uw
+from urbanweave.compat import urbantrace as uw_legacy
+
+import weave_engine
 from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
 from grids.h3_grid import H3GridSystem
 
@@ -73,6 +77,12 @@ app.add_middleware(
 
 # Directory pointing to the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+
+# Integration engine: "urbanweave" (the default) or "legacy" (the original operators, kept for one
+# cycle while the switch is verified; see docs/REDESIGN.md, phase 0).
+ENGINE = os.getenv("URBANTRACE_ENGINE", "urbanweave").strip().lower()
+if ENGINE not in ("urbanweave", "legacy"):
+    raise RuntimeError(f"URBANTRACE_ENGINE must be 'urbanweave' or 'legacy', not {ENGINE!r}")
 _COPILOT_AGENT: UrbanTraceCopilot | None = None
 
 
@@ -399,6 +409,87 @@ async def get_geojson(filename: str, simplify: bool = False):
 # 7. MULTIVARIATE INTEGRATION ENDPOINT (Parallel Tracks + Dual-Merge)
 # ==========================================
 
+def _load_catalog_geojson(name: str, label: str) -> gpd.GeoDataFrame:
+    path = os.path.join(DATA_DIR, "geojson", _geojson_filename(name))
+    try:
+        return gpd.read_file(path)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Could not load {label}: {str(e)}")
+
+
+def _integrate_with_urbanweave(request: "MultivariateIntegrationRequest") -> Dict[str, Any]:
+    """Run a multivariate request on urbanweave (weave_engine), validating against its registry."""
+    tracks = []
+    for var in request.variables:
+        source_gdf = _load_catalog_geojson(var.dataset_path, var.dataset_path)
+        for geom_type in source_gdf.geometry.geom_type.dropna().unique():
+            allowed = weave_engine.GEOMETRY_CONSTRAINTS.get(geom_type)
+            if allowed is not None and var.allocation_operator not in allowed:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Operator '{var.allocation_operator}' not valid for {geom_type} in {var.dataset_path}",
+                )
+        zoned = bool(var.zoning_mapping_operator and var.zoning_aggregation_operator)
+        try:
+            tracks.append(weave_engine.Track(
+                source_gdf, var.target_column, var.output_name or var.target_column,
+                var.allocation_operator, var.grid_aggregation_operator,
+                var.zoning_mapping_operator if zoned else None,
+                var.zoning_aggregation_operator if zoned else None,
+            ))
+        except uw.UrbanweaveError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    zones_gdf = _load_catalog_geojson(request.zones_path, "zones") if request.zones_path else None
+    try:
+        return weave_engine.run(tracks, request.resolution, zones_gdf, request.output_mode)
+    except uw.UrbanweaveError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def _multivariate_response(request: "MultivariateIntegrationRequest", result: Dict[str, Any]) -> Dict[str, Any]:
+    """The wire format of /api/integrate_multivariate, shared by both engines."""
+    response = {
+        "status": "success",
+        "operation": "multivariate_integration",
+        "engine": ENGINE,
+        "resolution": request.resolution,
+        "variables": [v.output_name or v.target_column for v in request.variables]
+    }
+    if "reports" in result:
+        response["reports"] = result["reports"]
+        response["changes"] = result.get("changes", [])
+        if result.get("zone_repairs"):
+            response["zone_repairs"] = result["zone_repairs"]
+
+    if 'grid' in result:
+        df_no_geom = result['grid'].drop(columns=['geometry'])
+        var_names = [(v.output_name or v.target_column) for v in request.variables]
+        final_hex_data = {}
+        for _, row in df_no_geom.iterrows():
+            row_dict = row.to_dict()
+            cell_id = row_dict.pop('cell_id', None)
+            if not cell_id:
+                continue
+            var_values = {name: row_dict.get(name, 0) for name in var_names}
+            # Sum of the variables as visualization intensity, kept for the current frontend;
+            # replaced by per-variable columns in redesign phase 4.
+            total_value = sum(var_values.values())
+            final_hex_data[cell_id] = {
+                "count": total_value,
+                "variables": var_values,
+                "sample_props": row_dict
+            }
+        response["data"] = final_hex_data
+        response["hex_count"] = len(final_hex_data)
+
+    if 'zones' in result:
+        zones_gdf = result['zones']
+        response["geojson"] = json.loads(zones_gdf.to_json())
+        response["zone_count"] = len(zones_gdf)
+
+    return response
+
+
 @app.post("/api/integrate_multivariate")
 async def integrate_multivariate(request: MultivariateIntegrationRequest):
     """
@@ -417,9 +508,13 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
         if not request.variables:
             raise HTTPException(status_code=400, detail="At least one variable is required")
         
-        # Build track configurations
+        if ENGINE != "legacy":
+            result = _integrate_with_urbanweave(request)
+            return _multivariate_response(request, result)
+
+        # Build track configurations (legacy engine)
         tracks = []
-        
+
         for var in request.variables:
             # Validate operators
             if var.allocation_operator not in ALLOCATION_REGISTRY:
@@ -502,52 +597,10 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
             output_mode=request.output_mode
         )
         
-        # Build response
-        response = {
-            "status": "success",
-            "operation": "multivariate_integration",
-            "resolution": request.resolution,
-            "variables": [v.output_name or v.target_column for v in request.variables]
-        }
+        return _multivariate_response(request, result)
         
-        # Convert grid output
-        if 'grid' in result:
-            grid_gdf = result['grid']
-            df_no_geom = grid_gdf.drop(columns=['geometry'])
-            final_hex_data = {}
-            
-            # Get variable names for this request
-            var_names = [(v.output_name or v.target_column) for v in request.variables]
-            
-            for _, row in df_no_geom.iterrows():
-                row_dict = row.to_dict()
-                cell_id = row_dict.pop('cell_id', None)
-                if not cell_id:
-                    continue
-                
-                # Get all variable values
-                var_values = {name: row_dict.get(name, 0) for name in var_names}
-                
-                # Use sum of variable values for visualization intensity
-                total_value = sum(var_values.values())
-                
-                final_hex_data[cell_id] = {
-                    "count": total_value,
-                    "variables": var_values,
-                    "sample_props": row_dict
-                }
-            
-            response["data"] = final_hex_data
-            response["hex_count"] = len(final_hex_data)
-        
-        # Convert zones output
-        if 'zones' in result:
-            zones_gdf = result['zones']
-            response["geojson"] = json.loads(zones_gdf.to_json())
-            response["zone_count"] = len(zones_gdf)
-        
-        return response
-        
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -558,8 +611,10 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
 async def get_available_operators():
     """
     Returns all available operators and geometry constraints for the frontend.
-    Enables dynamic operator selection UI.
+    Under urbanweave they are generated from its registry, which is included.
     """
+    if ENGINE != "legacy":
+        return uw_legacy.operators_payload()
     return {
         "allocation": list(ALLOCATION_REGISTRY.keys()),
         "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
@@ -1307,19 +1362,6 @@ async def run_operation(request: OperationRequest):
         raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
 
 
-@app.get("/api/operators")
-async def get_available_operators():
-    """
-    Returns all available operators and geometry constraints for the frontend.
-    Enables dynamic operator selection UI.
-    """
-    return {
-        "allocation": list(ALLOCATION_REGISTRY.keys()),
-        "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
-        "zoning_mapping": list(ZONING_MAPPING_REGISTRY.keys()),
-        "zoning_aggregation": list(ZONING_AGGREGATION_REGISTRY.keys()),
-        "geometry_constraints": GEOMETRY_CONSTRAINTS
-    }
 
 
 # ==========================================

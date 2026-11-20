@@ -83,6 +83,8 @@ An integration composes four operator families (`backend/integration_engine.py`)
 
 Each allocation operator declares the geometry types it supports. Multivariate integrations run one track per variable and then merge them on the shared grid or zones.
 
+The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original engine is kept for now and selected with `URBANTRACE_ENGINE=legacy`; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md).
+
 ---
 
 ## 🏗️ Tech stack
@@ -104,7 +106,8 @@ Each allocation operator declares the geometry types it supports. Multivariate i
 urbantrace/
 ├── backend/
 │   ├── main.py                  # FastAPI app and endpoints
-│   ├── integration_engine.py    # Integration pipelines (R, A₁, Z_map, A₂)
+│   ├── weave_engine.py          # Integrations on urbanweave (the default engine)
+│   ├── integration_engine.py    # Original integration pipelines (URBANTRACE_ENGINE=legacy)
 │   ├── operators/               # allocation/, aggregation/, zoning/
 │   ├── grids/h3_grid.py         # H3 grid system
 │   ├── h3_engine.py             # Quick H3 rasterization for previews
@@ -166,7 +169,15 @@ The backend loads `backend/.env` automatically. The copilot is optional; without
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to turn off every LLM call |
+| `URBANTRACE_ENGINE` | `urbanweave` (default) or `legacy`, the original operators |
 | `COPILOT_CATALOG` | How the dataset catalog is sent to the model: `index` (default), `compact` or `full` |
+
+Tests use small synthetic datasets, so they need no LFS data:
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
 
 The copilot needs a model that supports tool calling. With the default `index` catalog, each request carries one line per dataset (about 5k tokens for the 121 datasets), and the model reads the full description and columns of the datasets it is considering through a `get_dataset_details` tool. `compact` sends every dataset's description and columns tersely (about 42k tokens), and `full` sends the complete metadata (about 86k tokens, which needs a context window well above that). The formats are defined in `backend/catalog_format.py`; the dataset-discovery benchmark can compare them with `--ablation catalog_compact` or `--ablation catalog_index`.
 
@@ -177,7 +188,7 @@ npm install
 npm run dev
 ```
 
-The app runs at **http://localhost:5173**.
+The app runs at **http://localhost:5173**. It expects the backend at `http://localhost:8000`; set `VITE_API_BASE_URL` (for example in `frontend/.env.local`) to use another address.
 
 The maps use Autark's `autk-map`. On this branch it is linked from a local Autark checkout (`file:../../autark/autk-map` in `frontend/package.json`), because the tile basemap is not yet in the npm release; clone and build Autark next to this repository, or switch the dependency to a published version that includes tile layers.
 

@@ -3,6 +3,7 @@ import { Handle, Position, useReactFlow, NodeResizeControl } from '@xyflow/react
 import { Settings, Play, Loader2, AlertCircle, Download, SlidersHorizontal } from 'lucide-react';
 import axios from 'axios';
 import H3PreviewMap from '../../visualization/H3PreviewMap';
+import { API_BASE } from '../../../config/api';
 
 const OperationNode = memo(({ id, data }) => {
   const [isRunning, setIsRunning] = useState(false);
@@ -52,7 +53,7 @@ const OperationNode = memo(({ id, data }) => {
 
       const operationType = data.opType || "intersect"; 
 
-      const response = await axios.post('http://localhost:8000/run-operation', {
+      const response = await axios.post(`${API_BASE}/run-operation`, {
         operationType: operationType,
         datasetIds: datasetIds,
         resolution: resolution 

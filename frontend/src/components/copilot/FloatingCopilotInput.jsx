@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { API_BASE } from '../../config/api';
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const TOOL_EVENT_DELAY_MS = 140;
@@ -176,7 +177,7 @@ const FloatingCopilotInput = ({
     setIsSending(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/copilot/chat', {
+      const response = await fetch(`${API_BASE}/api/copilot/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

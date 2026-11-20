@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Network, Play, AlertCircle, MapPin, ChevronDown, ChevronUp, Settings, Sparkles, Loader2, X } from 'lucide-react';
+import { API_BASE } from '../../../config/api';
 
 const ALLOCATION_OPS = [
   "BinaryContainment",
@@ -205,7 +206,7 @@ const IntegrationNode = memo(({ id, data }) => {
         };
       });
 
-      const response = await fetch('http://localhost:8000/api/integrate_multivariate', {
+      const response = await fetch(`${API_BASE}/api/integrate_multivariate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -373,7 +374,7 @@ const IntegrationNode = memo(({ id, data }) => {
         }))
       };
 
-      const response = await fetch('http://localhost:8000/api/v1/copilot/recommend-operators', {
+      const response = await fetch(`${API_BASE}/api/v1/copilot/recommend-operators`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { RefreshCw, Map, Search, Upload, X } from 'lucide-react'; // Added X here
 import DatasetCard from '../catalog/DatasetCard'; 
+import { API_BASE } from '../../config/api';
 
 const DatasetSidebar = () => {
   const [datasets, setDatasets] = useState([]);
@@ -17,7 +18,7 @@ const DatasetSidebar = () => {
 
   const fetchDatasets = () => {
     setLoading(true);
-    axios.get('http://localhost:8000/datasets')
+    axios.get(`${API_BASE}/datasets`)
       .then(res => {
         setDatasets(res.data.datasets);
         setLoading(false);
@@ -77,7 +78,7 @@ const DatasetSidebar = () => {
       const formData = new FormData();
       formData.append('file', selectedUploadFile);
 
-      const response = await axios.post('http://localhost:8000/datasets/upload', formData, {
+      const response = await axios.post(`${API_BASE}/datasets/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
