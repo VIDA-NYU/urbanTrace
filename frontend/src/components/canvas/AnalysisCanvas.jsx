@@ -22,6 +22,8 @@ import {
 } from '../../lib/collections';
 import { checkCollection, resolveStudyArea } from '../../lib/scope';
 import { GridNode, StepNode, CalculateNode } from './nodes/PlanNodes';
+import { SweepNode, ValidateNode, DasymetricNode } from './nodes/AnalysisNodes';
+import { runSweep, runValidation, runDasymetric, reportUrl, METHODS_FOR } from '../../lib/analysis';
 import {
   buildPlan, buildDerived, validatePlan, runPlan, replayRun, toSpatialData, inputsOf, stepIdOf, valueKindOf,
   getValueKindSuggestions,
@@ -32,6 +34,70 @@ const OUTPUT_KIND = {
   count: 'extensive', weighted_count: 'extensive', density: 'intensive', mean: 'intensive', weighted_mean: 'intensive',
   median: 'intensive', weighted_median: 'intensive', majority: 'categorical', shares: 'intensive',
 };
+
+// The nodes connected to one input handle of a node
+const edgesInto = (nodeId, handle, nodes, edges) => edges
+  .filter((e) => e.target === nodeId && e.targetHandle === handle)
+  .map((e) => nodes.find((n) => n.id === e.source))
+  .filter(Boolean);
+
+const stemOf = (node) => String(node?.data?.id || node?.data?.filename || '').replace(/\.geojson$/i, '');
+
+// The configuration of an analysis node, as the collection records it and the API takes it
+function analysisConfig(node, nodes, edges) {
+  const d = node.data || {};
+  if (node.type === 'sweepNode') {
+    const step = edgesInto(node.id, 'step', nodes, edges)[0];
+    if (!step || !d.column) return null;
+    const variants = [
+      ...(d.resolutions || []).map((r) => ({ via: { kind: 'h3', resolution: r } })),
+      ...(d.zoneAlternatives || []).map((z) => ({ via: { kind: 'zones', dataset: z } })),
+      ...(d.methods || []).map((m) => ({ method: m })),
+    ];
+    return { step: stepIdOf(step), column: d.column, variants, top_share: d.topShare ?? 0.2 };
+  }
+  if (node.type === 'validateNode') {
+    const res = edgesInto(node.id, 'result', nodes, edges)[0];
+    const out = edgesInto(node.id, 'outcomes', nodes, edges)[0];
+    if (!res || !out || !d.column) return null;
+    const quantiles = String(d.quantiles || '0.5, 0.6, 0.7').split(/[,\s]+/).map(Number).filter((q) => q > 0 && q < 1);
+    const derivedId = res.type === 'calculateNode' ? buildDerived(nodes, edges).find((x) => x.node === res.id)?.id : null;
+    return { ...(derivedId ? { derived_id: derivedId } : { step: stepIdOf(res) }), column: d.column,
+      outcomes: { dataset: stemOf(out), ...(out.data?.timeWindow ? { time_window: out.data.timeWindow } : {}) }, quantiles };
+  }
+  if (node.type === 'dasymetricNode') {
+    const z = edgesInto(node.id, 'zones', nodes, edges)[0];
+    const t = edgesInto(node.id, 'target', nodes, edges)[0];
+    const priors = edgesInto(node.id, 'prior', nodes, edges);
+    if (!z || !t || !priors.length || !(d.totals || []).length) return null;
+    return {
+      zones: { dataset: stemOf(z), totals: d.totals },
+      target: t.type === 'gridNode' ? { kind: 'h3', resolution: Number(t.data?.resolution || 9) } : { kind: 'zones', dataset: stemOf(t) },
+      priors: priors.map((p) => ({ dataset: stemOf(p), column: d.priorWeights?.[p.id]?.column || null, weight: d.priorWeights?.[p.id]?.weight ?? 1 })),
+      normalize: d.normalize === 'none' ? null : (d.normalize || 'share'), fallback: d.fallback || 'area',
+    };
+  }
+  return null;
+}
+
+// The analyses of the canvas: analysis nodes, and priority indexes set on plan results
+function collectionAnalyses(nodes, edges) {
+  const out = [];
+  const names = { sweepNode: 'sweep', validateNode: 'validation', dasymetricNode: 'dasymetric' };
+  for (const n of nodes) {
+    if (names[n.type]) {
+      const config = analysisConfig(n, nodes, edges);
+      if (!config) continue;
+      if (config.derived_id) { config.derived = config.derived_id; delete config.derived_id; }
+      out.push({ id: n.id, kind: names[n.type], name: n.data?.name || `${names[n.type]} ${n.id.slice(-4)}`, config });
+    }
+    if (n.type === 'resultMapNode' && n.data?.priority?.variables?.length && n.data?.spatialData?.request?.plan_step) {
+      out.push({ id: `priority_${n.id}`, kind: 'priority', name: `Priority: ${n.data.spatialData.request.plan_step}`,
+        config: { result: n.data.spatialData.request.plan_step, ...n.data.priority } });
+    }
+  }
+  return out;
+}
 
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
@@ -259,7 +325,16 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     gridNode: GridNode,
     stepNode: StepNode,
     calculateNode: CalculateNode,
+    sweepNode: SweepNode,
+    validateNode: ValidateNode,
+    dasymetricNode: DasymetricNode,
   }), []);
+
+  // A Result Map's priority index (weights, directions, rationale), recorded as an analysis
+  const handlePriorityChange = useCallback((nodeId, priority) => {
+    setNodes((nds) => nds.map((n) => (n.id === nodeId && JSON.stringify(n.data?.priority) !== JSON.stringify(priority)
+      ? { ...n, data: { ...n.data, priority } } : n)));
+  }, []);
 
   const handleCompareHover = useCallback((featureId, featureType) => {
     setHoveredCompareFeatureId(featureId || null);
@@ -548,13 +623,14 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             hoveredCompareFeatureId,
             hoveredCompareFeatureType,
             onCompareDataReady: handleCompareDataReady,
+            onPriorityChange: handlePriorityChange,
             onDeleteNode: handleDeleteNode
           }
         };
       }
       return node;
     }));
-  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType, handleDeleteNode]);
+  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType, handleDeleteNode, handlePriorityChange]);
 
   const handleCompareDataReady = useCallback((nodeId, comparePayload) => {
     setNodes(nds => {
@@ -615,6 +691,24 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         animated: true,
         style: { stroke: '#4b5563', strokeWidth: 2 }
       }, eds));
+      return;
+    }
+
+    // ANALYSIS NODES (redesign phase 5): which nodes each input handle takes, and whether it takes several
+    const ANALYSIS_INPUTS = {
+      sweepNode: { step: [['stepNode'], false] },
+      validateNode: { result: [['stepNode', 'calculateNode'], false], outcomes: [['datasetNode'], false] },
+      dasymetricNode: { zones: [['datasetNode'], false], target: [['gridNode', 'datasetNode'], false], prior: [['datasetNode'], true] },
+    };
+    if (ANALYSIS_INPUTS[targetNode?.type]) {
+      const rule = ANALYSIS_INPUTS[targetNode.type][params.targetHandle];
+      if (!rule || !rule[0].includes(sourceNode?.type)) return;
+      setEdges((eds) => {
+        const kept = rule[1]
+          ? eds.filter((e) => !(e.target === params.target && e.source === params.source && e.targetHandle === params.targetHandle))
+          : eds.filter((e) => !(e.target === params.target && e.targetHandle === params.targetHandle));
+        return addEdge({ ...params, style: { stroke: '#db2777', strokeWidth: 2 } }, kept);
+      });
       return;
     }
 
@@ -957,6 +1051,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       ? { ...n, data: { ...n.data, valueKinds: { ...(n.data?.valueKinds || {}), [column]: kind } } } : n)));
   }, []);
   const runPlanNodeRef = React.useRef(null);
+  const runAnalysisNodeRef = React.useRef(null);
 
   const attachCallbacks = useCallback((type, data) => {
     const next = { ...data };
@@ -973,6 +1068,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       next.isMapSyncEnabled = isMapSyncEnabled;
       next.globalViewState = globalViewState;
       next.onGlobalViewStateChange = setGlobalViewState;
+      next.onDeleteNode = handleDeleteNode;
+    } else if (['sweepNode', 'validateNode', 'dasymetricNode'].includes(type)) {
+      next.onChange = handlePlanNodeChange;
+      next.onRun = (nodeId) => runAnalysisNodeRef.current?.(nodeId);
       next.onDeleteNode = handleDeleteNode;
     } else if (type === 'stepNode' || type === 'calculateNode' || type === 'gridNode') {
       next.onChange = handlePlanNodeChange;
@@ -1008,13 +1107,13 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     goal: collection.goal,
     notes: collection.notes,
     study_area: collection.study_area,
-    analyses: collection.analyses,
     datasets: collectionDatasets(nodes, edges),
     plan: (() => {
       const { plan } = buildPlan(nodes, edges);
       return plan.steps.length ? plan : null;
     })(),
     derived: buildDerived(nodes, edges).filter((d) => d.inputs.length),
+    analyses: collectionAnalyses(nodes, edges),
     // Integrations saved earlier stay while their integration node is on the canvas; results on
     // the canvas add or replace them.
     integrations: (() => {
@@ -1219,6 +1318,49 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         };
       }
     }
+    for (const n of nodes) {
+      if (n.type === 'sweepNode') {
+        const step = edgesInto(n.id, 'step', nodes, edges)[0];
+        if (!step) { contexts[n.id] = { problems: [] }; continue; }
+        const { source, target } = inputsOf(step.id, nodes, edges);
+        const geom = (source?.type === 'datasetNode' ? source.data?.metadata?.geometricType : 'Polygon') || 'Polygon';
+        const family = geom.replace(/^Multi/, '');
+        contexts[n.id] = {
+          stepId: stepIdOf(step), targetLabel: describeTarget(target)?.label || 'its target',
+          columns: columnsOfStep(step).filter((c) => c.kind !== 'categorical'),
+          methodChoices: (METHODS_FOR[family] || []).filter((m) => m !== step.data?.method),
+          zoneDatasets: availableDatasets.filter((d) => /Polygon/.test(d?.metadata?.geometricType || ''))
+            .map((d) => ({ id: normalizeDatasetId(d.id || d.filename), name: d.metadata?.name || d.name })),
+          problems: [],
+        };
+      } else if (n.type === 'validateNode') {
+        const res = edgesInto(n.id, 'result', nodes, edges)[0];
+        const out = edgesInto(n.id, 'outcomes', nodes, edges)[0];
+        let columns = [];
+        let resultId = null;
+        if (res?.type === 'stepNode') { resultId = stepIdOf(res); columns = columnsOfStep(res); }
+        if (res?.type === 'calculateNode') {
+          const d = buildDerived(nodes, edges).find((x) => x.node === res.id);
+          resultId = d?.id;
+          columns = inputsOf(res.id, nodes, edges).inputs.filter((i) => i.type === 'stepNode').flatMap(columnsOfStep);
+          if (d?.expression) columns = [...columns, { name: d.as, kind: d.kind }];
+        }
+        contexts[n.id] = { resultId, columns: columns.filter((c) => c.kind !== 'categorical'),
+          outcomes: out ? (out.data?.metadata?.name || out.data?.id) : null, problems: [] };
+      } else if (n.type === 'dasymetricNode') {
+        const z = edgesInto(n.id, 'zones', nodes, edges)[0];
+        const t = edgesInto(n.id, 'target', nodes, edges)[0];
+        const priors = edgesInto(n.id, 'prior', nodes, edges);
+        const numeric = (ds) => (ds?.data?.metadata?.columns || []).filter((c) =>
+          ['http://schema.org/Integer', 'http://schema.org/Float', 'Integer', 'Float'].includes(c.structural_type) || c.mean !== undefined).map((c) => c.name);
+        contexts[n.id] = {
+          zones: z ? { label: z.data?.metadata?.name || z.data?.id, columns: numeric(z) } : null,
+          target: describeTarget(t),
+          priors: priors.map((p) => ({ nodeId: p.id, label: p.data?.metadata?.name || p.data?.id, columns: numeric(p) })),
+          problems: [],
+        };
+      }
+    }
     setNodes((nds) => {
       let changed = false;
       const next = nds.map((n) => {
@@ -1229,7 +1371,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       });
       return changed ? next : nds;
     });
-  }, [nodes, edges, planProblems]);
+  }, [nodes, edges, planProblems, availableDatasets, normalizeDatasetId]);
 
   // RUNNING a step or a calculation: results in columns, shown in a Result Map connected to the node
   const showPlanResult = useCallback((nodeId, spatialData, name) => {
@@ -1292,6 +1434,53 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }
   }, [collection.study_area, getEdges, getNodes, handlePlanNodeChange, onLogActivity, showPlanResult]);
   useEffect(() => { runPlanNodeRef.current = runPlanNode; }, [runPlanNode]);
+
+  const runAnalysisNode = useCallback(async (nodeId) => {
+    const all = getNodes();
+    const allEdges = getEdges();
+    const node = all.find((n) => n.id === nodeId);
+    if (!node) return;
+    const setRun = (lastRun) => handlePlanNodeChange(nodeId, { lastRun });
+    const started = performance.now();
+    setRun({ running: true });
+    const studyArea = collection.study_area || null;
+    try {
+      const config = analysisConfig(node, all, allEdges);
+      if (!config) throw new Error('Connect the inputs first.');
+      let payload;
+      let display;
+      let title;
+      let result = null;
+      if (node.type === 'sweepNode') {
+        const step = edgesInto(nodeId, 'step', all, allEdges)[0];
+        const { plan } = buildPlan(all, allEdges, [step.id]);
+        payload = await runSweep({ plan, study_area: studyArea, ...config });
+        display = 'top_share';
+        title = `Sweep: ${config.column}`;
+        result = payload.sweep;
+      } else if (node.type === 'validateNode') {
+        const res = edgesInto(nodeId, 'result', all, allEdges)[0];
+        const stepIds = res.type === 'calculateNode' ? inputsOf(res.id, all, allEdges).inputs.filter((i) => i.type === 'stepNode').map((s) => s.id) : [res.id];
+        const { plan } = buildPlan(all, allEdges, stepIds);
+        const derived = res.type === 'calculateNode' ? buildDerived(all, allEdges).filter((d) => d.node === res.id) : null;
+        payload = await runValidation({ plan, study_area: studyArea, ...config, derived });
+        display = config.column;
+        title = `Validation: ${config.column}`;
+        result = payload.validation;
+      } else {
+        payload = await runDasymetric({ study_area: studyArea, ...config });
+        display = Object.keys(payload.columns)[0];
+        title = `Dasymetric: ${display}`;
+      }
+      const spatialData = toSpatialData(payload, { stepId: title, plan: null, sourceLabel: title, methodLabel: node.type.replace('Node', ''),
+        durationMs: Math.round(performance.now() - started), displayColumn: display, multivariate: false });
+      setRun({ running: false, result });
+      showPlanResult(nodeId, spatialData, title);
+    } catch (error) {
+      setRun({ running: false, error: error.message });
+    }
+  }, [collection.study_area, getEdges, getNodes, handlePlanNodeChange, showPlanResult]);
+  useEffect(() => { runAnalysisNodeRef.current = runAnalysisNode; }, [runAnalysisNode]);
 
   // RUN ALL and record a manifest (for replay and for the export), from the collection bar
   const runAllRecorded = useCallback(async () => {
@@ -1419,6 +1608,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         coverageDatasets={collectionDoc.datasets.map((d) => d.id)}
         warnings={[...warnings, ...(planProblems._plan || []).map((message) => ({ kind: 'plan', message }))]}
         hasPlan={!!collectionDoc.plan}
+        onReport={async () => {
+          const id = collectionDirty || !collection.id ? await saveCollection() : collection.id;
+          if (id) window.open(reportUrl(id), '_blank', 'noopener');
+        }}
         onRunAll={runAllRecorded}
         canReplay={!!lastManifestPath}
         onReplay={async () => {

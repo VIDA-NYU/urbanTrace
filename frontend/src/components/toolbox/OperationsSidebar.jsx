@@ -15,6 +15,9 @@ const OperationsSidebar = () => {
       grid: 'gridNode',             // plan nodes (redesign phase 4)
       step: 'stepNode',
       calculate: 'calculateNode',
+      sweep: 'sweepNode',           // analysis nodes (redesign phase 5)
+      validate: 'validateNode',
+      dasymetric: 'dasymetricNode',
     };
     if (NODE_TYPES[opType]) reactFlowType = NODE_TYPES[opType];
 

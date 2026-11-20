@@ -11,7 +11,7 @@ import { MapError } from './VectorPreviewMap';
 const HEX_LAYER = 'h3-hexagon-layer';
 const ZONE_LAYER = 'zone-layer';
 const VALUE_KEY = '__ut_value';
-const EXCLUDE_PROPS = ['zone_id', 'geometry', 'OBJECTID', 'Shape_Area', 'Shape_Leng', VALUE_KEY];
+const EXCLUDE_PROPS = ['zone_id', 'geometry', 'OBJECTID', 'Shape_Area', 'Shape_Leng', VALUE_KEY, '__display_column'];
 const FIRE_PALETTE = { low: [253, 224, 71], high: [153, 27, 27] };
 
 const getZoneFeatureId = (feature) => {
@@ -20,6 +20,11 @@ const getZoneFeatureId = (feature) => {
 };
 
 const zoneTotal = (props) => {
+  // A result that names the column to show (plan results do) is colored by it, never by a sum
+  if (props.__display_column) {
+    const v = props[props.__display_column];
+    return typeof v === 'number' && !isNaN(v) ? v : 0;
+  }
   if (props.zone_value) return props.zone_value;
   return Object.entries(props).reduce(
     (sum, [key, val]) => (!EXCLUDE_PROPS.includes(key) && typeof val === 'number' && !isNaN(val) ? sum + val : sum),

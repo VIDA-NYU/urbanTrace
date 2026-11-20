@@ -237,6 +237,17 @@ const ResultMapNode = memo(({ id, data }) => {
     }
   };
 
+  // Record the priority index on the canvas so the collection keeps it as an analysis (redesign phase 5)
+  const onPriorityChange = data?.onPriorityChange;
+  const priorityRecord = useMemo(() => (auditMappings.length ? {
+    variables: auditMappings.map((v) => ({ column: v.valueKey, weight: Number(v.weight) || 0,
+      direction: (v.direction || 'normal').toLowerCase(), rationale: v.reasoning || null })),
+    goal: tweakGoal || null,
+  } : null), [auditMappings, tweakGoal]);
+  useEffect(() => {
+    if (onPriorityChange && priorityRecord) onPriorityChange(id, priorityRecord);
+  }, [id, onPriorityChange, priorityRecord]);
+
   const hotspotHexData = useMemo(() => {
     if (!isHotspotCandidate || !resultMapData || !auditMappings.length) return null;
 

@@ -65,7 +65,7 @@ def catalog(tmp_path, monkeypatch):
     (geo / "test_rates.geojson").write_text(json.dumps(_fc([
         _polygon(COVER, rate=0.2), _polygon(BOWTIE, rate=0.6)])))
     (geo / "test_zones.geojson").write_text(json.dumps(_fc([
-        _polygon(WEST, zone="west"), _polygon(EAST, zone="east")])))
+        _polygon(WEST, zone="west", pop=100), _polygon(EAST, zone="east", pop=300)])))
     prof = tmp_path / "metadata_v2"
     prof.mkdir()
     # Points cover the western half of the box only; rates cover all of it but years earlier.

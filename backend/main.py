@@ -38,6 +38,8 @@ import collections_store
 import export as exporter
 import scope
 import plans
+import analysis
+from fastapi.responses import HTMLResponse
 from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
 from grids.h3_grid import H3GridSystem
 
@@ -1529,6 +1531,15 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
         extras["results"] = (extras.get("results") or []) + plan_results
         files.update(plan_files)
         extras["readme_sections"] = plan_readme
+    analyses = _run_collection_analyses(doc) if options.include_results and doc.get("plan") else []
+    for a in analyses:
+        if a.get("payload"):
+            extras.setdefault("results", []).append(_analysis_result(a))
+        else:
+            extras.setdefault("results", []).append({"name": a["name"], "frames": {}, "caveats": [f"{a['name']}: {a['error']}"]})
+    extras.setdefault("readme_sections", [])
+    extras["readme_sections"] = list(extras["readme_sections"]) + _analysis_readme(analyses)
+    files["report.html"] = _collection_report(doc, analyses).encode()
     extras["extra_files"] = files
     return extras
 
@@ -1872,6 +1883,214 @@ async def import_collection(file: UploadFile = File(...)):
     missing = [d.get("id") for d in doc.get("datasets", [])
                if catalog.dataset_path(DATA_DIR, catalog.stem_of(d.get("id"))) is None]
     return {"collection": created, "missing_datasets": missing}
+
+
+# ==========================================
+# ANALYSIS (docs/REDESIGN.md, phase 5)
+# ==========================================
+
+class SweepRequest(BaseModel):
+    plan: Dict[str, Any]
+    study_area: Optional[Dict[str, Any]] = None
+    step: str
+    column: str
+    variants: List[Dict[str, Any]] = Field(default_factory=list)
+    top_share: float = 0.2
+
+
+class ValidateRequest(BaseModel):
+    plan: Dict[str, Any]
+    study_area: Optional[Dict[str, Any]] = None
+    step: Optional[str] = None
+    derived: Optional[List[Dict[str, Any]]] = None
+    column: str
+    outcomes: Dict[str, Any]
+    quantiles: List[float] = Field(default_factory=lambda: [0.5, 0.6, 0.7])
+
+
+class DasymetricRequest(BaseModel):
+    study_area: Optional[Dict[str, Any]] = None
+    zones: Dict[str, Any]
+    target: Dict[str, Any]
+    priors: List[Dict[str, Any]]
+    normalize: Optional[str] = "share"
+    fallback: str = "area"
+
+
+def _analysis_call(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except (analysis.AnalysisError, plans.PlanInputError, uw.UrbanweaveError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/analysis/sweep")
+def run_sweep(body: SweepRequest):
+    """One step's column under alternative supports or methods: ranks and their stability per unit."""
+    return _analysis_call(analysis.sweep, DATA_DIR, body.plan, body.study_area, _plan_cache(), step_id=body.step,
+                          column=body.column, variants=body.variants, top_share=body.top_share)
+
+
+@app.post("/api/analysis/validate")
+def run_validation(body: ValidateRequest):
+    """Coverage and lift of the highest-ranked units against outcome points (the paper's Table 3)."""
+    return _analysis_call(analysis.validate_outcomes, DATA_DIR, body.plan, body.study_area, _plan_cache(),
+                          step_id=body.step, column=body.column, outcomes=body.outcomes, quantiles=body.quantiles,
+                          derived=body.derived)
+
+
+@app.post("/api/analysis/dasymetric")
+def run_dasymetric(body: DasymetricRequest):
+    """Zone totals spread over finer targets in proportion to point priors."""
+    return _analysis_call(analysis.dasymetric, DATA_DIR, body.study_area, _plan_cache(), zones=body.zones,
+                          target=body.target, priors=body.priors, normalize=body.normalize, fallback=body.fallback)
+
+
+def _run_collection_analyses(doc: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Each analysis recorded on the collection, run again: {id, kind, name, payload | error, ...}."""
+    out = []
+    spec, area = doc.get("plan") or {}, doc.get("study_area")
+    derived_all = doc.get("derived") or []
+    for a in doc.get("analyses") or []:
+        kind, cfg = a.get("kind"), dict(a.get("config") or {})
+        name = a.get("name") or f"{kind} {a.get('id', '')}".strip()
+        entry = {"id": a.get("id"), "kind": kind, "name": name, "config": cfg}
+        try:
+            if kind == "sweep":
+                entry["payload"] = analysis.sweep(DATA_DIR, spec, area, _plan_cache(), step_id=cfg["step"],
+                                                  column=cfg["column"], variants=cfg.get("variants") or [],
+                                                  top_share=float(cfg.get("top_share", 0.2)))
+            elif kind == "validation":
+                derived = [d for d in derived_all if d.get("id") == cfg.get("derived")] if cfg.get("derived") else None
+                entry["payload"] = analysis.validate_outcomes(DATA_DIR, spec, area, _plan_cache(), step_id=cfg.get("step"),
+                                                              column=cfg["column"], outcomes=cfg["outcomes"],
+                                                              quantiles=cfg.get("quantiles") or [0.5, 0.6, 0.7], derived=derived)
+            elif kind == "dasymetric":
+                entry["payload"] = analysis.dasymetric(DATA_DIR, area, _plan_cache(), zones=cfg["zones"], target=cfg["target"],
+                                                       priors=cfg.get("priors") or [], normalize=cfg.get("normalize", "share"),
+                                                       fallback=cfg.get("fallback", "area"))
+            elif kind == "priority":
+                key = cfg.get("result")
+                derived = [d for d in derived_all if d.get("id") == key]
+                run = plans.run(DATA_DIR, spec, area, _plan_cache(), outputs=[] if derived else [key], derived=derived)
+                payload = run["steps"][key]
+                payload["columns"]["priority"] = analysis.priority(payload["columns"], cfg.get("variables") or [])
+                payload["kinds"]["priority"] = "intensive"
+                if payload.get("geojson"):
+                    for f, v in zip(payload["geojson"]["features"], payload["columns"]["priority"]):
+                        f["properties"]["priority"] = v
+                entry["payload"] = payload
+            else:
+                entry["error"] = f"unknown analysis kind {kind!r}"
+        except (analysis.AnalysisError, plans.PlanInputError, uw.UrbanweaveError, KeyError) as e:
+            entry["error"] = f"could not be run: {e}"
+        out.append(entry)
+    return out
+
+
+def _payload_frame(payload: Dict[str, Any]) -> gpd.GeoDataFrame:
+    geoms = analysis.payload_geometries(payload)
+    frame = pd.DataFrame({"target_id": payload["target_ids"], **payload["columns"]})
+    return gpd.GeoDataFrame(frame, geometry=geoms, crs="EPSG:4326")
+
+
+def _analysis_result(a: Dict[str, Any]) -> Dict[str, Any]:
+    p = a["payload"]
+    record = {k: p[k] for k in ("sweep", "validation", "dasymetric") if k in p}
+    lines = []
+    if "sweep" in p:
+        sw = p["sweep"]
+        lines.append(f"{sw['always_top']} of {sw['units']} units are in the top {round(sw['top_share'] * 100)}% under every variant; "
+                     f"{sw['sometimes_top']} only under some.")
+    if "validation" in p:
+        for row in p["validation"]["table"]:
+            lines.append(f"Top {round((1 - row['quantile']) * 100)}% of units hold {row['coverage']:.1%} of the outcomes "
+                         f"(lift {row['lift']})." if row["coverage"] is not None and row["lift"] is not None else "")
+    return {"name": a["name"], "frames": {"analysis": _payload_frame(p)}, "value_kinds": p.get("kinds"),
+            "request": {"analysis": a["kind"], "config": a["config"], **record}, "description": f"{a['kind'].capitalize()} analysis.",
+            "summary_lines": [l for l in lines if l]}
+
+
+def _analysis_readme(analyses: List[Dict[str, Any]]) -> List[str]:
+    if not analyses:
+        return []
+    lines = ["## Analyses", ""]
+    for a in analyses:
+        lines.append(f"### {a['name']} ({a['kind']})")
+        lines.append("")
+        p = a.get("payload")
+        if not p:
+            lines += [f"Not included: {a.get('error')}", ""]
+            continue
+        if "validation" in p:
+            lines += ["| Quantile | Threshold | Coverage | Outcomes in top units | Outcomes | Baseline | Lift |", "|---|---|---|---|---|---|---|"]
+            lines += [f"| {r['quantile']} | {r['threshold']} | {r['coverage']} | {r['n_high']} | {r['n_total']} | {r['baseline']} | {r['lift']} |"
+                      for r in p["validation"]["table"]]
+        if "sweep" in p:
+            sw = p["sweep"]
+            lines.append("Variants: " + "; ".join(f"{v['label']}" + ("" if v["ok"] else f" (failed: {v['error']})") for v in sw["variants"]) + ".")
+            agree = [x["spearman"] for x in sw["agreement"] if x["spearman"] is not None]
+            if agree:
+                lines.append(f"Spearman correlation between variants: {min(agree):.2f} to {max(agree):.2f}.")
+        if a["kind"] == "priority":
+            vars_ = a["config"].get("variables") or []
+            lines.append("Priority = " + " + ".join(f"{v.get('weight')}×{'(1−' if v.get('direction') == 'inverted' else ''}"
+                                                     f"norm({v.get('column')}){')' if v.get('direction') == 'inverted' else ''}" for v in vars_)
+                         + " (weights rescaled to sum to 1; each variable min-max normalized over the units).")
+            lines += [f"- {v.get('column')}: {v.get('rationale')}" for v in vars_ if v.get("rationale")]
+        lines.append("")
+    return lines
+
+
+def _collection_report(doc: Dict[str, Any], analyses: Optional[List[Dict[str, Any]]] = None) -> str:
+    """The printable report: plan results with maps and reports, analyses, caveats."""
+    sections = []
+    spec = doc.get("plan")
+    if spec and spec.get("steps"):
+        try:
+            run = plans.run(DATA_DIR, spec, doc.get("study_area"), _plan_cache(),
+                            outputs=[s["id"] for s in spec["steps"]], derived=doc.get("derived") or [])
+            for sid, payload in run["steps"].items():
+                cols = list(payload["columns"])
+                if not cols:
+                    continue
+                sections.append({"title": f"Result: {sid}", "svg": analysis.svg_map(payload, cols[-1], title=cols[-1]),
+                                 "lines": _plan_report_lines(sid, run["reports"].get(sid)) +
+                                          ([f"Derived: {payload['derived']['as']} = {payload['derived']['expression']}"]
+                                           if payload.get("derived", {}).get("expression") else [])})
+        except (plans.PlanInputError, uw.UrbanweaveError) as e:
+            sections.append({"title": "Plan", "text": f"The plan could not be run: {e}"})
+    analyses = analyses if analyses is not None else (_run_collection_analyses(doc) if spec else [])
+    for a in analyses:
+        p = a.get("payload")
+        if not p:
+            sections.append({"title": a["name"], "text": a.get("error")})
+            continue
+        sec = {"title": f"{a['name']} ({a['kind']})"}
+        if "sweep" in p:
+            sec["svg"] = analysis.svg_map(p, "top_share", title="Share of variants in which the unit ranks in the top")
+            sec["lines"] = [f"{p['sweep']['always_top']} of {p['sweep']['units']} units are in the top under every variant."]
+            sec["table"] = [["Variant", "Ran", "Units"]] + [[v["label"], "yes" if v["ok"] else v["error"], v.get("units")] for v in p["sweep"]["variants"]]
+        elif "validation" in p:
+            sec["svg"] = analysis.svg_map(p, p["validation"]["column"], title=p["validation"]["column"])
+            sec["table"] = [["Quantile", "Threshold", "Coverage", "In top", "Outcomes", "Baseline", "Lift"]] + [
+                [r["quantile"], r["threshold"], r["coverage"], r["n_high"], r["n_total"], r["baseline"], r["lift"]] for r in p["validation"]["table"]]
+        elif "dasymetric" in p:
+            col = next(iter(p["columns"]))
+            sec["svg"] = analysis.svg_map(p, col, title=col)
+        elif a["kind"] == "priority":
+            sec["svg"] = analysis.svg_map(p, "priority", title="Priority index")
+            sec["lines"] = [f"{v.get('column')}: weight {v.get('weight')}, {v.get('direction') or 'normal'}. {v.get('rationale') or ''}"
+                            for v in a["config"].get("variables") or []]
+        sections.append(sec)
+    datasets = [{**d, "origin": catalog.origin(DATA_DIR, catalog.stem_of(d.get("id")))} for d in doc.get("datasets") or []]
+    return analysis.report_html(doc, sections, scope.checks(DATA_DIR, doc), datasets)
+
+
+@app.get("/api/collections/{cid}/report", response_class=HTMLResponse)
+def collection_report(cid: str):
+    """The collection as a printable HTML report."""
+    return HTMLResponse(_collection_report(_get_collection(cid)))
 
 # ==========================================
 # 7. LLM COPILOT ENDPOINTS

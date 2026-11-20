@@ -160,9 +160,9 @@ export function buildDerived(nodes, edges) {
 }
 
 // Plan results (columns) in the shape ResultMapNode, CompareMapNode and the provenance panel read.
-export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, methodLabel, reductionsByColumn = {}, durationMs }) {
+export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, methodLabel, reductionsByColumn = {}, durationMs, displayColumn, multivariate = true }) {
   const columns = Object.keys(payload.columns || {});
-  const primary = columns[columns.length - 1];
+  const primary = displayColumn && columns.includes(displayColumn) ? displayColumn : columns[columns.length - 1];
   const isZoned = payload.target?.kind === 'zones';
   const variables = columns.map((c) => ({
     dataset: sourceLabel || stepId, targetColumn: c, outputName: c, allocation: methodLabel,
@@ -170,19 +170,25 @@ export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, met
     valueKind: payload.kinds?.[c] || null,
   }));
   const provenance = {
-    timestamp: new Date().toISOString(), durationMs, isMultivariate: columns.length > 1,
+    timestamp: new Date().toISOString(), durationMs, isMultivariate: multivariate && columns.length > 1,
     resolution: payload.target?.resolution || null, zoningEnabled: isZoned,
     targetZones: isZoned ? payload.target?.dataset : null, outputMode: isZoned ? 'zones' : 'grid', variables,
     planStep: stepId,
   };
   const base = {
-    status: 'success', engine: 'urbanweave-plan', isMultivariate: columns.length > 1, isZoned,
+    status: 'success', engine: 'urbanweave-plan', isMultivariate: multivariate && columns.length > 1, isZoned,
     outputMode: isZoned ? 'zones' : 'grid', provenance, columns: payload.columns, kinds: payload.kinds,
     targetIds: payload.target_ids, primaryColumn: primary,
     reports: reports ? { [stepId]: { allocation: reports } } : null,
     request: { plan_step: stepId, plan },
   };
-  if (isZoned) return { ...base, geojson: payload.geojson, zone_count: payload.geojson?.features?.length || 0 };
+  if (isZoned) {
+    const geojson = payload.geojson && {
+      ...payload.geojson,
+      features: payload.geojson.features.map((f) => ({ ...f, properties: { ...f.properties, __display_column: primary } })),
+    };
+    return { ...base, geojson, zone_count: geojson?.features?.length || 0 };
+  }
   const data = {};
   payload.target_ids.forEach((id, i) => {
     const vars = Object.fromEntries(columns.map((c) => [c, payload.columns[c][i]]));

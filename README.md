@@ -55,6 +55,9 @@ Built on React Flow. The workflow is made of nodes:
 | **H3 Grid** | A grid target at a chosen resolution, sized to the study area or to its sources. |
 | **Step** | Matches a source (a dataset or another step) onto a target (zones or an H3 grid) and aggregates: an [urbanweave](https://github.com/VIDA-NYU/urbanweave) method chosen from its registry, its parameters, and one or more reductions, each with a value kind (extensive, intensive, categorical) and an optional filter. Problems are marked on the step before it runs; after it runs, a report says what matched and what was left out. |
 | **Combine & Calculate** | Joins the outputs of steps that share a target and, optionally, adds a column computed from them (e.g. a rate per 1,000 residents). |
+| **Sensitivity Sweep** | Reruns a step's variable through other H3 resolutions, zone systems or matching methods, brings each variant back to the step's units, and maps how stable each unit's rank is (the share of variants in which it is among the top units). |
+| **Validate** | Ranks units by a result and checks them against known outcomes (points such as program sites): coverage, baseline and lift per quantile, as in the paper's Table 3. |
+| **Dasymetric** | Spreads zone totals over finer units (an H3 grid or other zones) in proportion to point priors, keeping each zone's total. Needs an urbanweave newer than 0.1.0a1. |
 | **Spatial Integration** (classic) | The original node: variables onto an H3 grid and optionally into zones, with the copilot's operator suggestions. |
 | **Result Map** | Shows an integration result as H3 cells or zones, with hotspot palettes. |
 | **Compare Maps** | Takes two hotspot result maps and shows where values went up or down, with direction symbols. |
@@ -65,6 +68,7 @@ Built on React Flow. The workflow is made of nodes:
 - A **collection** holds the goal, the datasets and why each was chosen, the steps (an urbanweave plan) and the canvas; save, open, or start a new one.
 - A **study area** (zones from a dataset, optionally filtered, or a box) limits integrations, search and exports. **Coverage** shows where the datasets have data; **checks** warn when periods do not overlap or a dataset misses most of the study area.
 - **Plan**: run every step and record the run (inputs by fingerprint), replay it later, or download `plan.json`.
+- **Report** opens a printable HTML page with the datasets and their sources, a map of each result with its report, the analyses (sweep stability, validation tables, priority weights and rationale) and the caveats.
 - **Export** writes a zip: a Frictionless `datapackage.json`, the datasets (embedded when their license is recorded, otherwise referenced by source), the results, `plan.json` and `manifest.json` to rerun in a notebook, and a README with the rationale and caveats. Exported packages can be imported back.
 
 ### 🧭 Integration provenance (right sidebar)
@@ -218,6 +222,8 @@ The maps use Autark's `autk-map`. On this branch it is linked from a local Autar
 | POST | `/api/collections/{id}/export`, `/api/collections/import` | Export a collection as a zip; import one |
 | POST | `/api/results/export` | One result map as a zip with its provenance |
 | GET/POST | `/api/catalog/index`, `/api/coverage`, `/api/study-area/*`, `/api/collections/check` | Search filters, coverage, study area, checks |
+| POST | `/api/analysis/sweep`, `/api/analysis/validate`, `/api/analysis/dasymetric` | Sensitivity sweeps, validation against outcomes, dasymetric disaggregation |
+| GET | `/api/collections/{id}/report` | The collection as a printable HTML report |
 | POST | `/run-operation` | Quick H3 preview, union or intersection |
 | POST | `/api/copilot/chat` | Copilot chat with the current canvas as context |
 | POST | `/api/v1/copilot/recommend-operators` | Zoning operator recommendations |

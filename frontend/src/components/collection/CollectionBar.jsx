@@ -1,7 +1,7 @@
 // The collection bar (docs/REDESIGN.md, section 2.1): name and goal of the collection on the canvas,
 // with new, open, save and export.
 import React, { useEffect, useRef, useState } from 'react';
-import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X, MapPinned, Grid3x3, AlertTriangle, CheckCircle2, Workflow, Upload } from 'lucide-react';
+import { FolderOpen, Save, FilePlus, Download, Loader2, Trash2, X, MapPinned, Grid3x3, AlertTriangle, CheckCircle2, Workflow, Upload, FileText } from 'lucide-react';
 import { listCollections, deleteCollection, importPackage } from '../../lib/collections';
 import { StudyAreaPanel, CoverageModal, WarningsPanel } from './ScopePanels';
 
@@ -110,7 +110,7 @@ function ExportPanel({ onExport, onClose, busy }) {
 export default function CollectionBar({
   collection, dirty, status, onRename, onGoalChange, onNew, onOpen, onSave, onExport, exporting,
   zoneDatasets = [], onStudyAreaChange, coverageDatasets = [], warnings = [],
-  hasPlan = false, onRunAll, onReplay, canReplay = false, onDownloadPlan,
+  hasPlan = false, onRunAll, onReplay, canReplay = false, onDownloadPlan, onReport,
 }) {
   const [open, setOpen] = useState(null); // 'open' | 'export' | 'goal' | 'area' | 'checks'
   const [coverageOpen, setCoverageOpen] = useState(false);
@@ -149,6 +149,9 @@ export default function CollectionBar({
           <Workflow size={13} /> Plan
         </button>
       )}
+      <button style={iconButton} onClick={onReport} title="A printable report of the collection: datasets, results, analyses, caveats">
+        <FileText size={13} /> Report
+      </button>
       <button style={iconButton} onClick={() => setOpen(open === 'export' ? null : 'export')} title="Export the collection"><Download size={13} /> Export</button>
       {open === 'goal' && (
         <div style={panel}>

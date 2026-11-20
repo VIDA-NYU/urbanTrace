@@ -418,7 +418,7 @@ the experts it interviewed, OSCUR partners), and the remaining phases reordered 
 Phases on the data side (1, 2, 6) and the integration side (3, 4) touch different code and can
 overlap when people are available.
 
-**Status (2026-11-20).** Phases 0 to 4 are built on the `autark-map` branch, each in its own commit,
+**Status (2026-11-20).** Phases 0 to 5 are built on the `autark-map` branch, each in its own commit,
 with backend tests on synthetic data (no Git LFS data needed). Where the build departed from the
 plan below:
 
@@ -437,6 +437,12 @@ plan below:
   defaults while the classic node keeps the legacy conventions. Derived variables are computed by
   UrbanTrace after the plan runs and recorded in the collection and the export README, since
   urbanweave plans have no calculation step.
+- Phase 5: sweeps bring every variant back to the step's own target (through the alternative
+  support and back by area overlap) so units can be ranked across variants; the validation table
+  notes when tied values make quantiles select the same units. Dasymetric disaggregation needs
+  `uw.dasymetric`, which is in urbanweave's repository but not in the 0.1.0a1 release: the node
+  says so until a newer prerelease is pinned. Priority indexes set on a Result Map are recorded as
+  analyses and recomputed in exports and reports.
 - The interface was checked by building it, rendering it in headless Chrome, and driving one
   collection through open, run and report over the DevTools protocol; the Chrome extension was not
   available for interactive testing.

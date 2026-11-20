@@ -8,6 +8,9 @@ import {
   Calculator,
   Network,    // Perfect for our Integration Pipeline
   Workflow,
+  Shuffle,
+  Target,
+  Layers3,
   Hexagon     // Good for H3 operations if available, otherwise use Grid/Map
 } from 'lucide-react';
 
@@ -20,6 +23,16 @@ export const OPERATION_CATEGORIES = [
       { type: 'step', label: 'Step', icon: Workflow, desc: 'Match a source onto a target and aggregate' },
       { type: 'grid', label: 'H3 Grid', icon: Hexagon, desc: 'A grid target at a chosen resolution' },
       { type: 'calculate', label: 'Combine & Calculate', icon: Calculator, desc: 'Join steps on a target; derive a variable' },
+    ]
+  },
+  {
+    id: 'analysis',
+    title: 'Analysis',
+    color: '#db2777',
+    items: [
+      { type: 'sweep', label: 'Sensitivity Sweep', icon: Shuffle, desc: 'How ranks change across resolutions, zones and methods' },
+      { type: 'validate', label: 'Validate', icon: Target, desc: 'Coverage and lift against known outcomes' },
+      { type: 'dasymetric', label: 'Dasymetric', icon: Layers3, desc: 'Spread zone totals over finer units with priors' },
     ]
   },
   {
