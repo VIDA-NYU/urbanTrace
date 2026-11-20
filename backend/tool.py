@@ -81,6 +81,10 @@ You are provided target_geometry and valid arrays: available_mapping_operators a
 - Extensive -> aggregation should preserve totals (typically Sum)
 - Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
 - Categorical/Ordinal -> use discrete grouping (typically Majority)
+operator_descriptions gives, for each operator, the urbanweave method or reduction it runs, what it
+does, and which value kinds it suits (from urbanweave's registry); prefer operators whose value kinds
+match your classification. available_mapping_operators already excludes mappings that do not fit the
+target geometry. Your choice is checked against the registry afterwards.
 
 Return ONLY a valid JSON array with one object per source variable, each containing:
 dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.

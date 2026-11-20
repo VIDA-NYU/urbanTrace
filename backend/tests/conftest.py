@@ -54,6 +54,11 @@ def catalog(tmp_path, monkeypatch):
     geo = tmp_path / "geojson"
     geo.mkdir()
     (tmp_path / "metadata").mkdir()
+    # The original (v1) profile the copilot's operator recommendation reads
+    (tmp_path / "metadata" / "test_points.json").write_text(json.dumps({
+        "geometricType": "Point", "sample": "count,name\n3,p0\n5,p1\n2,p2\n",
+        "columns": [{"name": "count", "structural_type": "http://schema.org/Integer", "mean": 3.67,
+                     "num_distinct_values": 6}]}))
     (geo / "test_points.geojson").write_text(json.dumps(_fc([
         {"type": "Feature", "properties": {"count": c, "name": f"p{i}", "date": DATES[i]},
          "geometry": {"type": "Point", "coordinates": [x, y]}} for i, (x, y, c) in enumerate(POINTS)])))

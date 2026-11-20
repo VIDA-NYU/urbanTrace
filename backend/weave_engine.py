@@ -50,6 +50,7 @@ from shapely.geometry import MultiPolygon, Polygon
 
 import urbanweave as uw
 from urbanweave.compat import urbantrace as legacy
+from urbanweave.registry import problems as registry_problems
 
 import scope
 
@@ -66,7 +67,7 @@ class Track:
     """One variable of a multivariate request."""
 
     def __init__(self, source_gdf, target_column, output_name, allocation, grid_aggregation,
-                 zoning_mapping=None, zoning_aggregation=None, time_window=None):
+                 zoning_mapping=None, zoning_aggregation=None, time_window=None, params=None):
         if allocation not in legacy.ALLOCATION:
             raise uw.InputError(f"Unknown allocation operator: {allocation}")
         if grid_aggregation not in legacy.GRID_AGGREGATION:
@@ -89,6 +90,14 @@ class Track:
                                     f"{time_window.get('start') or '…'} to {time_window.get('end') or '…'}.")
         self.source, self.repairs = _prepare(source_gdf, "source_id", f"Source dataset for {output_name!r}")
         self.area_report = None
+        # Method parameters the user set (e.g. a Gaussian bandwidth), checked against the registry.
+        method = legacy.ALLOCATION[allocation][0]
+        accepted = uw.registry()["matching"][method].get("params", {})
+        unknown = sorted(set(params or {}) - set(accepted))
+        if unknown:
+            raise uw.InputError(f"{allocation} ({method}) has no parameter {', '.join(unknown)}; "
+                                f"it accepts {', '.join(accepted) or 'none'}.")
+        self.params = {k: v for k, v in (params or {}).items() if v is not None and v != ""}
         self.column = target_column
         self.name = output_name
         self.allocation = allocation
@@ -171,6 +180,7 @@ def _grid_track(track: Track, cells: gpd.GeoDataFrame):
     params = dict(params)
     if method == "gaussian":
         params["bandwidth"] = _DEFAULT_BANDWIDTH_M
+    params.update(track.params)
     if method == "contain" and "MultiPoint" in set(track.source.geometry.geom_type):
         raise uw.UnsupportedError(
             f"BinaryContainment does not accept MultiPoint sources ({track.name}): the legacy operator gave "
@@ -287,3 +297,71 @@ def run(tracks: list[Track], resolution: int, zones_gdf: gpd.GeoDataFrame | None
         result["zones"] = gpd.GeoDataFrame(unified_zones, geometry="geometry", crs=_WGS84)
 
     return result
+
+
+# --- the registry, for interfaces and the copilot (redesign phase 3) -----------------------------
+
+#: Copilot classifications → urbanweave value kinds (an ordinal index is treated as categorical).
+VALUE_KIND = {"extensive": "extensive", "intensive": "intensive", "ordinal index": "categorical",
+              "ordinal": "categorical", "categorical": "categorical"}
+
+
+def zoning_method(zoning_mapping: str, zone_geometry: str | None) -> str:
+    """The urbanweave method a legacy zoning mapping runs, given the zones' geometry type."""
+    method = legacy.ZONING_MAPPING[zoning_mapping][0]
+    if zoning_mapping == "CentroidZoning" and (zone_geometry or "") in ("Point", "MultiPoint"):
+        return "sample"
+    return method
+
+
+def zoning_problems(zoning_mapping: str | None, zoning_aggregation: str | None, zone_geometry: str | None,
+                    classification: str | None = None) -> list[str]:
+    """Why a zoning mapping / aggregation does not fit H3 cells → these zones (empty when it fits),
+    checked against urbanweave's registry."""
+    reasons = []
+    geom = zone_geometry or "Polygon"
+    method = None
+    if zoning_mapping is not None:
+        if zoning_mapping not in legacy.ZONING_MAPPING:
+            return [f"Unknown zoning mapping {zoning_mapping!r}."]
+        method = zoning_method(zoning_mapping, geom)
+        reasons += registry_problems("Polygon", geom, method, source_support="h3", target_support="vector")
+    if zoning_aggregation is not None:
+        if zoning_aggregation not in legacy.ZONING_AGGREGATION:
+            return reasons + [f"Unknown zoning aggregation {zoning_aggregation!r}."]
+        reduction = legacy.ZONING_AGGREGATION[zoning_aggregation]
+        kind = VALUE_KIND.get((classification or "").strip().lower())
+        spec = uw.registry()["aggregation"][reduction]
+        if kind and kind not in spec["value_kinds"]:
+            reasons.append(f"{zoning_aggregation} ({reduction}) does not suit {kind} values.")
+        if method is not None:
+            provided = uw.registry()["matching"][method]["match_quantities"]
+            for q in spec.get("requires", []):
+                if q != "density_denominator" and q not in provided:
+                    reasons.append(f"{zoning_aggregation} needs {q}, which {zoning_mapping} ({method}) does not provide.")
+    return reasons
+
+
+def describe_operators() -> dict:
+    """Each legacy operator name with the urbanweave method or reduction it runs and the registry's
+    description of it: for operator pickers and the copilot."""
+    reg = uw.registry()
+    out = {"allocation": {}, "grid_aggregation": {}, "zoning_mapping": {}, "zoning_aggregation": {}}
+    for name, (method, params, note) in legacy.ALLOCATION.items():
+        spec = reg["matching"][method]
+        out["allocation"][name] = {"method": method, "fixed_params": params, "note": note,
+                                   "summary": spec.get("summary"), "assignment": spec.get("assignment"),
+                                   "params": spec.get("params", {})}
+    for name, (reduction, _) in legacy.GRID_AGGREGATION.items():
+        spec = reg["aggregation"][reduction]
+        out["grid_aggregation"][name] = {"reduction": reduction, "summary": spec.get("summary"),
+                                         "value_kinds": spec.get("value_kinds")}
+    for name, (method, params, note) in legacy.ZONING_MAPPING.items():
+        spec = reg["matching"][method]
+        out["zoning_mapping"][name] = {"method": method, "note": note, "summary": spec.get("summary"),
+                                       "assignment": spec.get("assignment")}
+    for name, reduction in legacy.ZONING_AGGREGATION.items():
+        spec = reg["aggregation"][reduction]
+        out["zoning_aggregation"][name] = {"reduction": reduction, "summary": spec.get("summary"),
+                                           "value_kinds": spec.get("value_kinds")}
+    return out

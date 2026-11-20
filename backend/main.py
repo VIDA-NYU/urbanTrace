@@ -222,6 +222,8 @@ class VariableConfigRequest(BaseModel):
     time_column: Optional[str] = None
     time_start: Optional[str] = None
     time_end: Optional[str] = None
+    # Parameters of the allocation method (registry names and units, e.g. {"bandwidth": 500} in metres)
+    allocation_params: Optional[Dict[str, Any]] = None
 
 
 class MultivariateIntegrationRequest(BaseModel):
@@ -468,7 +470,7 @@ def _integrate_with_urbanweave(request: "MultivariateIntegrationRequest") -> Dic
                 var.allocation_operator, var.grid_aggregation_operator,
                 var.zoning_mapping_operator if zoned else None,
                 var.zoning_aggregation_operator if zoned else None,
-                time_window=window,
+                time_window=window, params=var.allocation_params,
             ))
         except uw.UrbanweaveError as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -656,7 +658,9 @@ async def get_available_operators():
     Under urbanweave they are generated from its registry, which is included.
     """
     if ENGINE != "legacy":
-        return uw_legacy.operators_payload()
+        payload = uw_legacy.operators_payload()
+        payload["legacy"] = weave_engine.describe_operators()
+        return payload
     return {
         "allocation": list(ALLOCATION_REGISTRY.keys()),
         "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
@@ -963,8 +967,14 @@ async def recommend_operators(request: CopilotRecommendRequest):
     if not request.source_variables:
         raise HTTPException(status_code=400, detail="source_variables cannot be empty")
 
-    available_mapping_operators = list(ZONING_MAPPING_REGISTRY.keys())
+    zone_geometry = request.target_zoning.geometry_type or "Polygon"
+    # Only the mappings urbanweave's registry accepts for H3 cells -> these zones (redesign phase 3)
+    available_mapping_operators = [m for m in ZONING_MAPPING_REGISTRY
+                                   if not weave_engine.zoning_problems(m, None, zone_geometry)]
+    if not available_mapping_operators:
+        raise HTTPException(status_code=400, detail=f"No zoning mapping supports {zone_geometry} zones")
     available_aggregation_operators = list(ZONING_AGGREGATION_REGISTRY.keys())
+    descriptions = weave_engine.describe_operators()
 
     source_payload: List[Dict[str, Any]] = []
     for source_var in request.source_variables:
@@ -1008,6 +1018,10 @@ async def recommend_operators(request: CopilotRecommendRequest):
         },
         "available_mapping_operators": available_mapping_operators,
         "available_aggregation_operators": available_aggregation_operators,
+        "operator_descriptions": {
+            "zoning_mapping": {k: descriptions["zoning_mapping"][k] for k in available_mapping_operators},
+            "zoning_aggregation": descriptions["zoning_aggregation"],
+        },
         "source_variables": source_payload
     }
 
@@ -1052,6 +1066,20 @@ async def recommend_operators(request: CopilotRecommendRequest):
         if zoning_aggregation not in available_aggregation_operators:
             zoning_aggregation = _pick_aggregation_operator(classification, available_aggregation_operators)
 
+        # Check the pair against urbanweave's registry; replace what does not fit, and say why.
+        registry_check = None
+        reasons = weave_engine.zoning_problems(zoning_mapping, zoning_aggregation, zone_geometry, classification)
+        if reasons:
+            original = {"zoningMapping": zoning_mapping, "zoningAggregation": zoning_aggregation}
+            candidates = [zoning_aggregation] + [a for a in ("SumZoning", "WeightedMeanZoning", "MajorityZoning",
+                                                             "DensityZoning", "MaxZoning", "MinZoning")
+                                                 if a in available_aggregation_operators]
+            fixed = next(((m, a) for m in [zoning_mapping] + available_mapping_operators for a in candidates
+                          if not weave_engine.zoning_problems(m, a, zone_geometry, classification)), None)
+            if fixed:
+                zoning_mapping, zoning_aggregation = fixed
+            registry_check = {"replaced": original, "reasons": reasons, "fixed": fixed is not None}
+
         normalized_response.append({
             "dataset_name": dataset_name,
             "column_name": column_name,
@@ -1059,7 +1087,8 @@ async def recommend_operators(request: CopilotRecommendRequest):
             "zoningMapping": zoning_mapping,
             "zoningAggregation": zoning_aggregation,
             "reasoning": reasoning or "Recommended using metadata statistics and geometry-aware zoning constraints.",
-            "engine": rec.get("engine", used_engine)
+            "engine": rec.get("engine", used_engine),
+            "registry_check": registry_check,
         })
 
     if not normalized_response:
@@ -1487,7 +1516,77 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
         area = scope.study_area_geometry(DATA_DIR, doc.get("study_area"))
     except scope.ScopeError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    return {"area": area if options.clip else None, "warnings": scope.checks(DATA_DIR, doc)}
+    extras = {"area": area if options.clip else None, "warnings": scope.checks(DATA_DIR, doc)}
+    if options.include_results and ENGINE != "legacy":
+        extras["results"] = _rerun_integrations(doc)
+    return extras
+
+
+def _report_lines(reports: Dict[str, Any]) -> List[str]:
+    """Plain-language lines from urbanweave's reports, for the export README."""
+    lines = []
+    for name, rep in (reports or {}).items():
+        match = ((rep or {}).get("allocation") or {}).get("match") or {}
+        src = match.get("sources") or {}
+        if src:
+            unmatched = ", ".join(f"{v.get('count')} {k.replace('_', ' ')}" for k, v in (src.get("unmatched") or {}).items())
+            excluded = ", ".join(f"{v.get('count')} {k.replace('_', ' ')}" for k, v in (src.get("excluded") or {}).items())
+            line = f"`{name}`: {src.get('matched')} of {src.get('total')} features matched by {match.get('method')}"
+            if unmatched:
+                line += f"; unmatched: {unmatched}"
+            if excluded:
+                line += f"; excluded: {excluded}"
+            crs = (match.get("measurement") or {}).get("crs_name")
+            if crs:
+                line += f"; measured in {crs}"
+            lines.append(line + ".")
+        for key, label in (("repaired_geometries", "invalid geometries repaired"),):
+            if (rep or {}).get(key):
+                lines.append(f"`{name}`: {rep[key]['count']} {label}.")
+        if (rep or {}).get("time_window"):
+            tw = rep["time_window"]
+            lines.append(f"`{name}`: time window on {tw['column']} kept {tw['kept']} of {tw['rows']} rows.")
+        if (rep or {}).get("study_area"):
+            sa = rep["study_area"]
+            lines.append(f"`{name}`: {sa['kept']} of {sa['features']} features inside the study area.")
+    return lines
+
+
+def _rerun_integrations(doc: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Each integration of the collection, run again on urbanweave, as export results."""
+    kinds = {}
+    for d in doc.get("datasets", []):
+        kinds.update(d.get("value_kinds") or {})
+    results = []
+    for i, integ in enumerate(doc.get("integrations") or []):
+        req = dict(integ.get("request") or {})
+        if not req.get("variables"):
+            continue
+        if doc.get("study_area") and not req.get("study_area"):
+            req["study_area"] = doc["study_area"]
+        name = integ.get("name") or f"Integration {i + 1}"
+        try:
+            request = MultivariateIntegrationRequest(**req)
+            out = _integrate_with_urbanweave(request)
+        except HTTPException as e:
+            results.append({"name": name, "frames": {}, "caveats": [f"{name} could not be rerun: {e.detail}"]})
+            continue
+        except Exception as e:  # a malformed saved request
+            results.append({"name": name, "frames": {}, "caveats": [f"{name} could not be rerun: {e}"]})
+            continue
+        variables = [v.output_name or v.target_column for v in request.variables]
+        frames = {level: out[level] for level in ("grid", "zones") if level in out}
+        value_kinds = {}
+        for v in request.variables:
+            kind = kinds.get(v.target_column)
+            if kind:
+                value_kinds[v.output_name or v.target_column] = kind
+        desc = (f"{len(variables)} variable(s) ({', '.join(variables)}) on H3 resolution {request.resolution}"
+                + (f", aggregated to {catalog.stem_of(request.zones_path)}" if request.zones_path else "") + ".")
+        results.append({"name": name, "frames": frames, "value_kinds": value_kinds, "request": req,
+                        "reports": out.get("reports"), "changes": out.get("changes"), "description": desc,
+                        "summary_lines": _report_lines(out.get("reports"))})
+    return results
 
 
 @app.post("/api/collections/{cid}/export")

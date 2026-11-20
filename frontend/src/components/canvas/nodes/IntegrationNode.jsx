@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Network, Play, AlertCircle, MapPin, ChevronDown, ChevronUp, Settings, Sparkles, Loader2, X } from 'lucide-react';
 import { API_BASE } from '../../../config/api';
+import OperatorSelect, { ParamForm } from '../../methods/OperatorSelect';
+import ReportCard from '../../methods/ReportCard';
 
 const ALLOCATION_OPS = [
   "BinaryContainment",
@@ -218,6 +220,7 @@ const IntegrationNode = memo(({ id, data }) => {
             grid_aggregation_operator: v.aggregation,
             zoning_mapping_operator: v.zoningMapping,
             zoning_aggregation_operator: v.zoningAggregation,
+            ...(v.allocationParams && Object.keys(v.allocationParams).length ? { allocation_params: v.allocationParams } : {}),
             ...(timeWindow?.column ? {
               time_column: timeWindow.column,
               time_start: timeWindow.start || null,
@@ -293,7 +296,8 @@ const IntegrationNode = memo(({ id, data }) => {
       if (data.onLogActivity) {
         data.onLogActivity({
           status: 'success',
-          ...resultData.provenance
+          ...resultData.provenance,
+          reports: resultData.reports || null,
         });
       }
       
@@ -428,8 +432,14 @@ const IntegrationNode = memo(({ id, data }) => {
       (Array.isArray(recommendations) ? recommendations : []).forEach(rec => {
         const keyA = `${rec.dataset_name}::${rec.column_name}`;
         const keyB = `${rec.dataset_name}.geojson::${rec.column_name}`;
-        reasoningMap[keyA] = rec.reasoning || '';
-        reasoningMap[keyB] = rec.reasoning || '';
+        // Note any choice urbanweave's registry replaced, and why (redesign phase 3)
+        const check = rec.registry_check;
+        const note = check
+          ? ` [Checked against urbanweave's registry: replaced ${check.replaced.zoningMapping} + ${check.replaced.zoningAggregation}`
+            + ` because ${check.reasons.join(' ')}]`
+          : '';
+        reasoningMap[keyA] = (rec.reasoning || '') + note;
+        reasoningMap[keyB] = (rec.reasoning || '') + note;
       });
       
       // 3. Update React State so UI dropdowns match what just ran
@@ -656,58 +666,40 @@ const IntegrationNode = memo(({ id, data }) => {
                         <>
                           <label style={{...labelStyle, marginBottom: '4px', fontSize: '9px', color: '#047857'}}>
                             Boundary Math (Z_map)
-                            <select 
+                            <OperatorSelect
+                              kind="zoning_mapping"
                               value={config.zoningMapping || 'AreaWeightedZoning'}
-                              onChange={e => updateVariableConfig(dataset.id, { zoningMapping: e.target.value })}
-                              className="nodrag"
-                              style={{
-                                ...inputStyle,
-                                cursor: 'pointer',
-                                fontSize: '10px',
-                                height: '22px',
-                                borderColor: '#6ee7b7',
-                                opacity: isCopilotLoading ? 0.65 : 1,
-                                backgroundImage: isCopilotLoading ? 'linear-gradient(90deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%)' : undefined,
-                                backgroundSize: isCopilotLoading ? '200% 100%' : undefined,
-                                animation: isCopilotLoading ? 'copilotShimmer 1.2s linear infinite' : undefined
-                              }}
-                              title={copilotReasoning[`${dataset.filename}::${config.targetColumn}`] || ''}
+                              options={ZONING_MAPPING_OPS}
+                              onChange={next => updateVariableConfig(dataset.id, { zoningMapping: next })}
+                              zoneGeometry={data.connectedZoneMetadata?.geometricType || 'Polygon'}
                               disabled={isCopilotLoading}
-                            >
-                              {ZONING_MAPPING_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                            </select>
+                              accent={'#6ee7b7'}
+                              compact={false}
+                              title={copilotReasoning[`${dataset.filename}::${config.targetColumn}`] || ''}
+                            />
                           </label>
                           
                           <label style={{...labelStyle, marginBottom: '4px', fontSize: '9px', color: '#047857'}}>
                             Final Math (A₂)
-                            <select 
+                            <OperatorSelect
+                              kind="zoning_aggregation"
                               value={config.zoningAggregation || 'SumZoning'}
-                              onChange={e => {
+                              options={ZONING_AGGREGATION_OPS}
+                              onChange={next => {
                                 // Reverse-sync: auto-set grid aggregation based on zone aggregation
-                                const newZoneAgg = e.target.value;
+                                const newZoneAgg = next;
                                 const gridAgg = ZONE_TO_GRID_AGGREGATION[newZoneAgg] || 'SumAggregation';
                                 updateVariableConfig(dataset.id, { 
                                   zoningAggregation: newZoneAgg,
                                   aggregation: gridAgg  // Auto-sync grid aggregation
                                 });
                               }}
-                              className="nodrag"
-                              style={{
-                                ...inputStyle,
-                                cursor: 'pointer',
-                                fontSize: '10px',
-                                height: '22px',
-                                borderColor: '#6ee7b7',
-                                opacity: isCopilotLoading ? 0.65 : 1,
-                                backgroundImage: isCopilotLoading ? 'linear-gradient(90deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%)' : undefined,
-                                backgroundSize: isCopilotLoading ? '200% 100%' : undefined,
-                                animation: isCopilotLoading ? 'copilotShimmer 1.2s linear infinite' : undefined
-                              }}
-                              title={copilotReasoning[`${dataset.filename}::${config.targetColumn}`] || ''}
+                              
                               disabled={isCopilotLoading}
-                            >
-                              {ZONING_AGGREGATION_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                            </select>
+                              accent={'#6ee7b7'}
+                              compact={false}
+                              title={copilotReasoning[`${dataset.filename}::${config.targetColumn}`] || ''}
+                            />
                           </label>
 
                           {copilotReasoning[`${dataset.filename}::${config.targetColumn}`] && (
@@ -762,25 +754,32 @@ const IntegrationNode = memo(({ id, data }) => {
                               </div>
                               <label style={{...labelStyle, marginBottom: '4px', fontSize: '8px', color: '#64748b'}}>
                                 Grid Allocation
-                                <select 
-                                  value={config.allocation || 'ProportionalAreaWeighted'}
-                                  onChange={e => updateVariableConfig(dataset.id, { allocation: e.target.value })}
-                                  className="nodrag"
-                                  style={{...inputStyle, cursor: 'pointer', fontSize: '9px', height: '20px'}}
-                                >
-                                  {ALLOCATION_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                                </select>
+                                <OperatorSelect
+                              kind="allocation"
+                              value={config.allocation || 'ProportionalAreaWeighted'}
+                              options={ALLOCATION_OPS}
+                              onChange={next => updateVariableConfig(dataset.id, { allocation: next })}
+                              sourceGeometry={geoType}
+                              disabled={false}
+                              accent={'#cbd5e1'}
+                              compact={true}
+                            />
                               </label>
+                              <ParamForm allocation={config.allocation || 'ProportionalAreaWeighted'}
+                                values={config.allocationParams || {}}
+                                onChange={(allocationParams) => updateVariableConfig(dataset.id, { allocationParams })} />
                               <label style={{...labelStyle, marginBottom: '0', fontSize: '8px', color: '#64748b'}}>
                                 Grid Aggregation
-                                <select 
-                                  value={config.aggregation || 'SumAggregation'}
-                                  onChange={e => updateVariableConfig(dataset.id, { aggregation: e.target.value })}
-                                  className="nodrag"
-                                  style={{...inputStyle, cursor: 'pointer', fontSize: '9px', height: '20px'}}
-                                >
-                                  {AGGREGATION_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                                </select>
+                                <OperatorSelect
+                              kind="grid_aggregation"
+                              value={config.aggregation || 'SumAggregation'}
+                              options={AGGREGATION_OPS}
+                              onChange={next => updateVariableConfig(dataset.id, { aggregation: next })}
+                              
+                              disabled={false}
+                              accent={'#cbd5e1'}
+                              compact={true}
+                            />
                               </label>
                             </div>
                           )}
@@ -792,26 +791,33 @@ const IntegrationNode = memo(({ id, data }) => {
                         <>
                           <label style={{...labelStyle, marginBottom: '4px', fontSize: '9px'}}>
                             Allocation
-                            <select 
+                            <OperatorSelect
+                              kind="allocation"
                               value={config.allocation || 'ProportionalAreaWeighted'}
-                              onChange={e => updateVariableConfig(dataset.id, { allocation: e.target.value })}
-                              className="nodrag"
-                              style={{...inputStyle, cursor: 'pointer', fontSize: '10px', height: '22px'}}
-                            >
-                              {ALLOCATION_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                            </select>
+                              options={ALLOCATION_OPS}
+                              onChange={next => updateVariableConfig(dataset.id, { allocation: next })}
+                              sourceGeometry={geoType}
+                              disabled={false}
+                              accent={'#cbd5e1'}
+                              compact={false}
+                            />
                           </label>
+                          <ParamForm allocation={config.allocation || 'ProportionalAreaWeighted'}
+                            values={config.allocationParams || {}}
+                            onChange={(allocationParams) => updateVariableConfig(dataset.id, { allocationParams })} />
                           
                           <label style={{...labelStyle, marginBottom: '4px', fontSize: '9px'}}>
                             Aggregation
-                            <select 
+                            <OperatorSelect
+                              kind="grid_aggregation"
                               value={config.aggregation || 'SumAggregation'}
-                              onChange={e => updateVariableConfig(dataset.id, { aggregation: e.target.value })}
-                              className="nodrag"
-                              style={{...inputStyle, cursor: 'pointer', fontSize: '10px', height: '22px'}}
-                            >
-                              {AGGREGATION_OPS.map(op => <option key={op} value={op}>{op}</option>)}
-                            </select>
+                              options={AGGREGATION_OPS}
+                              onChange={next => updateVariableConfig(dataset.id, { aggregation: next })}
+                              
+                              disabled={false}
+                              accent={'#cbd5e1'}
+                              compact={false}
+                            />
                           </label>
                         </>
                       )}

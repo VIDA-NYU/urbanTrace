@@ -5,6 +5,7 @@ import H3PreviewMap from '../../visualization/H3PreviewMap';
 import { API_BASE } from '../../../config/api';
 import { cellToBoundary } from 'h3-js';
 import { exportResult } from '../../../lib/collections';
+import ReportCard from '../../methods/ReportCard';
 
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
@@ -633,6 +634,13 @@ const ResultMapNode = memo(({ id, data }) => {
               globalViewState={globalViewState}
               onGlobalViewStateChange={onGlobalViewStateChange}
             />
+          </div>
+        )}
+
+        {/* What each step did (urbanweave's reports), top-left over the map */}
+        {data?.spatialData?.reports && (
+          <div style={{ position: 'absolute', top: 8, left: 8, width: 240, maxHeight: '60%', overflowY: 'auto', zIndex: 5 }}>
+            <ReportCard reports={data.spatialData.reports} />
           </div>
         )}
 
