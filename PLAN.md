@@ -125,11 +125,11 @@ Decisions needed before starting (each adds an outside service or a heavy depend
 Work:
 
 - [ ] Attribute joins on identifiers (BBL, BIN, ZIP) — *needs no decision; can start now*
-- [ ] Direct source → zones steps
-- [ ] More matching methods: `within_distance`, `largest_overlap`, `representative_point`
-- [ ] More reductions: `median`, `shares`
+- [x] Direct source → zones steps — *Step nodes match a source onto zones directly (phase 4)*
+- [x] More matching methods: `within_distance`, `largest_overlap`, `representative_point` — *in the picker from urbanweave's registry*
+- [x] More reductions: `median`, `shares` — *`shares` writes one column per category (`share_a`, ...), now carried through plan results; `median` takes intensive values, as the registry says*
 - [ ] OSM streets and intersections as targets (`urbanweave[osm]`), per-road-km densities
-- [ ] Icons for `nearest_segment`, `nearest_node`, `within_distance`, `largest_overlap`, `representative_point`
+- [x] Icons for `nearest_segment`, `nearest_node`, `within_distance`, `largest_overlap`, `representative_point`
 - [ ] Rasters in the catalog and profiler; raster sources through `zonal_stats` (`urbanweave[raster]`)
 - [ ] Geocoding of addresses
 - [ ] Catalog growth on demand from NYC Open Data and Auctus
@@ -165,6 +165,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [ ] Uploads are profiled with datamart-profiler only (`upload_new_data.py`), so an uploaded dataset has no atlas-profiler profile: coverage falls back to the data, but value-kind suggestions are missing; profile uploads with atlas-profiler too
 - [ ] Add a LICENSE: the repository has none (urbanweave and atlas-clean are MIT); the README's acknowledgements section makes no license claim until one is chosen
 - [ ] Console warning: a `<button>` nested inside another `<button>` on the canvas (React reports it on every load)
+- [ ] The canvas lists a `shares` reduction as one output (`share`) in Combine & Calculate and the sweep, not its per-category columns
 
 ---
 

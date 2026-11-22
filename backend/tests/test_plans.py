@@ -197,3 +197,15 @@ def test_zones_overlapping_the_area_by_a_sliver_are_left_out():
         box(-73.9500001, 40.71, -73.93, 40.73),        # shares the edge, overlapping by a hair
         box(-73.90, 40.71, -73.88, 40.73)], crs=4326)  # elsewhere
     assert zones[scope.zones_in_area(zones, area)]["name"].tolist() == ["inside", "half"]
+
+
+def test_median_and_shares_reductions(client, catalog):
+    step = {"id": "red", "source": "pts", "match": {"method": "contain", "target": "zones"},
+            "aggregate": [{"method": "median", "column": "count", "as": "med"},
+                          {"method": "shares", "column": "name", "as": "share"}]}
+    plan = _plan(step)
+    plan["sources"]["pts"]["columns"] = {"count": {"kind": "intensive"}, "name": {"kind": "categorical"}}  # median takes intensive values
+    r = client.post("/api/plan/run", json={"plan": plan, "outputs": ["red"]})
+    assert r.status_code == 200, r.text
+    cols = r.json()["steps"]["red"]["columns"]
+    assert "med" in cols and any(c.startswith("share") for c in cols if c != "med"), cols

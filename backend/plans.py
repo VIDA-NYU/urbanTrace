@@ -351,10 +351,29 @@ def _plain_values(series: pd.Series) -> list:
     return [None if (v is None or (isinstance(v, float) and math.isnan(v))) else str(v) for v in series]
 
 
+def _step_columns(frame, kinds: dict) -> tuple[list[str], dict]:
+    """The output columns of a step's result and their value kinds. A ``shares`` reduction named
+    ``share`` writes one column per category (``share_a``, ``share_b``, ...), fractions, so intensive."""
+    shares = [a for a, k in kinds.items() if k == "shares"]
+    cols, out = [], {a: k for a, k in kinds.items() if k != "shares"}
+    for c in frame.columns:
+        if c in ("target_id", "geometry"):
+            continue
+        if c in out:
+            cols.append(c)
+        elif any(c.startswith(f"{a}_") for a in shares):
+            cols.append(c)
+            out[c] = "intensive"
+    return cols, out
+
+
 def _kinds_of(step: dict, declared: dict) -> dict:
     out = {}
     for r in step.get("aggregate") or []:
         alias = Reduction.from_dict(dict(r)).alias
+        if r.get("method") == "shares":
+            out[alias] = "shares"                       # expanded per category by _step_columns
+            continue
         kind = _OUTPUT_KIND.get(r.get("method"))
         if kind is None:
             kind = (declared.get(str(r.get("column"))) or {}).get("kind")
@@ -461,8 +480,7 @@ def run(data_dir, plan_spec: dict, study_area_spec, cache_root, *, outputs=None,
             raise PlanInputError(f"Unknown output step {sid!r}.")
         frame = result.outputs[sid]
         src = steps[sid].get("source")
-        kinds = _kinds_of(steps[sid], declared.get(src, {}) if isinstance(src, str) else {})
-        columns = [c for c in frame.columns if c not in ("target_id", "geometry") and c in kinds]
+        columns, kinds = _step_columns(frame, _kinds_of(steps[sid], declared.get(src, {}) if isinstance(src, str) else {}))
         tname, tinfo = target_of(sid)
         out["steps"][sid] = _columns_payload(frame, columns, kinds, tinfo, zones_frames.get(tname), labels.get(tname))
     for d in derived or []:
@@ -476,8 +494,7 @@ def run(data_dir, plan_spec: dict, study_area_spec, cache_root, *, outputs=None,
         for i in inputs:
             frame = result.outputs[i]
             src = steps[i].get("source")
-            k = _kinds_of(steps[i], declared.get(src, {}) if isinstance(src, str) else {})
-            cols = [c for c in frame.columns if c in k]
+            cols, k = _step_columns(frame, _kinds_of(steps[i], declared.get(src, {}) if isinstance(src, str) else {}))
             clash = set(cols) & set(kinds)
             if clash:
                 raise PlanInputError(f"derived {d.get('id')!r}: output names repeat across inputs: {', '.join(sorted(clash))}.")
