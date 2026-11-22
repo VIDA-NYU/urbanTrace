@@ -6,60 +6,13 @@ import zipfile
 import geopandas as gpd
 import pytest
 
-import main
 
 WEST = {"kind": "zones", "dataset": "test_zones", "column": "zone", "values": ["west"], "name": "West"}
 
 
 @pytest.fixture(autouse=True)
-def urbanweave_engine(monkeypatch, tmp_path):
+def collections_dir(monkeypatch, tmp_path):
     monkeypatch.setenv("URBANTRACE_COLLECTIONS_DIR", str(tmp_path / "collections"))
-
-
-def _points(**extra):
-    return {"dataset_path": "test_points.geojson", "target_column": "count", "output_name": "c",
-            "allocation_operator": "BinaryContainment", "grid_aggregation_operator": "SumAggregation", **extra}
-
-
-def _total(body):
-    return sum(cell["variables"]["c"] for cell in body["data"].values())
-
-
-def test_study_area_clips_sources(client, catalog):
-    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": WEST})
-    assert r.status_code == 200, r.text
-    body = r.json()
-    assert _total(body) == 10                                    # the three western points: 3 + 5 + 2
-    assert body["reports"]["c"]["study_area"] == {"features": 6, "kept": 3, "outside_study_area": 3}
-    assert body["study_area"]["name"] == "West"
-
-
-def test_bbox_study_area(client, catalog):
-    area = {"kind": "bbox", "bbox": [-73.98, 40.75, -73.96, 40.76]}
-    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": area})
-    assert r.status_code == 200, r.text
-    assert _total(r.json()) == 12                                # 7 + 1 + 4
-
-
-def test_bad_study_area_is_a_400(client, catalog):
-    area = {"kind": "zones", "dataset": "test_zones", "column": "zone", "values": ["north"]}
-    r = client.post("/api/integrate_multivariate", json={"variables": [_points()], "resolution": 9, "study_area": area})
-    assert r.status_code == 400 and "empty" in r.json()["detail"]
-
-
-def test_time_window_filters_rows(client, catalog):
-    window = {"time_column": "date", "time_start": "2020-01-01", "time_end": "2020-12-31"}
-    r = client.post("/api/integrate_multivariate", json={"variables": [_points(**window)], "resolution": 9})
-    assert r.status_code == 200, r.text
-    body = r.json()
-    assert _total(body) == 12                                    # 2020-06-15 (5) and 2020-02-02 (7)
-    assert body["reports"]["c"]["time_window"]["kept"] == 2
-
-
-def test_time_window_with_no_rows_is_a_400(client, catalog):
-    window = {"time_column": "date", "time_start": "2030-01-01"}
-    r = client.post("/api/integrate_multivariate", json={"variables": [_points(**window)], "resolution": 9})
-    assert r.status_code == 400 and "time window" in r.json()["detail"]
 
 
 def test_study_area_options_and_resolve(client, catalog):

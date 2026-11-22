@@ -78,45 +78,6 @@ Your answer is checked against urbanweave's registry afterwards; choices that do
 replaced. Return ONLY a JSON array with one object: {"method": ..., "reductions": [...], "reasoning": ...}.
 """
 
-ZONING_OPERATOR_RECOMMENDATION_FIELDS = (
-    "dataset_name",
-    "column_name",
-    "classification",
-    "zoningMapping",
-    "zoningAggregation",
-    "reasoning",
-)
-
-ZONING_OPERATOR_RECOMMENDATION_PROMPT = """
-You are an expert Spatial Data Scientist and GIS Architect. Your task is to select the
-optimal Zoning Mapping and Zoning Aggregation operators from the provided lists.
-
-Step 1: Analyze the Context & Metadata
-Review dataset_name and column_metadata.name together. If the column name is generic
-(e.g., value, count, total, metric), you MUST rely on dataset_name to determine the meaning.
-Then review num_distinct_values, distribution (mean, coverage), and sample_data.
-
-Step 2: Classify the Data Type
-- Extensive (Count/Total): high num_distinct_values, larger means, values scale with area
-- Intensive (Rate/Density): decimals/floats, keywords like rate/avg/median/density
-- Categorical/Ordinal (Index): low num_distinct_values (often 1-10), integer classes, index-like labels
-
-Step 3: Geospatial Reasoning & Operator Selection
-You are provided target_geometry and valid arrays: available_mapping_operators and available_aggregation_operators.
-- If target is Point/MultiPoint, area-weighted mapping is invalid. Choose point-safe mapping.
-- Extensive -> aggregation should preserve totals (typically Sum)
-- Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
-- Categorical/Ordinal -> use discrete grouping (typically Majority)
-operator_descriptions gives, for each operator, the urbanweave method or reduction it runs, what it
-does, and which value kinds it suits (from urbanweave's registry); prefer operators whose value kinds
-match your classification. available_mapping_operators already excludes mappings that do not fit the
-target geometry. Your choice is checked against the registry afterwards.
-
-Return ONLY a valid JSON array with one object per source variable, each containing:
-dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
-Never invent operators not present in provided arrays.
-""".strip()
-
 HOTSPOT_SYNTHESIS_FIELDS = (
     "dataset_name",
     "column_name",

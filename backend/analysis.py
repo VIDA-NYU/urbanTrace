@@ -32,7 +32,7 @@ import urbanweave as uw
 import catalog
 import plans
 import scope
-from weave_engine import _repair
+from geometry import repair as _repair
 
 _EXTENSIVE = {"count", "weighted_count", "sum"}
 

@@ -91,8 +91,8 @@ pulling new backend code, restart the backend: it does not reload by itself.
   | **Report** | The printable page. |
   | **Export** | The zip. |
 
-- **Right sidebar: the toolbox** (nodes to drag onto the canvas: *Plan (urbanweave)*, *Analysis*,
-  *Classic integration*) and the **provenance panel**, which logs each run with what it did.
+- **Right sidebar: the toolbox** (nodes to drag onto the canvas: *Plan (urbanweave)* and
+  *Analysis*) and the **provenance panel**, which logs each run with what it did.
 
 Unsaved changes are kept in the browser and restored after a reload, and the browser asks before
 leaving with unsaved changes. The last saved collection reopens on its own.
@@ -164,6 +164,9 @@ belongs to) and one or more **aggregations** (what to compute per neighborhood).
    connection that doesn't fit is refused, with the reason in the collection bar.
 3. **Matching**: open the picker and hover the options; each has a figure and a short explanation.
    Methods that don't fit points into polygons are greyed out with the reason. Keep `contain`.
+   Or click **Suggest**: the copilot proposes a method and reductions for this step and the
+   collection's goal, explains why, and urbanweave's registry checks the answer (without an LLM
+   configured, rules make the suggestion).
 4. **Aggregate**: click **+ add**. A row appears with `count`. Rename its output to `libraries`, and
    keep **0 if none** ticked so neighborhoods with no library show 0 rather than missing.
 5. Click **Run step**.

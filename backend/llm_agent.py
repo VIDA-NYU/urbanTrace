@@ -30,8 +30,6 @@ from tool import (
     HOTSPOT_SYNTHESIS_PROMPT,
     STEP_SUGGESTION_FIELDS,
     STEP_SUGGESTION_PROMPT,
-    ZONING_OPERATOR_RECOMMENDATION_FIELDS,
-    ZONING_OPERATOR_RECOMMENDATION_PROMPT,
     build_suggestions_from_tool_calls,
     build_tool_responses_from_tool_calls,
     get_dashboard_snapshot_json,
@@ -507,19 +505,6 @@ class UrbanTraceCopilot:
             results.append(normalized)
 
         return results or None
-
-    def recommend_zoning_operators(
-        self,
-        recommendation_payload: dict[str, Any],
-        retries: int = 2,
-    ) -> list[dict[str, Any]] | None:
-        return self._run_structured_json_list_task(
-            task_label="Structured zoning recommendation",
-            system_prompt=ZONING_OPERATOR_RECOMMENDATION_PROMPT,
-            response_fields=ZONING_OPERATOR_RECOMMENDATION_FIELDS,
-            task_payload=recommendation_payload,
-            retries=retries,
-        )
 
     def suggest_step(self, step_payload: dict[str, Any], retries: int = 2) -> dict[str, Any] | None:
         """A matching method, reductions and a rationale for one plan step, or None."""

@@ -1,15 +1,12 @@
 """Collections, origins and export (redesign phase 1), on the synthetic catalog."""
 import io
 import json
-import sys
 import zipfile
-from pathlib import Path
 
 import geopandas as gpd
 import pytest
 
 import catalog as cat
-import main
 
 
 @pytest.fixture()
@@ -96,20 +93,6 @@ def test_result_export_carries_provenance(client, catalog):
     z = _unzip(r)
     assert "provenance.json" in z.namelist() and "data/results/zone-result.gpkg" in z.namelist()
     assert json.loads(z.read("provenance.json"))["request"]["resolution"] == 8
-
-
-def test_geoparquet_copy_is_preferred(client, catalog, monkeypatch):
-    sys.path.insert(0, str(Path(main.__file__).resolve().parents[1] / "tools"))
-    from convert_to_geoparquet import convert
-    convert(catalog / "geojson" / "test_points.geojson", catalog / "geoparquet" / "test_points.parquet")
-    assert cat.dataset_path(catalog, "test_points").suffix == ".parquet"
-    assert list(cat.load(catalog, "test_points", ["count"]).columns) == ["count", "geometry"]
-    body = {"variables": [{"dataset_path": "test_points.geojson", "target_column": "count", "output_name": "c",
-                           "allocation_operator": "BinaryContainment", "grid_aggregation_operator": "SumAggregation"}],
-            "resolution": 9}
-    r = client.post("/api/integrate_multivariate", json=body)
-    assert r.status_code == 200, r.text
-    assert sum(c["variables"]["c"] for c in r.json()["data"].values()) == 22
 
 
 def test_unknown_origin_is_explicit(catalog):

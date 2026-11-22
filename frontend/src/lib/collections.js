@@ -79,7 +79,7 @@ const TRANSIENT_KEYS = new Set([
   'hoveredCompareFeatureId', 'hoveredCompareFeatureType',
   'context', 'lastRun', 'valueKindSuggestions', // plan node state, recomputed on load
 ]);
-// Outputs are not saved as nodes; they are recomputed from the saved integrations.
+// Outputs are not saved as nodes; they are recomputed by running the plan.
 const OUTPUT_NODE_TYPES = new Set(['resultMapNode', 'compareMapNode']);
 
 function serializableData(data = {}) {
@@ -153,25 +153,3 @@ export function collectionDatasets(nodes, edges = []) {
   return [...byId.values()];
 }
 
-// The integrations of the collection: one per result on the canvas, with its request and rationale.
-export function collectionIntegrations(nodes, edges) {
-  return nodes
-    // Classic integrations only; plan results are described by the collection's plan.
-    .filter((n) => n.type === 'resultMapNode' && n.data?.spatialData?.request?.variables)
-    .map((n) => {
-      const sd = n.data.spatialData;
-      const sourceEdge = edges.find((e) => e.target === n.id);
-      const rationale = {};
-      for (const v of sd.provenance?.variables || []) {
-        if (v?.rationale) rationale[`${v.dataset}::${v.targetColumn}`] = v.rationale;
-      }
-      return {
-        id: n.id,
-        node_id: sourceEdge?.source || null,
-        name: n.data?.name || 'Integration',
-        request: sd.request,
-        rationale,
-        created_at: sd.provenance?.timestamp || null,
-      };
-    });
-}

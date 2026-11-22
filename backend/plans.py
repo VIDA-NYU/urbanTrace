@@ -20,7 +20,7 @@ Results come back in columns: target IDs and one array per output column, with v
 also come with their geometry for the map. Derived variables (a Calculate node) are evaluated on
 the joined outputs of steps that share a target.
 
-Unlike the compatibility path (weave_engine.py), plans use urbanweave's own conventions: density
+Plans use urbanweave's own conventions: density
 per km², means weighted by overlap, missing stays missing.
 """
 from __future__ import annotations
@@ -43,7 +43,7 @@ from urbanweave.reducers import Reduction
 
 import catalog
 import scope
-from weave_engine import _repair
+from geometry import repair as _repair
 
 _WGS84 = "EPSG:4326"
 _OUTPUT_KIND = {"count": "extensive", "weighted_count": "extensive", "sum": None, "density": "intensive",

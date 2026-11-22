@@ -44,13 +44,12 @@ function Card({ resolved, figures, problem, name }) {
       <div style={{ lineHeight: 1.4 }}>{resolved.spec.summary}</div>
       {assignment && <div style={{ marginTop: 6, color: '#475569' }}><b>{humanize(assignment)}.</b> {ASSIGNMENT_TEXT[assignment] || ''}</div>}
       {resolved.spec.value_kinds && <div style={{ marginTop: 6 }}>Suits {resolved.spec.value_kinds.join(', ')} values.</div>}
-      {resolved.info?.note && <div style={{ marginTop: 6, color: '#64748b' }}>Compared with UrbanTrace's original operator: {resolved.info.note}.</div>}
       {problem && <div style={{ marginTop: 6, color: '#b45309' }}>{problem}.</div>}
     </div>
   );
 }
 
-export default function OperatorSelect({ kind, value, onChange, options, sourceGeometry, zoneGeometry, targetKind, targetGeometry, method, valueKind, column, disabled, title, accent = '#cbd5e1', compact }) {
+export default function OperatorSelect({ kind, value, onChange, options, sourceGeometry, targetKind, targetGeometry, method, valueKind, column, disabled, title, accent = '#cbd5e1', compact }) {
   const { payload, figures } = useRegistry();
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(null);
@@ -73,7 +72,7 @@ export default function OperatorSelect({ kind, value, onChange, options, sourceG
     return () => { document.removeEventListener('mousedown', close); window.removeEventListener('wheel', onScroll); };
   }, [open]);
 
-  const ctx = { sourceGeometry, zoneGeometry, targetKind, targetGeometry, method, valueKind, column };
+  const ctx = { sourceGeometry, targetKind, targetGeometry, method, valueKind, column };
   // The registry's own list when it has loaded; the passed list is only a fallback.
   const registryKeys = kind === 'matching' ? Object.keys(payload?.registry?.matching || {})
     : kind === 'reduction' ? Object.keys(payload?.registry?.aggregation || {}).filter((k) => payload.registry.aggregation[k].serializable !== false)
@@ -135,12 +134,10 @@ export default function OperatorSelect({ kind, value, onChange, options, sourceG
 }
 
 // The parameters of a matching method, from the registry (types, units, defaults, choices).
-export function ParamForm({ allocation, method, values = {}, onChange }) {
+export function ParamForm({ method, values = {}, onChange }) {
   const { payload } = useRegistry();
-  const resolved = method ? resolveOperator(payload, 'matching', method) : resolveOperator(payload, 'allocation', allocation);
-  const params = resolved?.spec?.params || {};
-  const fixed = resolved?.info?.fixed_params || {};
-  const entries = Object.entries(params).filter(([name]) => !(name in fixed) || name === 'bandwidth');
+  const resolved = method ? resolveOperator(payload, 'matching', method) : null;
+  const entries = Object.entries(resolved?.spec?.params || {});
   if (!entries.length) return null;
   const input = { width: '100%', boxSizing: 'border-box', fontSize: 9, height: 20, border: '1px solid #cbd5e1', borderRadius: 4, padding: '0 4px' };
   return (

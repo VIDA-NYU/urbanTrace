@@ -97,7 +97,7 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Results in columns; the `count` sum is gone for plan results
 - [x] Derived variables evaluated by UrbanTrace after the plan runs (AST whitelist), since urbanweave plans have no calculation step
 - [x] Exports add `plan.json`, `manifest.json`, `collection.json` and rerun instructions
-- [ ] Port the copilot's operator suggestions to Step nodes, then retire the classic Integration node — *kept as "Spatial Integration (classic)" until then*
+- [x] Port the copilot's operator suggestions to Step nodes, then retire the classic Integration node — *done in the release work (item 3)*
 
 ## Phase 5 — Analysis
 
@@ -182,7 +182,7 @@ by the user; in order:
    - [x] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`): `integration_engine.py`, `h3_engine.py`, `operators/`, `grids/` and two commented-out endpoints are gone
    - [x] Show each dataset's share inside the study area on its card, and sort by it (`/api/catalog/in-area`; "In study area" keeps datasets with data there, most first)
 2. - [x] Autark does the projection (`sourceCrs: 'EPSG:4326'`), hover and tooltips (`setTooltip`, `MapEvent.HOVER`) and framing (`fitBounds`); `autarkMap.js` lost its hit-testing, pointer correction and screen↔Mercator helpers (−137 lines). It needed a fix in Autark for canvases under a CSS transform: `fix/pointer-css-scale` in `~/src/autark` (local, with a test)
-3. - [ ] The copilot's method suggestions on Step nodes; then retire the classic Integration node
+3. - [x] The copilot's method suggestions on Step nodes (`/api/copilot/suggest-step`, `backend/suggest.py`: LLM offered only registry-valid choices, answer re-checked, rules as fallback; rationale kept on the node and in the export); the classic Integration node is retired with `/api/integrate_multivariate`, the zoning recommendation and `weave_engine.py` (geometry repair moved to `geometry.py`). Old collections open without their classic nodes and say so. The paper's operator-selection benchmark notebook calls the removed endpoint: it runs against `vis2026-camera-ready` until its scoring rule is redone (after the release)
 4. - [ ] atlas-clean in UrbanTrace: run its spatial checks when a dataset loads, apply accepted fixes as recipes, record them in provenance and the export. Needs atlas-clean's `feat/spatial` released with it
 5. - [ ] Dasymetric working: the user publishes an urbanweave prerelease with `uw.dasymetric`; pin it
 6. - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds

@@ -23,9 +23,8 @@ export function getFigures() {
 
 export const humanize = (name = '') => name.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
-// The registry entry behind a legacy operator name: {key, spec, info}
+// The registry entry for a method (kind 'matching') or a reduction (kind 'reduction'): {key, spec}
 export function resolveOperator(payload, kind, name) {
-  // Plan steps use urbanweave's own names: kind 'matching' (a method) or 'reduction'.
   if (kind === 'matching') {
     const spec = payload?.registry?.matching?.[name];
     return spec ? { key: name, spec, info: null, isMatching: true } : null;
@@ -34,18 +33,13 @@ export function resolveOperator(payload, kind, name) {
     const spec = payload?.registry?.aggregation?.[name];
     return spec ? { key: name, spec, info: null, isMatching: false } : null;
   }
-  const info = payload?.legacy?.[kind]?.[name];
-  if (!info) return null;
-  const isMatching = kind === 'allocation' || kind === 'zoning_mapping';
-  const key = isMatching ? info.method : info.reduction;
-  const spec = isMatching ? payload.registry?.matching?.[key] : payload.registry?.aggregation?.[key];
-  return { key, spec, info, isMatching };
+  return null;
 }
 
 const familyOf = (geometry = '') => geometry.replace(/^Multi/, '');
 
 // Why an operator does not fit (empty string when it does), from the registry.
-export function operatorProblem(payload, kind, name, { sourceGeometry, zoneGeometry, targetKind, targetGeometry, method, valueKind, column } = {}) {
+export function operatorProblem(payload, kind, name, { sourceGeometry, targetKind, targetGeometry, method, valueKind, column } = {}) {
   if (kind === 'matching') {
     const spec = payload?.registry?.matching?.[name];
     if (!spec) return '';
@@ -64,21 +58,6 @@ export function operatorProblem(payload, kind, name, { sourceGeometry, zoneGeome
     if (method && lacking.length) return `Needs ${lacking.join(', ')}, which ${method} does not provide`;
     if (spec.needs_column && column === '') return 'Needs a column';
     return '';
-  }
-  if (!payload?.legacy) return '';
-  if (kind === 'allocation') {
-    const allowed = sourceGeometry && payload.geometry_constraints?.[sourceGeometry];
-    return allowed && !allowed.includes(name) ? `Does not accept ${sourceGeometry} sources` : '';
-  }
-  if (kind === 'zoning_mapping') {
-    const resolved = resolveOperator(payload, kind, name);
-    if (!resolved?.spec) return '';
-    const zone = zoneGeometry || 'Polygon';
-    let spec = resolved.spec;
-    if (name === 'CentroidZoning' && familyOf(zone) === 'Point') spec = payload.registry.matching.sample;
-    const targets = (spec.targets || []).map(familyOf);
-    if (!targets.includes(familyOf(zone))) return `Does not map cells onto ${zone} zones`;
-    if (!(spec.source_supports || []).includes('h3')) return 'Does not take H3 cells as sources';
   }
   return '';
 }

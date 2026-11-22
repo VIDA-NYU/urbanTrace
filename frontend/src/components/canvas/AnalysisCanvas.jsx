@@ -8,7 +8,6 @@ import { Link, Unlink } from 'lucide-react';
 
 // 1. Import components
 import DatasetNode from './nodes/DatasetNode'; 
-import IntegrationNode from './nodes/IntegrationNode'; // <--- NEW Import
 import DatasetDetailsModal from '../catalog/DatasetDetailsModal'; 
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
 import CompareMapNode from './nodes/CompareMapNode';
@@ -17,7 +16,7 @@ import { API_BASE } from '../../config/api';
 import CollectionBar from '../collection/CollectionBar';
 import {
   getCollection, createCollection, updateCollection, exportCollection,
-  serializeCanvas, collectionDatasets, collectionIntegrations, downloadBlob,
+  serializeCanvas, collectionDatasets, downloadBlob,
 } from '../../lib/collections';
 import { checkCollection, resolveStudyArea } from '../../lib/scope';
 import { GridNode, StepNode, CalculateNode } from './nodes/PlanNodes';
@@ -113,7 +112,7 @@ const writeLastCollectionId = (id) => {
 const NODE_NAMES = { stepNode: 'a Step', calculateNode: 'a Combine & Calculate', datasetNode: 'a dataset', gridNode: 'an H3 Grid' };
 
 const EMPTY_COLLECTION = {
-  id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
+  id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [],
 };
 
 const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focusedLogTs, onTraceLineage, onActiveLogTimestampsChange, onStudyAreaResolved }) => {
@@ -331,7 +330,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   // 2. Register the custom node types
   const nodeTypes = useMemo(() => ({
     datasetNode: DatasetNode,
-    integrationNode: IntegrationNode, // <--- NEW Registration
     resultMapNode: ResultMapNode,
     compareMapNode: CompareMapNode,
     gridNode: GridNode,
@@ -362,34 +360,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         .filter(node => node.id !== nodeId)
         .map(node => {
           if (!deletedNode || !node?.data) return node;
-
-          // Keep IntegrationNode in sync when a dataset node is deleted.
-          if (node.type === 'integrationNode' && deletedNode.type === 'datasetNode') {
-            const nextConnectedDatasets = Array.isArray(node.data.connectedDatasets)
-              ? node.data.connectedDatasets.filter(dataset => dataset.nodeId !== nodeId)
-              : [];
-
-            const nextData = {
-              ...node.data,
-              connectedDatasets: nextConnectedDatasets
-            };
-
-            const deletedFilename = deletedNode.data?.filename;
-            if (nextConnectedDatasets.length === 0) {
-              nextData.connectedDatasetFilename = null;
-              nextData.connectedDatasetMetadata = null;
-            }
-
-            if (deletedFilename && node.data.connectedZoneFilename === deletedFilename) {
-              nextData.connectedZoneFilename = null;
-              nextData.connectedZoneMetadata = null;
-            }
-
-            return {
-              ...node,
-              data: nextData
-            };
-          }
 
           // Keep CompareMapNode in sync when a result map node is deleted.
           if (node.type === 'compareMapNode' && deletedNode.type === 'resultMapNode') {
@@ -526,65 +496,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }
   }, [setEdges, setNodes]);
 
-  // 3. The Handler for when the Integration API finishes
   // A new result opens to the right of what produced it, often past the edge of the canvas: bring
   // both into view (after React Flow has measured the new node).
   const revealNodes = useCallback((ids) => {
     setTimeout(() => fitView({ nodes: ids.map((id) => ({ id })), padding: 0.15, duration: 400, maxZoom: 1 }), 50);
   }, [fitView]);
 
-  const handleIntegrationComplete = useCallback((sourceNodeId, integrationData) => {
-    // 1. Generate unique IDs OUTSIDE the state setters. 
-    // Using randomUUID prevents identical millisecond collisions.
-    const uniqueId = typeof crypto !== 'undefined' && crypto.randomUUID 
-      ? crypto.randomUUID().slice(0, 8) 
-      : Date.now(); 
-      
-    const resultNodeId = `result_${uniqueId}`;
-    const newEdgeId = `e-${sourceNodeId}-${resultNodeId}`;
-
-    // 2. Safely update nodes
-    setNodes((nds) => {
-      const sourceNode = nds.find(n => n.id === sourceNodeId);
-      if (!sourceNode) return nds;
-
-      const resultNode = {
-        id: resultNodeId,
-        type: 'resultMapNode', 
-        position: { x: sourceNode.position.x + 350, y: sourceNode.position.y },
-        data: {
-          name: 'H3 Integration Result',
-          isResult: true, 
-          spatialData: integrationData,
-          // GLOBAL VIEWPORT SYNC: Pass sync props to ResultMapNode
-          isMapSyncEnabled,
-          globalViewState,
-          onGlobalViewStateChange: setGlobalViewState,
-          onDeleteNode: handleDeleteNode
-        }
-      };
-
-      return [...nds, resultNode];
-    });
-
-    // 3. Safely update edges as a completely separate operation
-    setEdges((eds) => {
-      // Bulletproof check: If this edge ID already exists, don't add it again
-      if (eds.some(e => e.id === newEdgeId)) return eds;
-
-      return [
-        ...eds,
-        { 
-          id: newEdgeId, 
-          source: sourceNodeId, 
-          target: resultNodeId, 
-          animated: true, 
-          style: { stroke: '#3b82f6', strokeWidth: 2 } 
-        }
-      ];
-    });
-    revealNodes([sourceNodeId, resultNodeId]);
-  }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState, handleDeleteNode, revealNodes]); // Ensure setNodes is in the dependency array
 
   // GLOBAL VIEWPORT SYNC: Update existing ResultMapNodes and DatasetNodes when sync state changes
   useEffect(() => {
@@ -771,79 +688,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       return;
     }
 
-    // Early return if not a valid connection to IntegrationNode
-    if (targetNode?.type !== 'integrationNode' || !sourceNode?.data?.filename) {
-      return;
-    }
-
-    const handleId = params.targetHandle;
-
-    // SINGLE ZONE RESTRICTION: Check BEFORE calling setNodes
-    if (handleId === 'zones' && targetNode.data.connectedZoneFilename) {
-      alert('Only one zoning dataset can be connected at a time. Please disconnect the current zone dataset first.');
-      return; // Exit early - don't call setNodes or setEdges
-    }
-
-    // Now handle the valid connection
-    if (handleId === 'zones') {
-      // Zone connection - add edge and update node data
-      setEdges((eds) => addEdge(params, eds));
-      setNodes((nds) => nds.map(node => {
-        if (node.id === params.target) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              connectedZoneFilename: sourceNode.data.filename,
-              connectedZoneMetadata: sourceNode.data.metadata
-            }
-          };
-        }
-        return node;
-      }));
-    } else {
-      // Source dataset connection - MULTIVARIATE SUPPORT
-      const existingDatasets = targetNode.data.connectedDatasets || [];
-      
-      // Check if this dataset is already connected
-      const alreadyConnected = existingDatasets.some(d => d.nodeId === sourceNode.id);
-      if (alreadyConnected) {
-        return; // Don't add duplicate
-      }
-
-      // Add the edge
-      setEdges((eds) => addEdge(params, eds));
-      
-      // CONTEXTUAL STATE INHERITANCE:
-      // Pass upstream node's selected column to pre-populate Variable Card
-      const inheritedColumn = sourceNode.data.selectedColumn || sourceNode.data.colorBy || '';
-      
-      const newDataset = {
-        id: `var_${Date.now()}`,
-        nodeId: sourceNode.id,
-        filename: sourceNode.data.filename,
-        metadata: sourceNode.data.metadata,
-        inheritedColumn: inheritedColumn,
-        timeWindow: sourceNode.data.timeWindow || null
-      };
-      
-      setNodes((nds) => nds.map(node => {
-        if (node.id === params.target) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              // Keep legacy single-dataset fields for backward compatibility
-              connectedDatasetFilename: sourceNode.data.filename,
-              connectedDatasetMetadata: sourceNode.data.metadata,
-              // NEW: Array of all connected datasets for multivariate
-              connectedDatasets: [...existingDatasets, newDataset]
-            }
-          };
-        }
-        return node;
-      }));
-    }
+    // Nothing else connects: say so rather than ignoring the drag.
+    if (targetNode) refuse(`${NODE_NAMES[sourceNode?.type] || 'This node'} cannot be connected there.`);
   }, [setNodes, setEdges, getNodes, getEdges]);
 
   const handleShowInfo = useCallback((nodeData) => {
@@ -853,11 +699,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const handleDatasetColumnChange = useCallback((nodeId, nextColumn) => {
     if (!nodeId) return;
     const selectedColumn = typeof nextColumn === 'string' ? nextColumn : '';
-    const downstreamNodeIds = new Set(
-      getEdges()
-        .filter((edge) => edge.source === nodeId)
-        .map((edge) => edge.target)
-    );
 
     setNodes((nds) =>
       nds.map((node) => {
@@ -875,54 +716,16 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           };
         }
 
-        if (
-          !downstreamNodeIds.has(node.id)
-          || node.type !== 'integrationNode'
-          || !Array.isArray(node.data?.connectedDatasets)
-        ) {
-          return node;
-        }
-
-        let changed = false;
-        const updatedDatasets = node.data.connectedDatasets.map((dataset) => {
-          if (dataset.nodeId !== nodeId || dataset.inheritedColumn === selectedColumn) {
-            return dataset;
-          }
-          changed = true;
-          return { ...dataset, inheritedColumn: selectedColumn };
-        });
-
-        if (!changed) {
-          return node;
-        }
-
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            connectedDatasets: updatedDatasets,
-          },
-        };
+        return node;
       })
     );
-  }, [getEdges]);
+  }, []);
 
-  // TIME WINDOW (redesign section 4.1): set on a dataset node, carried to the integrations it feeds
+  // TIME WINDOW (redesign section 4.1): set on a dataset node; plans apply it to the source
   const handleDatasetTimeWindowChange = useCallback((nodeId, timeWindow) => {
     setNodes((nds) => nds.map((node) => {
       if (node.id === nodeId && node.type === 'datasetNode') {
         return { ...node, data: { ...node.data, timeWindow: timeWindow || null } };
-      }
-      if (node.type === 'integrationNode' && Array.isArray(node.data?.connectedDatasets)
-          && node.data.connectedDatasets.some((d) => d.nodeId === nodeId)) {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            connectedDatasets: node.data.connectedDatasets.map((d) => (
-              d.nodeId === nodeId ? { ...d, timeWindow: timeWindow || null } : d)),
-          },
-        };
       }
       return node;
     }));
@@ -1098,12 +901,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
   const attachCallbacks = useCallback((type, data) => {
     const next = { ...data };
-    if (type === 'integrationNode') {
-      next.studyArea = collection.study_area || null;
-      next.onIntegrationComplete = handleIntegrationComplete;
-      next.onLogActivity = onLogActivity;
-      next.onDeleteNode = handleDeleteNode;
-    } else if (type === 'compareMapNode') {
+    if (type === 'compareMapNode') {
       next.onCompareHover = handleCompareHover;
       next.connectedResults = next.connectedResults || [];
       next.isMapSyncEnabled = isMapSyncEnabled;
@@ -1138,7 +936,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     }
     return next;
   }, [collection.study_area, globalViewState, handleCompareHover, handleDatasetColumnChange, handleDatasetTimeWindowChange,
-      handleDeleteNode, handleIntegrationComplete, handleShowInfo, isMapSyncEnabled, onLogActivity, handlePlanNodeChange,
+      handleDeleteNode, handleShowInfo, isMapSyncEnabled, onLogActivity, handlePlanNodeChange,
       handleValueKindChange]);
 
   // ---------------------------------------------------------------------------------------------
@@ -1156,15 +954,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     })(),
     derived: buildDerived(nodes, edges).filter((d) => d.inputs.length),
     analyses: collectionAnalyses(nodes, edges),
-    // Integrations saved earlier stay while their integration node is on the canvas; results on
-    // the canvas add or replace them.
-    integrations: (() => {
-      const current = collectionIntegrations(nodes, edges);
-      const nodeIds = new Set(nodes.map((n) => n.id));
-      const currentIds = new Set(current.map((i) => i.id));
-      const kept = (collection.integrations || []).filter((i) => !currentIds.has(i.id) && nodeIds.has(i.node_id));
-      return [...kept, ...current];
-    })(),
     canvas: serializeCanvas(nodes, edges),
   }), [collection, nodes, edges]);
   const collectionJson = useMemo(() => JSON.stringify(collectionDoc), [collectionDoc]);
@@ -1209,48 +998,28 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const datasets = await fetchAvailableDatasets();
       const savedNodes = doc.canvas?.nodes || [];
       const savedEdges = doc.canvas?.edges || [];
-      const byNodeId = new Map(savedNodes.map((n) => [n.id, n]));
-      const restored = savedNodes.map((n) => {
+      // The classic Integration node was retired; its nodes are left out, with their edges.
+      const RETIRED = new Set(['integrationNode', 'operationNode']);
+      const retired = new Set(savedNodes.filter((n) => RETIRED.has(n.type)).map((n) => n.id));
+      const restored = savedNodes.filter((n) => !retired.has(n.id)).map((n) => {
         let data = { ...n.data };
         if (n.type === 'datasetNode') {
           const dataset = findDatasetById(data.id || data.filename, datasets);
           data = { ...(dataset || {}), ...data, metadata: dataset?.metadata || null };
         }
-        if (n.type === 'integrationNode') {
-          // Re-link the inputs from the edges, with fresh dataset metadata.
-          const connectedDatasets = [];
-          data.connectedZoneFilename = null;
-          data.connectedZoneMetadata = null;
-          for (const e of savedEdges.filter((edge) => edge.target === n.id)) {
-            const src = byNodeId.get(e.source);
-            const dataset = src ? findDatasetById(src.data?.id || src.data?.filename, datasets) : null;
-            if (!src || !dataset) continue;
-            if (e.targetHandle === 'zones') {
-              data.connectedZoneFilename = dataset.filename;
-              data.connectedZoneMetadata = dataset.metadata;
-            } else {
-              connectedDatasets.push({
-                id: `var_${e.source}`, nodeId: e.source, filename: dataset.filename, metadata: dataset.metadata,
-                inheritedColumn: src.data?.selectedColumn || '', timeWindow: src.data?.timeWindow || null,
-              });
-            }
-          }
-          data.connectedDatasets = connectedDatasets;
-          data.connectedDatasetFilename = connectedDatasets[0]?.filename || null;
-          data.connectedDatasetMetadata = connectedDatasets[0]?.metadata || null;
-        }
         return { id: n.id, type: n.type, position: n.position, data: attachCallbacks(n.type, data) };
       });
       setNodes(restored);
-      setEdges(savedEdges);
+      setEdges(savedEdges.filter((e) => !retired.has(e.source) && !retired.has(e.target)));
       const loaded = {
         id: doc.id, name: doc.name, goal: doc.goal || '', notes: doc.notes || '',
-        study_area: doc.study_area || null, analyses: doc.analyses || [], integrations: doc.integrations || [],
+        study_area: doc.study_area || null, analyses: doc.analyses || [],
       };
       setCollection(loaded);
       // The snapshot is taken from the restored canvas on the next render (see effect below); a
       // draft keeps the snapshot of the version it was saved from, so it shows as unsaved.
       setSavedSnapshot(draftOf !== null ? draftOf : '__pending__');
+      return { retired: retired.size };
   }, [attachCallbacks, fetchAvailableDatasets, findDatasetById]);
 
   const openCollection = useCallback(async (id) => {
@@ -1258,8 +1027,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setCollectionStatus('Opening…');
     try {
       const doc = await getCollection(id);
-      await restoreDoc(doc);
-      setCollectionStatus(doc.integrations?.length ? 'Opened: run integrations to see results' : '');
+      const { retired } = await restoreDoc(doc);
+      setCollectionStatus(retired ? `Opened; ${retired} classic Integration node(s) were left out: rebuild them as Steps` : '');
     } catch (error) {
       setCollectionStatus(`Open failed: ${error.message}`);
     }
@@ -1313,18 +1082,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     if (savedSnapshot === '__pending__') setSavedSnapshot(collectionJson);
   }, [savedSnapshot, collectionJson]);
 
-  // STUDY AREA (redesign phase 2): integrations use it; the sidebar filters search by its extent.
+  // STUDY AREA (redesign phase 2): plans use it; the sidebar filters search by it.
   useEffect(() => {
     const area = collection.study_area || null;
-    setNodes((nds) => {
-      let changed = false;
-      const next = nds.map((node) => {
-        if (node.type !== 'integrationNode' || node.data?.studyArea === area) return node;
-        changed = true;
-        return { ...node, data: { ...node.data, studyArea: area } };
-      });
-      return changed ? next : nds;
-    });
     if (!onStudyAreaResolved) return;
     if (!area) { onStudyAreaResolved(null); return; }
     let alive = true;

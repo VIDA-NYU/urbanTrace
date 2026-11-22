@@ -10,7 +10,6 @@ const OperationsSidebar = () => {
     // Every tool has its own node type; an unknown one is not dragged.
     
     const NODE_TYPES = {
-      integrate: 'integrationNode', // the classic integration node (copilot operator recommendation)
       compare: 'compareMapNode',
       grid: 'gridNode',             // plan nodes (redesign phase 4)
       step: 'stepNode',
