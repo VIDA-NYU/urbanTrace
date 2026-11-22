@@ -43,6 +43,7 @@ from urbanweave.reducers import Reduction
 
 import catalog
 import scope
+from shapely.geometry import box
 from geometry import repair as _repair
 
 _WGS84 = "EPSG:4326"
@@ -122,6 +123,10 @@ def _bind_source(data_dir, name: str, spec: dict, area, columns_needed: set[str]
         report["repaired_geometries"] = repaired
     if area is not None:
         gdf, report["study_area"] = scope.clip_to_area(gdf, area)
+    else:
+        gdf, outside = _within_region(data_dir, gdf)
+        if outside:
+            report["outside_region"] = outside
     keep = ["source_id", *sorted(c for c in columns_needed if c in gdf.columns), gdf.geometry.name]
     gdf = gdf[list(dict.fromkeys(keep))].reset_index(drop=True)
     if len(gdf) == 0:
@@ -160,6 +165,25 @@ def label_column(gdf) -> str | None:
             continue
         return c
     return None
+
+
+def _within_region(data_dir, gdf):
+    """Without a study area, the catalog's region bounds a step: features entirely outside it (a
+    missing location coded as 0,0, a point geocoded to another state) are left out and reported,
+    so a few strays do not stretch the extent around the globe. When nothing is inside, the data is
+    left as it is: the coordinates are then probably in another CRS, and urbanweave says so."""
+    import cleaning
+    try:
+        region = cleaning.catalog_region(data_dir)
+    except Exception:
+        return gdf, None
+    inside = gdf.intersects(box(*region))
+    n_out = int((~inside).sum())
+    if n_out == 0 or not inside.any():
+        return gdf, None
+    sample = gdf.loc[~inside, "source_id"].astype(str).head(10).tolist() if "source_id" in gdf else []
+    return gdf[inside.to_numpy()], {"region": [round(v, 4) for v in region], "rows": int(len(gdf)),
+                                    "kept": int(inside.sum()), "outside": n_out, "sample": sample}
 
 
 def _zones_file(data_dir, name: str, spec: dict, area, cache: Path):

@@ -56,6 +56,7 @@ function summary(rep) {
   const tgt = match.targets || {};
   const parts = [];
   if (rep.study_area) parts.push(`${rep.study_area.kept} of ${rep.study_area.features} in study area`);
+  if (rep.outside_region) parts.push(`${rep.outside_region.outside} outside region`);
   parts.push(`${src.matched ?? 0}/${src.total ?? 0} matched`);
   if (tgt.total != null) parts.push(`${tgt.matched}/${tgt.total} targets`);
   return parts.join(' · ');
@@ -88,6 +89,8 @@ export default function ReportCard({ reports, defaultOpen = false, title = 'What
           <div style={{ fontWeight: 600, color: '#4338ca', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={name}>{name}</div>
           {rep?.time_window && <div>Time window on {rep.time_window.column}: {rep.time_window.kept} of {rep.time_window.rows} rows</div>}
           {rep?.study_area && <div>Study area: {rep.study_area.kept} of {rep.study_area.features} features inside</div>}
+          {rep?.outside_region && <div style={{ color: '#b45309' }}>{rep.outside_region.outside.toLocaleString()} of {rep.outside_region.rows.toLocaleString()} features lie outside the catalog's region and were left out</div>}
+          {rep?.cleaning?.fixes?.length > 0 && <div>Corrected on load: {rep.cleaning.fixes.map((f) => `${f.action} (${f.rows} rows)`).join(', ')}</div>}
           {rep?.repaired_geometries && <div style={{ color: '#b45309' }}>{rep.repaired_geometries.count} invalid geometries repaired</div>}
           <Step label={rep?.zoning ? 'To grid' : 'Matched'} report={rep?.allocation} />
           <Step label="To zones" report={rep?.zoning} />

@@ -101,3 +101,17 @@ def test_geoparquet_copy_is_preferred(client, catalog):
     r = _run(client, _plan())
     assert r.status_code == 200, r.text
     assert _total(r.json()) == 22
+
+
+def test_without_a_study_area_strays_outside_the_catalog_region_are_left_out(client, catalog):
+    # A missing location coded as 0,0: without the region it would stretch the extent around the globe
+    import json as _json
+    fc = _json.loads((catalog / "geojson" / "test_points.geojson").read_text())
+    fc["features"].append({"type": "Feature", "properties": {"count": 100, "name": "stray", "date": "2020-01-01"},
+                           "geometry": {"type": "Point", "coordinates": [0.0, 0.0]}})
+    (catalog / "geojson" / "test_strays.geojson").write_text(_json.dumps(fc))
+    r = _run(client, _plan("test_strays"))
+    assert r.status_code == 200, r.text
+    assert _total(r.json()) == 22                                   # the stray's 100 is not counted
+    out = r.json()["inputs"]["src"]["outside_region"]
+    assert out["outside"] == 1 and out["kept"] == 6

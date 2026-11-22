@@ -1309,7 +1309,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         durationMs: Math.round(performance.now() - started),
       });
       const reports = mode === 'step' ? { [key]: { allocation: out.reports?.[key], ...(srcInfo?.time_window ? { time_window: srcInfo.time_window } : {}),
-        ...(srcInfo?.study_area ? { study_area: srcInfo.study_area } : {}), ...(srcInfo?.repaired_geometries ? { repaired_geometries: srcInfo.repaired_geometries } : {}) } } : null;
+        ...(srcInfo?.study_area ? { study_area: srcInfo.study_area } : {}), ...(srcInfo?.repaired_geometries ? { repaired_geometries: srcInfo.repaired_geometries } : {}),
+        ...(srcInfo?.outside_region ? { outside_region: srcInfo.outside_region } : {}), ...(srcInfo?.cleaning ? { cleaning: srcInfo.cleaning } : {}) } } : null;
       setRun({ running: false, reports, durationMs: spatialData.provenance.durationMs });
       showPlanResult(nodeId, { ...spatialData, reports: reports || spatialData.reports }, mode === 'step' ? `Step ${key}` : `Derived: ${derived[0].as}`);
       onLogActivity?.({ status: 'success', ...spatialData.provenance, reports: reports || spatialData.reports });

@@ -67,9 +67,22 @@ def recipe_info(data_dir, stem: str) -> dict | None:
     return json.loads(meta.read_text()) if meta.exists() else {"fixes": [], "saved": None}
 
 
+_REGION_CACHE: dict = {}
+
+
 def catalog_region(data_dir) -> list[float]:
     """Where the catalog's data is: the median of the datasets' bounding boxes, side by side, so a
-    few misplaced datasets (swapped coordinates, the wrong CRS) do not stretch it."""
+    few misplaced datasets (swapped coordinates, the wrong CRS) do not stretch it. Cached until the
+    catalog's folders change."""
+    folders = [Path(data_dir) / d for d in ("geojson", "geoparquet", "metadata_v2")]
+    key = (str(Path(data_dir).resolve()), tuple(f.stat().st_mtime if f.exists() else 0 for f in folders))
+    if key not in _REGION_CACHE:
+        _REGION_CACHE.clear()
+        _REGION_CACHE[key] = _catalog_region(data_dir)
+    return list(_REGION_CACHE[key])
+
+
+def _catalog_region(data_dir) -> list[float]:
     import scope
     boxes = [r["bbox"] for r in scope.catalog_index(data_dir) if r.get("bbox")]
     sane = [b for b in boxes if -180 <= b[0] <= b[2] <= 180 and -90 <= b[1] <= b[3] <= 90]
