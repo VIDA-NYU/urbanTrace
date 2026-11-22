@@ -145,6 +145,8 @@ Found while using the tool (started 2026-11-22).
 - [x] Coverage map showed a blue box with the study area as a dot: shapely's counterclockwise rings read by d3-geo as the globe minus the polygon. Polygons are rewound for d3 (`frontend/src/lib/geo.js`), in the coverage map and the dataset preview
 - [x] Coverage map drawn with Autark (`CoverageMap.jsx`, `autk-map`) over the basemap, with pan, zoom and a hover listing the datasets in each cell, instead of a static d3 SVG
 - [ ] Remove the unused `maplibre-gl` and `d3-scale` dependencies
+- [x] No basemap on any Autark map: Autark now defaults the workspace CRS to EPSG:3395 and refused the EPSG:3857 tiles. Maps are created with `crs: 'EPSG:3857'` (`autarkMap.js`)
+- [ ] Let Autark project the data (`sourceCrs: 'EPSG:4326'`) instead of UrbanTrace's own Web Mercator code in `autarkMap.js`
 
 ---
 

@@ -373,7 +373,9 @@ export function useAutarkMap(canvasRef, { enabled = true, onCameraChange, onResi
       clearTimeout(entry.disposeTimer);
       entry.disposeTimer = null;
     } else {
-      const map = new AutkMap(canvas, false);
+      // The workspace CRS must be stated: Autark defaults to EPSG:3395 and then refuses the EPSG:3857
+      // basemap tiles. Collections reach the map already in Web Mercator (projectCollection).
+      const map = new AutkMap(canvas, false, { crs: 'EPSG:3857' });
       entry = {
         map,
         listener: null,
