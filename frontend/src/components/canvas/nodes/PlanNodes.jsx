@@ -3,7 +3,7 @@
 // validation problems) in data.context and handles changes and runs through callbacks.
 import React, { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Hexagon, Workflow, Calculator, Play, Loader2, X, Plus, Trash2, AlertCircle, Filter } from 'lucide-react';
+import { Hexagon, Workflow, Calculator, Play, Loader2, X, Plus, Trash2, AlertCircle, Filter, Sparkles } from 'lucide-react';
 import { getHexagonEdgeLengthAvg } from 'h3-js';
 import OperatorSelect, { ParamForm } from '../../methods/OperatorSelect';
 import ReportCard from '../../methods/ReportCard';
@@ -135,6 +135,22 @@ function ReductionRow({ r, ctx, method, onPatch, onRemove, onKind }) {
   );
 }
 
+// Why the copilot suggested this method and these reductions, and what urbanweave's registry changed.
+function SuggestionNote({ suggestion, onDismiss }) {
+  if (!suggestion || suggestion.loading) return null;
+  if (suggestion.error) return <div style={{ fontSize: 10, color: '#b91c1c' }}>{suggestion.error}</div>;
+  return (
+    <div className="nodrag nowheel" style={{ fontSize: 10, color: '#4c1d95', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 6, padding: '5px 7px', lineHeight: 1.4, maxHeight: 140, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, marginBottom: 2 }}>
+        <span>{suggestion.engine === 'llm' ? 'Copilot suggestion' : 'Suggested by rules (no LLM configured)'}</span>
+        <X size={11} style={{ cursor: 'pointer' }} onClick={onDismiss} />
+      </div>
+      <div>{suggestion.reasoning}</div>
+      {(suggestion.notes || []).map((n) => <div key={n} style={{ color: '#b45309', marginTop: 2 }}>Registry check: {n}</div>)}
+    </div>
+  );
+}
+
 export const StepNode = memo(({ id, data }) => {
   const ctx = data.context || {};
   const method = data.method || 'contain';
@@ -165,6 +181,14 @@ export const StepNode = memo(({ id, data }) => {
             {ctx.target ? ctx.target.label : 'connect zones or an H3 grid'}
           </span>
         </div>
+        <button className="nodrag" disabled={!ctx.source || ctx.source.isStep || !ctx.target || data.suggestion?.loading}
+          onClick={() => data.onSuggest?.(id)}
+          title={ctx.source?.isStep ? 'Suggestions need a dataset as source' : "Suggest a method and reductions for this step and the collection's goal"}
+          style={{ ...iconBtn, justifySelf: 'start', color: '#7c3aed', border: '1px solid #ddd6fe', background: '#f5f3ff', padding: '3px 8px', borderRadius: 6, fontSize: 10, gap: 4,
+            opacity: !ctx.source || ctx.source.isStep || !ctx.target ? 0.5 : 1 }}>
+          {data.suggestion?.loading ? <Loader2 size={11} className="spin" /> : <Sparkles size={11} />} Suggest
+        </button>
+        <SuggestionNote suggestion={data.suggestion} onDismiss={() => set({ suggestion: null })} />
         <label style={small}>
           Matching
           <OperatorSelect kind="matching" value={method} onChange={(m) => set({ method: m, params: {} })}

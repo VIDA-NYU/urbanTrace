@@ -28,6 +28,8 @@ from catalog_format import (
 from tool import (
     HOTSPOT_SYNTHESIS_FIELDS,
     HOTSPOT_SYNTHESIS_PROMPT,
+    STEP_SUGGESTION_FIELDS,
+    STEP_SUGGESTION_PROMPT,
     ZONING_OPERATOR_RECOMMENDATION_FIELDS,
     ZONING_OPERATOR_RECOMMENDATION_PROMPT,
     build_suggestions_from_tool_calls,
@@ -518,6 +520,17 @@ class UrbanTraceCopilot:
             task_payload=recommendation_payload,
             retries=retries,
         )
+
+    def suggest_step(self, step_payload: dict[str, Any], retries: int = 2) -> dict[str, Any] | None:
+        """A matching method, reductions and a rationale for one plan step, or None."""
+        out = self._run_structured_json_list_task(
+            task_label="Structured step suggestion",
+            system_prompt=STEP_SUGGESTION_PROMPT,
+            response_fields=STEP_SUGGESTION_FIELDS,
+            task_payload=step_payload,
+            retries=retries,
+        )
+        return out[0] if out else None
 
     def synthesize_hotspot_semantics(
         self,

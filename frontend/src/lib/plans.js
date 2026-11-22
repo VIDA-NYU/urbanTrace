@@ -15,6 +15,8 @@ async function post(path, body) {
 
 export const validatePlan = (plan, studyArea) => post('/api/plan/validate', { plan, study_area: studyArea || null });
 export const runPlan = (body) => post('/api/plan/run', body);
+// The copilot's method and reductions for a step (backend/suggest.py)
+export const suggestStep = (body) => post('/api/copilot/suggest-step', body);
 export const replayRun = (manifestPath) => post('/api/plan/replay', { manifest_path: manifestPath });
 
 const kindCache = new Map();

@@ -39,6 +39,7 @@ import export as exporter
 import scope
 import plans
 import analysis
+import suggest
 from fastapi.responses import HTMLResponse
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
@@ -751,6 +752,28 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
     }
 
 
+class StepSuggestionRequest(BaseModel):
+    source: Dict[str, Any]
+    target: Dict[str, Any]
+    goal: Optional[str] = None
+    columns: Optional[List[str]] = None
+
+
+@app.post("/api/copilot/suggest-step")
+async def suggest_step(body: StepSuggestionRequest):
+    """A matching method and reductions for a plan step, with a rationale, checked against urbanweave's
+    registry (suggest.py). Uses the LLM when one is configured, else rules."""
+    try:
+        agent = get_copilot_agent()
+        ask = agent.suggest_step
+    except Exception:
+        ask = None
+    try:
+        return await asyncio.to_thread(suggest.suggest, DATA_DIR, body.source, body.target, body.goal, body.columns, ask)
+    except suggest.SuggestError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app.post("/api/v1/copilot/recommend-operators")
 async def recommend_operators(request: CopilotRecommendRequest):
     """
@@ -1001,6 +1024,18 @@ def _plan_cache() -> str:
     return os.getenv("URBANTRACE_PLAN_CACHE") or os.path.join(DATA_DIR, "plan_cache")
 
 
+def _step_rationales(doc: Dict[str, Any]) -> Dict[str, str]:
+    """The copilot's rationale kept on each Step node of the canvas, by step id."""
+    out = {}
+    for n in ((doc.get("canvas") or {}).get("nodes") or []):
+        data = n.get("data") or {}
+        reasoning = (data.get("suggestion") or {}).get("reasoning")
+        if n.get("type") == "stepNode" and reasoning:
+            sid = re.sub(r"[^A-Za-z0-9_]+", "_", data.get("stepId") or n.get("id") or "").strip("_")[:40]
+            out[sid] = reasoning
+    return out
+
+
 def _export_plan(doc: Dict[str, Any], options: "ExportOptions"):
     """Run the collection's plan with a manifest; return its results, plan.json/manifest.json, and
     README lines on rerunning it in a notebook."""
@@ -1051,11 +1086,13 @@ def _export_plan(doc: Dict[str, Any], options: "ExportOptions"):
         cols = list(payload["columns"])
         # Named after what it holds: a derived variable's name, a step's single output, else the step id.
         rname = derived.get("as") or (cols[0] if len(cols) == 1 else sid)
+        rationale = _step_rationales(doc).get(sid)
         results.append({"name": rname, "frames": {"output": frame}, "value_kinds": payload.get("kinds"),
                         "request": {"plan_step": sid, **({"derived": payload["derived"]} if payload.get("derived") else {})},
                         "reports": reports, "description": f"Output of plan step `{sid}`" +
                         (f": {payload['derived']['expression']}" if payload.get("derived", {}).get("expression") else "") + ".",
-                        "summary_lines": _plan_report_lines(sid, out["reports"].get(sid))})
+                        "summary_lines": _plan_report_lines(sid, out["reports"].get(sid))
+                        + ([f"Why this method: {rationale}"] if rationale else [])})
     bindings = ", ".join(f'"{n}": gpd.read_parquet("data/sources/{catalog.stem_of((d.get("urbantrace") or {}).get("dataset"))}.parquet")'
                          for n, d in (spec.get("sources") or {}).items())
     readme = ["## Rerunning the plan", "",

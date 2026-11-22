@@ -25,7 +25,7 @@ import { SweepNode, ValidateNode, DasymetricNode } from './nodes/AnalysisNodes';
 import { runSweep, runValidation, runDasymetric, reportUrl, METHODS_FOR } from '../../lib/analysis';
 import {
   buildPlan, buildDerived, validatePlan, runPlan, replayRun, toSpatialData, inputsOf, stepIdOf, valueKindOf,
-  getValueKindSuggestions,
+  getValueKindSuggestions, suggestStep as suggestStepApi,
 } from '../../lib/plans';
 
 // Value kind of a step's output column, from the reduction that made it (as urbanweave assigns it)
@@ -1093,6 +1093,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       ? { ...n, data: { ...n.data, valueKinds: { ...(n.data?.valueKinds || {}), [column]: kind } } } : n)));
   }, []);
   const runPlanNodeRef = React.useRef(null);
+  const suggestStepRef = React.useRef(null);
   const runAnalysisNodeRef = React.useRef(null);
 
   const attachCallbacks = useCallback((type, data) => {
@@ -1119,6 +1120,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         : (nodeId) => runPlanNodeRef.current?.(nodeId, 'step');
       next.onValueKindChange = handleValueKindChange;
       next.onDeleteNode = handleDeleteNode;
+      if (type === 'stepNode') next.onSuggest = (nodeId) => suggestStepRef.current?.(nodeId);
       if (type === 'stepNode' && !next.stepId) {
         next.method = next.method || 'contain';
         next.reductions = next.reductions || [{ method: 'count', column: '', as: 'count', fillEmpty: true }];
@@ -1381,8 +1383,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     });
     const describeTarget = (t) => {
       if (!t) return null;
-      if (t.type === 'gridNode') return { kind: 'h3', label: `H3 grid, resolution ${t.data?.resolution || 9}`, geometry: 'Polygon' };
-      return { kind: 'zones', label: t.data?.metadata?.name || t.data?.name || t.data?.id, geometry: t.data?.metadata?.geometricType || 'Polygon' };
+      if (t.type === 'gridNode') return { kind: 'h3', label: `H3 grid, resolution ${t.data?.resolution || 9}`, geometry: 'Polygon', resolution: Number(t.data?.resolution || 9) };
+      return { kind: 'zones', label: t.data?.metadata?.name || t.data?.name || t.data?.id, geometry: t.data?.metadata?.geometricType || 'Polygon',
+        dataset: normalizeDatasetId(t.data?.id || t.data?.filename) };
     };
     const contexts = {};
     for (const n of nodes) {
@@ -1394,6 +1397,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           src = {
             label: source.data?.metadata?.name || source.data?.name || source.data?.id, geometry: source.data?.metadata?.geometricType,
             columns: cols.map((name) => ({ name, kind: valueKindOf(source.data, name) })), datasetNodeId: source.id,
+            dataset: normalizeDatasetId(source.data?.id || source.data?.filename),
           };
         } else if (source?.type === 'stepNode') {
           const upTarget = describeTarget(inputsOf(source.id, nodes, edges).target);
@@ -1485,6 +1489,32 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setEdges((eds) => [...eds, { id: `e-${nodeId}-${resultNodeId}`, source: nodeId, target: resultNodeId, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }]);
     revealNodes([nodeId, resultNodeId]);
   }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled, revealNodes]);
+
+  // The copilot's suggestion for a step: method and reductions in urbanweave's vocabulary, checked
+  // against its registry, with a rationale kept on the node (and so in the collection and export).
+  const suggestStep = useCallback(async (nodeId) => {
+    const node = getNodes().find((n) => n.id === nodeId);
+    const ctx = node?.data?.context || {};
+    if (!ctx.source?.dataset || !ctx.target) {
+      handlePlanNodeChange(nodeId, { suggestion: { error: 'Connect a dataset as source and a target first.' } });
+      return;
+    }
+    handlePlanNodeChange(nodeId, { suggestion: { loading: true } });
+    try {
+      const focus = (node.data.reductions || []).map((r) => r.column).filter(Boolean);
+      const target = ctx.target.kind === 'h3' ? { kind: 'h3', resolution: ctx.target.resolution } : { kind: 'zones', dataset: ctx.target.dataset };
+      const out = await suggestStepApi({ source: { dataset: ctx.source.dataset }, target, goal: collection.goal || null, columns: focus });
+      out.reductions.forEach((r) => { if (r.column) handleValueKindChange(ctx.source.datasetNodeId, r.column, r.kind); });
+      handlePlanNodeChange(nodeId, {
+        method: out.method, params: out.params || {},
+        reductions: out.reductions.map((r) => ({ method: r.method, column: r.column || '', as: r.as, asEdited: true, fillEmpty: r.kind === 'extensive' })),
+        suggestion: { reasoning: out.reasoning, notes: out.notes || [], engine: out.engine, at: new Date().toISOString() },
+      });
+    } catch (error) {
+      handlePlanNodeChange(nodeId, { suggestion: { error: error.message } });
+    }
+  }, [collection.goal, getNodes, handlePlanNodeChange, handleValueKindChange]);
+  useEffect(() => { suggestStepRef.current = suggestStep; }, [suggestStep]);
 
   const runPlanNode = useCallback(async (nodeId, mode) => {
     const all = getNodes();

@@ -52,6 +52,32 @@ SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES = {
     "add_dataset_node",
 }
 
+STEP_SUGGESTION_FIELDS = ("method", "reductions", "reasoning")
+
+STEP_SUGGESTION_PROMPT = """
+You are an expert spatial data scientist. An analyst is building one integration step: a source
+dataset is matched onto target units (zones, or an H3 grid) and aggregated per unit. Suggest how.
+
+You get: the analyst's goal; the source (name, description, geometry, row count, and columns with a
+suggested value kind and statistics); the target; available_methods (matching methods that fit these
+geometries, each with a summary and how it assigns sources); and available_reductions (each with a
+summary, the value kinds it suits, and whether it needs a column).
+
+Choose:
+1. method: one name from available_methods.
+2. reductions: one to three, each {"method": <name from available_reductions>, "column": <a source
+   column, or null when the reduction needs no column>, "as": <a short snake_case output name that
+   says what it measures, e.g. "libraries" for a count of libraries>, "kind": <"extensive",
+   "intensive" or "categorical", the column's value kind>}. Prefer what the goal needs: often a
+   count, or a sum of an extensive column, or a mean of an intensive one; a categorical column takes
+   "majority" or "shares". Match each reduction to its column's value kind.
+3. reasoning: two or three plain sentences an analyst can check: why this method for these
+   geometries, and why these reductions for the goal.
+
+Your answer is checked against urbanweave's registry afterwards; choices that do not fit are
+replaced. Return ONLY a JSON array with one object: {"method": ..., "reductions": [...], "reasoning": ...}.
+"""
+
 ZONING_OPERATOR_RECOMMENDATION_FIELDS = (
     "dataset_name",
     "column_name",
