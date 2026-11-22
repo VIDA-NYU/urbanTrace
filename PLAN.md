@@ -147,6 +147,10 @@ Found while using the tool (started 2026-11-22).
 - [ ] Remove the unused `maplibre-gl` and `d3-scale` dependencies
 - [x] No basemap on any Autark map: Autark now defaults the workspace CRS to EPSG:3395 and refused the EPSG:3857 tiles. Maps are created with `crs: 'EPSG:3857'` (`autarkMap.js`)
 - [ ] Let Autark project the data (`sourceCrs: 'EPSG:4326'`) instead of UrbanTrace's own Web Mercator code in `autarkMap.js`
+- [x] No numbers visible after running a step: the report card started collapsed, the result map had no totals, and the new map opened behind the right sidebar. The closed card now shows "68 of 253 in study area · 68/68 matched · 44/69 targets"; the map shows the column's total, range and units with 0; new result maps are brought into view
+- [x] Zone names on hover ("Park Slope", not "Zone 0"): the label column is chosen as a unique name-like text column (never Socrata's `:id`), else a whole-number code; the old check missed pandas 3's string type
+- [x] Zones touching the study area by rounding were kept (Brooklyn had 77 NTAs instead of 69): a zone now needs 1% of its area inside (`scope.zones_in_area`), everywhere zones are filtered
+- [ ] Classic Integration results may open off-screen too (only plan results are brought into view)
 
 ---
 

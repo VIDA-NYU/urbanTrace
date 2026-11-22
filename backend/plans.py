@@ -127,6 +127,39 @@ def _bind_source(data_dir, name: str, spec: dict, area, columns_needed: set[str]
     return gdf, report
 
 
+def label_column(gdf) -> str | None:
+    """A column that names each zone for display (e.g. NTA's ``ntaname``): text, unique, preferring
+    a column called *name*; never a portal row id (Socrata's ``:id``) or a code-like column."""
+    from pandas.api.types import is_object_dtype, is_string_dtype
+    candidates = []
+    for c in gdf.columns:
+        if c in ("target_id", gdf.geometry.name) or str(c).startswith(":"):
+            continue
+        col = gdf[c]
+        if not (is_string_dtype(col) or is_object_dtype(col)) or col.nunique(dropna=True) != len(gdf):
+            continue
+        values = col.dropna().astype(str)
+        if values.str.fullmatch(r"[-+]?[0-9.eE]+").all():      # numbers stored as text (shape_area)
+            continue
+        name_like = "name" in str(c).lower()
+        has_space = values.str.contains(" ").mean()           # names have spaces more often than codes
+        candidates.append((not name_like, -has_space, -values.str.len().mean(), list(gdf.columns).index(c), c))
+    if candidates:
+        return min(candidates)[-1]
+    # No text name: a unique whole-number code (community district 301, ZIP 11211), not a row id.
+    from pandas.api.types import is_integer_dtype
+    for c in gdf.columns:
+        low = str(c).lower()
+        if c in ("target_id", gdf.geometry.name) or low.startswith((":", "objectid", "fid", "shape")):
+            continue
+        col = gdf[c]
+        as_int = col if is_integer_dtype(col) else pd.to_numeric(col, errors="coerce") if (is_string_dtype(col) or is_object_dtype(col)) else None
+        if as_int is None or as_int.isna().any() or (as_int % 1 != 0).any() or as_int.nunique() != len(gdf):
+            continue
+        return c
+    return None
+
+
 def _zones_file(data_dir, name: str, spec: dict, area, cache: Path):
     ut = spec.get("urbantrace") or {}
     stem = catalog.stem_of(ut.get("dataset"))
@@ -138,12 +171,10 @@ def _zones_file(data_dir, name: str, spec: dict, area, cache: Path):
     gdf["target_id"] = gdf.index.astype(str)
     gdf, repaired = _repair(gdf, "target_id")
     if area is not None:
-        gdf = gdf[gdf.intersects(area) & ~gdf.touches(area)]   # zones that only share an edge are out
+        gdf = gdf[scope.zones_in_area(gdf, area)]   # zones with (almost) nothing inside are out
         if len(gdf) == 0:
             raise PlanInputError(f"target {name!r}: no zones of {stem} touch the study area.")
-    # A label for display: the first text column with unique values (e.g. a neighborhood name).
-    label = next((c for c in gdf.columns if c not in ("target_id", gdf.geometry.name)
-                  and gdf[c].dtype == object and gdf[c].nunique() == len(gdf)), None)
+    label = label_column(gdf)
     keep = ["target_id", *( [label] if label else []), gdf.geometry.name]
     gdf = gdf[keep].reset_index(drop=True)
     digest = hashlib.sha256(gdf.to_json().encode()).hexdigest()[:16]

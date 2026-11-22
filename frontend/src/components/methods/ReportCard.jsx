@@ -19,6 +19,8 @@ function Step({ label, report }) {
   const match = report?.match;
   if (!match) return null;
   const src = match.sources || {};
+  const tgt = match.targets || {};
+  const empty = (report.aggregate || []).find((a) => a.empty_targets != null)?.empty_targets;
   const unmatched = Object.entries(src.unmatched || {});
   const excluded = Object.entries(src.excluded || {});
   const missing = (report.aggregate || []).flatMap((a) => {
@@ -35,12 +37,28 @@ function Step({ label, report }) {
       {unmatched.map(([cause, info]) => <div key={cause} style={{ color: '#b45309' }}>{info.count} unmatched: {causeText(cause)}</div>)}
       {excluded.map(([cause, info]) => <div key={cause} style={{ color: '#b45309' }}>{info.count} excluded: {causeText(cause)}</div>)}
       {missing.map((m) => <div key={m} style={{ color: '#b45309' }}>{m}</div>)}
+      {tgt.total != null && (
+        <div>{tgt.matched} of {tgt.total} targets received something{empty ? `; ${empty} received nothing` : ''}</div>
+      )}
       <div style={{ color: '#64748b' }}>
         {match.assignment ? `${match.assignment} assignment` : ''}
         {match.measurement?.crs_name ? ` · measured in ${match.measurement.crs_name}` : ''}
       </div>
     </div>
   );
+}
+
+// One line that is visible while the card is closed: what went in and what it reached.
+function summary(rep) {
+  const match = (rep?.allocation || rep?.zoning)?.match;
+  if (!match) return null;
+  const src = match.sources || {};
+  const tgt = match.targets || {};
+  const parts = [];
+  if (rep.study_area) parts.push(`${rep.study_area.kept} of ${rep.study_area.features} in study area`);
+  parts.push(`${src.matched ?? 0}/${src.total ?? 0} matched`);
+  if (tgt.total != null) parts.push(`${tgt.matched}/${tgt.total} targets`);
+  return parts.join(' · ');
 }
 
 function hasWarnings(rep) {
@@ -62,13 +80,16 @@ export default function ReportCard({ reports, defaultOpen = false, title = 'What
         {open ? <ChevronDown size={11} /> : <ChevronRight size={11} />} {title}
         {warn && <AlertTriangle size={11} color="#d97706" style={{ marginLeft: 'auto' }} />}
       </button>
+      {!open && Object.values(reports).map(summary).filter(Boolean).map((line, i) => (
+        <div key={i} style={{ color: '#475569', marginTop: 2 }}>{line}</div>
+      ))}
       {open && Object.entries(reports).map(([name, rep]) => (
         <div key={name} style={{ borderTop: '1px solid #f1f5f9', marginTop: 4, paddingTop: 4 }}>
           <div style={{ fontWeight: 600, color: '#4338ca', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={name}>{name}</div>
           {rep?.time_window && <div>Time window on {rep.time_window.column}: {rep.time_window.kept} of {rep.time_window.rows} rows</div>}
           {rep?.study_area && <div>Study area: {rep.study_area.kept} of {rep.study_area.features} features inside</div>}
           {rep?.repaired_geometries && <div style={{ color: '#b45309' }}>{rep.repaired_geometries.count} invalid geometries repaired</div>}
-          <Step label="To grid" report={rep?.allocation} />
+          <Step label={rep?.zoning ? 'To grid' : 'Matched'} report={rep?.allocation} />
           <Step label="To zones" report={rep?.zoning} />
         </div>
       ))}

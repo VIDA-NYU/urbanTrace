@@ -132,7 +132,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const [planProblems, setPlanProblems] = useState({});
   const [lastManifestPath, setLastManifestPath] = useState(null);
 
-  const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
+  const { screenToFlowPosition, getNodes, getEdges, fitView } = useReactFlow();
   
   // SIDEBAR RESIZE FIX: Trigger React Flow resize recalculation after sidebar transition
   useEffect(() => {
@@ -1390,7 +1390,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       }];
     });
     setEdges((eds) => [...eds, { id: `e-${nodeId}-${resultNodeId}`, source: nodeId, target: resultNodeId, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }]);
-  }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled]);
+    // The new map opens to the right of the step, often past the edge of the canvas: bring both into view.
+    setTimeout(() => fitView({ nodes: [{ id: nodeId }, { id: resultNodeId }], padding: 0.15, duration: 400, maxZoom: 1 }), 50);
+  }, [fitView, getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled]);
 
   const runPlanNode = useCallback(async (nodeId, mode) => {
     const all = getNodes();

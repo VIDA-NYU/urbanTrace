@@ -91,6 +91,33 @@ def study_area_summary(geom) -> dict | None:
     return {"bbox": list(geom.bounds), "area_km2": round(area_km2, 2), "geometry": mapping(geom)}
 
 
+# A zone belongs to the study area when this share of its area lies inside it. Testing only that it
+# intersects without touching keeps neighbours whose shared boundary differs by rounding: Brooklyn,
+# built from NTA zones, picked up 8 Queens and Manhattan zones overlapping it by about 0 m².
+ZONE_MIN_SHARE_INSIDE = 0.01
+
+
+def zones_in_area(gdf: gpd.GeoDataFrame, area, min_share: float = ZONE_MIN_SHARE_INSIDE) -> pd.Series:
+    """Boolean mask of the zones with at least *min_share* of their area inside *area* (EPSG:4326)."""
+    src = gdf.to_crs(_WGS84) if gdf.crs is not None and not gdf.crs.equals(_WGS84) else gdf
+    candidates = src.intersects(area) & ~src.touches(area)
+    mask = pd.Series(False, index=gdf.index)
+    if not candidates.any():
+        return mask
+    near = src[candidates]
+    try:
+        local = near.estimate_utm_crs()
+    except Exception:
+        local = "EPSG:3857"
+    zones_m = near.to_crs(local).geometry
+    area_m = gpd.GeoSeries([area], crs=_WGS84).to_crs(local).iloc[0]
+    zone_area = zones_m.area
+    share = zones_m.intersection(area_m).area / zone_area.where(zone_area > 0)
+    # Zones without area (lines, points used as targets) fall back to the intersection test.
+    mask.loc[near.index] = share.fillna(1.0).to_numpy() >= min_share
+    return mask
+
+
 def clip_to_area(gdf: gpd.GeoDataFrame, geom) -> tuple[gpd.GeoDataFrame, dict]:
     """Keep the features that intersect the study area, clipped to it; report how many were dropped."""
     if geom is None:

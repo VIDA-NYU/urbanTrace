@@ -170,3 +170,29 @@ def test_a_plan_built_by_the_canvas_runs(client, catalog):
     assert sum(v for v in out["steps"]["chained"]["columns"]["g"] if v) == pytest.approx(12)
     per_rate = out["steps"]["n_calc"]["columns"]["per_rate"]
     assert any(v is not None for v in per_rate)
+
+
+def test_label_column_prefers_a_name_over_row_ids_and_codes():
+    import geopandas as gpd
+    from shapely.geometry import box
+    import plans
+    gdf = gpd.GeoDataFrame({
+        ":id": ["row-a", "row-b"], "code": ["BK01", "BK02"], "shape_area": ["1.5", "2.5"],
+        "ntaname": ["Greenpoint", "Park Slope"]}, geometry=[box(0, 0, 1, 1), box(1, 0, 2, 1)], crs=4326)
+    assert plans.label_column(gdf) == "ntaname"
+    # Without text names, a unique whole-number code
+    coded = gpd.GeoDataFrame({"OBJECTID": [1, 2], "BoroCD": [301, 302]}, geometry=[box(0, 0, 1, 1), box(1, 0, 2, 1)], crs=4326)
+    assert plans.label_column(coded) == "BoroCD"
+
+
+def test_zones_overlapping_the_area_by_a_sliver_are_left_out():
+    import geopandas as gpd
+    from shapely.geometry import box
+    import scope
+    area = box(-74.0, 40.70, -73.95, 40.75)
+    zones = gpd.GeoDataFrame({"name": ["inside", "half", "sliver", "outside"]}, geometry=[
+        box(-73.99, 40.71, -73.97, 40.73),             # inside
+        box(-73.96, 40.71, -73.94, 40.73),             # half inside
+        box(-73.9500001, 40.71, -73.93, 40.73),        # shares the edge, overlapping by a hair
+        box(-73.90, 40.71, -73.88, 40.73)], crs=4326)  # elsewhere
+    assert zones[scope.zones_in_area(zones, area)]["name"].tolist() == ["inside", "half"]

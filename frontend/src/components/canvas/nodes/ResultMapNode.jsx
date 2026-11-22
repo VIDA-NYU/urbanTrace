@@ -7,6 +7,33 @@ import { cellToBoundary } from 'h3-js';
 import { exportResult } from '../../../lib/collections';
 import ReportCard from '../../methods/ReportCard';
 
+const fmtNumber = (v) => (Number.isInteger(v) ? v.toLocaleString() : v.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+
+// The shown column in numbers (plan results): its total when totals mean something (counts and
+// sums of extensive values), its range per unit, and how many units have nothing.
+function ValueSummary({ spatialData }) {
+  const column = spatialData?.primaryColumn;
+  const values = spatialData?.columns?.[column];
+  if (!column || !Array.isArray(values)) return null;
+  const nums = values.filter((v) => typeof v === 'number' && Number.isFinite(v));
+  if (!nums.length) return null;
+  const unit = spatialData.isZoned ? 'zones' : 'cells';
+  const reduction = spatialData.provenance?.variables?.find((v) => v.outputName === column)?.aggregation;
+  const additive = ['count', 'sum'].includes(reduction) || spatialData.kinds?.[column] === 'extensive';
+  const total = nums.reduce((a, b) => a + b, 0);
+  const zeros = nums.filter((v) => v === 0).length;
+  const missing = values.length - nums.length;
+  return (
+    <div className="nodrag" style={{ fontSize: 10, color: '#334155', background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 8px', lineHeight: 1.4 }}>
+      <div><b>{column}</b>{reduction ? ` (${reduction})` : ''}{additive ? <>: <b>{fmtNumber(total)}</b> in total</> : ''}</div>
+      <div style={{ color: '#475569' }}>
+        {fmtNumber(Math.min(...nums))}–{fmtNumber(Math.max(...nums))} per {unit.slice(0, -1)} · {values.length} {unit}
+        {zeros ? ` · ${zeros} with 0` : ''}{missing ? ` · ${missing} missing` : ''}
+      </div>
+    </div>
+  );
+}
+
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
   { name: 'Ocean',  emoji: '🌊', low: [186, 230, 253], high: [  7,  89, 133] },
@@ -648,10 +675,11 @@ const ResultMapNode = memo(({ id, data }) => {
           </div>
         )}
 
-        {/* What each step did (urbanweave's reports), top-left over the map */}
-        {data?.spatialData?.reports && (
-          <div style={{ position: 'absolute', top: 8, left: 8, width: 240, maxHeight: '60%', overflowY: 'auto', zIndex: 5 }}>
-            <ReportCard reports={data.spatialData.reports} />
+        {/* What each step did (urbanweave's reports) and the shown column's numbers, top-left over the map */}
+        {(data?.spatialData?.reports || data?.spatialData?.columns) && (
+          <div style={{ position: 'absolute', top: 8, left: 8, width: 240, maxHeight: '60%', overflowY: 'auto', zIndex: 5, display: 'grid', gap: 4 }}>
+            <ValueSummary spatialData={data.spatialData} />
+            {data.spatialData.reports && <ReportCard reports={data.spatialData.reports} />}
           </div>
         )}
 

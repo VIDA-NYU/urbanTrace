@@ -298,7 +298,7 @@ def dasymetric(data_dir, study_area_spec, cache_root, *, zones: dict, target: di
     zg["zone_id"] = zg.index.astype(str)
     zg, _ = _repair(zg, "zone_id")
     if area is not None:
-        zg = zg[zg.intersects(area) & ~zg.touches(area)]
+        zg = zg[scope.zones_in_area(zg, area)]
     for c in totals:
         zg[c] = pd.to_numeric(zg[c], errors="coerce")
     if target.get("kind") == "h3":
@@ -313,7 +313,7 @@ def dasymetric(data_dir, study_area_spec, cache_root, *, zones: dict, target: di
         tg["target_id"] = tg.index.astype(str)
         tg, _ = _repair(tg, "target_id")
         if area is not None:
-            tg = tg[tg.intersects(area) & ~tg.touches(area)]
+            tg = tg[scope.zones_in_area(tg, area)]
         tinfo = {"kind": "zones", "dataset": tstem}
         tid = "target_id"
     layers, weights = {}, {}

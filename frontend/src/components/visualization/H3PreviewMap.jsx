@@ -11,7 +11,9 @@ import { MapError } from './VectorPreviewMap';
 const HEX_LAYER = 'h3-hexagon-layer';
 const ZONE_LAYER = 'zone-layer';
 const VALUE_KEY = '__ut_value';
-const EXCLUDE_PROPS = ['zone_id', 'geometry', 'OBJECTID', 'Shape_Area', 'Shape_Leng', VALUE_KEY, '__display_column'];
+const EXCLUDE_PROPS = ['zone_id', 'label', 'geometry', 'OBJECTID', 'Shape_Area', 'Shape_Leng', VALUE_KEY, '__display_column'];
+// Counts read as counts: whole numbers without decimals, others with two.
+const fmt = (v) => (Number.isInteger(v) ? v.toLocaleString() : v.toFixed(2));
 const FIRE_PALETTE = { low: [253, 224, 71], high: [153, 27, 27] };
 
 const getZoneFeatureId = (feature) => {
@@ -68,7 +70,7 @@ const defaultTooltip = (object, layerId) => {
   if (layerId === HEX_LAYER) {
     const variablesHtml = object.variables && Object.keys(object.variables).length > 0
       ? Object.entries(object.variables)
-        .map(([name, val]) => `<div><strong>${name}:</strong> ${typeof val === 'number' ? val.toFixed(2) : val}</div>`)
+        .map(([name, val]) => `<div><strong>${name}:</strong> ${typeof val === 'number' ? fmt(val) : val}</div>`)
         .join('')
       : `<div><strong>Value:</strong> ${object.count}</div>`;
     return {
@@ -90,14 +92,14 @@ const defaultTooltip = (object, layerId) => {
   } else {
     const entries = Object.entries(props).filter(([key, val]) => !EXCLUDE_PROPS.includes(key) && typeof val === 'number' && !isNaN(val));
     variablesHtml = entries.length
-      ? entries.map(([name, val]) => `<div><strong>${name}:</strong> ${val.toFixed(2)}</div>`).join('')
+      ? entries.map(([name, val]) => `<div${name === props.__display_column ? ' style="font-weight:700"' : ''}><strong>${name}:</strong> ${fmt(val)}</div>`).join('')
       : '<div>No values</div>';
   }
   return {
     html: `
       <div style="font-family: sans-serif;">
         <div style="font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #475569; padding-bottom: 4px;">
-          Zone: ${props.zone_id || 'Unknown'}
+          ${props.label ?? `Zone ${props.zone_id ?? 'unknown'}`}
         </div>
         ${variablesHtml}
       </div>`,
