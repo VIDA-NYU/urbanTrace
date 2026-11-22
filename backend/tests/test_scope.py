@@ -74,8 +74,33 @@ def test_study_area_options_and_resolve(client, catalog):
 def test_catalog_index_has_time_and_bbox(client, catalog):
     rows = {d["id"]: d for d in client.get("/api/catalog/index").json()["datasets"]}
     assert rows["test_points"]["time"]["start"] == "2019-03-01"
-    assert rows["test_points"]["bbox"] == pytest.approx([-74.0, 40.75, -73.96, 40.76])
+    # The bbox comes from the density grid (the points' cells cover the western half only).
+    assert rows["test_points"]["bbox"] == pytest.approx([-74.0, 40.75, -73.98, 40.76])
     assert rows["test_zones"]["time"] is None
+
+
+def test_datasets_without_a_profile_grid_get_one_from_their_data(client, catalog):
+    import scope
+    # test_zones has no profile: its grid and bbox are computed from the polygons and cached.
+    rows = {d["id"]: d for d in client.get("/api/catalog/index").json()["datasets"]}
+    x1, y1, x2, y2 = rows["test_zones"]["bbox"]
+    assert x1 <= -74.0 and x2 >= -73.96 and y1 <= 40.75 and y2 >= 40.76
+    assert (catalog / ".extent_cache.json").exists()
+    cells, _, source = scope.dataset_cells(str(catalog), "test_zones")
+    assert source == "data" and cells and all(c[4] >= 1 for c in cells)
+    out = client.post("/api/coverage", json={"datasets": ["test_zones"],
+                                              "study_area": {"kind": "bbox", "bbox": [-74.0, 40.75, -73.96, 40.76]}}).json()
+    assert out["datasets"]["test_zones"]["grid_from"] == "data"
+    assert out["datasets"]["test_zones"]["share_of_area"] == 1.0
+
+
+def test_bbox_ignores_a_swapped_profile_envelope():
+    import scope
+    prof = {"spatial_coverage": [{"ranges": [{"range": {"type": "envelope", "coordinates": [[40.76, -74.0], [40.75, -73.96]]}}],
+                                  "grid": {"bounds": [-74.0, 40.75, -73.96, 40.76], "cell_degrees": [0.005, 0.005],
+                                           "cells": [[0, 0, 3], [7, 1, 2]]}}]}
+    _, bounds = scope.coverage_cells(prof)
+    assert bounds == pytest.approx([-74.0, 40.75, -73.96, 40.76])
 
 
 def test_coverage_shares_of_the_study_area(client, catalog):

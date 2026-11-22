@@ -25,4 +25,5 @@ benchmark/scripts/operator_selection/quantitative_ablation-operator_selection_ac
 # Local state written by the backend
 data/collections/
 data/.hash_cache.json
+data/.extent_cache.json
 data/plan_cache/

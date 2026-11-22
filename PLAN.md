@@ -137,6 +137,10 @@ Work:
 Found while using the tool (started 2026-11-22).
 
 - [x] Collection bar squeezed its labels ("A" for the goal, "No study area" on three lines, buttons past the edge): items no longer shrink, the bar sits right of Link Maps and wraps on narrow canvases
+- [x] "In study area" couldn't judge 35 polygon and line datasets (their profiles have no extent or grid), so it always showed them: a coverage grid is now computed once from the data and cached (`scope.dataset_cells`, `data/.extent_cache.json`); the coverage view uses it too
+- [x] Dataset bbox taken from the profile's density grid rather than its envelope
+- [ ] Three datasets have corrupt coordinates in the file itself: `2018_2019_school_locations` (latitude and longitude swapped, so it is excluded from every study area), `raised_crosswalk_locations` and `street_closures_due_to_construction_activities_by_intersection` (NY State Plane feet labelled EPSG:4326). Fix the files, or record a per-dataset correction applied on load
+- [ ] "In study area" barely narrows the list for a borough, because almost the whole catalog is citywide (83 of 86 datasets with a grid have data in Brooklyn). Show each dataset's share of rows inside the study area on its card and sort by it?
 
 ---
 

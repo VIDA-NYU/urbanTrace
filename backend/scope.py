@@ -6,7 +6,8 @@
   resolves it to one geometry in EPSG:4326. Integrations clip their sources to it and build the
   grid over it; exports clip to it.
 - **Coverage**: where each dataset has data, from the atlas-profiler density grid in its profile
-  (cells of about 300 m with counts), or its envelope when there is no grid.
+  (cells of about 300 m with counts); for datasets whose profile has none, a grid computed once from
+  the data and cached (:func:`dataset_cells`); the envelope only when the data cannot be read.
 - **Time**: each dataset's time range from its profile; :func:`checks` warns when the selected
   datasets' periods do not overlap or a dataset does not reach the study area.
 """
@@ -140,22 +141,92 @@ def padded_area(geom, pad_m: float):
 # --- coverage ------------------------------------------------------------------------------------
 
 def coverage_cells(prof: dict | None) -> tuple[list[tuple[float, float, float, float, int]], list[float] | None]:
-    """The profile's density-grid cells as (minx, miny, maxx, maxy, count), and the data's bbox."""
+    """The profile's density-grid cells as (minx, miny, maxx, maxy, count), and the data's bbox.
+
+    The bbox comes from the grid when there is one: some profiles store the envelope with latitude
+    and longitude swapped, while their grid is right."""
     if not prof:
         return [], None
-    cells, bounds = [], None
+    cells, envelope = [], None
     for cov in prof.get("spatial_coverage") or []:
         grid = cov.get("grid")
         env = _envelope(cov)
         if env:
-            bounds = env if bounds is None else [min(bounds[0], env[0]), min(bounds[1], env[1]),
-                                                 max(bounds[2], env[2]), max(bounds[3], env[3])]
+            envelope = env if envelope is None else [min(envelope[0], env[0]), min(envelope[1], env[1]),
+                                                     max(envelope[2], env[2]), max(envelope[3], env[3])]
         if grid and grid.get("cells"):
             x0, y0 = grid["bounds"][0], grid["bounds"][1]
             dx, dy = grid["cell_degrees"]
             for col, row, count in grid["cells"]:      # row 0 is the southern edge
                 cells.append((x0 + col * dx, y0 + row * dy, x0 + (col + 1) * dx, y0 + (row + 1) * dy, int(count)))
-    return cells, bounds
+    return cells, (_cells_bounds(cells) if cells else envelope)
+
+
+def _cells_bounds(cells) -> list[float]:
+    return [min(c[0] for c in cells), min(c[1] for c in cells), max(c[2] for c in cells), max(c[3] for c in cells)]
+
+
+# Datasets whose profile has no density grid (atlas-profiler gives none for most polygon and line
+# datasets) get one computed from the data: features per 0.005° cell. It is computed once per file
+# and cached by path, size and modification time in data/.extent_cache.json.
+_DATA_GRID_STEP = 0.005
+_MAX_DATA_GRID_CELLS = 250_000
+
+
+def dataset_cells(data_dir, stem: str) -> tuple[list[tuple[float, float, float, float, int]], list[float] | None, str | None]:
+    """Coverage cells and bbox of a catalog dataset, and where they came from ("profile" or "data")."""
+    cells, bounds = coverage_cells(catalog.profile(data_dir, stem))
+    if cells:
+        return cells, bounds, "profile"
+    try:
+        cells = _data_cells(data_dir, stem)
+    except Exception:                                    # unreadable data: fall back to the envelope
+        cells = None
+    if cells:
+        return cells, _cells_bounds(cells), "data"
+    return [], bounds, ("profile" if bounds else None)
+
+
+def _data_cells(data_dir, stem: str):
+    from pathlib import Path
+    import json
+    path = catalog.dataset_path(data_dir, stem)
+    if path is None:
+        return None
+    st = path.stat()
+    cache_path = Path(data_dir) / ".extent_cache.json"
+    key = str(path.resolve())
+    with catalog._hash_lock:
+        cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
+    hit = cache.get(key)
+    if hit and hit["size"] == st.st_size and hit["mtime"] == st.st_mtime:
+        return [tuple(c) for c in hit["cells"]]
+    gdf = catalog.load(data_dir, stem, columns=[])
+    if gdf.crs is not None and not gdf.crs.equals(_WGS84):
+        gdf = gdf.to_crs(_WGS84)
+    geoms = gdf.geometry.to_numpy()
+    geoms = geoms[~(shapely.is_missing(geoms) | shapely.is_empty(geoms))]
+    cells = []
+    if len(geoms):
+        geoms = np.where(shapely.is_valid(geoms), geoms, shapely.make_valid(geoms))
+        step = _DATA_GRID_STEP
+        x1, y1, x2, y2 = shapely.total_bounds(geoms)
+        i0, j0 = int(np.floor(x1 / step)), int(np.floor(y1 / step))
+        ni, nj = int(np.floor(x2 / step)) - i0 + 1, int(np.floor(y2 / step)) - j0 + 1
+        if ni * nj <= _MAX_DATA_GRID_CELLS:
+            ii, jj = np.meshgrid(np.arange(ni) + i0, np.arange(nj) + j0, indexing="ij")
+            ii, jj = ii.ravel(), jj.ravel()
+            boxes = shapely.box(ii * step, jj * step, (ii + 1) * step, (jj + 1) * step)
+            hits = shapely.STRtree(geoms).query(boxes, predicate="intersects")
+            counts = np.bincount(hits[0], minlength=len(boxes))
+            for k in np.nonzero(counts)[0]:
+                cells.append((round(float(ii[k] * step), 6), round(float(jj[k] * step), 6),
+                              round(float((ii[k] + 1) * step), 6), round(float((jj[k] + 1) * step), 6), int(counts[k])))
+    with catalog._hash_lock:
+        cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
+        cache[key] = {"size": st.st_size, "mtime": st.st_mtime, "cells": cells}
+        cache_path.write_text(json.dumps(cache))
+    return cells
 
 
 def _envelope(cov: dict):
@@ -173,8 +244,8 @@ def coverage(data_dir, stems: list[str], area=None) -> dict:
     per = {}
     cell_sets = {}
     for stem in stems:
-        cells, bounds = coverage_cells(catalog.profile(data_dir, stem))
-        per[stem] = {"bbox": bounds, "cells": len(cells), "has_grid": bool(cells)}
+        cells, bounds, source = dataset_cells(data_dir, stem)
+        per[stem] = {"bbox": bounds, "cells": len(cells), "has_grid": bool(cells), "grid_from": source if cells else None}
         cell_sets[stem] = cells
     # Put every dataset on a common lattice: snap cell centres to 0.005° (about 500 m).
     step = 0.005
@@ -236,7 +307,7 @@ def catalog_index(data_dir) -> list[dict]:
     out = []
     for stem in catalog.list_stems(data_dir):
         prof = catalog.profile(data_dir, stem)
-        _, bounds = coverage_cells(prof)
+        _, bounds, _ = dataset_cells(data_dir, stem)
         out.append({"id": stem, "bbox": bounds, "time": time_range(prof),
                     "geometry": (prof or {}).get("geometricType"), "rows": (prof or {}).get("nb_rows")})
     return out
