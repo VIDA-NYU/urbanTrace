@@ -137,10 +137,37 @@ Notes:
 
 ## 5. Keep and share
 
-- [ ] **Save**, reload the page, **open** the collection: does it come back intact?
-- [ ] **Report**: is it something you'd hand to someone?
-- [ ] **Export**, unzip, read `README.md` and `datapackage.json`
-- [ ] Load the data in a notebook with the README's snippet
+**What it's for.** This is what UrbanTrace produces: a collection someone else (or you, later, in
+another tool) can pick up without redoing your work. Three outputs:
+
+- **The saved collection**: on the server, reopened in UrbanTrace. Holds the canvas and its settings,
+  not the results (they are rerun).
+- **The report**: a printable page for people: goal, datasets and where they came from, maps of each
+  result, the analyses' tables, caveats.
+- **The export**: a zip for other tools (QGIS, GeoPandas, R, a notebook): the data, a
+  `datapackage.json` describing it, a README, and the plan to rerun the steps with urbanweave.
+
+**Saved collection**
+
+- [ ] **Save**, reload the page: it reopens the collection (no results; that's expected)
+- [ ] Rerun with **Plan → Run all steps and record the run**: results come back, and the run is kept
+  with a manifest so it can be replayed later (**Plan → Replay**)
+
+**Report**
+
+- [ ] Click **Report**: a page opens in a new tab
+- [ ] Is it something you'd hand to someone? What's missing or in the way?
+
+**Export**
+
+- [ ] Click **Export**. Under **Datasets**, choose **Embed every dataset** for this tryout: no dataset
+  in the catalog records a license yet, so the default embeds none and only references them by URL
+- [ ] Keep GeoParquet and GeoPackage; click **Download zip** and unzip it
+- [ ] Read `README.md`: does it explain what's there, why, and how to load it?
+- [ ] Skim `datapackage.json`: one entry per dataset and result, with source, hash and description
+- [ ] `plan.json` and `manifest.json`: the steps as urbanweave runs them, and the recorded run
+- [ ] Open a result in QGIS, or load it in a notebook with the README's snippet
+- [ ] Optional: **Open → import zip** brings the package back into UrbanTrace as a collection
 
 Notes:
 
