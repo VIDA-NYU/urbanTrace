@@ -168,7 +168,7 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [activeAuditVars, provenance]);
 
   useEffect(() => {
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return;
+    if (import.meta.env.PROD) return;
     if (!auditMappings.length) return;
 
     const unresolved = auditMappings.filter(item => item.resolution === 'unresolved');
@@ -911,7 +911,7 @@ const ResultMapNode = memo(({ id, data }) => {
               </span>
               {provenance.zoningEnabled && provenance.targetZones && (
                 <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: '600' }}>
-                  Zones: {provenance.targetZones.replace(/^.*[\/]/, '')}
+                  Zones: {provenance.targetZones.replace(/^.*[/]/, '')}
                 </span>
               )}
             </div>
@@ -926,7 +926,7 @@ const ResultMapNode = memo(({ id, data }) => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '10px' }}>{v.targetColumn}</span>
                     <span style={{ fontSize: '8px', color: '#64748b', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.dataset}>
-                      {v.dataset?.replace(/^.*[\/]/, '')}
+                      {v.dataset?.replace(/^.*[/]/, '')}
                     </span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>

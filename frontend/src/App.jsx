@@ -29,7 +29,9 @@ function App() {
     const prevActiveSet = prevActiveLogSetRef.current;
     const removedTimestamps = [...prevActiveSet].filter(ts => !currentActiveSet.has(ts));
 
+    // Logs follow the canvas: when results are removed there, their entries go here.
     if (removedTimestamps.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActivityLogs(prevLogs => prevLogs.filter(log => currentActiveSet.has(log.timestamp)));
       setHighlightedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));
       setFocusedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));

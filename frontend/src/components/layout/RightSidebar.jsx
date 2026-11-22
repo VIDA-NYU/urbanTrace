@@ -5,7 +5,8 @@ import IntegrationTopologyPanel from './IntegrationTopologyPanel';
 import { Trash2 } from 'lucide-react'; // <-- Import the icon
 import ReportCard from '../methods/ReportCard';
 
-const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs, onCleanUp }) => {
+// App also passes onCleanUp, for the clean-up button that is commented out below.
+const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs }) => {
   const reportLogs = activityLogs.filter((log) => log.status === 'success' && log.reports);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#fff' }}>

@@ -352,7 +352,9 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
     setPaths(newPaths);
   }, [logs, expandedRows]);
 
+  // Paths depend on the rendered rows' positions, so they can only be computed after layout.
   useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     recomputePaths();
   }, [recomputePaths]);
 
@@ -503,10 +505,10 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
             spatialOps.forEach(op => (spatialCounts[op] = 0));
             aggregationOps.forEach(op => (aggCounts[op] = 0));
             (log.variables || []).forEach(v => {
-              if (v.zoningMapping && spatialCounts.hasOwnProperty(v.zoningMapping)) {
+              if (v.zoningMapping && Object.hasOwn(spatialCounts, v.zoningMapping)) {
                 spatialCounts[v.zoningMapping]++;
               }
-              if (v.zoningAggregation && aggCounts.hasOwnProperty(v.zoningAggregation)) {
+              if (v.zoningAggregation && Object.hasOwn(aggCounts, v.zoningAggregation)) {
                 aggCounts[v.zoningAggregation]++;
               }
             });
