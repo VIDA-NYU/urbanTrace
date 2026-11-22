@@ -8,7 +8,6 @@ import { Link, Unlink } from 'lucide-react';
 
 // 1. Import components
 import DatasetNode from './nodes/DatasetNode'; 
-import OperationNode from './nodes/OperationNode';
 import IntegrationNode from './nodes/IntegrationNode'; // <--- NEW Import
 import DatasetDetailsModal from '../catalog/DatasetDetailsModal'; 
 import ResultMapNode from './nodes/ResultMapNode'; // Add this at the top
@@ -332,7 +331,6 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   // 2. Register the custom node types
   const nodeTypes = useMemo(() => ({
     datasetNode: DatasetNode,
-    operationNode: OperationNode,
     integrationNode: IntegrationNode, // <--- NEW Registration
     resultMapNode: ResultMapNode,
     compareMapNode: CompareMapNode,
@@ -1099,9 +1097,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
   const attachCallbacks = useCallback((type, data) => {
     const next = { ...data };
-    if (type === 'operationNode') {
-      next.color = data.opType === 'buffer' ? '#ec4899' : '#8b5cf6';
-    } else if (type === 'integrationNode') {
+    if (type === 'integrationNode') {
       next.studyArea = collection.study_area || null;
       next.onIntegrationComplete = handleIntegrationComplete;
       next.onLogActivity = onLogActivity;

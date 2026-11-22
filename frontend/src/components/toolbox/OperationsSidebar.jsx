@@ -7,7 +7,7 @@ const OperationsSidebar = () => {
   
   const onDragStart = (event, opType, opLabel) => {
     // 1. Route the tool to the correct custom React Flow node component
-    let reactFlowType = 'operationNode'; // Default for generic tools
+    // Every tool has its own node type; an unknown one is not dragged.
     
     const NODE_TYPES = {
       integrate: 'integrationNode', // the classic integration node (copilot operator recommendation)
@@ -19,7 +19,8 @@ const OperationsSidebar = () => {
       validate: 'validateNode',
       dasymetric: 'dasymetricNode',
     };
-    if (NODE_TYPES[opType]) reactFlowType = NODE_TYPES[opType];
+    const reactFlowType = NODE_TYPES[opType];
+    if (!reactFlowType) return;
 
     // 2. Set the payload
     const nodeData = {

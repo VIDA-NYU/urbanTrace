@@ -226,7 +226,6 @@ The maps use Autark's `autk-map`. On this branch it is linked from a local Autar
 | GET/POST | `/api/catalog/index`, `/api/coverage`, `/api/study-area/*`, `/api/collections/check` | Search filters, coverage, study area, checks |
 | POST | `/api/analysis/sweep`, `/api/analysis/validate`, `/api/analysis/dasymetric` | Sensitivity sweeps, validation against outcomes, dasymetric disaggregation |
 | GET | `/api/collections/{id}/report` | The collection as a printable HTML report |
-| POST | `/run-operation` | Quick H3 preview, union or intersection |
 | POST | `/api/copilot/chat` | Copilot chat with the current canvas as context |
 | POST | `/api/v1/copilot/recommend-operators` | Zoning operator recommendations |
 | POST | `/api/v1/copilot/synthesize-hotspot` | Hotspot direction per variable |
