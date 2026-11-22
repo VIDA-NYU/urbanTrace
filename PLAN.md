@@ -159,6 +159,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] Export file names used internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`): results are named after their output (`libraries`, `schools_per_library`), unnamed analyses after kind and column (`sweep_libraries`)
 - [x] Frontend lint: no errors (13 warnings remain, mostly hook dependencies)
 - [ ] Lint in CI: blocked while `@urban-toolkit/autk-map` is a `file:` dependency outside the repository, which CI cannot install; needs a published Autark package or a vendored build
+- [ ] Console warning: a `<button>` nested inside another `<button>` on the canvas (React reports it on every load)
 
 ---
 
@@ -180,7 +181,7 @@ by the user; in order:
    - [x] Delete `OperationNode` and `/run-operation`
    - [x] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`): `integration_engine.py`, `h3_engine.py`, `operators/`, `grids/` and two commented-out endpoints are gone
    - [x] Show each dataset's share inside the study area on its card, and sort by it (`/api/catalog/in-area`; "In study area" keeps datasets with data there, most first)
-2. - [ ] Autark does the projection (`sourceCrs: 'EPSG:4326'`); remove UrbanTrace's Web Mercator code from `autarkMap.js`
+2. - [x] Autark does the projection (`sourceCrs: 'EPSG:4326'`), hover and tooltips (`setTooltip`, `MapEvent.HOVER`) and framing (`fitBounds`); `autarkMap.js` lost its hit-testing, pointer correction and screen↔Mercator helpers (−137 lines). It needed a fix in Autark for canvases under a CSS transform: `fix/pointer-css-scale` in `~/src/autark` (local, with a test)
 3. - [ ] The copilot's method suggestions on Step nodes; then retire the classic Integration node
 4. - [ ] atlas-clean in UrbanTrace: run its spatial checks when a dataset loads, apply accepted fixes as recipes, record them in provenance and the export. Needs atlas-clean's `feat/spatial` released with it
 5. - [ ] Dasymetric working: the user publishes an urbanweave prerelease with `uw.dasymetric`; pin it
@@ -189,6 +190,7 @@ by the user; in order:
 8. Release mechanics
    - [ ] Version and CHANGELOG
    - [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
+   - [ ] Autark: release `fix/pointer-css-scale` (and `fitBounds`, newer than the build UrbanTrace had) with the rest of Autark; UrbanTrace links Autark from a local checkout, so a fresh clone needs it published or vendored
    - [ ] Push `autark-map`, open the PR to `main`, tag the release
 
 After the release: phase 6, licenses, the GeoParquet conversion, the benchmark's scoring rule in

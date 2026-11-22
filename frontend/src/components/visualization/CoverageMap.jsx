@@ -1,8 +1,8 @@
 // Coverage map, drawn with Autark (WebGPU) over the light-gray basemap: cells shaded by how many of
 // the canvas's datasets have data there, and the study area's outline.
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
-  BASEMAP_SOURCE, fitMercBounds, hitTest, metresPerPixel, projectCollection, screenToMerc, useAutarkMap, pointerInElement,
+  BASEMAP_SOURCE, SOURCE_CRS, fitMercBounds, metresPerPixel, prepareCollection, useAutarkMap,
 } from './autark/autarkMap';
 import { MapError } from './VectorPreviewMap';
 import { COVER_COLORS, coverageColor } from '../../lib/scope';
@@ -25,13 +25,12 @@ const outlineOf = (geometry) => {
 
 export default function CoverageMap({ cells, studyArea, max, palette = COVER_COLORS, height = 420 }) {
   const canvasRef = useRef(null);
-  const [tooltip, setTooltip] = useState(null);
   const loadedRef = useRef(false);
 
-  const projectedCells = useMemo(() => (cells?.features?.length ? projectCollection(cells) : null), [cells]);
+  const projectedCells = useMemo(() => (cells?.features?.length ? prepareCollection(cells) : null), [cells]);
   const projectedArea = useMemo(() => {
     const outline = outlineOf(studyArea?.geometry);
-    return outline ? projectCollection(outline) : null;
+    return outline ? prepareCollection(outline) : null;
   }, [studyArea]);
   const frame = projectedArea?.mercBounds || projectedCells?.mercBounds || null;
 
@@ -45,7 +44,7 @@ export default function CoverageMap({ cells, studyArea, max, palette = COVER_COL
   const userMovedRef = useRef(false);
   const frameRef = useRef(frame);
   useLayoutEffect(() => { frameRef.current = frame; });
-  const handleCameraChange = useCallback((map) => { setTooltip(null); sizeOutlineRef.current(map); }, []);
+  const handleCameraChange = useCallback((map) => { sizeOutlineRef.current(map); }, []);
   const handleResize = useCallback((map) => {
     if (userMovedRef.current || !loadedRef.current || !frameRef.current) return;
     fitMercBounds(map, frameRef.current, 16);
@@ -61,13 +60,18 @@ export default function CoverageMap({ cells, studyArea, max, palette = COVER_COL
       const top = Math.max(1, max);
       const colors = top === 1 ? [palette[0], coverageColor(palette, 1, 1)]
         : Array.from({ length: top }, (_, i) => coverageColor(palette, i + 1, top));
-      map.loadCollection(CELLS, { collection: projectedCells.collection, type: 'polygons' });
+      map.loadCollection(CELLS, { collection: projectedCells.collection, sourceCrs: SOURCE_CRS, type: 'polygons' });
       map.updateThematic(CELLS, { collection: projectedCells.collection, property: 'properties.n' });
       map.updateColorMap(CELLS, { colorMap: { type: 'sequential', colors, domainSpec: { type: 'user', params: top === 1 ? [0, 1] : [1, top] } } });
       map.updateRenderInfo(CELLS, { isColorMap: true, opacity: 0.75, strokeColor: { r: 255, g: 255, b: 255, alpha: 0.4 } });
+      // Which datasets have data in the cell under the pointer (Autark picks it on the GPU).
+      map.setTooltip(CELLS, (id) => {
+        const props = cells.features[projectedCells.sourceIndex[id]]?.properties;
+        return props ? `${props.n} of ${top}: ${props.datasets.join(', ')}` : null;
+      });
     }
     if (projectedArea) {
-      map.loadCollection(OUTLINE, { collection: projectedArea.collection, type: 'polylines' });
+      map.loadCollection(OUTLINE, { collection: projectedArea.collection, sourceCrs: SOURCE_CRS, type: 'polylines' });
       map.updateRenderInfo(OUTLINE, { color: OUTLINE_COLOR, isColorMap: false });
     }
     map.loadTiles(BASEMAP, { source: BASEMAP_SOURCE, crs: 'EPSG:3857' });
@@ -77,27 +81,10 @@ export default function CoverageMap({ cells, studyArea, max, palette = COVER_COL
     return () => {
       loadedRef.current = false;
       if (mapRef.current !== map) return;
+      map.setTooltip(CELLS, null);
       [CELLS, OUTLINE, BASEMAP].forEach((id) => map.removeLayer(id));
     };
-  }, [ready, mapRef, projectedCells, projectedArea, frame, max, palette]);
-
-  // Hover: which datasets have data in the cell (Autark picks only on double-click).
-  const handlePointerMove = (event) => {
-    const map = mapRef.current;
-    if (!map || !loadedRef.current || !projectedCells || event.buttons) {
-      if (tooltip) setTooltip(null);
-      return;
-    }
-    const [px, py] = pointerInElement(event);
-    const [x, y] = screenToMerc(map, px, py);
-    const index = hitTest(projectedCells, x, y, 0);
-    if (index < 0) {
-      setTooltip(null);
-      return;
-    }
-    const props = cells.features[projectedCells.sourceIndex[index]].properties;
-    setTooltip({ x: px, y: py, text: `${props.n} of ${max}: ${props.datasets.join(', ')}` });
-  };
+  }, [ready, mapRef, cells, projectedCells, projectedArea, frame, max, palette]);
 
   return (
     <div
@@ -105,19 +92,9 @@ export default function CoverageMap({ cells, studyArea, max, palette = COVER_COL
       style={{ width: '100%', height, position: 'relative', background: '#f1f5f9', borderRadius: 6, overflow: 'hidden' }}
       onPointerDown={() => { userMovedRef.current = true; }}
       onWheel={() => { userMovedRef.current = true; }}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={() => setTooltip(null)}
     >
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
       {error && <MapError message={error} />}
-      {tooltip && (
-        <div style={{
-          position: 'absolute', left: tooltip.x + 10, top: tooltip.y + 10, pointerEvents: 'none', zIndex: 5, maxWidth: 320,
-          background: '#1e293b', color: '#f8fafc', fontSize: 11, padding: '3px 6px', borderRadius: 4,
-        }}>
-          {tooltip.text}
-        </div>
-      )}
     </div>
   );
 }

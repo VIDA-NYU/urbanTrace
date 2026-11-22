@@ -1,10 +1,10 @@
 // H3 hexagon and reporting-zone preview map, drawn with Autark (WebGPU) over a light-gray basemap.
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { cellToBoundary, cellToLatLng, getResolution, latLngToCell } from 'h3-js';
+import { cellToBoundary, cellToLatLng } from 'h3-js';
+import { MapEvent } from '@urban-toolkit/autk-map';
 import {
-  BASEMAP_SOURCE, SCHEMES, applyViewState, cameraToViewState, colorMapFor, fitMercBounds, hitTest,
-  lonLatToMerc, mercToLonLat, mercToScreen, projectCollection, schemeForColor, schemeForPalette,
-  screenToMerc, useAutarkMap, pointerInElement,
+  BASEMAP_SOURCE, SCHEMES, SOURCE_CRS, applyViewState, cameraToViewState, colorMapFor, fitMercBounds,
+  lonLatToMerc, mercToScreen, prepareCollection, schemeForColor, schemeForPalette, useAutarkMap,
 } from './autark/autarkMap';
 import { MapError } from './VectorPreviewMap';
 
@@ -131,7 +131,6 @@ const H3PreviewMap = ({
   const canvasRef = useRef(null);
   const overlayRef = useRef(null);
   const [hasSize, setHasSize] = useState(false);
-  const [tooltip, setTooltip] = useState(null);
 
   // Wait until React Flow gives the container real dimensions before starting WebGPU.
   useEffect(() => {
@@ -157,7 +156,6 @@ const H3PreviewMap = ({
   });
 
   const handleCameraChange = useCallback((map) => {
-    setTooltip(null);
     drawSymbolsRef.current();
     const { isMapSyncEnabled: sync, onGlobalViewStateChange: emit } = syncRef.current;
     if (applyingViewRef.current || !sync || !emit || !loadedRef.current || emitFrameRef.current) return;
@@ -198,7 +196,7 @@ const H3PreviewMap = ({
 
   const hexProjected = useMemo(() => {
     if (!showHex || !hexes.length) return null;
-    const projected = projectCollection({
+    const projected = prepareCollection({
       type: 'FeatureCollection',
       features: hexes.map(d => ({
         type: 'Feature',
@@ -207,12 +205,12 @@ const H3PreviewMap = ({
       })),
     });
     const indexByHex = new Map(projected.sourceIndex.map((src, i) => [hexes[src].hex, i]));
-    return { ...projected, indexByHex, resolution: getResolution(hexes[0].hex) };
+    return { ...projected, indexByHex };
   }, [hexes, showHex]);
 
   const zoneProjected = useMemo(() => {
     if (!showZones || !geojsonData?.features?.length) return null;
-    const projected = projectCollection(geojsonData);
+    const projected = prepareCollection(geojsonData);
     projected.collection.features.forEach(f => {
       const props = f.properties;
       props[VALUE_KEY] = useHotspotPalette
@@ -251,7 +249,7 @@ const H3PreviewMap = ({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || !hexProjected) return undefined;
-    map.loadCollection(HEX_LAYER, { collection: hexProjected.collection, type: 'polygons', property: `properties.${VALUE_KEY}` });
+    map.loadCollection(HEX_LAYER, { collection: hexProjected.collection, sourceCrs: SOURCE_CRS, type: 'polygons', property: `properties.${VALUE_KEY}` });
     map.updateRenderInfo(HEX_LAYER, { opacity: 0.8, isColorMap: true, strokeColor: { r: 255, g: 255, b: 255, alpha: 0.3 } });
     loadedRef.current = true;
     return () => {
@@ -262,7 +260,7 @@ const H3PreviewMap = ({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || !zoneProjected) return undefined;
-    map.loadCollection(ZONE_LAYER, { collection: zoneProjected.collection, type: 'polygons', property: `properties.${VALUE_KEY}` });
+    map.loadCollection(ZONE_LAYER, { collection: zoneProjected.collection, sourceCrs: SOURCE_CRS, type: 'polygons', property: `properties.${VALUE_KEY}` });
     map.updateRenderInfo(ZONE_LAYER, { opacity: 0.75, isColorMap: true, strokeColor: { r: 15, g: 118, b: 110, alpha: 0.8 } });
     loadedRef.current = true;
     return () => {
@@ -372,67 +370,57 @@ const H3PreviewMap = ({
     drawSymbolsRef.current();
   }, [symbols, ready, hexProjected, zoneProjected]);
 
-  // ---- Hover: Autark picks only on double-click, so hit-test here --------------------------
+  // ---- Hover and tooltip: Autark picks the feature under the pointer on the GPU ------------
+  // Picking is on one layer at a time: the zones when they are shown (they are drawn on top), else the hexagons.
 
   const setHover = (hex, zone) => {
     if (hoverRef.current.hex !== hex) onHexHover?.(hex);
     if (hoverRef.current.zone !== zone) onZoneHover?.(zone);
     hoverRef.current = { hex, zone };
   };
+  const setHoverRef = useRef(setHover);
+  useLayoutEffect(() => { setHoverRef.current = setHover; });
+  const tooltipRef = useRef(customTooltip);
+  useLayoutEffect(() => { tooltipRef.current = customTooltip; });
 
-  const handlePointerMove = (event) => {
+  const pickLayer = zoneProjected ? ZONE_LAYER : hexProjected ? HEX_LAYER : null;
+  useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loadedRef.current || event.buttons) return;
-    const [px, py] = pointerInElement(event);
-    const [x, y] = screenToMerc(map, px, py);
+    if (!ready || !map || !pickLayer) return undefined;
+    const objectOf = (layerId, id) => {
+      if (id === null || id === undefined) return null;
+      if (layerId === ZONE_LAYER) return zoneProjected ? geojsonData.features[zoneProjected.sourceIndex[id]] : null;
+      return hexProjected ? hexes[hexProjected.sourceIndex[id]] : null;
+    };
+    map.setTooltip(pickLayer, (id) => {
+      const object = objectOf(pickLayer, id);
+      if (!object) return null;
+      const content = tooltipRef.current?.({ object, layer: { id: pickLayer } }) || defaultTooltip(object, pickLayer);
+      if (typeof content === 'string') return content;
+      const el = document.createElement('div');
+      Object.assign(el.style, { fontSize: '11px', padding: '6px 8px', borderRadius: '6px', maxWidth: '250px', ...(content.style || {}) });
+      el.innerHTML = content.html;
+      return el;
+    });
+    const onHover = ({ layerId, id }) => {
+      const object = layerId === pickLayer ? objectOf(layerId, id) : null;
+      setHoverRef.current(layerId === HEX_LAYER && object ? object.hex : null,
+        layerId === ZONE_LAYER && object ? getZoneFeatureId(object) || null : null);
+    };
+    map.events.on(MapEvent.HOVER, onHover);
+    return () => {
+      map.events.off(MapEvent.HOVER, onHover);
+      if (mapRef.current === map) map.setTooltip(pickLayer, null);
+    };
+  }, [ready, mapRef, pickLayer, hexProjected, zoneProjected, hexes, geojsonData]);
 
-    let object = null;
-    let layerId = null;
-    let zone = null;
-    let hex = null;
-    if (zoneProjected) {
-      const index = hitTest(zoneProjected, x, y, 0);
-      if (index >= 0) {
-        object = geojsonData.features[zoneProjected.sourceIndex[index]];
-        layerId = ZONE_LAYER;
-        zone = getZoneFeatureId(object) || null;
-      }
-    }
-    if (!object && hexProjected) {
-      const [lng, lat] = mercToLonLat(x, y);
-      const cell = latLngToCell(lat, lng, hexProjected.resolution);
-      const index = hexProjected.indexByHex.get(cell);
-      if (index !== undefined) {
-        object = hexes[hexProjected.sourceIndex[index]];
-        layerId = HEX_LAYER;
-        hex = object.hex;
-      }
-    }
-    setHover(hex, zone);
-
-    if (!object) {
-      setTooltip(null);
-      return;
-    }
-    const content = customTooltip?.({ object, layer: { id: layerId } }) || defaultTooltip(object, layerId);
-    setTooltip({ x: px, y: py, content });
-  };
-
-  const handlePointerLeave = () => {
-    setHover(null, null);
-    setTooltip(null);
-  };
-
-  const tooltipBody = tooltip && (typeof tooltip.content === 'string'
-    ? { text: tooltip.content, style: {} }
-    : { html: tooltip.content.html, style: tooltip.content.style || {} });
+  const handlePointerLeave = () => setHover(null, null);
 
   return (
     <div
       ref={containerRef}
       className="nodrag nowheel ut-autark-map"
       style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '0 0 8px 8px', overflow: 'hidden', background: '#f1f5f9' }}
-      onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       onPointerDown={() => { userMovedRef.current = true; }}
       onWheel={() => { userMovedRef.current = true; }}
@@ -441,16 +429,6 @@ const H3PreviewMap = ({
       <canvas ref={overlayRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
       {error && <MapError message={error} />}
 
-      {tooltipBody && (
-        <div
-          style={{
-            position: 'absolute', left: tooltip.x + 12, top: tooltip.y + 12, zIndex: 20, pointerEvents: 'none',
-            backgroundColor: '#1e293b', color: '#f8fafc', fontSize: '11px', padding: '8px', borderRadius: '6px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.3)', maxWidth: '250px', ...tooltipBody.style,
-          }}
-          {...(tooltipBody.html ? { dangerouslySetInnerHTML: { __html: tooltipBody.html } } : { children: tooltipBody.text })}
-        />
-      )}
 
       {/* Minimized 2D density legend */}
       {!hideLegend && maxCount > 1 && (

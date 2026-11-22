@@ -1,8 +1,10 @@
 // Shared helpers for the Autark (WebGPU) map previews.
 //
-// Autark draws in projected metres, relative to an origin it takes from the first layer loaded.
-// The backend serves lon/lat (EPSG:4326), so every collection is projected to Web Mercator
-// (EPSG:3857) before it reaches the map, and the basemap tiles are told the same CRS.
+// Collections reach Autark in lon/lat (EPSG:4326, as the backend serves them) and Autark projects
+// them into the map's workspace CRS, Web Mercator (EPSG:3857), which the basemap tiles use too.
+// Autark also does hover, picking and tooltips. What stays here: framing (a first view that skips
+// stray points), the camera as a Deck.GL-style view state for linked maps, colour schemes, and the
+// React lifecycle.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AutkMap } from '@urban-toolkit/autk-map';
 
@@ -29,16 +31,6 @@ export const mercToLonLat = (x, y) => [
   (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * 180 / Math.PI,
 ];
 
-const mapCoords = (coords, fn) => (typeof coords[0] === 'number' ? fn(coords) : coords.map(c => mapCoords(c, fn)));
-
-const projectGeometry = (geometry) => {
-  if (!geometry) return null;
-  if (geometry.type === 'GeometryCollection') {
-    return { ...geometry, geometries: geometry.geometries.map(projectGeometry) };
-  }
-  return { ...geometry, coordinates: mapCoords(geometry.coordinates, ([lon, lat]) => lonLatToMerc(lon, lat)) };
-};
-
 const growBounds = (b, coords) => {
   if (typeof coords[0] === 'number') {
     if (coords[0] < b[0]) b[0] = coords[0];
@@ -59,38 +51,37 @@ export const geometryBounds = (geometry) => {
   return b[0] === Infinity ? null : b;
 };
 
+const mercBox = ([x0, y0, x1, y1]) => [...lonLatToMerc(x0, y0), ...lonLatToMerc(x1, y1)];
+
 /**
- * Projects a lon/lat collection to Web Mercator. Features without geometry are dropped, so the
- * returned `sourceIndex` maps each projected feature back to its original feature.
- * `mercBounds` is [minX, minY, maxX, maxY] in metres; `featureBounds` holds one box per feature;
- * `frameBounds` is what to frame on first view (see framingBounds).
+ * Prepares a lon/lat collection for Autark, which projects it (load it with `sourceCrs: SOURCE_CRS`).
+ * Features without geometry are dropped, so a feature's position in the layer (Autark's component
+ * id, which hover and tooltips report) maps back to the original through `sourceIndex`.
+ * `mercBounds` and `frameBounds` are in Web Mercator metres, the map's coordinates (see framingBounds).
  */
-export const projectCollection = (collection) => {
+export const prepareCollection = (collection) => {
   const features = [];
   const sourceIndex = [];
-  const featureBounds = [];
-  const total = [Infinity, Infinity, -Infinity, -Infinity];
+  const boxes = [];
   (collection?.features || []).forEach((feature, i) => {
-    if (!feature?.geometry) return;
-    const geometry = projectGeometry(feature.geometry);
-    const bounds = geometryBounds(geometry);
-    if (!bounds) return;
-    features.push({ type: 'Feature', id: features.length, properties: { ...(feature.properties || {}) }, geometry });
+    const bounds = geometryBounds(feature?.geometry);
+    if (!bounds || !bounds.every(Number.isFinite)) return;
+    features.push({ type: 'Feature', id: features.length, properties: { ...(feature.properties || {}) }, geometry: feature.geometry });
     sourceIndex.push(i);
-    featureBounds.push(bounds);
-    total[0] = Math.min(total[0], bounds[0]);
-    total[1] = Math.min(total[1], bounds[1]);
-    total[2] = Math.max(total[2], bounds[2]);
-    total[3] = Math.max(total[3], bounds[3]);
+    boxes.push(mercBox(bounds));
   });
+  const union = boxes.reduce((u, b) => [Math.min(u[0], b[0]), Math.min(u[1], b[1]), Math.max(u[2], b[2]), Math.max(u[3], b[3])],
+    [Infinity, Infinity, -Infinity, -Infinity]);
   return {
     collection: { type: 'FeatureCollection', features },
     sourceIndex,
-    featureBounds,
-    mercBounds: features.length ? total : null,
-    frameBounds: features.length ? framingBounds(featureBounds) : null,
+    mercBounds: features.length ? union : null,
+    frameBounds: features.length ? framingBounds(boxes) : null,
   };
 };
+
+/** The CRS collections are given to Autark in. */
+export const SOURCE_CRS = 'EPSG:4326';
 
 /**
  * Bounds to frame on first view. Some datasets carry bad geocodes far from the city (one school
@@ -179,14 +170,20 @@ const setTopDownCamera = (map, mercX, mercY, mpp) => {
   cam.resize(map.canvas.offsetWidth, map.canvas.offsetHeight);
 };
 
-/** Frames a Web Mercator bounding box, leaving `padding` CSS pixels on each side. */
+/** Frames a Web Mercator bounding box with Autark's fitBounds, leaving about `padding` CSS pixels on each side. */
 export const fitMercBounds = (map, bounds, padding = 10) => {
   if (!bounds) return;
-  const w = Math.max(map.canvas.clientWidth - 2 * padding, 1);
-  const h = Math.max(map.canvas.clientHeight - 2 * padding, 1);
+  const w = Math.max(map.canvas.clientWidth, 1);
+  const h = Math.max(map.canvas.clientHeight, 1);
   const spanX = Math.max(bounds[2] - bounds[0], 50);
   const spanY = Math.max(bounds[3] - bounds[1], 50);
-  setTopDownCamera(map, (bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2, Math.max(spanX / w, spanY / h));
+  const cx = (bounds[0] + bounds[2]) / 2;
+  const cy = (bounds[1] + bounds[3]) / 2;
+  const padX = (spanX / Math.max(w - 2 * padding, 1)) * padding;
+  const padY = (spanY / Math.max(h - 2 * padding, 1)) * padding;
+  map.fitBounds([cx - spanX / 2 - padX, cy - spanY / 2 - padY, cx + spanX / 2 + padX, cy + spanY / 2 + padY]);
+  // CSS pixels, as Autark's own resize handler uses (zoom-at-cursor depends on it).
+  map.camera.resize(map.canvas.offsetWidth, map.canvas.offsetHeight);
 };
 
 /** The camera as a Deck.GL-style view state, so the shared sync state keeps its shape. */
@@ -204,28 +201,6 @@ export const applyViewState = (map, viewState) => {
   setTopDownCamera(map, x, y, WORLD / (WORLD_PX_AT_ZOOM_0 * 2 ** viewState.zoom));
 };
 
-/**
- * The pointer's position in the element's own (unscaled) CSS pixels. React Flow zooms nodes with a
- * CSS transform, so screen offsets must be divided by the scale before they are used for hit tests or
- * to place an overlay inside the node.
- */
-export const pointerInElement = (event) => {
-  const el = event.currentTarget;
-  const rect = el.getBoundingClientRect();
-  const sx = el.offsetWidth ? rect.width / el.offsetWidth : 1;
-  const sy = el.offsetHeight ? rect.height / el.offsetHeight : 1;
-  return [(event.clientX - rect.left) / (sx || 1), (event.clientY - rect.top) / (sy || 1)];
-};
-
-/** Mercator position under a CSS-pixel offset within the canvas. */
-export const screenToMerc = (map, px, py) => {
-  const w = map.canvas.clientWidth || 1;
-  const h = map.canvas.clientHeight || 1;
-  const [lx, ly] = map.camera.getGroundPoint(px / w, 1 - py / h, 1e7);
-  const [ox, oy] = map.layerManager.origin;
-  return [lx + ox, ly + oy];
-};
-
 /** CSS-pixel position of a Mercator point, or null when it is behind the camera. */
 export const mercToScreen = (map, x, y, vp = map.camera.getViewProjectionMatrix()) => {
   const [ox, oy] = map.layerManager.origin;
@@ -236,55 +211,6 @@ export const mercToScreen = (map, x, y, vp = map.camera.getViewProjectionMatrix(
   const cw = vp[3] * lx + vp[7] * ly + vp[15];
   if (cw <= 0) return null;
   return [((cx / cw + 1) / 2) * map.canvas.clientWidth, ((1 - cy / cw) / 2) * map.canvas.clientHeight];
-};
-
-// ---------------------------------------------------------------------------------------------
-// Hit testing (Autark only picks on double-click, so hover is done here)
-// ---------------------------------------------------------------------------------------------
-
-const ringContains = (ring, x, y) => {
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
-  }
-  return inside;
-};
-
-// Planar even-odd test, so it does not depend on ring winding order.
-const polygonContains = (rings, x, y) => rings.reduce((inside, ring) => (ringContains(ring, x, y) ? !inside : inside), false);
-
-const vertexDistance = (coords, x, y) =>
-  typeof coords[0] === 'number'
-    ? Math.hypot(coords[0] - x, coords[1] - y)
-    : coords.reduce((best, c) => Math.min(best, vertexDistance(c, x, y)), Infinity);
-
-/**
- * Index of the projected feature under (x, y), or -1. Polygons need the point inside them;
- * points and lines need a vertex within `tolerance` metres.
- */
-export const hitTest = (projected, x, y, tolerance) => {
-  const { collection, featureBounds } = projected;
-  let best = -1;
-  let bestDist = tolerance;
-  for (let i = collection.features.length - 1; i >= 0; i--) {
-    const b = featureBounds[i];
-    if (x < b[0] - tolerance || x > b[2] + tolerance || y < b[1] - tolerance || y > b[3] + tolerance) continue;
-    const g = collection.features[i].geometry;
-    if (g.type === 'Polygon') {
-      if (polygonContains(g.coordinates, x, y)) return i;
-    } else if (g.type === 'MultiPolygon') {
-      if (g.coordinates.some(p => polygonContains(p, x, y))) return i;
-    } else {
-      const d = vertexDistance(g.coordinates, x, y);
-      if (d <= bestDist) {
-        bestDist = d;
-        best = i;
-      }
-    }
-  }
-  return best;
 };
 
 // ---------------------------------------------------------------------------------------------

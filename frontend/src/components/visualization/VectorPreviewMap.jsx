@@ -2,8 +2,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import {
-  BASEMAP_SOURCE, SCHEMES, applyViewState, cameraToViewState, colorMapFor, fitMercBounds, hitTest,
-  layerTypeFor, metresPerPixel, projectCollection, screenToMerc, useAutarkMap, pointerInElement,
+  BASEMAP_SOURCE, SCHEMES, SOURCE_CRS, applyViewState, cameraToViewState, colorMapFor, fitMercBounds,
+  layerTypeFor, metresPerPixel, prepareCollection, useAutarkMap,
 } from './autark/autarkMap';
 import { API_BASE } from '../../config/api';
 
@@ -28,7 +28,6 @@ const VectorPreviewMap = ({
   const [loaded, setLoaded] = useState({ filename: null, data: null });
   const data = loaded.filename === filename ? loaded.data : null;
   const loading = loaded.filename !== filename;
-  const [tooltip, setTooltip] = useState(null);
 
   const loadedRef = useRef(false);
   const applyingViewRef = useRef(false);
@@ -58,7 +57,6 @@ const VectorPreviewMap = ({
   });
 
   const handleCameraChange = useCallback((map) => {
-    setTooltip(null);
     sizeMarksRef.current(map);
     const { isMapSyncEnabled: sync, onGlobalViewStateChange: emit } = syncRef.current;
     if (applyingViewRef.current || !sync || !emit || !loadedRef.current || emitFrameRef.current) return;
@@ -102,7 +100,7 @@ const VectorPreviewMap = ({
     };
   }, [filename]);
 
-  const projected = useMemo(() => (data ? projectCollection(data) : null), [data]);
+  const projected = useMemo(() => (data ? prepareCollection(data) : null), [data]);
   useLayoutEffect(() => {
     projectedRef.current = projected;
   });
@@ -122,7 +120,7 @@ const VectorPreviewMap = ({
     if (!ready || !map || !projected?.mercBounds) return undefined;
 
     const type = layerTypeFor(projected.collection);
-    map.loadCollection(DATA_LAYER, { collection: projected.collection, type });
+    map.loadCollection(DATA_LAYER, { collection: projected.collection, sourceCrs: SOURCE_CRS, type });
     layerTypeRef.current = type;
     map.updateRenderInfo(DATA_LAYER, { opacity: 0.8, strokeColor: { r: 255, g: 255, b: 255, alpha: 0.5 } });
     map.loadTiles('basemap', { source: BASEMAP_SOURCE, crs: 'EPSG:3857' });
@@ -162,6 +160,18 @@ const VectorPreviewMap = ({
     }
   }, [ready, projected, thematic, mapRef]);
 
+  // Tooltip with the selected column's value, for the feature Autark picks under the pointer
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !projected?.mercBounds) return undefined;
+    if (!selectedColumn) { map.setTooltip(DATA_LAYER, null); return undefined; }
+    map.setTooltip(DATA_LAYER, (id) => {
+      const value = data.features[projected.sourceIndex[id]]?.properties?.[selectedColumn];
+      return value === undefined ? null : `${selectedColumn}: ${value}`;
+    });
+    return () => { if (mapRef.current === map) map.setTooltip(DATA_LAYER, null); };
+  }, [ready, projected, data, selectedColumn, mapRef]);
+
   // GLOBAL VIEWPORT SYNC: follow the shared camera unless this map produced it
   useEffect(() => {
     const map = mapRef.current;
@@ -172,24 +182,6 @@ const VectorPreviewMap = ({
     applyingViewRef.current = false;
   }, [ready, isMapSyncEnabled, globalViewState, mapRef]);
 
-  // Hover tooltip: Autark picks only on double-click, so hit-test here
-  const handlePointerMove = (event) => {
-    const map = mapRef.current;
-    if (!map || !loadedRef.current || !projected || !selectedColumn || event.buttons) {
-      if (tooltip) setTooltip(null);
-      return;
-    }
-    const [px, py] = pointerInElement(event);
-    const [x, y] = screenToMerc(map, px, py);
-    const index = hitTest(projected, x, y, 6 * metresPerPixel(map));
-    if (index < 0) {
-      setTooltip(null);
-      return;
-    }
-    const value = data.features[projected.sourceIndex[index]]?.properties?.[selectedColumn];
-    setTooltip({ x: px, y: py, text: `${selectedColumn}: ${value}` });
-  };
-
   // The canvas stays mounted while loading: the map is created once, on mount.
   return (
     <div
@@ -197,20 +189,10 @@ const VectorPreviewMap = ({
       style={{ width: '100%', height: `${height}px`, position: 'relative', background: '#f1f5f9' }}
       onPointerDown={() => { userMovedRef.current = true; }}
       onWheel={() => { userMovedRef.current = true; }}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={() => setTooltip(null)}
     >
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
       {loading && <div style={{ position: 'absolute', inset: 0, background: '#f8fafc' }} />}
       {error && <MapError message={error} />}
-      {tooltip && (
-        <div style={{
-          position: 'absolute', left: tooltip.x + 10, top: tooltip.y + 10, pointerEvents: 'none', zIndex: 5,
-          background: '#1e293b', color: '#f8fafc', fontSize: '10px', padding: '3px 6px', borderRadius: '4px', whiteSpace: 'nowrap',
-        }}>
-          {tooltip.text}
-        </div>
-      )}
     </div>
   );
 };
