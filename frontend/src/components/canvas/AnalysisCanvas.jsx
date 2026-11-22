@@ -529,6 +529,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   }, [setEdges, setNodes]);
 
   // 3. The Handler for when the Integration API finishes
+  // A new result opens to the right of what produced it, often past the edge of the canvas: bring
+  // both into view (after React Flow has measured the new node).
+  const revealNodes = useCallback((ids) => {
+    setTimeout(() => fitView({ nodes: ids.map((id) => ({ id })), padding: 0.15, duration: 400, maxZoom: 1 }), 50);
+  }, [fitView]);
+
   const handleIntegrationComplete = useCallback((sourceNodeId, integrationData) => {
     // 1. Generate unique IDs OUTSIDE the state setters. 
     // Using randomUUID prevents identical millisecond collisions.
@@ -579,7 +585,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         }
       ];
     });
-  }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState, handleDeleteNode]); // Ensure setNodes is in the dependency array
+    revealNodes([sourceNodeId, resultNodeId]);
+  }, [setEdges, setNodes, isMapSyncEnabled, globalViewState, setGlobalViewState, handleDeleteNode, revealNodes]); // Ensure setNodes is in the dependency array
 
   // GLOBAL VIEWPORT SYNC: Update existing ResultMapNodes and DatasetNodes when sync state changes
   useEffect(() => {
@@ -1480,9 +1487,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       }];
     });
     setEdges((eds) => [...eds, { id: `e-${nodeId}-${resultNodeId}`, source: nodeId, target: resultNodeId, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }]);
-    // The new map opens to the right of the step, often past the edge of the canvas: bring both into view.
-    setTimeout(() => fitView({ nodes: [{ id: nodeId }, { id: resultNodeId }], padding: 0.15, duration: 400, maxZoom: 1 }), 50);
-  }, [fitView, getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled]);
+    revealNodes([nodeId, resultNodeId]);
+  }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled, revealNodes]);
 
   const runPlanNode = useCallback(async (nodeId, mode) => {
     const all = getNodes();
