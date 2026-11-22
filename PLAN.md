@@ -132,6 +132,12 @@ Work:
 - [ ] Catalog growth on demand from NYC Open Data and Auctus
 - [ ] MCP server: catalog search, profiles, collections, export (can move up any time a consumer asks)
 
+## Tryout fixes
+
+Found while using the tool (started 2026-11-22).
+
+- [x] Collection bar squeezed its labels ("A" for the goal, "No study area" on three lines, buttons past the edge): items no longer shrink, the bar sits right of Link Maps and wraps on narrow canvases
+
 ---
 
 ## Release

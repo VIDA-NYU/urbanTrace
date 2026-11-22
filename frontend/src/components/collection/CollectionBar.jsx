@@ -6,14 +6,15 @@ import { listCollections, deleteCollection, importPackage } from '../../lib/coll
 import { StudyAreaPanel, CoverageModal, WarningsPanel } from './ScopePanels';
 
 const bar = {
-  position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 100,
-  display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', background: '#fff',
+  // Right of the Link Maps button; wraps to a second row on narrow canvases instead of squeezing items.
+  position: 'absolute', top: 10, left: 130, right: 10, width: 'fit-content', marginLeft: 'auto', marginRight: 'auto',
+  zIndex: 100, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4, padding: '6px 8px', background: '#fff',
   border: '1px solid #cbd5e1', borderRadius: 8, boxShadow: '0 2px 6px rgba(0,0,0,0.08)', fontSize: 12,
-  maxWidth: 'calc(100% - 340px)',
 };
 const iconButton = {
-  display: 'flex', alignItems: 'center', gap: 4, padding: '5px 8px', border: '1px solid #e2e8f0',
+  display: 'flex', alignItems: 'center', gap: 4, padding: '5px 7px', border: '1px solid #e2e8f0',
   background: '#f8fafc', borderRadius: 6, cursor: 'pointer', color: '#334155', fontSize: 12, fontWeight: 600,
+  flexShrink: 0, whiteSpace: 'nowrap',
 };
 const panel = {
   position: 'absolute', top: 'calc(100% + 6px)', left: 0, width: 380, background: '#fff', border: '1px solid #cbd5e1',
@@ -123,7 +124,7 @@ export default function CollectionBar({
   return (
     <div style={bar} ref={ref}>
       <input value={collection.name} onChange={(e) => onRename(e.target.value)} title="Collection name"
-        style={{ border: 'none', fontWeight: 700, fontSize: 13, color: '#0f172a', width: 190, outline: 'none' }} />
+        style={{ border: 'none', fontWeight: 700, fontSize: 13, color: '#0f172a', width: 140, flexShrink: 0, outline: 'none' }} />
       <button style={{ ...iconButton, fontWeight: 500, maxWidth: 220, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
         onClick={() => setOpen(open === 'goal' ? null : 'goal')} title={collection.goal || 'Describe what this collection is for'}>
         {collection.goal ? `Goal: ${collection.goal}` : 'Add a goal'}
@@ -140,7 +141,7 @@ export default function CollectionBar({
         title={warnings.length ? `${warnings.length} warning(s)` : 'No problems found'}>
         {warnings.length ? <AlertTriangle size={13} /> : <CheckCircle2 size={13} />}{warnings.length || ''}
       </button>
-      <span style={{ color: dirty ? '#b45309' : '#16a34a', fontSize: 11, minWidth: 64 }}>{status || (dirty ? 'Unsaved' : 'Saved')}</span>
+      <span style={{ color: dirty ? '#b45309' : '#16a34a', fontSize: 11, whiteSpace: 'nowrap', flexShrink: 0 }}>{status || (dirty ? 'Unsaved' : 'Saved')}</span>
       <button style={iconButton} onClick={onNew} title="New collection"><FilePlus size={13} /></button>
       <button style={iconButton} onClick={() => setOpen(open === 'open' ? null : 'open')} title="Open a collection"><FolderOpen size={13} /></button>
       <button style={iconButton} onClick={onSave} title="Save the collection"><Save size={13} /> Save</button>
