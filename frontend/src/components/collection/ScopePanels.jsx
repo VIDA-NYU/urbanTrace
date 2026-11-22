@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { geoMercator, geoPath } from 'd3-geo';
 import { getStudyAreaOptions, resolveStudyArea, getCoverage } from '../../lib/scope';
+import { rewindForD3 } from '../../lib/geo';
 
 const panelStyle = {
   position: 'absolute', top: 'calc(100% + 6px)', left: 0, width: 400, background: '#fff', border: '1px solid #cbd5e1',
@@ -144,6 +145,7 @@ export function CoverageModal({ datasets, studyArea, onClose }) {
     const fc = { type: 'FeatureCollection', features: [...data.features] };
     if (data.study_area) fc.features.push({ type: 'Feature', geometry: data.study_area.geometry, properties: { area: true } });
     if (!fc.features.length) return [];
+    fc.features = fc.features.map(rewindForD3);
     const projection = geoMercator().fitSize([width, height], fc);
     const path = geoPath(projection);
     return fc.features.map((f, i) => ({ d: path(f), f, key: i }));

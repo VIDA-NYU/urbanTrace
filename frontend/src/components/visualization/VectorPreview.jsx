@@ -1,8 +1,9 @@
 // frontend/src/components/VectorPreview.jsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { geoMercator, geoPath } from 'd3-geo';
 import { API_BASE } from '../../config/api';
+import { rewindForD3 } from '../../lib/geo';
 
 const VectorPreview = ({ filename }) => {
   const [data, setData] = useState(null);
@@ -13,7 +14,7 @@ const VectorPreview = ({ filename }) => {
     // Fetch simplified version for the node
     axios.get(`${API_BASE}/dataset/${filename}?simplify=true`)
       .then(res => {
-        setData(res.data);
+        setData(rewindForD3(res.data));
         setLoading(false);
       })
       .catch(err => {

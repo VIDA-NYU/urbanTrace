@@ -142,6 +142,7 @@ Found while using the tool (started 2026-11-22).
 - [ ] Three datasets have corrupt coordinates in the file itself: `2018_2019_school_locations` (latitude and longitude swapped, so it is excluded from every study area), `raised_crosswalk_locations` and `street_closures_due_to_construction_activities_by_intersection` (NY State Plane feet labelled EPSG:4326). To be flagged by atlas-clean (its PLAN.md, M5 Spatial data), with the accepted recipe applied on load and recorded in provenance
 - [ ] "In study area" barely narrows the list for a borough, because almost the whole catalog is citywide (83 of 86 datasets with a grid have data in Brooklyn). Show each dataset's share of rows inside the study area on its card and sort by it?
 - [x] Coverage "share of study area" misled for points: it counts ~500 m cells with any feature, so ~60 libraries spread over Brooklyn score 7% and schools 46%, shown in orange, and the checks warn "partial coverage". Points are now measured by spread (the part of the area inside the hull of their cells) with the count inside; the cell share is kept for polygons and lines and now divides by the study area's own cells, not those of the other datasets; a dataset with nothing in the area gets "no data in the study area"
+- [x] Coverage map showed a blue box with the study area as a dot: shapely's counterclockwise rings read by d3-geo as the globe minus the polygon. Polygons are rewound for d3 (`frontend/src/lib/geo.js`), in the coverage map and the dataset preview
 
 ---
 
