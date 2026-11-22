@@ -145,19 +145,29 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] Coverage "share of study area" misled for points: it counts ~500 m cells with any feature, so ~60 libraries spread over Brooklyn score 7% and schools 46%, shown in orange, and the checks warn "partial coverage". Points are now measured by spread (the part of the area inside the hull of their cells) with the count inside; the cell share is kept for polygons and lines and now divides by the study area's own cells, not those of the other datasets; a dataset with nothing in the area gets "no data in the study area"
 - [x] Coverage map showed a blue box with the study area as a dot: shapely's counterclockwise rings read by d3-geo as the globe minus the polygon. Polygons are rewound for d3 (`frontend/src/lib/geo.js`), in the coverage map and the dataset preview
 - [x] Coverage map drawn with Autark (`CoverageMap.jsx`, `autk-map`) over the basemap, with pan, zoom and a hover listing the datasets in each cell, instead of a static d3 SVG
-- [ ] Remove the unused `maplibre-gl` and `d3-scale` dependencies
+- [x] Removed the unused `maplibre-gl` and `d3-scale` dependencies
 - [x] No basemap on any Autark map: Autark now defaults the workspace CRS to EPSG:3395 and refused the EPSG:3857 tiles. Maps are created with `crs: 'EPSG:3857'` (`autarkMap.js`)
 - [ ] Let Autark project the data (`sourceCrs: 'EPSG:4326'`) instead of UrbanTrace's own Web Mercator code in `autarkMap.js`
 - [x] No numbers visible after running a step: the report card started collapsed, the result map had no totals, and the new map opened behind the right sidebar. The closed card now shows "68 of 253 in study area · 68/68 matched · 44/69 targets"; the map shows the column's total, range and units with 0; new result maps are brought into view
 - [x] Zone names on hover ("Park Slope", not "Zone 0"): the label column is chosen as a unique name-like text column (never Socrata's `:id`), else a whole-number code; the old check missed pandas 3's string type
 - [x] Zones touching the study area by rounding were kept (Brooklyn had 77 NTAs instead of 69): a zone now needs 1% of its area inside (`scope.zones_in_area`), everywhere zones are filtered
-- [ ] Classic Integration results may open off-screen too (only plan results are brought into view)
+- [x] Classic Integration results are brought into view too (`revealNodes`)
 - [x] Unsaved work was lost on reload without warning, and a reload always started empty: the browser now asks before leaving with unsaved changes, keeps them as a draft in the browser, and on reload restores the draft or reopens the last saved collection. Results are not saved (decided 2026-11-22: they are rerun)
 - [x] Couldn't connect to Combine & Calculate: it took only Step nodes and refused anything else silently, while the visible end of a chain is the step's Result Map. A Result Map now stands for the Step (or Calculate) that made it, for Calculate, Sweep and Validate; refused connections say why in the collection bar
 - [x] Map tooltips (and the feature they name) were off whenever the canvas was zoomed: React Flow scales nodes with a CSS transform, and pointer offsets were used unscaled. `pointerInElement` in `autarkMap.js`, used by the result, dataset and coverage maps
 - [x] `dycd_program_sites` preview was blank: one site geocoded to Los Angeles, and when the densest area held over 95% of the points the frame took every feature, strays included. It now frames the central 99.6% (`framingBounds` in `autarkMap.js`); affects every Autark map's first view
-- [ ] Export file names use internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`); name them after the output or analysis (`schools_per_library`, `sweep_libraries`)
-- [ ] Frontend lint: 8 errors and 13 warnings in older code (`ResultMapNode.jsx` and others); CI runs backend tests only
+- [x] Export file names used internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`): results are named after their output (`libraries`, `schools_per_library`), unnamed analyses after kind and column (`sweep_libraries`)
+- [x] Frontend lint: no errors (13 warnings remain, mostly hook dependencies)
+- [ ] Lint in CI: blocked while `@urban-toolkit/autk-map` is a `file:` dependency outside the repository, which CI cannot install; needs a published Autark package or a vendored build
+
+---
+
+## Documentation
+
+- [ ] Update `README.md` for the redesigned tool: what UrbanTrace is for (find, prepare, analyse, export), collections and export, study area and coverage, plans and Step nodes, analyses, the report; the integration model, API and project structure sections predate phases 1–5
+- [ ] Update the documentation (`docs/`): REDESIGN.md's status, the walkthrough, an API reference for the new endpoints
+- [ ] New screenshots of the current interface for the README and the walkthrough (collection bar, coverage map, Step with its report card, result map, sweep and validation, report, export); `docs/screenshots/` holds previews of earlier versions
+- [ ] Move `Supplementary_Material.pdf` from the repository root to a directory that says what it is (e.g. `paper/`), with a README: supplementary material for the arXiv paper [2607.25124](https://arxiv.org/abs/2607.25124), which describes an earlier version of UrbanTrace (tag `vis2026-camera-ready`); update the README's link
 
 ---
 
