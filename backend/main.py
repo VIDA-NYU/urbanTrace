@@ -1166,7 +1166,8 @@ def _collection_report(doc: Dict[str, Any], analyses: Optional[List[Dict[str, An
                 cols = list(payload["columns"])
                 if not cols:
                     continue
-                sections.append({"title": f"Result: {sid}", "svg": analysis.svg_map(payload, cols[-1], title=cols[-1]),
+                title = (payload.get("derived") or {}).get("as") or sid   # a derived variable by its name
+                sections.append({"title": f"Result: {title}", "svg": analysis.svg_map(payload, cols[-1], title=cols[-1]),
                                  "lines": _plan_report_lines(sid, run["reports"].get(sid)) +
                                           ([f"Derived: {payload['derived']['as']} = {payload['derived']['expression']}"]
                                            if payload.get("derived", {}).get("expression") else [])})
