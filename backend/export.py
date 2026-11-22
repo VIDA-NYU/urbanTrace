@@ -39,7 +39,8 @@ FORMATS = {"parquet": ("parquet", "application/vnd.apache.parquet"),
 
 
 def _slug(text: str, fallback: str = "collection") -> str:
-    s = re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
+    """A file-name-safe version of *text*; underscores are kept, so column names stay recognisable."""
+    s = re.sub(r"[^a-z0-9_]+", "-", (text or "").lower()).strip("-_")
     return s[:60] or fallback
 
 
@@ -188,17 +189,23 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
             else:
                 not_included.append({"name": stem, "reason": why, **info})
 
+        used: set[str] = set()
         for res in results or []:
-            for level, gdf in (res.get("frames") or {}).items():
-                if gdf is None or len(gdf) == 0:
-                    continue
+            frames = {k: v for k, v in (res.get("frames") or {}).items() if v is not None and len(v)}
+            for level, gdf in frames.items():
                 gdf = _clean(gdf)
-                base = _slug(res["name"], "result")
+                # Files are named after the result (libraries, schools_per_library, sweep_libraries);
+                # the level is added only when a result has several frames, a counter on a clash.
+                base = _slug(res["name"], "result") + (f"_{level}" if len(frames) > 1 else "")
+                stem, k = base, 2
+                while base in used:
+                    base, k = f"{stem}_{k}", k + 1
+                used.add(base)
                 schema = _schema(gdf, res.get("value_kinds") or {}, res.get("units"))
                 for fmt in formats:
-                    rel = f"data/results/{base}_{level}.{FORMATS[fmt][0]}"
+                    rel = f"data/results/{base}.{FORMATS[fmt][0]}"
                     _write(gdf, root / rel, fmt)
-                    name = f"{base}-{level}" if fmt == formats[0] else f"{base}-{level}-{fmt}"
+                    name = base if fmt == formats[0] else f"{base}-{fmt}"
                     resources.append(_resource(name, rel, fmt, root / rel, schema, {
                         "description": res.get("description"),
                         "urbantrace:result": {"level": level, "request": res.get("request"),

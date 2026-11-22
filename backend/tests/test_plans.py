@@ -138,7 +138,8 @@ def test_export_carries_the_plan_and_imports_back(client, catalog):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     names = set(z.namelist())
     assert {"plan.json", "manifest.json", "collection.json"} <= names
-    assert {"data/results/plan-count-zones_output.parquet", "data/results/plan-d_output.parquet"} <= names
+    # Results are named after what they hold: the step (several outputs) and the derived variable
+    assert {"data/results/count_zones.parquet", "data/results/x.parquet"} <= names
     plan_json = json.loads(z.read("plan.json"))
     zone_path = plan_json["targets"]["zones"]["path"]
     assert zone_path.startswith("data/targets/") and zone_path in names

@@ -1594,7 +1594,11 @@ def _export_plan(doc: Dict[str, Any], options: "ExportOptions"):
             frame = gpd.GeoDataFrame(frame, geometry=[_Poly([(lng, lat) for lat, lng in _h3.cell_to_boundary(c)]) for c in ids],
                                      crs="EPSG:4326")
         reports = {sid: out["reports"].get(sid)} if sid in out["reports"] else None
-        results.append({"name": f"plan {sid}", "frames": {"output": frame}, "value_kinds": payload.get("kinds"),
+        derived = payload.get("derived") or {}
+        cols = list(payload["columns"])
+        # Named after what it holds: a derived variable's name, a step's single output, else the step id.
+        rname = derived.get("as") or (cols[0] if len(cols) == 1 else sid)
+        results.append({"name": rname, "frames": {"output": frame}, "value_kinds": payload.get("kinds"),
                         "request": {"plan_step": sid, **({"derived": payload["derived"]} if payload.get("derived") else {})},
                         "reports": reports, "description": f"Output of plan step `{sid}`" +
                         (f": {payload['derived']['expression']}" if payload.get("derived", {}).get("expression") else "") + ".",
@@ -1953,7 +1957,7 @@ def _run_collection_analyses(doc: Dict[str, Any]) -> List[Dict[str, Any]]:
     derived_all = doc.get("derived") or []
     for a in doc.get("analyses") or []:
         kind, cfg = a.get("kind"), dict(a.get("config") or {})
-        name = a.get("name") or f"{kind} {a.get('id', '')}".strip()
+        name = _analysis_name(a)
         entry = {"id": a.get("id"), "kind": kind, "name": name, "config": cfg}
         try:
             if kind == "sweep":
@@ -1992,6 +1996,17 @@ def _payload_frame(payload: Dict[str, Any]) -> gpd.GeoDataFrame:
     geoms = analysis.payload_geometries(payload)
     frame = pd.DataFrame({"target_id": payload["target_ids"], **payload["columns"]})
     return gpd.GeoDataFrame(frame, geometry=geoms, crs="EPSG:4326")
+
+
+def _analysis_name(a: Dict[str, Any]) -> str:
+    """What an analysis is called in exports and reports: its kind and the column it is about
+    (sweep_libraries, validation_schools_per_library), unless the user named it."""
+    kind, cfg, name = a.get("kind") or "analysis", a.get("config") or {}, (a.get("name") or "").strip()
+    generated = not name or re.fullmatch(rf"{re.escape(kind)} [0-9A-Za-z_]{{1,8}}", name)
+    if not generated:
+        return name
+    about = cfg.get("column") or cfg.get("step") or a.get("id") or ""
+    return f"{kind}_{about}".strip("_")
 
 
 def _analysis_result(a: Dict[str, Any]) -> Dict[str, Any]:

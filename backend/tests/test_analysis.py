@@ -103,12 +103,19 @@ def test_report_and_export_carry_analyses(client, catalog):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     names = set(z.namelist())
     assert "report.html" in names
-    assert {"data/results/resolution-sweep_analysis.parquet", "data/results/against-sites_analysis.parquet",
-            "data/results/priority_analysis.parquet"} <= names
-    assert ("data/results/population_analysis.parquet" in names) == hasattr(uw, "dasymetric")
+    assert {"data/results/resolution-sweep.parquet", "data/results/against-sites.parquet",
+            "data/results/priority.parquet"} <= names
+    assert ("data/results/population.parquet" in names) == hasattr(uw, "dasymetric")
     readme = z.read("README.md").decode()
     assert "## Analyses" in readme and "| 0.5 | 11.0 | 0.5 | 3 | 6 | 0.5 | 1.0 |" in readme
     assert "Broken" in readme and "could not be run" in readme
     import geopandas as gpd
-    pr = gpd.read_parquet(io.BytesIO(z.read("data/results/priority_analysis.parquet")))
+    pr = gpd.read_parquet(io.BytesIO(z.read("data/results/priority.parquet")))
     assert "priority" in pr.columns and pr["priority"].between(0, 1).all()
+
+
+def test_unnamed_analyses_are_named_after_their_kind_and_column():
+    import main
+    assert main._analysis_name({"kind": "sweep", "name": "sweep 7016", "config": {"column": "libraries"}}) == "sweep_libraries"
+    assert main._analysis_name({"kind": "validation", "config": {"column": "schools_per_library"}}) == "validation_schools_per_library"
+    assert main._analysis_name({"kind": "sweep", "name": "Resolution sweep", "config": {"column": "x"}}) == "Resolution sweep"

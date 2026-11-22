@@ -94,7 +94,7 @@ def test_result_export_carries_provenance(client, catalog):
     r = client.post("/api/results/export", json={"name": "Zone result", "geojson": geojson,
                                                  "provenance": {"request": {"resolution": 8}}})
     z = _unzip(r)
-    assert "provenance.json" in z.namelist() and "data/results/zone-result_result.gpkg" in z.namelist()
+    assert "provenance.json" in z.namelist() and "data/results/zone-result.gpkg" in z.namelist()
     assert json.loads(z.read("provenance.json"))["request"]["resolution"] == 8
 
 
