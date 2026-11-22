@@ -2,8 +2,11 @@
 
 **Progress (2026-11-22):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
 real task (Brooklyn schools and libraries) that found and fixed 17 problems, listed under
-[Tryout fixes](#tryout-fixes); it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). 25 commits are
-not pushed. Backend tests pass (none skipped since urbanweave 0.1.0a2); all use synthetic data. Phase 6 has not started; it needs the decisions listed under it.
+[Tryout fixes](#tryout-fixes); it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). Release work:
+items 1–5 of [Release](#release) done (clean-ups, Autark doing the maps, the copilot on Step nodes
+with the classic node retired, atlas-clean's checks, dasymetric on urbanweave 0.1.0a2); next are a
+second real task, the documentation and the release itself. 40 commits are not pushed (one push at
+release). Backend tests pass, none skipped; all use synthetic data.
 
 Design doc: [docs/REDESIGN.md](docs/REDESIGN.md). It says why; this file tracks what is done.
 
