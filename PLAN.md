@@ -190,8 +190,10 @@ by the user; in order:
 3. - [x] The copilot's method suggestions on Step nodes (`/api/copilot/suggest-step`, `backend/suggest.py`: LLM offered only registry-valid choices, answer re-checked, rules as fallback; rationale kept on the node and in the export); the classic Integration node is retired with `/api/integrate_multivariate`, the zoning recommendation and `weave_engine.py` (geometry repair moved to `geometry.py`). Old collections open without their classic nodes and say so. The paper's operator-selection benchmark notebook calls the removed endpoint: it runs against `vis2026-camera-ready` until its scoring rule is redone (after the release)
 4. - [x] atlas-clean in UrbanTrace (`backend/cleaning.py`): **Check data** on a dataset node runs atlas-clean's spatial checks against the catalog's region and proposes fixes; accepted fixes are saved as a recipe in `data/recipes/<stem>.json` and replayed on every load (`catalog.load`), so previews, plans, coverage and exports use the corrected data; plans report it under `inputs.<source>.cleaning`, exports include the recipe and a Corrections section. atlas-clean became light for this (atlas-profiler and autoddg are extras now, `dc5b831` on its `feat/spatial`). Verified on `2018_2019_school_locations` (swap found and fixed; recipe removed again afterwards)
 5. - [x] Dasymetric working: urbanweave 0.1.0a2 published to PyPI on 2026-11-22 (with the user's uncommitted dasymetric work committed into it: per-target priors, several totals, the 2016–2025 taxi notebook) and pinned; UrbanTrace's dasymetric test runs; checked on Brooklyn (2023 population over 351 H3 cells with schools as prior, total kept)
-6. - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
-7. - [ ] Documentation (section above): README, docs, screenshots, supplementary material
+6. Whole-catalog run, then a second real task
+   - [ ] Run all 121 datasets through every stage (load, profile and coverage, in-area share, atlas-clean checks, a step onto neighborhoods and onto an H3 grid, the map preview, export), with timings: `tools/corpus_check.py`; list what fails, what is slow and what looks wrong, and fix or log each
+   - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
+7. - [x] Documentation (section above): README, docs, screenshots, supplementary material (2026-11-22)
 8. Release mechanics
    - [ ] Version and CHANGELOG
    - [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
