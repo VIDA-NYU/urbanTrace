@@ -1214,6 +1214,25 @@ async def get_catalog_index():
     return {"datasets": scope.catalog_index(DATA_DIR)}
 
 
+_IN_AREA_CACHE: Dict[str, Any] = {}
+
+
+@app.post("/api/catalog/in-area")
+async def get_catalog_in_area(body: Dict[str, Any]):
+    """How much of each catalog dataset is in the study area (*body* is the study area spec), for
+    sorting and filtering the sidebar. Cached per spec: profiles do not change while the server runs."""
+    key = json.dumps(body, sort_keys=True)
+    if key not in _IN_AREA_CACHE:
+        try:
+            area = scope.study_area_geometry(DATA_DIR, body)
+        except scope.ScopeError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        if area is None:
+            raise HTTPException(status_code=400, detail="No study area.")
+        _IN_AREA_CACHE[key] = await asyncio.to_thread(scope.catalog_in_area, DATA_DIR, area)
+    return {"datasets": _IN_AREA_CACHE[key]}
+
+
 @app.get("/api/study-area/options/{dataset_id}")
 async def get_study_area_options(dataset_id: str):
     stem = catalog.stem_of(dataset_id)

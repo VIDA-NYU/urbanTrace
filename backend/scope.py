@@ -336,6 +336,31 @@ def _point_spread(cells, area) -> dict:
             "points_inside": n_inside, "share_of_rows": round(n_inside / n_total, 3) if n_total else 0.0}
 
 
+def catalog_in_area(data_dir, area) -> dict:
+    """For every catalog dataset, how much of it is in the study area, for the search sidebar:
+    points as spread and count inside (see _point_spread), other geometries as the share of the area's
+    ~500 m cells they reach. Datasets with no grid or extent are left out (unknown)."""
+    step = 0.005
+    x1, y1, x2, y2 = area.bounds
+    ii, jj = np.meshgrid(np.arange(np.floor(x1 / step), np.ceil(x2 / step)),
+                         np.arange(np.floor(y1 / step), np.ceil(y2 / step)), indexing="ij")
+    boxes = shapely.box(ii.ravel() * step, jj.ravel() * step, (ii.ravel() + 1) * step, (jj.ravel() + 1) * step)
+    inside = shapely.intersects(boxes, area)
+    area_keys = {(int(i), int(j)) for i, j, k in zip(ii.ravel(), jj.ravel(), inside) if k}
+    out = {}
+    for stem in catalog.list_stems(data_dir):
+        cells, _, _ = dataset_cells(data_dir, stem)
+        if not cells:
+            continue
+        if _is_points(data_dir, stem):
+            out[stem] = _point_spread(cells, area)
+        else:
+            keys = {(int(np.floor((c[0] + c[2]) / 2 / step)), int(np.floor((c[1] + c[3]) / 2 / step))) for c in cells}
+            share = len(keys & area_keys) / len(area_keys) if area_keys else 0.0
+            out[stem] = {"measure": "cells", "share_of_area": round(min(1.0, share), 3)}
+    return out
+
+
 # --- time ----------------------------------------------------------------------------------------
 
 def time_range(prof: dict | None) -> dict | None:

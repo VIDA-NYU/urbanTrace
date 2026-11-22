@@ -44,3 +44,14 @@ export function overlapsPeriod(time, fromYear, toYear) {
 // Coverage: cells shaded by how many datasets have data there (the map and its legend).
 export const COVER_COLORS = ['#e2e8f0', '#bfdbfe', '#60a5fa', '#2563eb', '#1e3a8a'];
 export const coverageColor = (palette, n, max) => palette[Math.min(palette.length - 1, Math.round((n / max) * (palette.length - 1)))];
+
+// How much of each catalog dataset is in a study area (by its spec), for the sidebar; cached per spec.
+const inAreaCache = new Map();
+export function getCatalogInArea(spec) {
+  const key = JSON.stringify(spec);
+  if (!inAreaCache.has(key)) {
+    inAreaCache.set(key, post('/api/catalog/in-area', spec).then((j) => j.datasets || {})
+      .catch((e) => { inAreaCache.delete(key); throw e; }));
+  }
+  return inAreaCache.get(key);
+}

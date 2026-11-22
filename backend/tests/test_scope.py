@@ -156,3 +156,14 @@ def test_no_data_in_the_study_area_is_its_own_warning(client, catalog):
     far = {"kind": "bbox", "bbox": [-73.90, 40.80, -73.85, 40.85]}
     warnings = client.post("/api/collections/check", json={"datasets": [{"id": "test_points"}], "study_area": far}).json()
     assert [w["kind"] for w in warnings["warnings"]] == ["coverage_none"]
+
+
+def test_catalog_in_area_measures_each_dataset(client, catalog):
+    west = {"kind": "bbox", "bbox": [-74.0, 40.75, -73.98, 40.76]}
+    out = client.post("/api/catalog/in-area", json=west).json()["datasets"]
+    assert out["test_points"]["measure"] == "spread" and out["test_points"]["points_inside"] > 0
+    assert out["test_zones"]["measure"] == "cells" and out["test_zones"]["share_of_area"] == 1.0
+    far = {"kind": "bbox", "bbox": [-73.90, 40.80, -73.85, 40.85]}
+    out = client.post("/api/catalog/in-area", json=far).json()["datasets"]
+    assert out["test_points"]["share_of_area"] == 0 and out["test_points"]["points_inside"] == 0
+    assert client.post("/api/catalog/in-area", json={"kind": "bbox", "bbox": [1, 1, 0, 0]}).status_code == 400

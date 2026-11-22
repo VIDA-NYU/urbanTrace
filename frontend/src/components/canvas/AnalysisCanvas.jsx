@@ -1326,7 +1326,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     if (!onStudyAreaResolved) return;
     if (!area) { onStudyAreaResolved(null); return; }
     let alive = true;
-    resolveStudyArea(area).then((summary) => alive && onStudyAreaResolved(summary)).catch(() => alive && onStudyAreaResolved(null));
+    resolveStudyArea(area).then((summary) => alive && onStudyAreaResolved({ ...summary, spec: area })).catch(() => alive && onStudyAreaResolved(null));
     return () => { alive = false; };
   }, [collection.study_area, onStudyAreaResolved]);
 

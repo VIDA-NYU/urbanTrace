@@ -4,7 +4,7 @@ import axios from 'axios';
 import { RefreshCw, Map, Search, Upload, X } from 'lucide-react'; // Added X here
 import DatasetCard from '../catalog/DatasetCard'; 
 import { API_BASE } from '../../config/api';
-import { getCatalogIndex, bboxIntersects, overlapsPeriod } from '../../lib/scope';
+import { getCatalogIndex, getCatalogInArea, bboxIntersects, overlapsPeriod } from '../../lib/scope';
 
 const DatasetSidebar = ({ studyArea = null }) => {
   const [datasets, setDatasets] = useState([]);
@@ -24,6 +24,16 @@ const DatasetSidebar = ({ studyArea = null }) => {
   const [fromYear, setFromYear] = useState('');
   const [toYear, setToYear] = useState('');
   useEffect(() => { getCatalogIndex().then(setCatalogIndex); }, []);
+  // How much of each dataset is in the study area, kept with the spec it belongs to.
+  const [inArea, setInArea] = useState({ key: null, value: null });
+  const areaKey = studyArea?.spec ? JSON.stringify(studyArea.spec) : null;
+  useEffect(() => {
+    if (!areaKey) return undefined;
+    let alive = true;
+    getCatalogInArea(JSON.parse(areaKey)).then((value) => alive && setInArea({ key: areaKey, value })).catch(() => {});
+    return () => { alive = false; };
+  }, [areaKey]);
+  const areaShares = areaKey && inArea.key === areaKey ? inArea.value : null;
 
   const fetchDatasets = () => {
     setLoading(true);
@@ -111,14 +121,21 @@ const DatasetSidebar = ({ studyArea = null }) => {
     }
   };
 
+  // "In study area" keeps the datasets with data inside it, most of it first; until the shares
+  // arrive, the bounding boxes stand in.
+  const shareOf = (ds) => areaShares?.[ds.id]?.share_of_area;
   const filteredDatasets = datasets.filter(ds => {
     const name = ds.metadata?.name || ds.name || "";
     if (!name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     const info = catalogIndex[ds.id];
-    if (inStudyArea && studyArea && info?.bbox && !bboxIntersects(info.bbox, studyArea.bbox)) return false;
+    if (inStudyArea && studyArea) {
+      if (areaShares && areaShares[ds.id] && !(shareOf(ds) > 0)) return false;
+      if (!areaShares && info?.bbox && !bboxIntersects(info.bbox, studyArea.bbox)) return false;
+    }
     if ((fromYear || toYear) && !overlapsPeriod(info?.time, fromYear, toYear)) return false;
     return true;
   });
+  if (inStudyArea && areaShares) filteredDatasets.sort((a, b) => (shareOf(b) ?? -1) - (shareOf(a) ?? -1));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f9fafb' }}>
@@ -259,6 +276,7 @@ const DatasetSidebar = ({ studyArea = null }) => {
           <DatasetCard 
             key={ds.id || ds.filename} 
             dataset={ds} 
+            inArea={areaShares ? areaShares[ds.id] || null : undefined}
             onDragStart={handleDragStart} 
           />
         ))}

@@ -141,7 +141,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] "In study area" couldn't judge 35 polygon and line datasets (their profiles have no extent or grid), so it always showed them: a coverage grid is now computed once from the data and cached (`scope.dataset_cells`, `data/.extent_cache.json`); the coverage view uses it too
 - [x] Dataset bbox taken from the profile's density grid rather than its envelope
 - [ ] Three datasets have corrupt coordinates in the file itself: `2018_2019_school_locations` (latitude and longitude swapped, so it is excluded from every study area), `raised_crosswalk_locations` and `street_closures_due_to_construction_activities_by_intersection` (NY State Plane feet labelled EPSG:4326). To be flagged by atlas-clean (its PLAN.md, M5 Spatial data), with the accepted recipe applied on load and recorded in provenance
-- [ ] "In study area" barely narrows the list for a borough, because almost the whole catalog is citywide (83 of 86 datasets with a grid have data in Brooklyn). Show each dataset's share of rows inside the study area on its card and sort by it?
+- [x] "In study area" barely narrows the list for a borough, because almost the whole catalog is citywide (83 of 86 datasets with a grid have data in Brooklyn). Show each dataset's share of rows inside the study area on its card and sort by it?
 - [x] Coverage "share of study area" misled for points: it counts ~500 m cells with any feature, so ~60 libraries spread over Brooklyn score 7% and schools 46%, shown in orange, and the checks warn "partial coverage". Points are now measured by spread (the part of the area inside the hull of their cells) with the count inside; the cell share is kept for polygons and lines and now divides by the study area's own cells, not those of the other datasets; a dataset with nothing in the area gets "no data in the study area"
 - [x] Coverage map showed a blue box with the study area as a dot: shapely's counterclockwise rings read by d3-geo as the globe minus the polygon. Polygons are rewound for d3 (`frontend/src/lib/geo.js`), in the coverage map and the dataset preview
 - [x] Coverage map drawn with Autark (`CoverageMap.jsx`, `autk-map`) over the basemap, with pan, zoom and a hover listing the datasets in each cell, instead of a static d3 SVG
@@ -179,7 +179,7 @@ by the user; in order:
 1. Clean-ups
    - [x] Delete `OperationNode` and `/run-operation`
    - [x] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`): `integration_engine.py`, `h3_engine.py`, `operators/`, `grids/` and two commented-out endpoints are gone
-   - [ ] Show each dataset's share inside the study area on its card, and sort by it
+   - [x] Show each dataset's share inside the study area on its card, and sort by it (`/api/catalog/in-area`; "In study area" keeps datasets with data there, most first)
 2. - [ ] Autark does the projection (`sourceCrs: 'EPSG:4326'`); remove UrbanTrace's Web Mercator code from `autarkMap.js`
 3. - [ ] The copilot's method suggestions on Step nodes; then retire the classic Integration node
 4. - [ ] atlas-clean in UrbanTrace: run its spatial checks when a dataset loads, apply accepted fixes as recipes, record them in provenance and the export. Needs atlas-clean's `feat/spatial` released with it
