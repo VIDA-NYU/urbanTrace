@@ -184,8 +184,15 @@ export function CoverageModal({ datasets, studyArea, onClose }) {
                   <tr key={id} style={{ borderTop: '1px solid #f1f5f9' }}>
                     <td>{id}{info.approximate ? ' (from its extent)' : ''}</td>
                     <td>{info.has_grid ? info.cells : '—'}</td>
-                    {data.study_area && <td style={{ color: info.share_of_area < 0.5 ? '#b45309' : '#0f172a' }}>
-                      {info.share_of_area != null ? `${Math.round(info.share_of_area * 100)}%` : '—'}</td>}
+                    {data.study_area && (
+                      <td style={{ color: info.share_of_area < 0.5 ? '#b45309' : '#0f172a' }}
+                        title={info.measure === 'spread'
+                          ? `Points: the part of the study area their spread reaches. ${info.points_inside} points inside (${Math.round(info.share_of_rows * 100)}% of the dataset), counted from its density grid.`
+                          : 'Share of the study area\'s 500 m cells where the dataset has data.'}>
+                        {info.share_of_area != null ? `${Math.round(info.share_of_area * 100)}%` : '—'}
+                        {info.measure === 'spread' && <span style={{ color: '#64748b' }}> · {info.points_inside} points</span>}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

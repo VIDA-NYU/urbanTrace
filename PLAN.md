@@ -141,7 +141,7 @@ Found while using the tool (started 2026-11-22).
 - [x] Dataset bbox taken from the profile's density grid rather than its envelope
 - [ ] Three datasets have corrupt coordinates in the file itself: `2018_2019_school_locations` (latitude and longitude swapped, so it is excluded from every study area), `raised_crosswalk_locations` and `street_closures_due_to_construction_activities_by_intersection` (NY State Plane feet labelled EPSG:4326). To be flagged by atlas-clean (its PLAN.md, M5 Spatial data), with the accepted recipe applied on load and recorded in provenance
 - [ ] "In study area" barely narrows the list for a borough, because almost the whole catalog is citywide (83 of 86 datasets with a grid have data in Brooklyn). Show each dataset's share of rows inside the study area on its card and sort by it?
-- [ ] Coverage "share of study area" misleads for points: it counts ~500 m cells with any feature, so ~60 libraries spread over Brooklyn score 7% and schools 46%, shown in orange, and the checks warn "partial coverage". For points, report the points inside the area (count and share of the dataset's rows) and how they spread, and keep the cell share for polygons and lines
+- [x] Coverage "share of study area" misled for points: it counts ~500 m cells with any feature, so ~60 libraries spread over Brooklyn score 7% and schools 46%, shown in orange, and the checks warn "partial coverage". Points are now measured by spread (the part of the area inside the hull of their cells) with the count inside; the cell share is kept for polygons and lines and now divides by the study area's own cells, not those of the other datasets; a dataset with nothing in the area gets "no data in the study area"
 
 ---
 

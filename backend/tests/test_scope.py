@@ -107,7 +107,10 @@ def test_coverage_shares_of_the_study_area(client, catalog):
     whole = {"kind": "bbox", "bbox": [-74.0, 40.75, -73.96, 40.76]}
     out = client.post("/api/coverage", json={"datasets": ["test_points", "test_rates"], "study_area": whole}).json()
     assert out["datasets"]["test_rates"]["share_of_area"] == 1.0
-    assert out["datasets"]["test_points"]["share_of_area"] == pytest.approx(0.5)
+    # Points are measured by spread: their cells cover the western half of the box.
+    assert out["datasets"]["test_points"]["measure"] == "spread"
+    assert out["datasets"]["test_points"]["share_of_area"] == pytest.approx(0.5, abs=0.01)
+    assert out["datasets"]["test_points"]["points_inside"] == 8
     assert {f["properties"]["n"] for f in out["features"]} == {1, 2}
 
 
@@ -116,7 +119,8 @@ def test_checks_warn_about_time_and_coverage(client, catalog):
            "study_area": {"kind": "bbox", "bbox": [-73.98, 40.75, -73.96, 40.76]}}
     kinds = {w["kind"]: w for w in client.post("/api/collections/check", json=doc).json()["warnings"]}
     assert "time_no_overlap" in kinds and "2010-12-31" in kinds["time_no_overlap"]["message"]
-    assert kinds["coverage_partial"]["datasets"] == ["test_points"]
+    # The points are all in the western half, the study area is the eastern half.
+    assert kinds["coverage_none"]["datasets"] == ["test_points"]
     # A time window on the rates that reaches 2019 removes the period warning.
     doc["datasets"][1]["time_window"] = {"start": "2005-01-01", "end": "2020-01-01"}
     kinds = {w["kind"] for w in client.post("/api/collections/check", json=doc).json()["warnings"]}
@@ -134,3 +138,22 @@ def test_export_clips_to_the_study_area_and_lists_warnings(client, catalog):
     assert "## Study area" in readme and "The periods do not overlap" in readme
     package = json.loads(z.read("datapackage.json"))
     assert package["urbantrace:export"]["clipped"] is True
+
+
+def test_points_spread_over_the_area_are_not_partial(client, catalog):
+    import json
+    # Few points, one per corner of the box: a cell share would be tiny, the spread is the whole box.
+    prof = json.loads((catalog / "metadata_v2" / "test_points.json").read_text())
+    prof["spatial_coverage"][0]["grid"]["cells"] = [[0, 0, 1], [7, 0, 1], [0, 1, 1], [7, 1, 1]]
+    (catalog / "metadata_v2" / "test_points.json").write_text(json.dumps(prof))
+    whole = {"kind": "bbox", "bbox": [-74.0, 40.75, -73.96, 40.76]}
+    out = client.post("/api/coverage", json={"datasets": ["test_points"], "study_area": whole}).json()
+    assert out["datasets"]["test_points"]["share_of_area"] == 1.0
+    warnings = client.post("/api/collections/check", json={"datasets": [{"id": "test_points"}], "study_area": whole}).json()
+    assert not [w for w in warnings["warnings"] if w["kind"].startswith("coverage")]
+
+
+def test_no_data_in_the_study_area_is_its_own_warning(client, catalog):
+    far = {"kind": "bbox", "bbox": [-73.90, 40.80, -73.85, 40.85]}
+    warnings = client.post("/api/collections/check", json={"datasets": [{"id": "test_points"}], "study_area": far}).json()
+    assert [w["kind"] for w in warnings["warnings"]] == ["coverage_none"]

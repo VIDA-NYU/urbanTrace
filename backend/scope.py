@@ -273,11 +273,40 @@ def coverage(data_dir, stems: list[str], area=None) -> dict:
         features.append({"type": "Feature", "geometry": mapping(geom),
                          "properties": {"n": len(who), "datasets": sorted(who)}})
     if area is not None:
-        total = sum(1 for f in features)
+        # The study area's own cells on the lattice, so a share does not depend on the other datasets.
+        x1, y1, x2, y2 = area.bounds
+        ii, jj = np.meshgrid(np.arange(np.floor(x1 / step), np.ceil(x2 / step)),
+                             np.arange(np.floor(y1 / step), np.ceil(y2 / step)), indexing="ij")
+        area_boxes = shapely.box(ii.ravel() * step, jj.ravel() * step, (ii.ravel() + 1) * step, (jj.ravel() + 1) * step)
+        total = int(shapely.intersects(area_boxes, area).sum())
         for stem in stems:
             mine = sum(1 for f in features if stem in f["properties"]["datasets"])
-            per[stem]["share_of_area"] = round(mine / total, 3) if total else 0.0
+            per[stem]["share_of_area"] = round(min(1.0, mine / total), 3) if total else 0.0
+            per[stem]["measure"] = "cells"
+            if _is_points(data_dir, stem) and cell_sets[stem]:
+                per[stem].update(_point_spread(cell_sets[stem], area))
     return {"type": "FeatureCollection", "features": features, "datasets": per, "cell_degrees": step}
+
+
+def _is_points(data_dir, stem: str) -> bool:
+    return str((catalog.profile(data_dir, stem) or {}).get("geometricType") or "").endswith("Point")
+
+
+def _point_spread(cells, area) -> dict:
+    """For points, a share of cells says little (60 libraries spread over a borough fill a few percent
+    of its cells). Instead: the points inside the area (from the density grid, so approximate at the
+    edge), their share of the dataset, and how far they spread: the part of the area inside the convex
+    hull of the cells that hold them."""
+    boxes = shapely.box(*np.array([c[:4] for c in cells]).T)
+    counts = np.array([c[4] for c in cells])
+    inside = shapely.intersects(boxes, area) & ~shapely.touches(boxes, area)
+    n_inside, n_total = int(counts[inside].sum()), int(counts.sum())
+    spread = 0.0
+    if inside.any():
+        hull = shapely.convex_hull(shapely.union_all(boxes[inside]))
+        spread = float(shapely.area(shapely.intersection(hull, area)) / shapely.area(area))
+    return {"measure": "spread", "share_of_area": round(min(1.0, spread), 3),
+            "points_inside": n_inside, "share_of_rows": round(n_inside / n_total, 3) if n_total else 0.0}
 
 
 # --- time ----------------------------------------------------------------------------------------
@@ -362,9 +391,17 @@ def checks(data_dir, doc: dict) -> list[dict]:
         cov = coverage(data_dir, stems, area)
         for stem, info in cov["datasets"].items():
             share = info.get("share_of_area")
-            if share is not None and share < 0.5:
-                warnings.append({"kind": "coverage_partial",
-                                 "message": f"{stem} has data in {share:.0%} of the study area"
-                                            + (" (estimated from its extent)" if info.get("approximate") else "") + ".",
-                                 "datasets": [stem], "share": share})
+            if share is None:
+                continue
+            if share == 0 or (info.get("measure") == "spread" and info.get("points_inside") == 0):
+                warnings.append({"kind": "coverage_none", "message": f"{stem} has no data in the study area.",
+                                 "datasets": [stem], "share": 0.0})
+            elif share < 0.5:
+                if info.get("measure") == "spread":
+                    message = (f"{stem}'s {info['points_inside']} points in the study area spread over only "
+                               f"{share:.0%} of it.")
+                else:
+                    message = (f"{stem} has data in {share:.0%} of the study area"
+                               + (" (estimated from its extent)" if info.get("approximate") else "") + ".")
+                warnings.append({"kind": "coverage_partial", "message": message, "datasets": [stem], "share": share})
     return warnings
