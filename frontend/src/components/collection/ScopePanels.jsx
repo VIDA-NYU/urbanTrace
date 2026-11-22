@@ -1,9 +1,8 @@
 // Study area picker, coverage view and warnings for the collection bar (docs/REDESIGN.md, phase 2).
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { geoMercator, geoPath } from 'd3-geo';
-import { getStudyAreaOptions, resolveStudyArea, getCoverage } from '../../lib/scope';
-import { rewindForD3 } from '../../lib/geo';
+import { getStudyAreaOptions, resolveStudyArea, getCoverage, COVER_COLORS, coverageColor } from '../../lib/scope';
+import CoverageMap from '../visualization/CoverageMap';
 
 const panelStyle = {
   position: 'absolute', top: 'calc(100% + 6px)', left: 0, width: 400, background: '#fff', border: '1px solid #cbd5e1',
@@ -129,8 +128,6 @@ export function StudyAreaPanel({ value, zoneDatasets, onApply, onClose }) {
   );
 }
 
-const COVER_COLORS = ['#e2e8f0', '#bfdbfe', '#60a5fa', '#2563eb', '#1e3a8a'];
-
 export function CoverageModal({ datasets, studyArea, onClose }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -138,18 +135,6 @@ export function CoverageModal({ datasets, studyArea, onClose }) {
     if (!datasets.length) return;
     getCoverage(datasets, studyArea).then(setData).catch((e) => setError(e.message));
   }, [datasets, studyArea]);
-  const width = 560;
-  const height = 420;
-  const paths = useMemo(() => {
-    if (!data) return null;
-    const fc = { type: 'FeatureCollection', features: [...data.features] };
-    if (data.study_area) fc.features.push({ type: 'Feature', geometry: data.study_area.geometry, properties: { area: true } });
-    if (!fc.features.length) return [];
-    fc.features = fc.features.map(rewindForD3);
-    const projection = geoMercator().fitSize([width, height], fc);
-    const path = geoPath(projection);
-    return fc.features.map((f, i) => ({ d: path(f), f, key: i }));
-  }, [data]);
   const max = Math.max(1, datasets.length);
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -159,25 +144,17 @@ export function CoverageModal({ datasets, studyArea, onClose }) {
         {!datasets.length && <div>Add datasets to the canvas first.</div>}
         {error && <div style={{ color: '#b91c1c' }}>{error}</div>}
         {datasets.length > 0 && !data && !error && <div><Loader2 size={14} /> computing coverage…</div>}
-        {paths && (
+        {data && (
           <>
-            <svg width={width} height={height} style={{ background: '#f8fafc', borderRadius: 6, maxWidth: '100%' }}>
-              {paths.filter((p) => !p.f.properties.area).map((p) => (
-                <path key={p.key} d={p.d} fill={COVER_COLORS[Math.min(COVER_COLORS.length - 1, Math.round((p.f.properties.n / max) * (COVER_COLORS.length - 1)))]}
-                  stroke="none"><title>{p.f.properties.datasets.join(', ')}</title></path>
-              ))}
-              {paths.filter((p) => p.f.properties.area).map((p) => (
-                <path key={p.key} d={p.d} fill="none" stroke="#dc2626" strokeWidth={1.5} strokeDasharray="4 3" />
-              ))}
-            </svg>
+            <CoverageMap cells={data} studyArea={data.study_area} max={max} palette={COVER_COLORS} />
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', margin: '6px 0 10px', color: '#475569' }}>
               Datasets with data in a cell (about 500 m):
               {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
                 <span key={n} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <span style={{ width: 12, height: 12, background: COVER_COLORS[Math.min(COVER_COLORS.length - 1, Math.round((n / max) * (COVER_COLORS.length - 1)))], display: 'inline-block' }} /> {n}
+                  <span style={{ width: 12, height: 12, background: coverageColor(COVER_COLORS, n, max), display: 'inline-block' }} /> {n}
                 </span>
               ))}
-              {data.study_area && <span style={{ color: '#dc2626' }}>– – study area</span>}
+              {data.study_area && <span style={{ color: '#dc2626' }}>— study area</span>}
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead><tr style={{ textAlign: 'left', color: '#64748b' }}><th>Dataset</th><th>Cells</th>{data.study_area && <th>Share of study area</th>}</tr></thead>

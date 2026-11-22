@@ -40,3 +40,7 @@ export function overlapsPeriod(time, fromYear, toYear) {
   const end = time.end ? Number(time.end.slice(0, 4)) : Infinity;
   return (!fromYear || end >= Number(fromYear)) && (!toYear || start <= Number(toYear));
 }
+
+// Coverage: cells shaded by how many datasets have data there (the map and its legend).
+export const COVER_COLORS = ['#e2e8f0', '#bfdbfe', '#60a5fa', '#2563eb', '#1e3a8a'];
+export const coverageColor = (palette, n, max) => palette[Math.min(palette.length - 1, Math.round((n / max) * (palette.length - 1)))];
