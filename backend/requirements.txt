@@ -21,5 +21,7 @@ datamart-profiler
 # LLM / external APIs
 # openai
 # portkey-ai
-# pydantic# Data checks and corrections (backend/cleaning.py) use atlas-clean[geo]. Optional until its spatial
+# pydantic
+
+# Data checks and corrections (backend/cleaning.py) use atlas-clean[geo]. Optional until its spatial
 # checks are released: install a local checkout with  pip install -e "../../atlas-clean[geo]"
