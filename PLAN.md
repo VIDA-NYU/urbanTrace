@@ -1,9 +1,10 @@
 # UrbanTrace — Implementation Plan
 
-**Progress (2026-11-20):** Phases 0–5 built on the `autark-map` branch, one commit each (not pushed).
-61 backend tests pass and 1 is skipped (dasymetric, which needs urbanweave newer than 0.1.0a1). All
-tests use synthetic data, so the 17.7 GB Git LFS catalog is not needed. Phase 6 has not started; it
-needs the decisions listed under it.
+**Progress (2026-11-22):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
+real task (Brooklyn schools and libraries) that found and fixed 17 problems, listed under
+[Tryout fixes](#tryout-fixes); it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). 25 commits are
+not pushed. 67 backend tests pass and 1 is skipped (dasymetric, which needs urbanweave newer than
+0.1.0a1); all use synthetic data. Phase 6 has not started; it needs the decisions listed under it.
 
 Design doc: [docs/REDESIGN.md](docs/REDESIGN.md). It says why; this file tracks what is done.
 
@@ -107,7 +108,7 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Priority indexes from Result Maps recorded as analyses and recomputed server-side
 - [x] Report: `/api/collections/{id}/report`, printable HTML (≈60 KB), included in exports as `report.html`
 - [x] Exports include the analyses and README sections for them
-- [ ] Interactive check in a real browser — *done only in headless Chrome over CDP; the Chrome extension was unavailable*
+- [x] Interactive check in a real browser — *the tryout on 2026-11-22, by the user; fixes under Tryout fixes*
 
 ## Phase 6 — More data and other tools
 
@@ -156,13 +157,14 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] Map tooltips (and the feature they name) were off whenever the canvas was zoomed: React Flow scales nodes with a CSS transform, and pointer offsets were used unscaled. `pointerInElement` in `autarkMap.js`, used by the result, dataset and coverage maps
 - [x] `dycd_program_sites` preview was blank: one site geocoded to Los Angeles, and when the densest area held over 95% of the points the frame took every feature, strays included. It now frames the central 99.6% (`framingBounds` in `autarkMap.js`); affects every Autark map's first view
 - [ ] Export file names use internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`); name them after the output or analysis (`schools_per_library`, `sweep_libraries`)
+- [ ] Frontend lint: 8 errors and 13 warnings in older code (`ResultMapNode.jsx` and others); CI runs backend tests only
 
 ---
 
 ## Release
 
 - [ ] Push `autark-map` and open a PR to `main`
-- [ ] Try the tool on the paper's case studies and with expert users; reorder phase 6 by what that shows
+- [ ] Try the tool on the paper's case studies and with expert users; reorder phase 6 by what that shows — *one task done (the walkthrough); the paper's case studies and other users not yet*
 - [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
 - [ ] Scoring rule for the operator-selection benchmark in urbanweave's vocabulary (REDESIGN §6)
 
