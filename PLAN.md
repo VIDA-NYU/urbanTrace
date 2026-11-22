@@ -3,8 +3,7 @@
 **Progress (2026-11-22):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
 real task (Brooklyn schools and libraries) that found and fixed 17 problems, listed under
 [Tryout fixes](#tryout-fixes); it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). 25 commits are
-not pushed. 67 backend tests pass and 1 is skipped (dasymetric, which needs urbanweave newer than
-0.1.0a1); all use synthetic data. Phase 6 has not started; it needs the decisions listed under it.
+not pushed. Backend tests pass (none skipped since urbanweave 0.1.0a2); all use synthetic data. Phase 6 has not started; it needs the decisions listed under it.
 
 Design doc: [docs/REDESIGN.md](docs/REDESIGN.md). It says why; this file tracks what is done.
 
@@ -104,7 +103,7 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Sensitivity sweep over resolutions, zone systems and methods; rank-stability map; Spearman agreement
 - [x] Validate node: coverage, baseline and lift per quantile, with a note when ties make quantiles coincide
 - [x] Dasymetric node with point priors
-- [ ] Pin an urbanweave prerelease that has `uw.dasymetric` — *needs publishing urbanweave; the node says it's unavailable until then*
+- [x] Pin an urbanweave prerelease that has `uw.dasymetric` — *0.1.0a2*
 - [x] Priority indexes from Result Maps recorded as analyses and recomputed server-side
 - [x] Report: `/api/collections/{id}/report`, printable HTML (≈60 KB), included in exports as `report.html`
 - [x] Exports include the analyses and README sections for them
@@ -184,7 +183,7 @@ by the user; in order:
 2. - [x] Autark does the projection (`sourceCrs: 'EPSG:4326'`), hover and tooltips (`setTooltip`, `MapEvent.HOVER`) and framing (`fitBounds`); `autarkMap.js` lost its hit-testing, pointer correction and screen↔Mercator helpers (−137 lines). It needed a fix in Autark for canvases under a CSS transform: `fix/pointer-css-scale` in `~/src/autark` (local, with a test)
 3. - [x] The copilot's method suggestions on Step nodes (`/api/copilot/suggest-step`, `backend/suggest.py`: LLM offered only registry-valid choices, answer re-checked, rules as fallback; rationale kept on the node and in the export); the classic Integration node is retired with `/api/integrate_multivariate`, the zoning recommendation and `weave_engine.py` (geometry repair moved to `geometry.py`). Old collections open without their classic nodes and say so. The paper's operator-selection benchmark notebook calls the removed endpoint: it runs against `vis2026-camera-ready` until its scoring rule is redone (after the release)
 4. - [x] atlas-clean in UrbanTrace (`backend/cleaning.py`): **Check data** on a dataset node runs atlas-clean's spatial checks against the catalog's region and proposes fixes; accepted fixes are saved as a recipe in `data/recipes/<stem>.json` and replayed on every load (`catalog.load`), so previews, plans, coverage and exports use the corrected data; plans report it under `inputs.<source>.cleaning`, exports include the recipe and a Corrections section. atlas-clean became light for this (atlas-profiler and autoddg are extras now, `dc5b831` on its `feat/spatial`). Verified on `2018_2019_school_locations` (swap found and fixed; recipe removed again afterwards)
-5. - [ ] Dasymetric working: the user publishes an urbanweave prerelease with `uw.dasymetric`; pin it
+5. - [x] Dasymetric working: urbanweave 0.1.0a2 published to PyPI on 2026-11-22 (with the user's uncommitted dasymetric work committed into it: per-target priors, several totals, the 2016–2025 taxi notebook) and pinned; UrbanTrace's dasymetric test runs; checked on Brooklyn (2023 population over 351 H3 cells with schools as prior, total kept)
 6. - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
 7. - [ ] Documentation (section above): README, docs, screenshots, supplementary material
 8. Release mechanics

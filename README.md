@@ -59,7 +59,7 @@ Built on React Flow. The workflow is made of nodes:
 | **Combine & Calculate** | Joins the outputs of steps that share a target and, optionally, adds a column computed from them (e.g. a rate per 1,000 residents). |
 | **Sensitivity Sweep** | Reruns a step's variable through other H3 resolutions, zone systems or matching methods, brings each variant back to the step's units, and maps how stable each unit's rank is (the share of variants in which it is among the top units). |
 | **Validate** | Ranks units by a result and checks them against known outcomes (points such as program sites): coverage, baseline and lift per quantile, as in the paper's Table 3. |
-| **Dasymetric** | Spreads zone totals over finer units (an H3 grid or other zones) in proportion to point priors, keeping each zone's total. Needs an urbanweave newer than 0.1.0a1. |
+| **Dasymetric** | Spreads zone totals over finer units (an H3 grid or other zones) in proportion to point priors, keeping each zone's total. |
 | **Spatial Integration** (classic) | The original node: variables onto an H3 grid and optionally into zones, with the copilot's operator suggestions. |
 | **Result Map** | Shows an integration result as H3 cells or zones, with hotspot palettes. |
 | **Compare Maps** | Takes two hotspot result maps and shows where values went up or down, with direction symbols. |
