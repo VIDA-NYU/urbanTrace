@@ -7,7 +7,7 @@
 > tracked in [PLAN.md](../PLAN.md); the tool is described in the [README](../README.md) and
 > [walkthrough](WALKTHROUGH.md). This document keeps the reasoning.
 
-Status: draft for discussion (2026-11-20). Author: Claudio Silva, with Claude.
+Written 2026-11-20 as a draft for discussion. Author: Claudio Silva, with Claude.
 
 ## Summary
 
