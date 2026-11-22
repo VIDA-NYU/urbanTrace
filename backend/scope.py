@@ -202,7 +202,11 @@ _MAX_DATA_GRID_CELLS = 250_000
 
 def dataset_cells(data_dir, stem: str) -> tuple[list[tuple[float, float, float, float, int]], list[float] | None, str | None]:
     """Coverage cells and bbox of a catalog dataset, and where they came from ("profile" or "data")."""
-    cells, bounds = coverage_cells(catalog.profile(data_dir, stem))
+    import cleaning
+    # A corrected dataset's profile describes the data before correction (a swap, a wrong CRS), so
+    # its coverage comes from the corrected data instead.
+    cells, bounds = (([], None) if cleaning.has_recipe(data_dir, stem)
+                     else coverage_cells(catalog.profile(data_dir, stem)))
     if cells:
         return cells, bounds, "profile"
     try:
@@ -223,6 +227,10 @@ def _data_cells(data_dir, stem: str):
     st = path.stat()
     cache_path = Path(data_dir) / ".extent_cache.json"
     key = str(path.resolve())
+    import cleaning
+    recipe = cleaning.recipe_path(data_dir, stem)
+    if recipe.exists():                                   # the corrected data: one entry per recipe version
+        key += f"#recipe:{recipe.stat().st_mtime}"
     with catalog._hash_lock:
         cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
     hit = cache.get(key)
@@ -384,13 +392,16 @@ def time_range(prof: dict | None) -> dict | None:
 
 
 def catalog_index(data_dir) -> list[dict]:
-    """One row per dataset for search filters: bbox, time range, geometry type, rows."""
+    """One row per dataset for search filters: bbox, time range, geometry type, rows, and whether
+    atlas-clean corrections are saved for it."""
+    import cleaning
     out = []
     for stem in catalog.list_stems(data_dir):
         prof = catalog.profile(data_dir, stem)
         _, bounds, _ = dataset_cells(data_dir, stem)
         out.append({"id": stem, "bbox": bounds, "time": time_range(prof),
-                    "geometry": (prof or {}).get("geometricType"), "rows": (prof or {}).get("nb_rows")})
+                    "geometry": (prof or {}).get("geometricType"), "rows": (prof or {}).get("nb_rows"),
+                    "corrected": cleaning.has_recipe(data_dir, stem)})
     return out
 
 

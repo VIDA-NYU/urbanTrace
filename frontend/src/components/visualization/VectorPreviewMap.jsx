@@ -16,6 +16,7 @@ const LINE_WIDTH_PX = 1.5;
 
 const VectorPreviewMap = ({
   filename,
+  rev = 0, // bumped when the dataset's saved corrections change, to reload it
   height = 120, // CSS pixels
   selectedColumn,
   // GLOBAL VIEWPORT SYNC: Props for linked camera
@@ -25,9 +26,10 @@ const VectorPreviewMap = ({
 }) => {
   const canvasRef = useRef(null);
   // The response is kept with the filename it belongs to, so `loading` is derived rather than set in an effect.
-  const [loaded, setLoaded] = useState({ filename: null, data: null });
-  const data = loaded.filename === filename ? loaded.data : null;
-  const loading = loaded.filename !== filename;
+  const [loaded, setLoaded] = useState({ key: null, data: null });
+  const key = `${filename}#${rev}`;
+  const data = loaded.key === key ? loaded.data : null;
+  const loading = loaded.key !== key;
 
   const loadedRef = useRef(false);
   const applyingViewRef = useRef(false);
@@ -89,16 +91,16 @@ const VectorPreviewMap = ({
   // 1. Fetch data
   useEffect(() => {
     let cancelled = false;
-    axios.get(`${API_BASE}/dataset/${filename}?simplify=true`)
-      .then(res => !cancelled && setLoaded({ filename, data: res.data }))
+    axios.get(`${API_BASE}/dataset/${filename}?simplify=true${rev ? `&rev=${rev}` : ''}`)
+      .then(res => !cancelled && setLoaded({ key, data: res.data }))
       .catch(err => {
         console.error('Preview load error', err);
-        if (!cancelled) setLoaded({ filename, data: null });
+        if (!cancelled) setLoaded({ key, data: null });
       });
     return () => {
       cancelled = true;
     };
-  }, [filename]);
+  }, [filename, rev, key]);
 
   const projected = useMemo(() => (data ? prepareCollection(data) : null), [data]);
   useLayoutEffect(() => {

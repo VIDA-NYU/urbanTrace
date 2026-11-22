@@ -47,6 +47,7 @@ export const coverageColor = (palette, n, max) => palette[Math.min(palette.lengt
 
 // How much of each catalog dataset is in a study area (by its spec), for the sidebar; cached per spec.
 const inAreaCache = new Map();
+export const clearInAreaCache = () => inAreaCache.clear();
 export function getCatalogInArea(spec) {
   const key = JSON.stringify(spec);
   if (!inAreaCache.has(key)) {

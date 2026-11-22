@@ -53,16 +53,28 @@ def dataset_path(data_dir, stem: str) -> Path | None:
     return None
 
 
-def load(data_dir, stem: str, columns: list[str] | None = None) -> gpd.GeoDataFrame:
-    """Read a dataset, optionally only some columns (plus geometry). Raises FileNotFoundError."""
+def load(data_dir, stem: str, columns: list[str] | None = None, clean: bool = True) -> gpd.GeoDataFrame:
+    """Read a dataset, optionally only some columns (plus geometry). Raises FileNotFoundError.
+
+    With *clean* (the default), the dataset's atlas-clean recipe, if one was saved, is replayed
+    (cleaning.py); what it did is in ``gdf.attrs["urbantrace_cleaning"]``."""
     path = dataset_path(data_dir, stem)
     if path is None:
         raise FileNotFoundError(f"Dataset {stem!r} is not in the catalog")
+    import cleaning
+    corrected = clean and cleaning.has_recipe(data_dir, stem)
+    read_columns = None if corrected else columns       # a recipe may use any column
     if path.suffix == ".parquet":
-        return gpd.read_parquet(path, columns=None if columns is None else [*columns, "geometry"])
-    gdf = gpd.read_file(path)
+        gdf = gpd.read_parquet(path, columns=None if read_columns is None else [*read_columns, "geometry"])
+    else:
+        gdf = gpd.read_file(path)
+    if corrected:
+        gdf, report = cleaning.apply(data_dir, stem, gdf)
+        gdf.attrs["urbantrace_cleaning"] = report
     if columns is not None:
+        attrs = dict(gdf.attrs)
         gdf = gdf[[c for c in columns if c in gdf.columns] + [gdf.geometry.name]]
+        gdf.attrs.update(attrs)
     return gdf
 
 

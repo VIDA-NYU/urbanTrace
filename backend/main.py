@@ -39,6 +39,7 @@ import scope
 import plans
 import analysis
 import suggest
+import cleaning
 from fastapi.responses import HTMLResponse
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
@@ -258,13 +259,10 @@ async def get_dataset_report(dataset_id: str):
 async def get_geojson(filename: str, simplify: bool = False):
     print(f"Requesting dataset: {filename} (simplify={simplify})")
     """Serves raw or simplified GeoJSON data to the frontend."""
-    geojson_dir = os.path.join(DATA_DIR, "geojson")
-    resolved_filename = _geojson_filename(filename)
-    path = os.path.join(geojson_dir, resolved_filename)
-    if not os.path.exists(path):
+    stem = catalog.stem_of(filename)
+    if not catalog.valid_stem(stem) or catalog.dataset_path(DATA_DIR, stem) is None:
         raise HTTPException(status_code=404, detail="File not found")
-    
-    gdf = gpd.read_file(path)
+    gdf = catalog.load(DATA_DIR, stem)    # with its saved corrections (cleaning.py)
     
     if gdf.crs and gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
@@ -605,6 +603,22 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
     extras.setdefault("readme_sections", [])
     extras["readme_sections"] = list(extras["readme_sections"]) + _analysis_readme(analyses)
     files["report.html"] = _collection_report(doc, analyses).encode()
+    # Corrections replayed on the datasets (atlas-clean recipes), so the package says what changed
+    corrections = []
+    for d in doc.get("datasets", []):
+        stem = catalog.stem_of(d.get("id"))
+        info = cleaning.recipe_info(DATA_DIR, stem) if catalog.valid_stem(stem) else None
+        if info is None:
+            continue
+        files[f"data/recipes/{stem}.json"] = cleaning.recipe_path(DATA_DIR, stem).read_bytes()
+        fixes = "; ".join(f"{f['action']}: {f['rationale']}" for f in info.get("fixes", [])) or "see the recipe"
+        corrections.append(f"- `{stem}`: {fixes} (`data/recipes/{stem}.json`, an atlas-clean recipe)")
+    if corrections:
+        extras["readme_sections"] = list(extras["readme_sections"]) + [
+            "## Corrections", "",
+            "These datasets were checked with [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) and "
+            "corrected before use; the sources in this package and the results are the corrected data.", "",
+            *corrections, ""]
     extras["extra_files"] = files
     return extras
 
@@ -771,6 +785,58 @@ async def get_dataset_origin(dataset_id: str):
 async def get_catalog_index():
     """One row per dataset (bbox, time range, geometry, rows) for search filters."""
     return {"datasets": scope.catalog_index(DATA_DIR)}
+
+
+# --- data checks and corrections with atlas-clean (cleaning.py) ---------------------------------
+
+class RecipeBody(BaseModel):
+    accept: List[str]
+
+
+def _dataset_stem(dataset_id: str) -> str:
+    stem = catalog.stem_of(dataset_id)
+    if not catalog.valid_stem(stem) or catalog.dataset_path(DATA_DIR, stem) is None:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return stem
+
+
+def _corrections_changed():
+    """Coverage and study-area shares depend on corrected data."""
+    _IN_AREA_CACHE.clear()
+
+
+@app.post("/api/datasets/{dataset_id}/check")
+async def check_dataset(dataset_id: str):
+    """atlas-clean's spatial checks on a dataset, with proposed fixes (nothing changes yet)."""
+    stem = _dataset_stem(dataset_id)
+    try:
+        return await asyncio.to_thread(cleaning.check, DATA_DIR, stem)
+    except cleaning.CleaningError as e:
+        raise HTTPException(status_code=400 if cleaning.AVAILABLE else 501, detail=str(e))
+
+
+@app.get("/api/datasets/{dataset_id}/recipe")
+async def get_recipe(dataset_id: str):
+    return {"recipe": cleaning.recipe_info(DATA_DIR, _dataset_stem(dataset_id))}
+
+
+@app.post("/api/datasets/{dataset_id}/recipe")
+async def save_recipe(dataset_id: str, body: RecipeBody):
+    """Accept fixes from a check; they are replayed on every later load of the dataset."""
+    stem = _dataset_stem(dataset_id)
+    try:
+        meta = await asyncio.to_thread(cleaning.save, DATA_DIR, stem, body.accept)
+    except cleaning.CleaningError as e:
+        raise HTTPException(status_code=400 if cleaning.AVAILABLE else 501, detail=str(e))
+    _corrections_changed()
+    return {"recipe": meta}
+
+
+@app.delete("/api/datasets/{dataset_id}/recipe")
+async def delete_recipe(dataset_id: str):
+    found = cleaning.delete(DATA_DIR, _dataset_stem(dataset_id))
+    _corrections_changed()
+    return {"deleted": found}
 
 
 _IN_AREA_CACHE: Dict[str, Any] = {}

@@ -1,7 +1,8 @@
 // frontend/src/components/DatasetNode.jsx
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Database, Layers, Palette, Info, X, Clock } from 'lucide-react'; // Added Info icon
+import { Database, Layers, Palette, Info, X, Clock, ShieldCheck } from 'lucide-react';
+import CheckDataModal from '../../catalog/CheckDataModal';
 import VectorPreviewMap from '../../visualization/VectorPreviewMap';
 import { getCatalogIndex } from '../../../lib/scope';
 
@@ -41,6 +42,18 @@ const DatasetNode = memo(({ id, data }) => {
   const columns = meta.columns;
   const name = meta.name || data.name || 'Untitled';
   const filename = data.filename || name + '.geojson';
+  const datasetId = data.id || filename.replace(/\.geojson$/i, '');
+
+  // Data checks (atlas-clean): whether corrections are saved, and a revision that makes the preview
+  // reload after they change.
+  const [checking, setChecking] = useState(false);
+  const [rev, setRev] = useState(0);
+  const [corrected, setCorrected] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    getCatalogIndex().then((idx) => { if (alive) setCorrected(Boolean(idx[datasetId]?.corrected)); });
+    return () => { alive = false; };
+  }, [datasetId, rev]);
   
   // GLOBAL VIEWPORT SYNC: Extract sync props from data
   const isMapSyncEnabled = data.isMapSyncEnabled || false;
@@ -142,6 +155,16 @@ const DatasetNode = memo(({ id, data }) => {
 
           <button
             className="nodrag"
+            onClick={(e) => { e.stopPropagation(); setChecking(true); }}
+            title={corrected ? 'Corrections saved (atlas-clean); check again or remove them' : 'Check this dataset for data-quality problems (atlas-clean)'}
+            style={{ background: corrected ? '#ccfbf1' : 'none', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex',
+              alignItems: 'center', gap: 2, color: corrected ? '#0f766e' : '#64748b', borderRadius: '4px', fontSize: 9, fontWeight: 600 }}
+          >
+            <ShieldCheck size={12} />{corrected ? 'Corrected' : ''}
+          </button>
+
+          <button
+            className="nodrag"
             onClick={(e) => {
               e.stopPropagation();
               data?.onDeleteNode?.(id);
@@ -168,9 +191,14 @@ const DatasetNode = memo(({ id, data }) => {
       </div>
 
       {/* 2. Map Preview */}
+      {checking && (
+        <CheckDataModal datasetId={datasetId} name={name} onClose={() => setChecking(false)}
+          onChanged={() => { setRev((r) => r + 1); data.onCorrected?.(id); }} />
+      )}
       <VectorPreviewMap
         height={150}
-        filename={filename} 
+        filename={filename}
+        rev={rev}
         selectedColumn={selectedColumn}
         isMapSyncEnabled={isMapSyncEnabled}
         globalViewState={globalViewState}
