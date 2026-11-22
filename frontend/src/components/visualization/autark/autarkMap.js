@@ -124,7 +124,17 @@ export const framingBounds = (featureBoundsList) => {
       best = [cx, cy];
     }
   });
-  if (bestCount >= 0.95 * boxes.length) return union(boxes);
+  if (bestCount >= 0.95 * boxes.length) {
+    // Nearly everything is in one area: frame the central 99.6% of the features, so a few strays (one
+    // program site geocoded to Los Angeles) do not stretch the frame across a continent.
+    if (boxes.length < 50) return union(boxes);
+    const centres = boxes.map((b) => [(b[0] + b[2]) / 2, (b[1] + b[3]) / 2]);
+    const xs = centres.map((c) => c[0]).sort((a, b) => a - b);
+    const ys = centres.map((c) => c[1]).sort((a, b) => a - b);
+    const q = (arr, f) => arr[Math.min(arr.length - 1, Math.max(0, Math.round(f * (arr.length - 1))))];
+    const [x0, x1, y0, y1] = [q(xs, 0.002), q(xs, 0.998), q(ys, 0.002), q(ys, 0.998)];
+    return union(boxes.filter((b, i) => centres[i][0] >= x0 && centres[i][0] <= x1 && centres[i][1] >= y0 && centres[i][1] <= y1));
+  }
   const cluster = boxes.filter(b => {
     const [cx, cy] = cellOf(b);
     return Math.abs(cx - best[0]) <= 1 && Math.abs(cy - best[1]) <= 1;

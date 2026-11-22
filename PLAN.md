@@ -154,6 +154,7 @@ Found while using the tool (started 2026-11-22).
 - [x] Unsaved work was lost on reload without warning, and a reload always started empty: the browser now asks before leaving with unsaved changes, keeps them as a draft in the browser, and on reload restores the draft or reopens the last saved collection. Results are not saved (decided 2026-11-22: they are rerun)
 - [x] Couldn't connect to Combine & Calculate: it took only Step nodes and refused anything else silently, while the visible end of a chain is the step's Result Map. A Result Map now stands for the Step (or Calculate) that made it, for Calculate, Sweep and Validate; refused connections say why in the collection bar
 - [x] Map tooltips (and the feature they name) were off whenever the canvas was zoomed: React Flow scales nodes with a CSS transform, and pointer offsets were used unscaled. `pointerInElement` in `autarkMap.js`, used by the result, dataset and coverage maps
+- [x] `dycd_program_sites` preview was blank: one site geocoded to Los Angeles, and when the densest area held over 95% of the points the frame took every feature, strays included. It now frames the central 99.6% (`framingBounds` in `autarkMap.js`); affects every Autark map's first view
 
 ---
 
