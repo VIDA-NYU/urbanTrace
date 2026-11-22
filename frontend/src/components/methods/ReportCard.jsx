@@ -48,8 +48,35 @@ function Step({ label, report }) {
   );
 }
 
+// A join on a key (urbanweave's reduce): how many keys the rows carried, and those matching no zone.
+function KeyJoin({ report }) {
+  if (report?.conversion !== 'reduce') return null;
+  const unknown = report.unknown_keys || {};
+  const sample = (unknown.sample || unknown.ids || []).slice(0, 5);
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div>Joined on <b>{report.by}</b>: rows with {report.groups} distinct key(s)</div>
+      {unknown.count > 0 && (
+        <div style={{ color: '#b45309' }}>
+          {unknown.count} key(s) match no zone and were left out{sample.length ? ` (e.g. ${sample.join(', ')})` : ''}
+        </div>
+      )}
+      {(report.reductions || []).filter((r) => r.rows_skipped).map((r) => (
+        <div key={r.as} style={{ color: '#b45309' }}>{r.as}: {r.rows_skipped} row(s) with a missing value left out</div>
+      ))}
+      {(report.reductions || []).filter((r) => r.zero_denominator_targets).map((r) => (
+        <div key={`${r.as}-z`} style={{ color: '#b45309' }}>{r.as}: {r.zero_denominator_targets} zone(s) with a zero denominator</div>
+      ))}
+    </div>
+  );
+}
+
 // One line that is visible while the card is closed: what went in and what it reached.
 function summary(rep) {
+  if (rep?.allocation?.conversion === 'reduce') {
+    const a = rep.allocation;
+    return [`joined on ${a.by}: ${a.groups} key(s)`, a.unknown_keys?.count ? `${a.unknown_keys.count} match no zone` : null].filter(Boolean).join(' · ');
+  }
   const match = (rep?.allocation || rep?.zoning)?.match;
   if (!match) return null;
   const src = match.sources || {};
@@ -66,7 +93,7 @@ function hasWarnings(rep) {
   const steps = [rep?.allocation, rep?.zoning].filter(Boolean);
   return steps.some((s) => {
     const src = s.match?.sources || {};
-    return Object.keys(src.unmatched || {}).length || Object.keys(src.excluded || {}).length;
+    return Object.keys(src.unmatched || {}).length || Object.keys(src.excluded || {}).length || s.unknown_keys?.count > 0;
   }) || !!rep?.repaired_geometries;
 }
 
@@ -92,6 +119,7 @@ export default function ReportCard({ reports, defaultOpen = false, title = 'What
           {rep?.outside_region && <div style={{ color: '#b45309' }}>{rep.outside_region.outside.toLocaleString()} of {rep.outside_region.rows.toLocaleString()} features lie outside the catalog's region and were left out</div>}
           {rep?.cleaning?.fixes?.length > 0 && <div>Corrected on load: {rep.cleaning.fixes.map((f) => `${f.action} (${f.rows} rows)`).join(', ')}</div>}
           {rep?.repaired_geometries && <div style={{ color: '#b45309' }}>{rep.repaired_geometries.count} invalid geometries repaired</div>}
+          <KeyJoin report={rep?.allocation} />
           <Step label={rep?.zoning ? 'To grid' : 'Matched'} report={rep?.allocation} />
           <Step label="To zones" report={rep?.zoning} />
         </div>

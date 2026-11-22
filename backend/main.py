@@ -283,7 +283,9 @@ async def get_geojson(filename: str, simplify: bool = False, columns: Optional[s
     if rows > cap:                                        # an even sample keeps the picture of where data is
         gdf = gdf.iloc[np.linspace(0, rows - 1, cap).astype(int)]
     geoms = gdf.geometry.simplify(tolerance=0.001, preserve_topology=True)
-    gdf = gdf.set_geometry(shapely.set_precision(geoms.to_numpy(), 1e-5))
+    # Round coordinates (about 1 m) to shrink the response; point by point, so invalid polygons
+    # (MODZCTA has some) are rounded rather than refused
+    gdf = gdf.set_geometry(shapely.set_precision(geoms.to_numpy(), 1e-5, mode="pointwise"))
     out = json.loads(gdf.to_json(drop_id=True))
     out["urbantrace"] = {"rows": rows, "sampled": int(len(gdf)), "columns": [c for c in gdf.columns if c != gdf.geometry.name]}
     return out

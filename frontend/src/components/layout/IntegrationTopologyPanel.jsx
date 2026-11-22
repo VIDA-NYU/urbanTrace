@@ -338,7 +338,8 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
         const rightKey = isExpanded ? `${ts}-${dsName}` : ts;
         const rightEl = rightRowRefs.current[rightKey];
 
-        if (leftEl && rightEl) {
+        // One line per dataset and row, however many of the row's columns come from that dataset
+        if (leftEl && rightEl && !newPaths.some((p) => p.key === `${ts}|${dsName}|${isExpanded}`)) {
           newPaths.push({
             key: `${ts}|${dsName}|${isExpanded}`,
             ts,

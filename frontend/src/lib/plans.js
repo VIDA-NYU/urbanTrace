@@ -57,6 +57,17 @@ export function inputsOf(nodeId, nodes, edges) {
 
 export const stepIdOf = (node) => safeName(node?.data?.stepId || node?.id);
 
+// A join on a key offers urbanweave's reduce reductions: sum, and ratio_of_sums (sum of one column
+// over the sum of another, per zone).
+export const KEY_REDUCTIONS = ['sum', 'ratio_of_sums'];
+export const keyReductionName = (r) => r.as || (r.method === 'ratio_of_sums'
+  ? ['ratio', r.numerator, r.denominator].filter(Boolean).join('_') : ['sum', r.column].filter(Boolean).join('_'));
+export function keyReductions(reductions = []) {
+  return reductions.filter((r) => KEY_REDUCTIONS.includes(r.method)).map((r) => (r.method === 'ratio_of_sums'
+    ? { method: r.method, numerator: r.numerator, denominator: r.denominator, as: safeName(keyReductionName(r)) }
+    : { method: 'sum', column: r.column, as: safeName(keyReductionName(r)) }));
+}
+
 // Build the plan for the whole canvas, or only for *onlyStepIds* and the steps they depend on.
 export function buildPlan(nodes, edges, onlyStepIds = null) {
   const stepNodes = nodes.filter((n) => n.type === 'stepNode');
@@ -75,18 +86,20 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     sources[name] = { kind: 'vector', columns: {}, urbantrace: { dataset: stem, node: dsNode.id, ...(dsNode.data?.timeWindow ? { time_window: dsNode.data.timeWindow } : {}) } };
     return name;
   };
-  const nameForTarget = (tNode) => {
-    if (targetNameOf.has(tNode.id)) return targetNameOf.get(tNode.id);
+  const nameForTarget = (tNode, idColumn = null) => {
+    const memo = idColumn ? `${tNode.id}#${idColumn}` : tNode.id;
+    if (targetNameOf.has(memo)) return targetNameOf.get(memo);
     let name;
     if (tNode.type === 'gridNode') {
       name = safeName(`h3_${tNode.data?.resolution || 9}_${tNode.id.slice(-4)}`);
       targets[name] = { kind: 'h3', resolution: Number(tNode.data?.resolution || 9) };
     } else {
       const stem = normalizeDatasetId(tNode.data?.id || tNode.data?.filename);
-      name = safeName(`zones_${stem}`);
-      targets[name] = { kind: 'zones', urbantrace: { dataset: stem, node: tNode.id } };
+      // Zones identified by a code column are a target of their own (their IDs are the codes)
+      name = safeName(idColumn ? `zones_${stem}_by_${idColumn}` : `zones_${stem}`);
+      targets[name] = { kind: 'zones', urbantrace: { dataset: stem, node: tNode.id, ...(idColumn ? { id_column: idColumn } : {}) } };
     }
-    targetNameOf.set(tNode.id, name);
+    targetNameOf.set(memo, name);
     return name;
   };
 
@@ -118,6 +131,25 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     else if (source.type === 'datasetNode') sourceRef = nameForSource(source);
     else { problems[sid] = ['The source must be a dataset or a step.']; continue; }
     if (!['datasetNode', 'gridNode'].includes(target.type)) { problems[sid] = ['The target must be zones or an H3 grid.']; continue; }
+    if (d.mode === 'key') {
+      const p = [];
+      if (source.type !== 'datasetNode') p.push('A join on a key reads a dataset, not a step.');
+      if (target.type !== 'datasetNode') p.push('A join on a key needs zones, not an H3 grid.');
+      if (!d.keyBy) p.push('Choose the source column that holds the key.');
+      if (!d.keyIdColumn) p.push('Choose the zones column that holds the same key.');
+      if (p.length) { problems[sid] = p; continue; }
+      const aggregate = keyReductions(d.reductions);
+      steps.push({ id: sid, source: sourceRef, reduce: { by: d.keyBy, target: nameForTarget(target, d.keyIdColumn), aggregate } });
+      const decl = sources[sourceRef].columns;
+      decl[d.keyBy] = decl[d.keyBy] || {};
+      for (const r of aggregate) {
+        for (const col of [r.column, r.numerator, r.denominator].filter(Boolean)) {
+          const kind = valueKindOf(source.data, col);
+          decl[col] = kind ? { kind } : {};
+        }
+      }
+      continue;
+    }
     const targetRef = nameForTarget(target);
     const aggregate = (d.reductions || []).filter((r) => r.method).map((r) => {
       const out = { method: r.method, as: r.as || [r.method, r.column].filter(Boolean).join('_') };

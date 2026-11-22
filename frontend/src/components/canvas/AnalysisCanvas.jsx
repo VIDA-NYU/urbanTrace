@@ -24,7 +24,7 @@ import { SweepNode, ValidateNode, DasymetricNode } from './nodes/AnalysisNodes';
 import { runSweep, runValidation, runDasymetric, reportUrl, METHODS_FOR } from '../../lib/analysis';
 import {
   buildPlan, buildDerived, validatePlan, runPlan, replayRun, toSpatialData, inputsOf, stepIdOf, valueKindOf,
-  getValueKindSuggestions, suggestStep as suggestStepApi,
+  getValueKindSuggestions, suggestStep as suggestStepApi, keyReductions,
 } from '../../lib/plans';
 
 // Value kind of a step's output column, from the reduction that made it (as urbanweave assigns it)
@@ -1132,7 +1132,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   // CONTEXT of each plan node: what is connected, columns with value kinds, problems
   useEffect(() => {
     const { problems: localProblems } = buildPlan(nodes, edges);
-    const columnsOfStep = (stepNode) => (stepNode.data?.reductions || []).filter((r) => r.method).map((r) => {
+    const columnsOfStep = (stepNode) => (stepNode.data?.mode === 'key'
+      ? keyReductions(stepNode.data?.reductions).map((r) => {
+        const { source } = inputsOf(stepNode.id, nodes, edges);
+        return { name: r.as, kind: r.method === 'ratio_of_sums' ? 'intensive' : (source?.type === 'datasetNode' ? valueKindOf(source.data, r.column) : null) };
+      })
+      : (stepNode.data?.reductions || []).filter((r) => r.method).map((r) => {
       const alias = r.as || [r.method, r.column].filter(Boolean).join('_');
       let kind = OUTPUT_KIND[r.method] || null;
       if (!kind) {
@@ -1140,12 +1145,13 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         kind = source?.type === 'datasetNode' ? valueKindOf(source.data, r.column) : null;
       }
       return { name: alias, kind };
-    });
+    }));
     const describeTarget = (t) => {
       if (!t) return null;
       if (t.type === 'gridNode') return { kind: 'h3', label: `H3 grid, resolution ${t.data?.resolution || 9}`, geometry: 'Polygon', resolution: Number(t.data?.resolution || 9) };
       return { kind: 'zones', label: t.data?.metadata?.name || t.data?.name || t.data?.id, geometry: t.data?.metadata?.geometricType || 'Polygon',
-        dataset: normalizeDatasetId(t.data?.id || t.data?.filename) };
+        dataset: normalizeDatasetId(t.data?.id || t.data?.filename),
+        columns: (t.data?.metadata?.columns || []).map((c) => c.name).filter(Boolean) };
     };
     const contexts = {};
     for (const n of nodes) {
@@ -1304,8 +1310,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const spatialData = toSpatialData(payload, {
         stepId: key, plan, reports: out.reports?.[key] || null,
         sourceLabel: srcInfo?.dataset || (mode === 'calculate' ? `derived from ${derived[0].inputs.join(', ')}` : key),
-        methodLabel: step?.match?.method || 'combine',
-        reductionsByColumn: Object.fromEntries((step?.aggregate || []).map((r) => [r.as, r.method])),
+        methodLabel: step?.match?.method || (step?.reduce ? `join on ${step.reduce.by}` : 'combine'),
+        reductionsByColumn: Object.fromEntries((step?.aggregate || step?.reduce?.aggregate || []).map((r) => [r.as, r.method])),
         durationMs: Math.round(performance.now() - started),
       });
       const reports = mode === 'step' ? { [key]: { allocation: out.reports?.[key], ...(srcInfo?.time_window ? { time_window: srcInfo.time_window } : {}),

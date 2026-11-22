@@ -114,17 +114,17 @@ Still open: see [Open questions](#open-questions) at the end.
 
 ## Phase 6 — More data and other tools
 
-Decisions needed before starting (each adds an outside service or a heavy dependency):
+Decisions (2026-11-22, by the user):
 
-- [ ] Geocoding: which service (NYC GeoSearch proposed), and off unless explicitly enabled?
-- [ ] OSM: live downloads for the study area, or only GraphML files provided by the user? (adds `osmnx`)
-- [ ] Rasters: add `rasterio` + `exactextract`; which rasters first (heat, tree canopy)?
-- [ ] Catalog growth: download and profile automatically when added, or confirm each time?
-- [ ] MCP server: read-only apart from creating collections?
+- [x] Geocoding: NYC GeoSearch (free, no key). Sends address columns to that service, so it is off unless the analyst asks for it per dataset
+- [x] OSM: live downloads for the study area; adds `osmnx` (`urbanweave[osm]`)
+- [x] Rasters: add `rasterio` + `exactextract` (`urbanweave[raster]`, which already uses both). Which rasters first (heat, tree canopy) is still open
+- [x] Catalog growth: download and profile automatically when an analyst adds a dataset
+- [x] MCP server: on hold
 
 Work:
 
-- [ ] Attribute joins on identifiers (BBL, BIN, ZIP) — *backend done: plan steps with urbanweave's `reduce` (sum, ratio_of_sums) join rows onto zones by a key, zones can be identified by a code column (`urbantrace.id_column`), keys compared as text (11211 = "11211" = 11211.0), unknown keys reported; the Step node's "Join on a key" mode is still to do*
+- [x] Attribute joins on identifiers (BBL, BIN, ZIP) — *plan steps with urbanweave's `reduce` (sum, ratio_of_sums) join rows onto zones by a key; zones are identified by a code column (`urbantrace.id_column`), keys compared as text (11211 = "11211" = 11211.0), unknown keys reported. The Step node has a "Join on a key" mode (source key, zones key, guessed from familiar names such as zipcode or modzcta; sum and ratio of sums), and the report card says how many keys matched no zone. Checked on DYCD program sites by `zipcode` onto MODZCTA: 178 areas, 656,642 participants by key and 656,051 by location; the 12 unmatched keys are building ZIPs (10020, 10118, ...) that MODZCTA folds into neighbours. Not yet: a count (urbanweave's reduce offers sum and ratio_of_sums), and a key join combined with a location step onto the same zones (they are different targets, so Combine & Calculate refuses them)*
 - [x] Direct source → zones steps — *Step nodes match a source onto zones directly (phase 4)*
 - [x] More matching methods: `within_distance`, `largest_overlap`, `representative_point` — *in the picker from urbanweave's registry*
 - [x] More reductions: `median`, `shares` — *`shares` writes one column per category (`share_a`, ...), now carried through plan results; `median` takes intensive values, as the registry says*
@@ -133,7 +133,7 @@ Work:
 - [ ] Rasters in the catalog and profiler; raster sources through `zonal_stats` (`urbanweave[raster]`)
 - [ ] Geocoding of addresses
 - [ ] Catalog growth on demand from NYC Open Data and Auctus
-- [ ] MCP server: catalog search, profiles, collections, export (can move up any time a consumer asks)
+- [ ] MCP server: catalog search, profiles, collections, export — *on hold (user, 2026-11-22)*
 
 ## Tryout fixes
 
@@ -165,6 +165,10 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [ ] Uploads are profiled with datamart-profiler only (`upload_new_data.py`), so an uploaded dataset has no atlas-profiler profile: coverage falls back to the data, but value-kind suggestions are missing; profile uploads with atlas-profiler too
 - [ ] Add a LICENSE: the repository has none (urbanweave and atlas-clean are MIT); the README's acknowledgements section makes no license claim until one is chosen
 - [ ] Console warning: a `<button>` nested inside another `<button>` on the canvas (React reports it on every load)
+- [x] Dropdowns in plan nodes were blank (white text on white) when the OS is in dark mode: `index.css` was Vite's starter sheet, which turns unstyled text white and buttons black in dark mode; the interface is now light everywhere
+- [x] Map preview of MODZCTA returned 500: rounding coordinates with `set_precision` refused its invalid polygons; it now rounds point by point. The whole-catalog run had checked previews before the rounding was added; re-checked after the fix: all 121 previews load, the largest 6.5 MB
+- [x] The provenance panel drew one line per column, so a step with two columns from one dataset repeated a React key; one line per dataset and row now
+- [ ] Hotspot synthesis on a plan result fails (400): `ResultMapNode` sends the step's output names (`count`, `fill_rate`) as source columns to `/api/v1/copilot/synthesize-hotspot`; it should send the source columns, or not run on a single step's outputs
 - [ ] The canvas lists a `shares` reduction as one output (`share`) in Combine & Calculate and the sweep, not its per-category columns
 
 ---

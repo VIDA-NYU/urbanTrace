@@ -7,18 +7,18 @@ import { Hexagon, Workflow, Calculator, Play, Loader2, X, Plus, Trash2, AlertCir
 import { getHexagonEdgeLengthAvg } from 'h3-js';
 import OperatorSelect, { ParamForm } from '../../methods/OperatorSelect';
 import ReportCard from '../../methods/ReportCard';
-import { KINDS, KIND_COLORS } from '../../../lib/plans';
+import { KINDS, KIND_COLORS, KEY_REDUCTIONS, keyReductionName } from '../../../lib/plans';
 
 const shell = (accent, width) => ({
   width, background: '#fff', borderRadius: 8, border: `1px solid ${accent}55`, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-  fontSize: 11, fontFamily: 'Inter, system-ui, sans-serif', overflow: 'visible',
+  fontSize: 11, fontFamily: 'Inter, system-ui, sans-serif', overflow: 'visible', color: '#0f172a',
 });
 const header = (bg, fg) => ({
   display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, padding: '6px 10px',
   background: bg, color: fg, fontWeight: 600, borderBottom: '1px solid #e2e8f0', borderRadius: '8px 8px 0 0',
 });
 const small = { fontSize: 9, color: '#64748b', fontWeight: 600 };
-const input = { width: '100%', boxSizing: 'border-box', fontSize: 10, height: 22, border: '1px solid #cbd5e1', borderRadius: 4, padding: '0 4px', background: '#fff' };
+const input = { width: '100%', boxSizing: 'border-box', fontSize: 10, height: 22, border: '1px solid #cbd5e1', borderRadius: 4, padding: '0 4px', background: '#fff', color: '#0f172a' };
 const iconBtn = { border: 'none', background: 'transparent', cursor: 'pointer', padding: 2, display: 'inline-flex', color: 'inherit' };
 
 function DeleteButton({ id, data }) {
@@ -135,6 +135,34 @@ function ReductionRow({ r, ctx, method, onPatch, onRemove, onKind }) {
   );
 }
 
+// One reduction of a join on a key: a sum of a column, or a ratio of two sums.
+function KeyReductionRow({ r, columns, onPatch, onRemove }) {
+  const colSelect = (field, placeholder) => (
+    <select className="nodrag" style={{ ...input, height: 20 }} value={r[field] || ''} title={placeholder}
+      onChange={(e) => onPatch({ [field]: e.target.value })}>
+      <option value="">{placeholder}</option>
+      {columns.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+    </select>
+  );
+  return (
+    <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: 6, display: 'grid', gap: 4, background: '#f8fafc' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: r.method === 'ratio_of_sums' ? '86px 1fr 1fr auto' : '86px 1fr auto', gap: 4, alignItems: 'center' }}>
+        <select className="nodrag" style={{ ...input, height: 20 }} value={r.method}
+          onChange={(e) => onPatch({ method: e.target.value })}
+          title={r.method === 'ratio_of_sums' ? 'Per zone: the sum of one column over the sum of another (a rate)' : 'Per zone: the sum of a column over the rows with its key'}>
+          {KEY_REDUCTIONS.map((m) => <option key={m} value={m}>{m === 'ratio_of_sums' ? 'ratio of sums' : m}</option>)}
+        </select>
+        {r.method === 'ratio_of_sums' ? <>{colSelect('numerator', 'numerator')}{colSelect('denominator', 'denominator')}</> : colSelect('column', 'column')}
+        <button className="nodrag" style={{ ...iconBtn, color: '#94a3b8' }} title="Remove" onClick={onRemove}><Trash2 size={11} /></button>
+      </div>
+      <input className="nodrag" style={{ ...input, height: 20 }} value={r.as || ''} placeholder={keyReductionName({ ...r, as: '' })}
+        title="Output column name" onChange={(e) => onPatch({ as: e.target.value.replace(/[^A-Za-z0-9_]/g, '_') })} />
+    </div>
+  );
+}
+
+const KEY_HINT = /^(bbl|bin|zip|zipcode|zip_code|postcode|postal_code|modzcta|zcta|geoid|boro_?cd|community_?district|nta_?code|ntacode|nta2020|census_?tract|ct2020|boroct2020)$/i;
+
 // Why the copilot suggested this method and these reductions, and what urbanweave's registry changed.
 function SuggestionNote({ suggestion, onDismiss }) {
   if (!suggestion || suggestion.loading) return null;
@@ -157,7 +185,24 @@ export const StepNode = memo(({ id, data }) => {
   const reductions = data.reductions || [];
   const set = (patch) => data.onChange?.(id, patch);
   const patchReduction = (i, patch) => set({ reductions: reductions.map((r, j) => (j === i ? { ...r, ...patch } : r)) });
-  const ready = ctx.source && ctx.target && reductions.some((r) => r.method);
+  const keyMode = data.mode === 'key';
+  const keyReady = keyMode && data.keyBy && data.keyIdColumn
+    && reductions.some((r) => (r.method === 'ratio_of_sums' ? r.numerator && r.denominator : r.method === 'sum' && r.column));
+  const ready = ctx.source && ctx.target && (keyMode ? keyReady : reductions.some((r) => r.method));
+  const sourceColumns = ctx.source?.columns || [];
+  const targetColumns = ctx.target?.columns || [];
+  // Switching modes starts the reductions afresh: the two modes offer different ones. A key column
+  // with a familiar name (zipcode, bbl, ...) is chosen for the analyst.
+  const setMode = (mode) => {
+    if (mode === (data.mode || 'location')) return;
+    if (mode === 'key') {
+      const guess = (cols) => cols.find((c) => KEY_HINT.test(c)) || '';
+      set({ mode, keyBy: data.keyBy || guess(sourceColumns.map((c) => c.name)), keyIdColumn: data.keyIdColumn || guess(targetColumns),
+        reductions: [{ method: 'sum', column: '', as: '' }], suggestion: null });
+    } else {
+      set({ mode: 'location', reductions: [{ method: 'count', column: '', as: 'count', fillEmpty: true }] });
+    }
+  };
   return (
     <div style={shell('#6366f1', 300)}>
       <Handle type="target" id="source" position={Position.Left} style={{ top: 46, background: '#6366f1', width: 8, height: 8, border: '2px solid #fff' }} />
@@ -181,6 +226,40 @@ export const StepNode = memo(({ id, data }) => {
             {ctx.target ? ctx.target.label : 'connect zones or an H3 grid'}
           </span>
         </div>
+        <div style={{ display: 'flex', border: '1px solid #c7d2fe', borderRadius: 6, overflow: 'hidden', fontSize: 10 }}>
+          {[['location', 'Match by location'], ['key', 'Join on a key']].map(([m, label]) => (
+            <button key={m} type="button" className="nodrag" onClick={() => setMode(m)}
+              title={m === 'key' ? 'Rows carry a code (ZIP, BBL, district, ...) that identifies the zone: sum them onto the zone with that code' : 'Match features to zones or cells by where they are'}
+              style={{ flex: 1, border: 'none', padding: '3px 0', cursor: 'pointer', fontWeight: 600,
+                background: (data.mode || 'location') === m ? '#4f46e5' : '#fff', color: (data.mode || 'location') === m ? '#fff' : '#4338ca' }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        {keyMode ? (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              <label style={small}>
+                Key in the source
+                <select className="nodrag" style={input} value={data.keyBy || ''} onChange={(e) => set({ keyBy: e.target.value })}>
+                  <option value="">choose…</option>
+                  {sourceColumns.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}
+                </select>
+              </label>
+              <label style={small}>
+                Same key in the zones
+                <select className="nodrag" style={input} value={data.keyIdColumn || ''} onChange={(e) => set({ keyIdColumn: e.target.value })}
+                  disabled={ctx.target?.kind !== 'zones'}>
+                  <option value="">{ctx.target?.kind === 'zones' ? 'choose…' : 'connect zones'}</option>
+                  {targetColumns.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </label>
+            </div>
+            <div style={{ fontSize: 9, color: '#64748b' }}>
+              Rows go to the zone whose key matches, wherever they are on the map; keys are compared as text (11211 = "11211"). Rows whose key matches no zone are reported.
+            </div>
+          </>
+        ) : (<>
         <button className="nodrag" disabled={!ctx.source || ctx.source.isStep || !ctx.target || data.suggestion?.loading}
           onClick={() => data.onSuggest?.(id)}
           title={ctx.source?.isStep ? 'Suggestions need a dataset as source' : "Suggest a method and reductions for this step and the collection's goal"}
@@ -195,14 +274,20 @@ export const StepNode = memo(({ id, data }) => {
             sourceGeometry={ctx.source?.geometry} targetKind={ctx.target?.kind} targetGeometry={ctx.target?.geometry} />
         </label>
         <ParamForm method={method} values={data.params || {}} onChange={(params) => set({ params })} />
+        </>)}
         <div style={{ ...small, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
           Aggregate
           <button className="nodrag" style={{ ...iconBtn, color: '#4338ca', fontSize: 9, gap: 2 }}
-            onClick={() => set({ reductions: [...reductions, { method: 'count', column: '', as: 'count', fillEmpty: true }] })}>
+            onClick={() => set({ reductions: [...reductions, keyMode ? { method: 'sum', column: '', as: '' } : { method: 'count', column: '', as: 'count', fillEmpty: true }] })}>
             <Plus size={11} /> add
           </button>
         </div>
-        {reductions.map((r, i) => (
+        {keyMode && reductions.map((r, i) => (
+          <KeyReductionRow key={i} r={r} columns={sourceColumns}
+            onPatch={(patch) => patchReduction(i, patch)}
+            onRemove={() => set({ reductions: reductions.filter((_, j) => j !== i) })} />
+        ))}
+        {!keyMode && reductions.map((r, i) => (
           <ReductionRow key={i} r={r} ctx={ctx} method={method}
             onPatch={(patch) => patchReduction(i, patch)}
             onRemove={() => set({ reductions: reductions.filter((_, j) => j !== i) })}

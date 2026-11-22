@@ -115,3 +115,10 @@ def test_without_a_study_area_strays_outside_the_catalog_region_are_left_out(cli
     assert _total(r.json()) == 22                                   # the stray's 100 is not counted
     out = r.json()["inputs"]["src"]["outside_region"]
     assert out["outside"] == 1 and out["kept"] == 6
+
+
+def test_preview_of_invalid_polygons(client, catalog):
+    # The map preview rounds coordinates; an invalid polygon (the bowtie) must not make it fail
+    r = client.get("/dataset/test_rates.geojson?simplify=true")
+    assert r.status_code == 200, r.text
+    assert r.json()["urbantrace"]["sampled"] == len(r.json()["features"])
