@@ -7,7 +7,8 @@ Three formats, chosen with the COPILOT_CATALOG setting:
 - ``compact``: the same information written tersely: types as ``Integer`` instead of
   ``http://schema.org/Integer``, no repeated keyword list, no empty fields.
 - ``index``: one line per dataset (id, geometry, number of columns, first sentence of the
-  description). The model asks for the columns and full description of the datasets it is
+  description). Polygon datasets also give their number of polygons and the columns that identify
+  a zone, so the model can tell neighborhoods (262 NTAs) from sub-borough areas (55) or ZIP codes. The model asks for the columns and full description of the datasets it is
   considering with the ``get_dataset_details`` tool, which the backend answers itself.
 """
 
@@ -74,10 +75,45 @@ def _first_sentence(text: str, limit: int = INDEX_SUMMARY_CHARS) -> str:
     return sentence
 
 
+MAX_ZONE_KEYS = 3
+# Integer columns whose name says they identify a zone (BoroCD, modzcta, CounDist, bor_subb, ...)
+_KEY_NAME = re.compile(r"(code|cd|id|fips|zcta|dist|num|no|subb|nta|tract|block|zone)$|^(cd|nta|zcta|geoid)", re.I)
+
+
+def zone_keys(meta: dict[str, Any]) -> list[str]:
+    """Columns that identify a zone: one distinct value per row, text, or an integer named like a code."""
+    rows = meta.get("nb_rows")
+    if not rows:
+        return []
+    keys = []
+    for c in meta.get("columns") or []:
+        name = str(c.get("name") or "")
+        if not name or name.startswith(":") or name.lower() == "geometry" or name.isdigit():
+            continue
+        if c.get("num_distinct_values") != rows:
+            continue
+        structural = _short(c.get("structural_type", ""))
+        if structural == "Text" or (structural == "Integer" and _KEY_NAME.search(name)):
+            keys.append(name)
+    return keys[:MAX_ZONE_KEYS]
+
+
+def _zones(meta: dict[str, Any]) -> str:
+    """'262 polygons, keys nta2020/ntaname/ntaabbrev' for a polygon dataset, '' otherwise."""
+    if "Polygon" not in str(meta.get("geometricType") or "") or not meta.get("nb_rows"):
+        return ""
+    keys = zone_keys(meta)
+    zones = f"{meta['nb_rows']} polygons"
+    return f"{zones}, keys {'/'.join(keys)}" if keys else zones
+
+
 def index_entry(dataset_id: str, meta: dict[str, Any] | None, description: str = "") -> str:
-    """One line: id, geometry, number of columns, and the description's first sentence."""
+    """One line: id, geometry, number of columns, the description's first sentence, and, for a
+    polygon dataset, its number of polygons and the columns that identify one."""
+    meta = meta or {}
     summary = _first_sentence(description) if description else "no description"
-    return f"- {_header(dataset_id, meta or {})}: {summary}"
+    zones = _zones(meta)
+    return f"- {_header(dataset_id, meta)}: {summary}" + (f" [{zones}]" if zones else "")
 
 
 CATALOG_HEADERS = {
@@ -86,7 +122,8 @@ CATALOG_HEADERS = {
         "then columns as name:type):"
     ),
     "index": (
-        "UrbanTrace dataset catalog, one line per dataset (id (geometry, number of columns): summary). "
+        "UrbanTrace dataset catalog, one line per dataset (id (geometry, number of columns): summary; "
+        "polygon datasets end with [number of polygons, keys: the columns that identify one]). "
         "Before suggesting or comparing datasets, call get_dataset_details with the ids of the "
         "candidates you are considering to read their full descriptions and columns."
     ),

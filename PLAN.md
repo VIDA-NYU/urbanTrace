@@ -166,6 +166,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [ ] Add a LICENSE: the repository has none (urbanweave and atlas-clean are MIT); the README's acknowledgements section makes no license claim until one is chosen
 - [ ] Console warning: a `<button>` nested inside another `<button>` on the canvas (React reports it on every load)
 - [ ] The canvas lists a `shares` reduction as one output (`share`) in Combine & Calculate and the sweep, not its per-category columns
+- [x] The copilot's one-line catalog couldn't tell zone datasets apart: NTAs (262) and sub-borough areas (55) both read as "neighborhood/community district", and in the discovery trial it chose `NYC_population` where `NTA_Neighborhood_Tabulation_Areas` was expected. Polygon lines now end with their number of polygons and key columns (`catalog_format.zone_keys`, about 200 tokens more) — *two-case rerun (`benchmark/results/catalog_zone_hint_trial.csv`): case 1 now picks the NTAs, citing the counts; case 2 still picks sub-borough areas, on purpose (for the population denominator), though it calls them the finer of the two*
 
 ---
 
