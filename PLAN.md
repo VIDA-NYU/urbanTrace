@@ -151,6 +151,7 @@ Found while using the tool (started 2026-11-22).
 - [x] Zone names on hover ("Park Slope", not "Zone 0"): the label column is chosen as a unique name-like text column (never Socrata's `:id`), else a whole-number code; the old check missed pandas 3's string type
 - [x] Zones touching the study area by rounding were kept (Brooklyn had 77 NTAs instead of 69): a zone now needs 1% of its area inside (`scope.zones_in_area`), everywhere zones are filtered
 - [ ] Classic Integration results may open off-screen too (only plan results are brought into view)
+- [x] Unsaved work was lost on reload without warning, and a reload always started empty: the browser now asks before leaving with unsaved changes, keeps them as a draft in the browser, and on reload restores the draft or reopens the last saved collection. Results are not saved (decided 2026-11-22: they are rerun)
 
 ---
 

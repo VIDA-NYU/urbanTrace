@@ -99,6 +99,18 @@ function collectionAnalyses(nodes, edges) {
   return out;
 }
 
+// Unsaved work and the last collection, kept in this browser only (docs: tryout fixes in PLAN.md).
+// Storage can be unavailable (private windows, blocked site data), so every access is guarded.
+const DRAFT_KEY = 'urbantrace.collectionDraft';
+const LAST_KEY = 'urbantrace.lastCollection';
+const readDraft = () => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch { return null; } };
+const writeDraft = (draft) => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* full or blocked */ } };
+const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY); } catch { /* blocked */ } };
+const readLastCollectionId = () => { try { return localStorage.getItem(LAST_KEY); } catch { return null; } };
+const writeLastCollectionId = (id) => {
+  try { if (id) localStorage.setItem(LAST_KEY, id); else localStorage.removeItem(LAST_KEY); } catch { /* blocked */ }
+};
+
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
 };
@@ -1157,13 +1169,13 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setCollection(EMPTY_COLLECTION);
     setSavedSnapshot(null);
     setCollectionStatus('');
+    clearDraft();
+    writeLastCollectionId(null);
   }, [confirmDiscard]);
 
-  const openCollection = useCallback(async (id) => {
-    if (!confirmDiscard()) return;
-    setCollectionStatus('Opening…');
-    try {
-      const doc = await getCollection(id);
+  // Put a collection document on the canvas. A draft (unsaved changes kept in the browser) stays
+  // marked unsaved against the saved version it started from.
+  const restoreDoc = useCallback(async (doc, { draftOf = null } = {}) => {
       const datasets = await fetchAvailableDatasets();
       const savedNodes = doc.canvas?.nodes || [];
       const savedEdges = doc.canvas?.edges || [];
@@ -1206,13 +1218,66 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         study_area: doc.study_area || null, analyses: doc.analyses || [], integrations: doc.integrations || [],
       };
       setCollection(loaded);
-      // The snapshot is taken from the restored canvas on the next render (see effect below).
-      setSavedSnapshot('__pending__');
+      // The snapshot is taken from the restored canvas on the next render (see effect below); a
+      // draft keeps the snapshot of the version it was saved from, so it shows as unsaved.
+      setSavedSnapshot(draftOf !== null ? draftOf : '__pending__');
+  }, [attachCallbacks, fetchAvailableDatasets, findDatasetById]);
+
+  const openCollection = useCallback(async (id) => {
+    if (!confirmDiscard()) return;
+    setCollectionStatus('Opening…');
+    try {
+      const doc = await getCollection(id);
+      await restoreDoc(doc);
       setCollectionStatus(doc.integrations?.length ? 'Opened: run integrations to see results' : '');
     } catch (error) {
       setCollectionStatus(`Open failed: ${error.message}`);
     }
-  }, [attachCallbacks, confirmDiscard, fetchAvailableDatasets, findDatasetById]);
+  }, [confirmDiscard, restoreDoc]);
+
+  // On reload: reopen the unsaved draft if there is one, else the last collection worked on.
+  // Results are not kept; steps are rerun.
+  const restoredOnLoadRef = React.useRef(false);
+  const [loadRestored, setLoadRestored] = useState(false);
+  useEffect(() => {
+    if (restoredOnLoadRef.current) return;
+    restoredOnLoadRef.current = true;
+    const draft = readDraft();
+    const lastId = readLastCollectionId();
+    (async () => {
+      try {
+        if (draft?.doc) {
+          await restoreDoc(draft.doc, { draftOf: draft.savedSnapshot ?? null });
+          setCollectionStatus('Restored unsaved changes');
+        } else if (lastId) {
+          await restoreDoc(await getCollection(lastId));
+        }
+      } catch {
+        clearDraft();             // a stale draft or a deleted collection: start empty
+      } finally {
+        setLoadRestored(true);
+      }
+    })();
+  }, [restoreDoc]);
+
+  // Keep a draft while there are unsaved changes; remember the collection once it is saved.
+  useEffect(() => {
+    if (!loadRestored || savedSnapshot === '__pending__') return undefined;
+    const timer = setTimeout(() => {
+      if (collectionDirty) writeDraft({ doc: { ...collectionDoc, id: collection.id }, savedSnapshot });
+      else clearDraft();
+      if (collection.id && !collectionDirty) writeLastCollectionId(collection.id);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [loadRestored, collectionDoc, collectionDirty, collection.id, savedSnapshot]);
+
+  // Warn before a reload or close would lose unsaved changes (the draft is kept as well).
+  useEffect(() => {
+    if (!collectionDirty) return undefined;
+    const onBeforeUnload = (e) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [collectionDirty]);
 
   useEffect(() => {
     if (savedSnapshot === '__pending__') setSavedSnapshot(collectionJson);
