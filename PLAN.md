@@ -44,8 +44,8 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Invalid polygons repaired with `make_valid` and reported, not excluded
 - [x] Refusals (corrupt coordinates) shown with their reason, not as a generic 500
 - [ ] Run the 38 large corpus cases before deleting the legacy engine — *skipped: no testing on the large catalog*
-- [ ] Delete the legacy engine and `URBANTRACE_ENGINE` after one cycle
-- [ ] Delete `OperationNode` and `/run-operation` (REDESIGN §6 proposes deleting them; nothing on the canvas creates the node)
+- [ ] *(in Release)* Delete the legacy engine and `URBANTRACE_ENGINE` after one cycle
+- [ ] *(in Release)* Delete `OperationNode` and `/run-operation` (REDESIGN §6 proposes deleting them; nothing on the canvas creates the node)
 
 ## Phase 1 — Catalog and collections
 
@@ -173,10 +173,26 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 
 ## Release
 
-- [ ] Push `autark-map` and open a PR to `main`
-- [ ] Try the tool on the paper's case studies and with expert users; reorder phase 6 by what that shows — *one task done (the walkthrough); the paper's case studies and other users not yet*
-- [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
-- [ ] Scoring rule for the operator-selection benchmark in urbanweave's vocabulary (REDESIGN §6)
+One push, as a major release, when everything below is done (decided 2026-11-22). Scope chosen
+by the user; in order:
+
+1. Clean-ups
+   - [ ] Delete `OperationNode` and `/run-operation`
+   - [ ] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`)
+   - [ ] Show each dataset's share inside the study area on its card, and sort by it
+2. - [ ] Autark does the projection (`sourceCrs: 'EPSG:4326'`); remove UrbanTrace's Web Mercator code from `autarkMap.js`
+3. - [ ] The copilot's method suggestions on Step nodes; then retire the classic Integration node
+4. - [ ] atlas-clean in UrbanTrace: run its spatial checks when a dataset loads, apply accepted fixes as recipes, record them in provenance and the export. Needs atlas-clean's `feat/spatial` released with it
+5. - [ ] Dasymetric working: the user publishes an urbanweave prerelease with `uw.dasymetric`; pin it
+6. - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
+7. - [ ] Documentation (section above): README, docs, screenshots, supplementary material
+8. Release mechanics
+   - [ ] Version and CHANGELOG
+   - [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
+   - [ ] Push `autark-map`, open the PR to `main`, tag the release
+
+After the release: phase 6, licenses, the GeoParquet conversion, the benchmark's scoring rule in
+urbanweave's vocabulary, lint in CI.
 
 ## Open questions
 
