@@ -110,6 +110,8 @@ def _bind_source(data_dir, name: str, spec: dict, area, columns_needed: set[str]
     report = {"dataset": stem, "rows": int(len(gdf))}
     if gdf.attrs.get("urbantrace_cleaning"):
         report["cleaning"] = gdf.attrs["urbantrace_cleaning"]     # corrections replayed (cleaning.py)
+    if gdf.attrs.get("urbantrace_geocoded"):
+        report["geocoded"] = gdf.attrs["urbantrace_geocoded"]     # rows located from addresses (geocode.py)
     tw = ut.get("time_window") or {}
     if tw.get("column") and (tw.get("start") or tw.get("end")):
         try:

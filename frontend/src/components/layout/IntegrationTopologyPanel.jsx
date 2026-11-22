@@ -551,7 +551,7 @@ const IntegrationTopologyPanel = ({ logs = [], onHoverLog, focusedLogTs }) => {
                           {isExpanded ? <ChevronDown size={9} /> : <ChevronRight size={9} />}
                         </span>
                         <span style={styles.sparkMeta}>
-                          {formatDuration(log.durationMs)} · {log.variables?.length || 0}v · r{log.resolution}
+                          {formatDuration(log.durationMs)} · {log.variables?.length || 0}v · {log.resolution ? `r${log.resolution}` : (log.targetZones || 'zones').replace(/_/g, ' ').slice(0, 18)}
                         </span>
                       </div>
                     </div>

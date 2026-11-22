@@ -205,7 +205,8 @@ def dataset_cells(data_dir, stem: str) -> tuple[list[tuple[float, float, float, 
     import cleaning
     # A corrected dataset's profile describes the data before correction (a swap, a wrong CRS), so
     # its coverage comes from the corrected data instead.
-    cells, bounds = (([], None) if cleaning.has_recipe(data_dir, stem)
+    import geocode
+    cells, bounds = (([], None) if cleaning.has_recipe(data_dir, stem) or geocode.has_result(data_dir, stem)
                      else coverage_cells(catalog.profile(data_dir, stem)))
     if cells:
         return cells, bounds, "profile"
@@ -228,9 +229,13 @@ def _data_cells(data_dir, stem: str):
     cache_path = Path(data_dir) / ".extent_cache.json"
     key = str(path.resolve())
     import cleaning
+    import geocode
     recipe = cleaning.recipe_path(data_dir, stem)
     if recipe.exists():                                   # the corrected data: one entry per recipe version
         key += f"#recipe:{recipe.stat().st_mtime}"
+    located = geocode.result_path(data_dir, stem)
+    if located.exists():                                  # rows located from addresses
+        key += f"#geocoded:{located.stat().st_mtime}"
     with catalog._hash_lock:
         cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
     hit = cache.get(key)
@@ -393,15 +398,17 @@ def time_range(prof: dict | None) -> dict | None:
 
 def catalog_index(data_dir) -> list[dict]:
     """One row per dataset for search filters: bbox, time range, geometry type, rows, and whether
-    atlas-clean corrections are saved for it."""
+    atlas-clean corrections are saved for it, or rows located from addresses."""
     import cleaning
+    import geocode
     out = []
     for stem in catalog.list_stems(data_dir):
         prof = catalog.profile(data_dir, stem)
         _, bounds, _ = dataset_cells(data_dir, stem)
         out.append({"id": stem, "bbox": bounds, "time": time_range(prof),
                     "geometry": (prof or {}).get("geometricType"), "rows": (prof or {}).get("nb_rows"),
-                    "corrected": cleaning.has_recipe(data_dir, stem)})
+                    "corrected": cleaning.has_recipe(data_dir, stem),
+                    "located": geocode.has_result(data_dir, stem)})
     return out
 
 

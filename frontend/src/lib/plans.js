@@ -194,14 +194,20 @@ export function buildDerived(nodes, edges) {
 }
 
 // Plan results (columns) in the shape ResultMapNode, CompareMapNode and the provenance panel read.
-export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, methodLabel, reductionsByColumn = {}, durationMs, displayColumn, multivariate = true }) {
+export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, methodLabel, reductionsByColumn = {}, sourceColumns = {}, datasetsByColumn = {}, methodsByColumn = {}, rationalesByColumn = {}, expressionsByColumn = {}, durationMs, displayColumn, multivariate = true }) {
   const columns = Object.keys(payload.columns || {});
   const primary = displayColumn && columns.includes(displayColumn) ? displayColumn : columns[columns.length - 1];
   const isZoned = payload.target?.kind === 'zones';
   const variables = columns.map((c) => ({
-    dataset: sourceLabel || stepId, targetColumn: c, outputName: c, allocation: methodLabel,
-    aggregation: reductionsByColumn[c] || null, zoningMapping: null, zoningAggregation: null,
-    valueKind: payload.kinds?.[c] || null,
+    dataset: datasetsByColumn[c] || (expressionsByColumn[c] ? 'derived' : sourceLabel || stepId), targetColumn: c, outputName: c,
+    allocation: methodsByColumn[c] || methodLabel,
+    aggregation: reductionsByColumn[c] || (expressionsByColumn[c] ? 'expression' : null), valueKind: payload.kinds?.[c] || null,
+    // What the provenance graph draws (the paper's triangles and circles) and the result map's
+    // chips: the step's matching method and the reduction that made this column
+    // (a column computed by a Calculate expression has neither)
+    zoningMapping: methodsByColumn[c] || null, zoningAggregation: reductionsByColumn[c] || null,
+    sourceColumn: sourceColumns[c] || expressionsByColumn[c] || null,
+    rationale: rationalesByColumn[c] || (expressionsByColumn[c] ? `Computed: ${c} = ${expressionsByColumn[c]}` : null),
   }));
   const provenance = {
     timestamp: new Date().toISOString(), durationMs, isMultivariate: multivariate && columns.length > 1,

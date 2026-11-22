@@ -131,7 +131,7 @@ Work:
 - [ ] OSM streets and intersections as targets (`urbanweave[osm]`), per-road-km densities
 - [x] Icons for `nearest_segment`, `nearest_node`, `within_distance`, `largest_overlap`, `representative_point`
 - [ ] Rasters in the catalog and profiler; raster sources through `zonal_stats` (`urbanweave[raster]`)
-- [ ] Geocoding of addresses
+- [ ] Geocoding of addresses — *backend done (`geocode.py`): per dataset, on the analyst's request, rows without a location are located from their address columns with NYC GeoSearch; each answer is checked (house number, street, borough; GeoSearch's own confidence is 0.8 for everything), only checked locations are saved (`data/geocoded/<stem>.json`) and filled on load, reported in plans and exports. Certificates of occupancy: 212 of 322 rows located in 10 s; the rest answered with another address. Still to do: the Check data dialog's "Locate from addresses" section*
 - [ ] Catalog growth on demand from NYC Open Data and Auctus
 - [ ] MCP server: catalog search, profiles, collections, export — *on hold (user, 2026-11-22)*
 
@@ -168,7 +168,9 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] Dropdowns in plan nodes were blank (white text on white) when the OS is in dark mode: `index.css` was Vite's starter sheet, which turns unstyled text white and buttons black in dark mode; the interface is now light everywhere
 - [x] Map preview of MODZCTA returned 500: rounding coordinates with `set_precision` refused its invalid polygons; it now rounds point by point. The whole-catalog run had checked previews before the rounding was added; re-checked after the fix: all 121 previews load, the largest 6.5 MB
 - [x] The provenance panel drew one line per column, so a step with two columns from one dataset repeated a React key; one line per dataset and row now
-- [ ] Hotspot synthesis on a plan result fails (400): `ResultMapNode` sends the step's output names (`count`, `fill_rate`) as source columns to `/api/v1/copilot/synthesize-hotspot`; it should send the source columns, or not run on a single step's outputs
+- [x] The Integration Provenance Graph (paper, Fig. 1D: data cards, triangles for mapping operators, circles for aggregations, the rationale on hover) was empty of operators since phase 4: it reads each variable's mapping and aggregation, which only the retired Integration node filled. Plan results now fill them per column (the step's method, the column's reduction, the copilot's rationale or the step's report), Calculate columns are traced to their own steps and datasets, and runs onto zones are labelled by the zones instead of `rnull`
+- [x] The Multivariate Priority Map (hotspot synthesis) failed on plan results (400): it sent output names (`libraries`, `fill_rate`) as dataset columns. It now sends how each column was computed (count of features, sum of a column, a Calculate formula)
+- [x] Zoom out stopped at 50% (React Flow's default), too close to fit a workflow with its result maps: now 10%
 - [ ] The canvas lists a `shares` reduction as one output (`share`) in Combine & Calculate and the sweep, not its per-category columns
 
 ---

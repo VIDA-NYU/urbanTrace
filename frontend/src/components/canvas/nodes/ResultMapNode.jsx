@@ -204,7 +204,9 @@ const ResultMapNode = memo(({ id, data }) => {
         const payload = {
           source_variables: provenance.variables.map(v => ({
             dataset_name: v.dataset,
-            column_name: v.targetColumn
+            column_name: v.targetColumn,
+            source_column: v.sourceColumn || null,
+            aggregation: v.aggregation || null,
           }))
         };
 
@@ -244,7 +246,9 @@ const ResultMapNode = memo(({ id, data }) => {
       const payload = {
         source_variables: provenance.variables.map(v => ({
           dataset_name: v.dataset,
-          column_name: v.targetColumn
+          column_name: v.targetColumn,
+          source_column: v.sourceColumn || null,
+          aggregation: v.aggregation || null,
         })),
         ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : {})
       };

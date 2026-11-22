@@ -122,3 +122,17 @@ def test_preview_of_invalid_polygons(client, catalog):
     r = client.get("/dataset/test_rates.geojson?simplify=true")
     assert r.status_code == 200, r.text
     assert r.json()["urbantrace"]["sampled"] == len(r.json()["features"])
+
+
+def test_hotspot_synthesis_takes_plan_outputs(client, catalog):
+    # A step's outputs are named by the analyst (a count has no source column) and a Calculate
+    # column has a formula: both are described to the synthesis instead of refused
+    r = client.post("/api/v1/copilot/synthesize-hotspot", json={"source_variables": [
+        {"dataset_name": "test_points", "column_name": "n_points", "aggregation": "count"},
+        {"dataset_name": "test_points", "column_name": "total", "source_column": "count", "aggregation": "sum"},
+        {"dataset_name": "derived", "column_name": "ratio", "source_column": "total / n_points", "aggregation": "expression"}]})
+    assert r.status_code == 200, r.text
+    assert {v["column_name"] for v in r.json()["variables"]} == {"n_points", "total", "ratio"}
+    bad = client.post("/api/v1/copilot/synthesize-hotspot", json={"source_variables": [
+        {"dataset_name": "test_points", "column_name": "nope"}]})
+    assert bad.status_code == 400

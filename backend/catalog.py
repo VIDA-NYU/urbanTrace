@@ -53,11 +53,14 @@ def dataset_path(data_dir, stem: str) -> Path | None:
     return None
 
 
-def load(data_dir, stem: str, columns: list[str] | None = None, clean: bool = True) -> gpd.GeoDataFrame:
+def load(data_dir, stem: str, columns: list[str] | None = None, clean: bool = True,
+         geocoded: bool = True) -> gpd.GeoDataFrame:
     """Read a dataset, optionally only some columns (plus geometry). Raises FileNotFoundError.
 
     With *clean* (the default), the dataset's atlas-clean recipe, if one was saved, is replayed
-    (cleaning.py); what it did is in ``gdf.attrs["urbantrace_cleaning"]``."""
+    (cleaning.py); what it did is in ``gdf.attrs["urbantrace_cleaning"]``. With *geocoded* (the
+    default), rows located from their addresses (geocode.py) get those locations; the report is in
+    ``gdf.attrs["urbantrace_geocoded"]``."""
     path = dataset_path(data_dir, stem)
     if path is None:
         raise FileNotFoundError(f"Dataset {stem!r} is not in the catalog")
@@ -72,6 +75,14 @@ def load(data_dir, stem: str, columns: list[str] | None = None, clean: bool = Tr
     if corrected:
         gdf, report = cleaning.apply(data_dir, stem, gdf)
         gdf.attrs["urbantrace_cleaning"] = report
+    if geocoded:
+        import geocode
+        if geocode.has_result(data_dir, stem):
+            attrs = dict(gdf.attrs)
+            gdf, report = geocode.apply(data_dir, stem, gdf)
+            gdf.attrs.update(attrs)
+            if report:
+                gdf.attrs["urbantrace_geocoded"] = report
     if columns is not None:
         attrs = dict(gdf.attrs)
         gdf = gdf[[c for c in columns if c in gdf.columns] + [gdf.geometry.name]]

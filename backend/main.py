@@ -42,6 +42,7 @@ import plans
 import analysis
 import suggest
 import cleaning
+import geocode
 from fastapi.responses import HTMLResponse
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
@@ -128,7 +129,9 @@ def get_copilot_agent() -> UrbanTraceCopilot:
 
 class HotspotVariableRequest(BaseModel):
     dataset_name: str
-    column_name: str
+    column_name: str                       # the variable on the map (a plan step's output name)
+    source_column: Optional[str] = None    # the dataset column it was computed from, if any
+    aggregation: Optional[str] = None      # how (count, sum, weighted_mean, ...)
 
 
 class HotspotSynthesisRequest(BaseModel):
@@ -394,6 +397,11 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
     source_payload: List[Dict[str, Any]] = []
 
     for item in request.source_variables:
+        if item.aggregation == "expression":            # a Calculate node's column: its formula is the description
+            source_payload.append({"dataset_name": _normalize_dataset_stem(item.dataset_name), "column_name": item.column_name,
+                                   "computed_as": f"expression: {item.source_column or ''}".strip(),
+                                   "column_metadata": {}, "sample_data": []})
+            continue
         metadata_path = _metadata_path_for_dataset(item.dataset_name)
         if not os.path.exists(metadata_path):
             raise HTTPException(status_code=404, detail=f"Metadata not found for dataset: {item.dataset_name}")
@@ -401,17 +409,24 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         with open(metadata_path, "r", encoding="utf-8") as f:
             metadata = json.load(f)
 
-        column_meta = next((c for c in metadata.get("columns", []) if c.get("name") == item.column_name), None)
-        if not column_meta:
+        # A plan step's output is named by the analyst (libraries, fill_rate): describe it by the
+        # column it came from, and by how it was computed (a count has no source column).
+        source = item.source_column or item.column_name
+        column_meta = next((c for c in metadata.get("columns", []) if c.get("name") == source), None)
+        if not column_meta and not item.aggregation:
             raise HTTPException(
                 status_code=400,
-                detail=f"Column '{item.column_name}' not found in metadata for dataset '{item.dataset_name}'"
+                detail=f"Column '{source}' not found in metadata for dataset '{item.dataset_name}'"
             )
+        column_meta = column_meta or {}
 
-        sample_values = _extract_sample_values(metadata.get("sample"), item.column_name, max_rows=20)
+        sample_values = _extract_sample_values(metadata.get("sample"), source, max_rows=20) if item.source_column or column_meta else []
         source_payload.append({
             "dataset_name": _normalize_dataset_stem(item.dataset_name),
             "column_name": item.column_name,
+            **({"computed_as": f"{item.aggregation} of {item.source_column}" if item.source_column
+                else f"{item.aggregation} of {_normalize_dataset_stem(item.dataset_name)} features per unit"}
+               if item.aggregation else {}),
             "column_metadata": {
                 "structural_type": column_meta.get("structural_type"),
                 "num_distinct_values": column_meta.get("num_distinct_values"),
@@ -630,6 +645,24 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
         files[f"data/recipes/{stem}.json"] = cleaning.recipe_path(DATA_DIR, stem).read_bytes()
         fixes = "; ".join(f"{f['action']}: {f['rationale']}" for f in info.get("fixes", [])) or "see the recipe"
         corrections.append(f"- `{stem}`: {fixes} (`data/recipes/{stem}.json`, an atlas-clean recipe)")
+    # Rows located from their addresses (geocode.py): the service, the checks, how many
+    located = []
+    for d in doc.get("datasets", []):
+        stem = catalog.stem_of(d.get("id"))
+        g = geocode.info(DATA_DIR, stem) if catalog.valid_stem(stem) else None
+        if g is None:
+            continue
+        files[f"data/geocoded/{stem}.json"] = geocode.result_path(DATA_DIR, stem).read_bytes()
+        rs = g.get("rows_by_status", {})
+        located.append(f"- `{stem}`: {g.get('located', 0):,} of {g.get('missing', 0):,} rows without a location located with "
+                       f"{g.get('service')} on {str(g.get('saved', ''))[:10]} (columns {', '.join(f'{k}: `{v}`' for k, v in (g.get('spec') or {}).items())}); "
+                       f"not located: {rs.get('different', 0):,} answered with a different address, {rs.get('not_found', 0):,} not found, "
+                       f"{rs.get('without_house_number', 0):,} without a house number (`data/geocoded/{stem}.json`)")
+    if located:
+        extras["readme_sections"] = list(extras["readme_sections"]) + [
+            "## Rows located from addresses", "",
+            "Some rows had an address but no location. Their addresses were sent to a geocoder, and an answer was used "
+            "only when its house number, street and borough were the ones sent.", "", *located, ""]
     if corrections:
         extras["readme_sections"] = list(extras["readme_sections"]) + [
             "## Corrections", "",
@@ -856,6 +889,51 @@ async def save_recipe(dataset_id: str, body: RecipeBody):
 @app.delete("/api/datasets/{dataset_id}/recipe")
 async def delete_recipe(dataset_id: str):
     found = cleaning.delete(DATA_DIR, _dataset_stem(dataset_id))
+    _corrections_changed()
+    return {"deleted": found}
+
+
+class GeocodeBody(BaseModel):
+    spec: Dict[str, Optional[str]] = Field(default_factory=dict)
+
+
+def _geocode_spec(spec: Dict[str, Optional[str]]) -> Dict[str, str]:
+    return {k: v for k, v in (spec or {}).items() if k in ("address", "house", "street", "borough", "zip") and v}
+
+
+@app.post("/api/datasets/{dataset_id}/geocode/preview")
+async def geocode_preview(dataset_id: str, body: GeocodeBody):
+    """What locating rows from their addresses would do: rows without a location, the address
+    columns, how many addresses would be sent and where. Sends nothing."""
+    stem = _dataset_stem(dataset_id)
+    try:
+        return await asyncio.to_thread(geocode.preview, DATA_DIR, stem, _geocode_spec(body.spec) or None)
+    except geocode.GeocodeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/datasets/{dataset_id}/geocode")
+async def geocode_start(dataset_id: str, body: GeocodeBody):
+    """Send the addresses of the rows without a location to NYC GeoSearch and save the locations
+    that check out (geocode.py). Runs in the background; poll GET for progress."""
+    stem = _dataset_stem(dataset_id)
+    if not geocode.enabled():
+        raise HTTPException(status_code=403, detail="Geocoding is turned off on this server (URBANTRACE_GEOCODER=off).")
+    spec = _geocode_spec(body.spec)
+    if not (spec.get("address") or (spec.get("house") and spec.get("street"))):
+        raise HTTPException(status_code=400, detail="Choose the address column, or the house number and street columns.")
+    return {"job": geocode.start(DATA_DIR, stem, spec, on_done=_corrections_changed)}
+
+
+@app.get("/api/datasets/{dataset_id}/geocode")
+async def geocode_get(dataset_id: str):
+    stem = _dataset_stem(dataset_id)
+    return {"job": geocode.status(stem), "saved": geocode.info(DATA_DIR, stem), "enabled": geocode.enabled()}
+
+
+@app.delete("/api/datasets/{dataset_id}/geocode")
+async def geocode_delete(dataset_id: str):
+    found = geocode.delete(DATA_DIR, _dataset_stem(dataset_id))
     _corrections_changed()
     return {"deleted": found}
 

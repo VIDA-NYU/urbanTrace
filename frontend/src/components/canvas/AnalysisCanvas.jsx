@@ -1282,6 +1282,17 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   }, [collection.goal, getNodes, handlePlanNodeChange, handleValueKindChange]);
   useEffect(() => { suggestStepRef.current = suggestStep; }, [suggestStep]);
 
+  // The rationale the provenance graph shows on hover: the copilot's, when it suggested this step's
+  // method, and what urbanweave reported the step did.
+  const stepRationale = (node, step, report) => {
+    const parts = [];
+    if (node?.data?.suggestion?.reasoning) parts.push(node.data.suggestion.reasoning);
+    const src = report?.match?.sources;
+    if (src) parts.push(`${step?.match?.method}: ${src.matched} of ${src.total} source features matched.`);
+    if (report?.conversion === 'reduce') parts.push(`Joined on ${report.by}: ${report.groups} keys, ${report.unknown_keys?.count || 0} matching no zone.`);
+    return parts.join(' ') || null;
+  };
+
   const runPlanNode = useCallback(async (nodeId, mode) => {
     const all = getNodes();
     const allEdges = getEdges();
@@ -1307,11 +1318,20 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const payload = out.steps[key];
       const step = plan.steps.find((s) => s.id === key);
       const srcInfo = step ? out.inputs?.[step.source] : null;
+      // Each output column and the step (and its reduction) that made it: one step, or a
+      // Calculate node's input steps
+      const columnSteps = plan.steps.filter((s) => (mode === 'step' ? s.id === key : derived[0].inputs.includes(s.id)))
+        .flatMap((s) => (s.aggregate || s.reduce?.aggregate || []).map((r) => ({ r, s })));
       const spatialData = toSpatialData(payload, {
         stepId: key, plan, reports: out.reports?.[key] || null,
         sourceLabel: srcInfo?.dataset || (mode === 'calculate' ? `derived from ${derived[0].inputs.join(', ')}` : key),
         methodLabel: step?.match?.method || (step?.reduce ? `join on ${step.reduce.by}` : 'combine'),
-        reductionsByColumn: Object.fromEntries((step?.aggregate || step?.reduce?.aggregate || []).map((r) => [r.as, r.method])),
+        reductionsByColumn: Object.fromEntries(columnSteps.map(({ r }) => [r.as, r.method])),
+        sourceColumns: Object.fromEntries(columnSteps.map(({ r }) => [r.as, r.column || r.numerator || null])),
+        datasetsByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, out.inputs?.[s.source]?.dataset || null])),
+        methodsByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, s.match?.method || (s.reduce ? `join on ${s.reduce.by}` : null)])),
+        rationalesByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, stepRationale(all.find((n) => byStepNode[n.id] === s.id), s, out.reports?.[s.id])])),
+        expressionsByColumn: derived?.[0]?.expression ? { [derived[0].as]: derived[0].expression } : {},
         durationMs: Math.round(performance.now() - started),
       });
       const reports = mode === 'step' ? { [key]: { allocation: out.reports?.[key], ...(srcInfo?.time_window ? { time_window: srcInfo.time_window } : {}),
