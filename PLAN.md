@@ -161,6 +161,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [x] Export file names used internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`): results are named after their output (`libraries`, `schools_per_library`), unnamed analyses after kind and column (`sweep_libraries`)
 - [x] Frontend lint: no errors (13 warnings remain, mostly hook dependencies)
 - [ ] Lint in CI: blocked while `@urban-toolkit/autk-map` is a `file:` dependency outside the repository, which CI cannot install; needs a published Autark package or a vendored build
+- [ ] Add a LICENSE: the repository has none (urbanweave and atlas-clean are MIT); the README's acknowledgements section makes no license claim until one is chosen
 - [ ] Console warning: a `<button>` nested inside another `<button>` on the canvas (React reports it on every load)
 
 ---
@@ -170,7 +171,7 @@ Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHR
 - [ ] Update `README.md` for the redesigned tool: what UrbanTrace is for (find, prepare, analyse, export), collections and export, study area and coverage, plans and Step nodes, analyses, the report; the integration model, API and project structure sections predate phases 1–5
 - [ ] Update the documentation (`docs/`): REDESIGN.md's status, the walkthrough, an API reference for the new endpoints
 - [ ] New screenshots of the current interface for the README and the walkthrough (collection bar, coverage map, Step with its report card, result map, sweep and validation, report, export); `docs/screenshots/` holds previews of earlier versions
-- [ ] Move `Supplementary_Material.pdf` from the repository root to a directory that says what it is (e.g. `paper/`), with a README: supplementary material for the arXiv paper [2607.25124](https://arxiv.org/abs/2607.25124), which describes an earlier version of UrbanTrace (tag `vis2026-camera-ready`); update the README's link
+- [x] Move `Supplementary_Material.pdf` from the repository root to a directory that says what it is (e.g. `paper/`), with a README: supplementary material for the arXiv paper [2607.25124](https://arxiv.org/abs/2607.25124), which describes an earlier version of UrbanTrace (tag `vis2026-camera-ready`); update the README's link
 
 ---
 
