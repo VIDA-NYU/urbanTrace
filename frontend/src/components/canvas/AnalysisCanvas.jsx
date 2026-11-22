@@ -111,6 +111,8 @@ const writeLastCollectionId = (id) => {
   try { if (id) localStorage.setItem(LAST_KEY, id); else localStorage.removeItem(LAST_KEY); } catch { /* blocked */ }
 };
 
+const NODE_NAMES = { stepNode: 'a Step', calculateNode: 'a Combine & Calculate', datasetNode: 'a dataset', gridNode: 'an H3 Grid' };
+
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [], integrations: [],
 };
@@ -676,11 +678,27 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
 
 
   // 4. Update onConnect to pass data between nodes
-  const onConnect = useCallback((params) => {
+  const onConnect = useCallback((rawParams) => {
     // Get current nodes state OUTSIDE of setNodes callback for early validation
     const currentNodes = getNodes();
-    const sourceNode = currentNodes.find(n => n.id === params.source);
+    let params = rawParams;
+    let sourceNode = currentNodes.find(n => n.id === params.source);
     const targetNode = currentNodes.find(n => n.id === params.target);
+    // A Result Map made by a Step (or a Combine & Calculate) stands for that node: dragging from the map,
+    // the visible end of the chain, connects its producer.
+    const PLAN_INPUT_TARGETS = ['calculateNode', 'sweepNode', 'validateNode'];
+    if (sourceNode?.type === 'resultMapNode' && PLAN_INPUT_TARGETS.includes(targetNode?.type)) {
+      const producerEdge = getEdges().find((e) => e.target === sourceNode.id
+        && ['stepNode', 'calculateNode'].includes(currentNodes.find((n) => n.id === e.source)?.type));
+      if (producerEdge) {
+        params = { ...params, source: producerEdge.source, sourceHandle: null };
+        sourceNode = currentNodes.find((n) => n.id === producerEdge.source);
+      }
+    }
+    const refuse = (message) => {
+      setCollectionStatus(message);
+      setTimeout(() => setCollectionStatus((m) => (m === message ? '' : m)), 5000);
+    };
 
     if (targetNode?.type === 'compareMapNode') {
       if (sourceNode?.type !== 'resultMapNode') {
@@ -714,7 +732,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     };
     if (ANALYSIS_INPUTS[targetNode?.type]) {
       const rule = ANALYSIS_INPUTS[targetNode.type][params.targetHandle];
-      if (!rule || !rule[0].includes(sourceNode?.type)) return;
+      if (!rule || !rule[0].includes(sourceNode?.type)) {
+        refuse(rule ? `That input takes ${rule[0].map((t) => NODE_NAMES[t] || t).join(' or ')}.` : 'That input does not take this node.');
+        return;
+      }
       setEdges((eds) => {
         const kept = rule[1]
           ? eds.filter((e) => !(e.target === params.target && e.source === params.source && e.targetHandle === params.targetHandle))
@@ -731,7 +752,11 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       if (targetNode.type === 'stepNode' && handle === 'source') ok = ['datasetNode', 'stepNode'].includes(sourceNode?.type) && sourceNode.id !== targetNode.id;
       if (targetNode.type === 'stepNode' && handle === 'target') ok = ['datasetNode', 'gridNode'].includes(sourceNode?.type);
       if (targetNode.type === 'calculateNode') ok = sourceNode?.type === 'stepNode';
-      if (!ok) return;
+      if (!ok) {
+        refuse(targetNode.type === 'calculateNode' ? 'Combine & Calculate takes Steps (or their result maps).'
+          : handle === 'source' ? 'A Step\'s source is a dataset or another Step.' : 'A Step\'s target is a zones dataset or an H3 Grid.');
+        return;
+      }
       setEdges((eds) => {
         const kept = targetNode.type === 'stepNode'
           ? eds.filter((e) => !(e.target === params.target && e.targetHandle === handle)) // one per handle

@@ -152,6 +152,7 @@ Found while using the tool (started 2026-11-22).
 - [x] Zones touching the study area by rounding were kept (Brooklyn had 77 NTAs instead of 69): a zone now needs 1% of its area inside (`scope.zones_in_area`), everywhere zones are filtered
 - [ ] Classic Integration results may open off-screen too (only plan results are brought into view)
 - [x] Unsaved work was lost on reload without warning, and a reload always started empty: the browser now asks before leaving with unsaved changes, keeps them as a draft in the browser, and on reload restores the draft or reopens the last saved collection. Results are not saved (decided 2026-11-22: they are rerun)
+- [x] Couldn't connect to Combine & Calculate: it took only Step nodes and refused anything else silently, while the visible end of a chain is the step's Result Map. A Result Map now stands for the Step (or Calculate) that made it, for Calculate, Sweep and Validate; refused connections say why in the collection bar
 
 ---
 
