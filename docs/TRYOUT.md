@@ -88,8 +88,50 @@ Notes:
 
 ## 4. Analyse
 
-- [ ] **Sensitivity Sweep** on the libraries step: is the top 20% stable across variants?
-- [ ] **Validate** with schools as outcome points: is the table understandable?
+**What it's for.** Step 3 produced numbers per neighborhood. Step 4 asks how far to trust them,
+in two ways:
+
+- **Sensitivity sweep: would the answer change with other reasonable choices?** The libraries count
+  depends on choices you made: neighborhoods as units, `contain` as the method. The sweep reruns the
+  step with alternatives (an H3 grid, other zones such as community districts, another method),
+  brings each result back to the neighborhoods, and ranks them. Neighborhoods in the top under every
+  variant are robust findings; those in the top only under some depend on the choice.
+- **Validate: does the ranking line up with something observed?** It takes the units ranked highest
+  by a result and counts how many outcome points (here, youth program sites) fall in them, compared
+  with what their share of units would predict.
+
+**Sensitivity sweep**
+
+- [ ] Drag **Sensitivity Sweep** (toolbox → Analysis) onto the canvas; connect the **libraries Step**
+  (or its Result Map) to its left handle. The node says "Reruns step_1 under each alternative"
+- [ ] **Column**: `libraries`
+- [ ] Alternatives: tick H3 resolution **8**; under **Through other zones** pick `Community_Districs`;
+  tick another matching method if one is offered
+- [ ] Leave **top** at 20% and click **Run**
+- [ ] Read the result: "N of 69 units are in the top under every variant; M only under some", the
+  agreement between variants (Spearman, 1 = same ranking), and any variant that couldn't run, with
+  its reason. The map shows how often each neighborhood is in the top
+- [ ] Does the summary make sense? Is it clear what a "variant" is?
+
+**Validate against outcomes**
+
+- [ ] Drag `dycd_program_sites` (youth and community program sites, 2020–22; 3,036 in Brooklyn) onto
+  the canvas
+- [ ] Drag **Validate** (toolbox → Analysis); connect the **Combine & Calculate** node (or the
+  schools Step) to its upper handle (**Result**) and `dycd_program_sites` to its lower handle
+  (**Outcomes**)
+- [ ] **Column**: `schools_per_library`; keep the quantiles `0.5, 0.6, 0.7`; click **Run**
+- [ ] Read the table, one row per quantile (0.7 = the top 30% of neighborhoods):
+  - **Coverage**: the share of program sites inside those top neighborhoods
+  - **In top**: how many program sites that is
+  - **Baseline**: the share of neighborhoods that are in the top (what coverage would be by chance)
+  - **Lift** = coverage / baseline. Above 1: program sites concentrate in the neighborhoods your
+    ratio ranks highest; below 1: they're elsewhere
+  - A note appears when tied values put more units at the threshold than the quantile implies
+- [ ] Is the table understandable without this explanation?
+
+The libraries-and-schools question has no true outcome here, so read the lift as "do youth programs
+already sit where schools outnumber libraries?", not as proof the ranking is right.
 
 Notes:
 
