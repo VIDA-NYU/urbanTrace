@@ -1528,7 +1528,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
           edgesReconnectable={false}
           fitView
           // Fitting a single small node would zoom in (1.7x) and blow up its text; never fit past 100%
-          fitViewOptions={{ maxZoom: 1 }}
+          fitViewOptions={{ maxZoom: 1, minZoom: 0.1 }}
+          // React Flow stops at 50% by default, too close to fit a workflow with its result maps
+          minZoom={0.1}
         >
           <Background variant="dots" gap={20} size={1} color="#cbd5e1" />
           <Controls />
