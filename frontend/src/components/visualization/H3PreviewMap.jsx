@@ -4,7 +4,7 @@ import { cellToBoundary, cellToLatLng, getResolution, latLngToCell } from 'h3-js
 import {
   BASEMAP_SOURCE, SCHEMES, applyViewState, cameraToViewState, colorMapFor, fitMercBounds, hitTest,
   lonLatToMerc, mercToLonLat, mercToScreen, projectCollection, schemeForColor, schemeForPalette,
-  screenToMerc, useAutarkMap,
+  screenToMerc, useAutarkMap, pointerInElement,
 } from './autark/autarkMap';
 import { MapError } from './VectorPreviewMap';
 
@@ -383,9 +383,7 @@ const H3PreviewMap = ({
   const handlePointerMove = (event) => {
     const map = mapRef.current;
     if (!map || !loadedRef.current || event.buttons) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
+    const [px, py] = pointerInElement(event);
     const [x, y] = screenToMerc(map, px, py);
 
     let object = null;

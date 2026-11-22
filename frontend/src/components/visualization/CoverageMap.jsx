@@ -2,7 +2,7 @@
 // the canvas's datasets have data there, and the study area's outline.
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
-  BASEMAP_SOURCE, fitMercBounds, hitTest, metresPerPixel, projectCollection, screenToMerc, useAutarkMap,
+  BASEMAP_SOURCE, fitMercBounds, hitTest, metresPerPixel, projectCollection, screenToMerc, useAutarkMap, pointerInElement,
 } from './autark/autarkMap';
 import { MapError } from './VectorPreviewMap';
 import { COVER_COLORS, coverageColor } from '../../lib/scope';
@@ -88,9 +88,7 @@ export default function CoverageMap({ cells, studyArea, max, palette = COVER_COL
       if (tooltip) setTooltip(null);
       return;
     }
-    const rect = event.currentTarget.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
+    const [px, py] = pointerInElement(event);
     const [x, y] = screenToMerc(map, px, py);
     const index = hitTest(projectedCells, x, y, 0);
     if (index < 0) {

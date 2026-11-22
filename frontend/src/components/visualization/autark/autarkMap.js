@@ -194,6 +194,19 @@ export const applyViewState = (map, viewState) => {
   setTopDownCamera(map, x, y, WORLD / (WORLD_PX_AT_ZOOM_0 * 2 ** viewState.zoom));
 };
 
+/**
+ * The pointer's position in the element's own (unscaled) CSS pixels. React Flow zooms nodes with a
+ * CSS transform, so screen offsets must be divided by the scale before they are used for hit tests or
+ * to place an overlay inside the node.
+ */
+export const pointerInElement = (event) => {
+  const el = event.currentTarget;
+  const rect = el.getBoundingClientRect();
+  const sx = el.offsetWidth ? rect.width / el.offsetWidth : 1;
+  const sy = el.offsetHeight ? rect.height / el.offsetHeight : 1;
+  return [(event.clientX - rect.left) / (sx || 1), (event.clientY - rect.top) / (sy || 1)];
+};
+
 /** Mercator position under a CSS-pixel offset within the canvas. */
 export const screenToMerc = (map, px, py) => {
   const w = map.canvas.clientWidth || 1;

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import axios from 'axios';
 import {
   BASEMAP_SOURCE, SCHEMES, applyViewState, cameraToViewState, colorMapFor, fitMercBounds, hitTest,
-  layerTypeFor, metresPerPixel, projectCollection, screenToMerc, useAutarkMap,
+  layerTypeFor, metresPerPixel, projectCollection, screenToMerc, useAutarkMap, pointerInElement,
 } from './autark/autarkMap';
 import { API_BASE } from '../../config/api';
 
@@ -179,9 +179,7 @@ const VectorPreviewMap = ({
       if (tooltip) setTooltip(null);
       return;
     }
-    const rect = event.currentTarget.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
+    const [px, py] = pointerInElement(event);
     const [x, y] = screenToMerc(map, px, py);
     const index = hitTest(projected, x, y, 6 * metresPerPixel(map));
     if (index < 0) {
