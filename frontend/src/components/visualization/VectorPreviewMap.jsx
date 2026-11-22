@@ -27,7 +27,8 @@ const VectorPreviewMap = ({
   const canvasRef = useRef(null);
   // The response is kept with the filename it belongs to, so `loading` is derived rather than set in an effect.
   const [loaded, setLoaded] = useState({ key: null, data: null });
-  const key = `${filename}#${rev}`;
+  // The preview asks only for the column it colors by (and at most 50,000 features); see /dataset/{name}.
+  const key = `${filename}#${rev}#${selectedColumn || ''}`;
   const data = loaded.key === key ? loaded.data : null;
   const loading = loaded.key !== key;
 
@@ -91,7 +92,8 @@ const VectorPreviewMap = ({
   // 1. Fetch data
   useEffect(() => {
     let cancelled = false;
-    axios.get(`${API_BASE}/dataset/${filename}?simplify=true${rev ? `&rev=${rev}` : ''}`)
+    const cols = selectedColumn ? `&columns=${encodeURIComponent(selectedColumn)}` : '';
+    axios.get(`${API_BASE}/dataset/${filename}?simplify=true${cols}${rev ? `&rev=${rev}` : ''}`)
       .then(res => !cancelled && setLoaded({ key, data: res.data }))
       .catch(err => {
         console.error('Preview load error', err);
@@ -100,7 +102,7 @@ const VectorPreviewMap = ({
     return () => {
       cancelled = true;
     };
-  }, [filename, rev, key]);
+  }, [filename, rev, key, selectedColumn]);
 
   const projected = useMemo(() => (data ? prepareCollection(data) : null), [data]);
   useLayoutEffect(() => {

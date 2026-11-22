@@ -115,11 +115,13 @@ def one(stem: str, data_dir: str, cache: str) -> dict:
         return run
 
     def preview():
-        gdf = state["gdf"]
-        g = gdf.to_crs("EPSG:4326") if gdf.crs is not None and str(gdf.crs) != "EPSG:4326" else gdf.copy()
-        g["geometry"] = g["geometry"].simplify(tolerance=0.001, preserve_topology=True)
-        size = len(json.dumps(g.__geo_interface__, default=str))
-        return {"mb": round(size / 1e6, 1)}
+        # What the map preview receives: /dataset/{name}?simplify=true (geometry only, sampled)
+        from fastapi.testclient import TestClient
+        import main
+        main.DATA_DIR = data_dir
+        r = TestClient(main.app).get(f"/dataset/{stem}.geojson?simplify=true")
+        r.raise_for_status()
+        return {"mb": round(len(r.content) / 1e6, 1), "sampled": r.json().get("urbantrace", {}).get("sampled")}
 
     def package():
         with tempfile.TemporaryDirectory() as tmp:

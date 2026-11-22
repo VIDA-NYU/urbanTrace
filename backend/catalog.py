@@ -67,7 +67,8 @@ def load(data_dir, stem: str, columns: list[str] | None = None, clean: bool = Tr
     if path.suffix == ".parquet":
         gdf = gpd.read_parquet(path, columns=None if read_columns is None else [*read_columns, "geometry"])
     else:
-        gdf = gpd.read_file(path)
+        # Read only the columns asked for (pyogrio skips the rest, much faster on wide, large files)
+        gdf = gpd.read_file(path, columns=read_columns) if read_columns is not None else gpd.read_file(path)
     if corrected:
         gdf, report = cleaning.apply(data_dir, stem, gdf)
         gdf.attrs["urbantrace_cleaning"] = report

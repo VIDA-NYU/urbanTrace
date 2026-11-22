@@ -7,6 +7,8 @@ from typing import List, Optional, Dict, Any
 import geopandas as gpd
 import pandas as pd
 import json
+import shapely
+import numpy as np
 import os
 import csv
 import io
@@ -255,23 +257,36 @@ async def get_dataset_report(dataset_id: str):
     return FileResponse(path, media_type="text/html")
 
 
+PREVIEW_MAX_FEATURES = 50_000
+
+
 @app.get("/dataset/{filename}")
-async def get_geojson(filename: str, simplify: bool = False):
-    print(f"Requesting dataset: {filename} (simplify={simplify})")
-    """Serves raw or simplified GeoJSON data to the frontend."""
+async def get_geojson(filename: str, simplify: bool = False, columns: Optional[str] = None,
+                      max_features: Optional[int] = None):
+    """A dataset as GeoJSON (WGS84), with its saved corrections (cleaning.py).
+
+    With *simplify* (map previews) it is light: geometries simplified and rounded to about a metre,
+    only the *columns* asked for (comma-separated; none by default), and at most *max_features*
+    features (an even sample, 50,000 by default); ``urbantrace.rows`` and ``urbantrace.sampled``
+    say how many there are and how many were sent. Without it, the whole dataset."""
     stem = catalog.stem_of(filename)
     if not catalog.valid_stem(stem) or catalog.dataset_path(DATA_DIR, stem) is None:
         raise HTTPException(status_code=404, detail="File not found")
-    gdf = catalog.load(DATA_DIR, stem)    # with its saved corrections (cleaning.py)
-    
+    wanted = [c for c in (columns or "").split(",") if c] if simplify else None
+    gdf = await asyncio.to_thread(catalog.load, DATA_DIR, stem, wanted)
     if gdf.crs and gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
-    
-    if simplify:
-        # Simplify geometry to reduce payload size for UI previews
-        gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.001, preserve_topology=True)
-        
-    return gdf.__geo_interface__
+    if not simplify:
+        return gdf.__geo_interface__
+    rows = int(len(gdf))
+    cap = max_features or PREVIEW_MAX_FEATURES
+    if rows > cap:                                        # an even sample keeps the picture of where data is
+        gdf = gdf.iloc[np.linspace(0, rows - 1, cap).astype(int)]
+    geoms = gdf.geometry.simplify(tolerance=0.001, preserve_topology=True)
+    gdf = gdf.set_geometry(shapely.set_precision(geoms.to_numpy(), 1e-5))
+    out = json.loads(gdf.to_json(drop_id=True))
+    out["urbantrace"] = {"rows": rows, "sampled": int(len(gdf)), "columns": [c for c in gdf.columns if c != gdf.geometry.name]}
+    return out
 
 
 @app.get("/api/operators")
@@ -713,6 +728,10 @@ def _export_plan(doc: Dict[str, Any], options: "ExportOptions"):
 
 
 def _plan_report_lines(step_id: str, report: Optional[Dict[str, Any]]) -> List[str]:
+    if (report or {}).get("conversion") == "reduce":       # a join on a key
+        unknown = (report.get("unknown_keys") or {}).get("count", 0)
+        return [f"`{step_id}`: rows joined on `{report.get('by')}` into {report.get('groups')} key(s)"
+                + (f"; {unknown} key(s) match no zone" if unknown else "") + "."]
     match = (report or {}).get("match") or {}
     src = match.get("sources") or {}
     if not src:

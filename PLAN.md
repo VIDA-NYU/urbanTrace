@@ -57,7 +57,7 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Upload records source URL, publisher and license
 - [x] SHA-256 hashes for served files (cached in `data/.hash_cache.json`)
 - [x] Catalog reads a GeoParquet copy when present (`backend/catalog.py`)
-- [ ] Convert the lake to GeoParquet (`tools/convert_to_geoparquet.py` exists, not run)
+- [ ] Convert the lake to GeoParquet (`tools/convert_to_geoparquet.py` exists, not run) — *the whole-catalog run shows GeoJSON parsing dominates on the largest datasets (10–25 s per stage)*
 
 ### Collections
 - [x] Server-side collections: CRUD `/api/collections` (`backend/collections_store.py`, schema `urbantrace.collection/1`)
@@ -124,7 +124,7 @@ Decisions needed before starting (each adds an outside service or a heavy depend
 
 Work:
 
-- [ ] Attribute joins on identifiers (BBL, BIN, ZIP) — *needs no decision; can start now*
+- [ ] Attribute joins on identifiers (BBL, BIN, ZIP) — *backend done: plan steps with urbanweave's `reduce` (sum, ratio_of_sums) join rows onto zones by a key, zones can be identified by a code column (`urbantrace.id_column`), keys compared as text (11211 = "11211" = 11211.0), unknown keys reported; the Step node's "Join on a key" mode is still to do*
 - [x] Direct source → zones steps — *Step nodes match a source onto zones directly (phase 4)*
 - [x] More matching methods: `within_distance`, `largest_overlap`, `representative_point` — *in the picker from urbanweave's registry*
 - [x] More reductions: `median`, `shares` — *`shares` writes one column per category (`share_a`, ...), now carried through plan results; `median` takes intensive values, as the registry says*
@@ -192,7 +192,7 @@ by the user; in order:
 4. - [x] atlas-clean in UrbanTrace (`backend/cleaning.py`): **Check data** on a dataset node runs atlas-clean's spatial checks against the catalog's region and proposes fixes; accepted fixes are saved as a recipe in `data/recipes/<stem>.json` and replayed on every load (`catalog.load`), so previews, plans, coverage and exports use the corrected data; plans report it under `inputs.<source>.cleaning`, exports include the recipe and a Corrections section. atlas-clean became light for this (atlas-profiler and autoddg are extras now, `dc5b831` on its `feat/spatial`). Verified on `2018_2019_school_locations` (swap found and fixed; recipe removed again afterwards)
 5. - [x] Dasymetric working: urbanweave 0.1.0a2 published to PyPI on 2026-11-22 (with the user's uncommitted dasymetric work committed into it: per-target priors, several totals, the 2016–2025 taxi notebook) and pinned; UrbanTrace's dasymetric test runs; checked on Brooklyn (2023 population over 351 H3 cells with schools as prior, total kept)
 6. Whole-catalog run, then a second real task
-   - [ ] Run all 121 datasets through every stage (load, profile and coverage, in-area share, atlas-clean checks, a step onto neighborhoods and onto an H3 grid, the map preview, export), with timings: `tools/corpus_check.py`; list what fails, what is slow and what looks wrong, and fix or log each
+   - [x] Run all 121 datasets through every stage (2026-11-22; `benchmark/results/corpus_check/summary.md`). Fixed from it: steps without a study area are bounded by the catalog's region (every yellow-taxi year failed on a few thousand 0,0 rows); map previews sent every feature with every column (up to 856 MB; now geometry, the coloring column and at most 50,000 features, 3.6–6.5 MB on the largest); GeoJSON reads only the columns asked for; Check data pre-ticks only coordinate and geometry fixes (32 datasets have placeholder values flagged as errors, whose fixes change attributes). Left: the three datasets with broken coordinates fail until corrected (Check data fixes them); the largest datasets take 10–25 s per stage, mostly parsing GeoJSON (the GeoParquet conversion would cut it)
    - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
 7. - [x] Documentation (section above): README, docs, screenshots, supplementary material (2026-11-22)
 8. Release mechanics

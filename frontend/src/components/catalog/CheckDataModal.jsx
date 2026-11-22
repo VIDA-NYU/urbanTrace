@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { X, Loader2, ShieldCheck } from 'lucide-react';
 import { checkDataset, saveRecipe, deleteRecipe } from '../../lib/cleaning';
 
+const GEOMETRY_FIXES = new Set(['swap_xy', 'set_crs', 'make_valid']);
 const SEVERITY = { error: ['#b91c1c', '#fef2f2'], warning: ['#b45309', '#fffbeb'], info: ['#475569', '#f8fafc'] };
 const ACTIONS = {
   swap_xy: 'Swap latitude and longitude', set_crs: 'Declare the coordinate system', make_valid: 'Repair geometry',
@@ -21,9 +22,10 @@ export default function CheckDataModal({ datasetId, name, onClose, onChanged }) 
     checkDataset(datasetId).then((out) => {
       if (!alive) return;
       setState({ out });
-      // Fixes for errors start ticked; the rest are the analyst's call
+      // Coordinate and geometry fixes for errors start ticked; attribute fixes (placeholders, flags)
+      // and everything else are the analyst's call
       const severityOf = Object.fromEntries(out.issues.map((i) => [i.id, i.severity]));
-      setAccepted(new Set(out.fixes.filter((f) => severityOf[f.issue_id] === 'error').map((f) => f.id)));
+      setAccepted(new Set(out.fixes.filter((f) => severityOf[f.issue_id] === 'error' && GEOMETRY_FIXES.has(f.action)).map((f) => f.id)));
     }).catch((e) => alive && setState({ error: e.message }));
     return () => { alive = false; };
   }, [datasetId]);

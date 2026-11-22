@@ -49,7 +49,8 @@ from geometry import repair as _repair
 _WGS84 = "EPSG:4326"
 _OUTPUT_KIND = {"count": "extensive", "weighted_count": "extensive", "sum": None, "density": "intensive",
                 "mean": "intensive", "weighted_mean": "intensive", "median": "intensive",
-                "weighted_median": "intensive", "majority": "categorical", "shares": "intensive"}
+                "weighted_median": "intensive", "majority": "categorical", "shares": "intensive",
+                "ratio_of_sums": "intensive"}
 
 
 class PlanInputError(ValueError):
@@ -167,6 +168,21 @@ def label_column(gdf) -> str | None:
     return None
 
 
+def key_values(series: pd.Series) -> pd.Series:
+    """Keys as text for joins: whole numbers without a decimal part (BBL 1000010001.0 ->
+    "1000010001"), surrounding spaces removed, missing stays missing."""
+    def one(v):
+        if v is None or (isinstance(v, float) and math.isnan(v)):
+            return None
+        if isinstance(v, float) and v.is_integer():
+            return str(int(v))
+        text = str(v).strip()
+        if text.endswith(".0") and text[:-2].lstrip("-").isdigit():
+            text = text[:-2]
+        return text or None
+    return series.map(one).astype(object)
+
+
 def _within_region(data_dir, gdf):
     """Without a study area, the catalog's region bounds a step: features entirely outside it (a
     missing location coded as 0,0, a point geocoded to another state) are left out and reported,
@@ -194,7 +210,17 @@ def _zones_file(data_dir, name: str, spec: dict, area, cache: Path):
     gdf = catalog.load(data_dir, stem)
     gdf = gdf.to_crs(_WGS84) if gdf.crs is not None and not gdf.crs.equals(_WGS84) else gdf
     gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
-    gdf["target_id"] = gdf.index.astype(str)
+    id_column = ut.get("id_column")
+    if id_column:                                   # zones identified by a code, for joins on a key
+        if id_column not in gdf.columns:
+            raise PlanInputError(f"target {name!r}: {stem} has no column {id_column!r}.")
+        keys = key_values(gdf[id_column])
+        if keys.isna().any() or keys.duplicated().any():
+            raise PlanInputError(f"target {name!r}: {id_column!r} does not identify each zone of {stem} "
+                                 f"({int(keys.isna().sum())} missing, {int(keys.duplicated().sum())} repeated).")
+        gdf["target_id"] = keys.to_numpy()
+    else:
+        gdf["target_id"] = gdf.index.astype(str)
     gdf, repaired = _repair(gdf, "target_id")
     if area is not None:
         gdf = gdf[scope.zones_in_area(gdf, area)]   # zones with (almost) nothing inside are out
@@ -218,6 +244,13 @@ def _columns_needed(spec: dict) -> dict[str, set[str]]:
         src = step.get("source")
         if not isinstance(src, str) or src.startswith("@") or src not in need:
             continue
+        body = step.get("reduce") or {}
+        if body.get("by"):
+            need[src].add(str(body["by"]))
+        for r in body.get("aggregate") or []:               # a join on a key: sum or ratio_of_sums
+            for k in ("column", "numerator", "denominator"):
+                if r.get(k) is not None:
+                    need[src].add(str(r[k]))
         for r in step.get("aggregate") or []:
             if r.get("column") is not None:
                 need[src].add(str(r["column"]))
@@ -243,6 +276,11 @@ def prepare(data_dir, plan_spec: dict, study_area_spec, cache_root):
     sources, info = {}, {"sources": {}, "targets": {}, "study_area": study_area_spec}
     for name, sspec in (spec.get("sources") or {}).items():
         sources[name], info["sources"][name] = _bind_source(data_dir, name, sspec, area, need.get(name, set()))
+    # Joins on a key: keys compared as text, so 11211, "11211" and 11211.0 meet (zones' IDs, likewise)
+    for step in spec.get("steps") or []:
+        by, src = (step.get("reduce") or {}).get("by"), step.get("source")
+        if by and isinstance(src, str) and src in sources and by in sources[src].columns:
+            sources[src] = sources[src].assign(**{by: key_values(sources[src][by])})
     zones_frames = {}
     for name, tspec in (spec.get("targets") or {}).items():
         kind = tspec.get("kind")
@@ -310,16 +348,23 @@ def validate(data_dir, plan_spec: dict, study_area_spec, cache_root) -> dict:
         if known is not None:
             for col in sorted(need.get(name, set()) - known):
                 for step in spec.get("steps") or []:
-                    uses = step.get("source") == name and any(
+                    body = step.get("reduce") or {}
+                    uses = step.get("source") == name and (any(
                         str(r.get("column")) == col or any(isinstance(c, dict) and c.get("column") == col
                                                            for c in (r.get("where") if isinstance(r.get("where"), list) else [r.get("where")]))
-                        for r in step.get("aggregate") or [])
+                        for r in step.get("aggregate") or []) or str(body.get("by")) == col or any(
+                        col in (str(r.get(k)) for k in ("column", "numerator", "denominator")) for r in body.get("aggregate") or []))
                     if uses:
                         add(step.get("id", "_plan"), f"{stem} has no column {col}.")
     for name, tspec in (spec.get("targets") or {}).items():
-        stem = catalog.stem_of(((tspec or {}).get("urbantrace") or {}).get("dataset"))
+        ut = (tspec or {}).get("urbantrace") or {}
+        stem = catalog.stem_of(ut.get("dataset"))
         if (tspec or {}).get("kind") == "zones" and stem and catalog.dataset_path(data_dir, stem) is None:
             add(_owner(f"target '{name}'", spec), f"Zones dataset {stem} is not in the catalog.")
+        elif ut.get("id_column") and stem:
+            known = _profile_columns(data_dir, stem)
+            if known is not None and ut["id_column"] not in known:
+                add(_owner(f"target '{name}'", spec), f"{stem} has no column {ut['id_column']}.")
     try:
         problems = Plan(spec)._problems(source_names=list(spec.get("sources") or {}))
     except uw.UrbanweaveError as e:
@@ -369,7 +414,7 @@ def _step_columns(frame, kinds: dict) -> tuple[list[str], dict]:
 
 def _kinds_of(step: dict, declared: dict) -> dict:
     out = {}
-    for r in step.get("aggregate") or []:
+    for r in (step.get("aggregate") or (step.get("reduce") or {}).get("aggregate") or []):
         alias = Reduction.from_dict(dict(r)).alias
         if r.get("method") == "shares":
             out[alias] = "shares"                       # expanded per category by _step_columns
@@ -468,7 +513,7 @@ def run(data_dir, plan_spec: dict, study_area_spec, cache_root, *, outputs=None,
 
     def target_of(step_id):
         step = steps[step_id]
-        tgt = (step.get("match") or {}).get("target")
+        tgt = (step.get("match") or step.get("reduce") or {}).get("target")
         return tgt, info["targets"].get(tgt, {"kind": "other"})
 
     out = {"steps": {}, "reports": {sid: result.reports.get(sid) for sid in steps},

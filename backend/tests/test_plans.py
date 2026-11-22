@@ -209,3 +209,39 @@ def test_median_and_shares_reductions(client, catalog):
     assert r.status_code == 200, r.text
     cols = r.json()["steps"]["red"]["columns"]
     assert "med" in cols and any(c.startswith("share") for c in cols if c != "med"), cols
+
+
+def test_join_on_a_key(client, catalog):
+    # Points carry a zone code; their counts are joined onto the zones by that code, not by location.
+    import json as _json
+    zones = _json.loads((catalog / "geojson" / "test_zones.geojson").read_text())
+    for f, code in zip(zones["features"], [101, 102]):
+        f["properties"]["code"] = code                        # numbers in the zones
+    (catalog / "geojson" / "test_zones.geojson").write_text(_json.dumps(zones))
+    pts = _json.loads((catalog / "geojson" / "test_points.geojson").read_text())
+    for i, f in enumerate(pts["features"]):
+        f["properties"]["zone_code"] = ["101", "101.0", "102", "102", "102", "999"][i]   # text, one unknown
+    (catalog / "geojson" / "test_points.geojson").write_text(_json.dumps(pts))
+    prof_path = catalog / "metadata_v2" / "test_points.json"
+    prof = _json.loads(prof_path.read_text())
+    prof["columns"] = [{"name": "count", "structural_type": "http://schema.org/Integer"},
+                       {"name": "zone_code", "structural_type": "http://schema.org/Text"}]
+    prof_path.write_text(_json.dumps(prof))
+    plan = {"version": 1,
+            "sources": {"pts": {"kind": "vector", "columns": {"count": {"kind": "extensive"}},
+                                "urbantrace": {"dataset": "test_points"}}},
+            "targets": {"z": {"kind": "zones", "urbantrace": {"dataset": "test_zones", "id_column": "code"}}},
+            "steps": [{"id": "j", "source": "pts", "reduce": {"by": "zone_code", "target": "z", "aggregate": [
+                {"method": "sum", "column": "count", "as": "total"},
+                {"method": "ratio_of_sums", "numerator": "count", "denominator": "count", "as": "one"}]}}]}
+    v = client.post("/api/plan/validate", json={"plan": plan}).json(); assert v["ok"], v
+    r = client.post("/api/plan/run", json={"plan": plan, "outputs": ["j"]})
+    assert r.status_code == 200, r.text
+    out = r.json()["steps"]["j"]
+    assert out["target_ids"] == ["101", "102"]
+    assert out["columns"]["total"] == [3 + 5, 2 + 7 + 1]          # by key; the 999 row is reported, not counted
+    assert out["kinds"]["one"] == "intensive"
+    assert r.json()["reports"]["j"]["unknown_keys"]["count"] == 1
+    bad = json.loads(json.dumps(plan))
+    bad["targets"]["z"]["urbantrace"]["id_column"] = "zone"         # fine: names are unique too
+    assert client.post("/api/plan/run", json={"plan": bad, "outputs": ["j"]}).status_code == 200
