@@ -1,13 +1,22 @@
 # UrbanTrace 🏙️
 
-> LLM-assisted discovery and semantics-aware integration of urban spatial data.
+> Find, prepare and share urban spatial data, with explicit, checked integration.
 
-UrbanTrace is a visual analytics system for combining heterogeneous geospatial datasets. You build an analysis as a node-based workflow on an infinite canvas: find datasets with the help of an LLM copilot, bring them onto a common H3 grid with explicit, inspectable operators, aggregate the results into reporting zones such as neighborhoods or ZIP codes, and compare how conclusions change across spatial configurations.
+UrbanTrace helps an analyst answer an urban question with data that was never meant to be used
+together. You search a catalog of profiled datasets, bring them onto shared units (neighborhoods, an
+H3 grid) with documented methods, test how much the answer depends on those choices, and export the
+result as a collection that other tools can open and rerun. You build the analysis as a node-based
+workflow on a canvas, with an LLM copilot that suggests datasets and methods, and every
+integration runs on [urbanweave](https://github.com/VIDA-NYU/urbanweave).
 
 ![Status](https://img.shields.io/badge/status-research_prototype-yellow)
 ![Stack](https://img.shields.io/badge/stack-React%20%2B%20FastAPI%20%2B%20Autark%20(WebGPU)-blue)
 
-![UrbanTrace Screenshot](docs/screenshots/urbantrace_v4_preview.png)
+![UrbanTrace: a collection on the canvas, with steps, result maps, a calculation, a sensitivity sweep and a validation](docs/screenshots/canvas.jpg)
+
+**New to UrbanTrace?** [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) takes one question (which Brooklyn
+neighborhoods have many schools but few libraries?) through every part of the tool, explaining the
+concepts as it goes.
 
 ---
 
@@ -17,9 +26,16 @@ UrbanTrace is a visual analytics system for combining heterogeneous geospatial d
 Sonia Castelo, Eden Wu, Joao Rulff, Harish Doraiswamy, Juliana Freire, Claudio Silva
 *Accepted to IEEE VIS 2026 (Full Papers Track); to appear in IEEE Transactions on Visualization and Computer Graphics.*
 
-[arXiv:2607.25124](https://arxiv.org/abs/2607.25124) · [PDF](https://arxiv.org/pdf/2607.25124) · [Supplementary material](Supplementary_Material.pdf)
+[arXiv:2607.25124](https://arxiv.org/abs/2607.25124) · [PDF](https://arxiv.org/pdf/2607.25124) · [Supplementary material](paper/Supplementary_Material.pdf)
 
-The paper presents UrbanTrace as a visual analytics system that turns manual spatial data wrangling into a transparent, node-based workflow in which users collaborate with context-aware LLM agents. An offline profiler extracts semantic and geometric metadata from each dataset, which grounds the agents when they discover datasets and recommend integration operators. Three linked views show how analytical conclusions change across spatial configurations. The evaluation covers 28 urban scenarios; the dataset discovery and operator selection studies are in [`benchmark/`](benchmark/README.md).
+The paper presents UrbanTrace as a visual analytics system that turns manual spatial data wrangling
+into a transparent, node-based workflow in which users collaborate with context-aware LLM agents. An
+offline profiler extracts semantic and geometric metadata from each dataset, which grounds the agents
+when they discover datasets and recommend integration operators. The evaluation covers 28 urban
+scenarios; the dataset discovery and operator selection studies are in [`benchmark/`](benchmark/README.md).
+
+The paper describes an earlier version of UrbanTrace, before it ran on urbanweave; see
+[`paper/`](paper/README.md). To reproduce its results, check out the tag `vis2026-camera-ready`.
 
 If you use UrbanTrace, please cite:
 
@@ -38,67 +54,114 @@ If you use UrbanTrace, please cite:
 
 ---
 
-**New to UrbanTrace?** [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) takes one question (which Brooklyn neighborhoods have many schools but few libraries) through every part of the tool, explaining the concepts as it goes.
+## ✨ What it does
 
-## ✨ Features
+### 🗂️ Find data: the catalog (left sidebar)
 
-### 🗂️ Data library (left sidebar)
-- Lists the profiled datasets served by the backend, with geometry type, row count and column tags; search by name.
-- **Info** opens a details view of a dataset's metadata profile.
-- Drag a dataset onto the canvas to create a dataset node.
-- Upload a new `.geojson`; the backend profiles it and writes its metadata so it joins the catalog.
+<img src="docs/screenshots/catalog.png" alt="Catalog cards with each dataset's share of the study area" width="260" align="right">
 
-### 🖼️ Analysis canvas (center)
-Built on React Flow. The workflow is made of nodes:
+- 121 profiled NYC datasets, each with its geometry, row count, columns and a profile (**Info**): column
+  types and statistics, where and when it has data, and where it came from (publisher, source URL,
+  license when known).
+- Search by name; filter to datasets with data **in the study area** (sorted by how much of it they
+  reach) and to a range of **years**.
+- Drag a dataset onto the canvas to use it; upload your own GeoJSON (with its source and license).
+- The copilot suggests datasets for a goal; nothing is added until you accept it.
 
-| Node | What it does |
+<br clear="right">
+
+### 📦 Frame it: the collection (top bar)
+
+A **collection** is what UrbanTrace produces: a goal, the datasets chosen and why, a study area, the
+steps and analyses on the canvas, and where each dataset came from. It is saved on the server;
+unsaved changes survive a reload.
+
+- The **study area** (zones from a dataset, optionally filtered, or a box) narrows search, clips
+  sources before they are combined, and bounds grids and exports.
+- **Coverage** shows where each dataset has data in the study area; **checks** warn when periods do not
+  overlap or a dataset has little or nothing there.
+
+<img src="docs/screenshots/coverage.png" alt="Coverage of four datasets over Brooklyn" width="520">
+
+### 🔗 Prepare it: steps on urbanweave (canvas)
+
+A **Step** turns a dataset into numbers per unit: a *source* (libraries) matched onto a *target*
+(neighborhoods or an H3 grid) by a **matching method** (`contain`, `area_overlap`, `nearest`,
+`gaussian`, ...) and summarised by **reductions** (count, sum, mean, majority, ...). Each column has
+a **value kind** (extensive, intensive, categorical), which decides how it may be carried between units.
+
+- The method picker comes from urbanweave's registry: each method has a figure and an explanation, and
+  methods that do not fit the geometries are greyed out with the reason.
+- **Suggest** asks the copilot for a method and reductions for this step and the collection's goal; its
+  answer is checked against urbanweave's registry, and anything that does not fit is replaced, with the
+  reason shown.
+- After a run, the step reports what matched and what was left out and why, and the result map shows
+  totals, ranges and units with nothing.
+- **Combine & Calculate** derives a variable from steps that share a target (`schools / (libraries + 1)`).
+- The steps form an **urbanweave plan**; a run can be recorded and replayed.
+
+![A step with the copilot's suggestion and its report, next to its result map](docs/screenshots/step.png)
+
+### 🔍 Check it: data quality with atlas-clean
+
+**Check data** on a dataset node runs [atlas-clean](https://github.com/VIDA-NYU/atlas-clean)'s spatial
+checks (swapped latitude and longitude, a wrong coordinate system, invalid or empty geometry,
+duplicates, ...) and proposes fixes. Accepted fixes are saved as a recipe and replayed whenever the
+dataset is used; steps, reports and exports say what was corrected.
+
+<img src="docs/screenshots/check_data.png" alt="Check data: swapped coordinates found in a school dataset, with proposed fixes" width="560">
+
+### 📊 Question it: analyses
+
+| Node | What it answers |
 |---|---|
-| **Dataset** | A source dataset with a map preview; color it by any numeric column, and set a time window on its dates. Also serves as zones for a step. |
-| **H3 Grid** | A grid target at a chosen resolution, sized to the study area or to its sources. |
-| **Step** | Matches a source (a dataset or another step) onto a target (zones or an H3 grid) and aggregates: an [urbanweave](https://github.com/VIDA-NYU/urbanweave) method chosen from its registry, its parameters, and one or more reductions, each with a value kind (extensive, intensive, categorical) and an optional filter. Problems are marked on the step before it runs; after it runs, a report says what matched and what was left out. |
-| **Combine & Calculate** | Joins the outputs of steps that share a target and, optionally, adds a column computed from them (e.g. a rate per 1,000 residents). |
-| **Sensitivity Sweep** | Reruns a step's variable through other H3 resolutions, zone systems or matching methods, brings each variant back to the step's units, and maps how stable each unit's rank is (the share of variants in which it is among the top units). |
-| **Validate** | Ranks units by a result and checks them against known outcomes (points such as program sites): coverage, baseline and lift per quantile, as in the paper's Table 3. |
-| **Dasymetric** | Spreads zone totals over finer units (an H3 grid or other zones) in proportion to point priors, keeping each zone's total. |
-| **Spatial Integration** (classic) | The original node: variables onto an H3 grid and optionally into zones, with the copilot's operator suggestions. |
-| **Result Map** | Shows an integration result as H3 cells or zones, with hotspot palettes. |
-| **Compare Maps** | Takes two hotspot result maps and shows where values went up or down, with direction symbols. |
+| **Sensitivity Sweep** | Would the ranking change with other reasonable choices? Reruns a step through other H3 resolutions, zone systems or methods, brings each variant back to the step's units, and maps how often each unit is in the top. |
+| **Validate** | Does the ranking line up with something observed? Coverage, baseline and lift of outcome points in the top units, per quantile. |
+| **Dasymetric** | Spreads zone totals over finer units in proportion to point priors, keeping each zone's total. |
+| **Compare Maps** | Where values went up or down between two result maps. |
 
-**Link Maps** syncs the camera across every map on the canvas.
+<img src="docs/screenshots/sweep.png" alt="A sensitivity sweep and the share of variants in which each neighborhood ranks in the top" width="480"> <img src="docs/screenshots/validate.png" alt="Validation table: coverage, baseline and lift" width="270">
 
-### 📦 Collections, study area and export (top bar)
-- A **collection** holds the goal, the datasets and why each was chosen, the steps (an urbanweave plan) and the canvas; save, open, or start a new one.
-- A **study area** (zones from a dataset, optionally filtered, or a box) limits integrations, search and exports. **Coverage** shows where the datasets have data; **checks** warn when periods do not overlap or a dataset misses most of the study area.
-- **Plan**: run every step and record the run (inputs by fingerprint), replay it later, or download `plan.json`.
-- **Report** opens a printable HTML page with the datasets and their sources, a map of each result with its report, the analyses (sweep stability, validation tables, priority weights and rationale) and the caveats.
-- **Export** writes a zip: a Frictionless `datapackage.json`, the datasets (embedded when their license is recorded, otherwise referenced by source), the results, `plan.json` and `manifest.json` to rerun in a notebook, and a README with the rationale and caveats. Exported packages can be imported back.
+On a result map, several variables can be weighted into a **priority index**, recorded with the
+collection.
 
-### 🧭 Integration provenance (right sidebar)
-Shows which datasets, variables and operators produced each result, so every number on a map can be traced back to its inputs and choices. Hovering or focusing a row highlights the result map it produced.
+### 📤 Share it: report and export
 
-### ✨ Copilot (LLM agent)
-- **Dataset discovery:** suggests datasets for an analysis goal from the catalog's metadata and descriptions; suggestions are added only when you accept them.
-- **Operator recommendation:** proposes zoning operators per variable from its metadata statistics and geometry.
-- **Hotspot synthesis:** interprets which direction of each variable signals a hotspot.
+- **Report** opens a printable page: goal, study area, datasets with their sources, a map and summary
+  of each step, the analyses, and caveats.
+- **Export** writes a zip that QGIS, GeoPandas, R or a notebook can open: a
+  [Frictionless](https://datapackage.org/) `datapackage.json` describing every file, the sources
+  (embedded when their license is recorded, otherwise referenced), the results, `plan.json` and
+  `manifest.json` to rerun the steps with urbanweave, any atlas-clean recipes, and a README with the
+  rationale and caveats. An exported zip can be opened back into UrbanTrace.
 
-Operator recommendation and hotspot synthesis fall back to built-in heuristics when no LLM is configured or the copilot is disabled.
+<img src="docs/screenshots/report.jpg" alt="The report of a collection" width="560">
+
+### 🧭 Provenance (right sidebar)
+
+Logs each run: which datasets, methods and parameters produced each result, so every number on a map
+can be traced back to its inputs and choices.
 
 ---
 
-## 🧮 Integration model
+## 🧮 How integration works
 
-An integration composes four operator families, written as **I = A₂ ∘ Z_map ∘ A₁ ∘ R**:
+Integration runs on [urbanweave](https://github.com/VIDA-NYU/urbanweave). A step is one
+`match` (which target each source feature belongs to, and with what weight) followed by `aggregate`
+(what to compute per target), measured in the local UTM zone. Missing values stay missing, value
+kinds decide how a column may be summarised, and every step reports what it matched, what it left out
+and why. The steps of a collection form an urbanweave plan (`plan.json`), so the same integration
+runs unchanged in a notebook:
 
-| Step | Role | Operators |
-|---|---|---|
-| **R**, allocation | Distributes each source feature onto H3 cells | `BinaryContainment`, `BinaryCentroidContainment`, `ProportionalAreaWeighted`, `ProportionalLengthWeighted`, `NearestAssignment`, `GaussianKernel` |
-| **A₁**, grid aggregation | Combines the allocated values in each cell | `SumAggregation`, `MeanAggregation`, `WeightedMeanAggregation`, `DensityAggregation`, `MajorityAggregation`, `MaxAggregation`, `MinAggregation`, `LengthWeightedAggregation` |
-| **Z_map**, zoning mapping | Maps H3 cells to reporting zones | `CentroidZoning`, `AreaWeightedZoning`, `LengthWeightedZoning` |
-| **A₂**, zone aggregation | Combines cell values in each zone | `SumZoning`, `WeightedMeanZoning`, `DensityZoning`, `MajorityZoning`, `MaxZoning`, `MinZoning`, `LengthWeightedZoning` |
+```python
+import geopandas as gpd
+import urbanweave as uw
+plan = uw.Plan.from_json("plan.json")
+run = plan.run({"NYC_libraries": gpd.read_parquet("data/sources/NYC_libraries.parquet")})
+```
 
-Each allocation operator declares the geometry types it supports. Multivariate integrations run one track per variable and then merge them on the shared grid or zones.
-
-The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original operators were removed; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md), with progress in [PLAN.md](PLAN.md).
+The redesign that moved UrbanTrace onto urbanweave, and what changed from the paper's version, is in
+[docs/REDESIGN.md](docs/REDESIGN.md); progress and what is left are in [PLAN.md](PLAN.md).
 
 ---
 
@@ -106,10 +169,13 @@ The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite, React Flow (`@xyflow/react`), Lucide icons, Axios |
-| Maps | [Autark](https://autarkjs.org/) `autk-map` (WebGPU), with an Esri light-gray basemap; `h3-js` |
+| Frontend | React 19, Vite, React Flow (`@xyflow/react`), Lucide icons |
+| Maps | [Autark](https://autarkjs.org/) `autk-map` (WebGPU): projection, picking and tooltips, over an Esri light-gray basemap; `h3-js` |
 | Backend | Python, FastAPI, GeoPandas, Shapely, H3 |
-| Profiling | `datamart-profiler`; AutoDDG dataset descriptions |
+| Integration | [urbanweave](https://github.com/VIDA-NYU/urbanweave) (`0.1.0a2`) |
+| Data quality | [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) (optional) |
+| Profiling | [atlas-profiler](https://github.com/VIDA-NYU/atlas-profiler) profiles; AutoDDG dataset descriptions |
+| Export | Frictionless Data Package; GeoParquet, GeoPackage, GeoJSON |
 | LLM | OpenAI, Hugging Face Inference Providers, or a Portkey gateway (configurable) |
 | Data | GeoJSON, stored with Git LFS |
 
@@ -121,24 +187,34 @@ The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which
 urbantrace/
 ├── backend/
 │   ├── main.py                  # FastAPI app and endpoints
-│   ├── weave_engine.py          # Integrations on urbanweave (the default engine)
-│   ├── llm_agent.py, tool.py    # Copilot (LLM agent and its tools)
-│   ├── upload_new_data.py       # Upload, profiling and metadata generation
-│   └── requirements.txt
-├── frontend/
-│   └── src/
-│       ├── components/
-│       │   ├── canvas/          # AnalysisCanvas and node types
-│       │   ├── visualization/   # Autark map previews
-│       │   ├── layout/          # Sidebars and provenance panel
-│       │   ├── catalog/         # Dataset cards and details
-│       │   ├── copilot/         # Copilot input and agent trace
-│       │   └── toolbox/         # Operations toolbox
-│       └── config/operations.js # Toolbox entries
-├── data/                        # Dataset lake (Git LFS)
-├── benchmark/                   # Discovery and operator-selection studies
-├── notebook/case_study_1/       # Case study validation notebook
-└── docs/screenshots/
+│   ├── plans.py                 # Running the canvas as an urbanweave plan
+│   ├── analysis.py              # Sweeps, validation, dasymetric, priority, the report
+│   ├── scope.py                 # Study area, coverage, time, checks
+│   ├── catalog.py               # Datasets, profiles, origins, hashes
+│   ├── cleaning.py              # Data checks and corrections with atlas-clean
+│   ├── suggest.py               # The copilot's step suggestions, checked against the registry
+│   ├── collections_store.py     # Saved collections
+│   ├── export.py                # Data packages
+│   ├── geometry.py              # Geometry repair
+│   ├── llm_agent.py, tool.py    # Copilot (LLM agent, prompts and tools)
+│   ├── upload_new_data.py       # Upload and profiling
+│   └── tests/                   # On small synthetic data; no LFS needed
+├── frontend/src/
+│   ├── components/
+│   │   ├── canvas/              # The canvas and its nodes (dataset, step, grid, calculate, analyses, results)
+│   │   ├── collection/          # Collection bar, study area, coverage
+│   │   ├── methods/             # Method picker, icons, report cards
+│   │   ├── catalog/             # Dataset cards, details, Check data
+│   │   ├── visualization/       # Autark maps
+│   │   ├── layout/              # Sidebars and provenance panel
+│   │   └── copilot/, toolbox/
+│   └── lib/                     # Plans, collections, scope, analyses, cleaning, registry
+├── data/                        # Dataset lake (Git LFS), profiles, origins, recipes
+├── docs/                        # WALKTHROUGH.md, REDESIGN.md, screenshots
+├── paper/                       # The VIS 2026 paper's supplementary material
+├── benchmark/                   # Discovery and operator-selection studies (paper)
+├── notebook/case_study_1/       # Case study validation notebook (paper)
+└── tools/                       # Origins, GeoParquet conversion, method figures
 ```
 
 ---
@@ -149,17 +225,16 @@ urbantrace/
 - **Node.js** 20.19+ (required by Vite 7)
 - **Python** 3.10+
 - **Git LFS**, to get the datasets
-- A browser with **WebGPU** for the maps: a recent Chrome, Edge or Safari
+- A browser with **WebGPU** for the maps: a recent Chrome or Edge
 
 ### Data
 The datasets are stored with Git LFS, about 17.7 GB in total. After cloning:
 
 ```bash
 git lfs install
-git lfs pull
+git lfs pull                                   # or only the app's datasets (about 8.8 GB):
+git lfs pull --include="data/geojson/*"
 ```
-
-To fetch only the app's datasets (`data/geojson`, about 8.8 GB): `git lfs pull --include="data/geojson/*"`. The dataset discovery benchmark reads `data/geojson_raw`; see [Data](#-data).
 
 ### Backend
 ```bash
@@ -167,11 +242,13 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-pip install openai          # needed for the OpenAI and Hugging Face copilot; portkey-ai for Portkey
+pip install -e "../../atlas-clean[geo]"   # optional: data checks (a checkout of atlas-clean next to this repository)
+pip install openai                         # optional: the OpenAI or Hugging Face copilot (portkey-ai for Portkey)
 uvicorn main:app --reload --port 8000
 ```
 
-The backend loads `backend/.env` automatically. The copilot is optional; without it, operator recommendation and hotspot synthesis use heuristics.
+The backend loads `backend/.env`. The copilot is optional; without it, step suggestions and hotspot
+synthesis use rules.
 
 | Variable | Purpose |
 |---|---|
@@ -180,16 +257,14 @@ The backend loads `backend/.env` automatically. The copilot is optional; without
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to turn off every LLM call |
-| `COPILOT_CATALOG` | How the dataset catalog is sent to the model: `index` (default), `compact` or `full` |
+| `COPILOT_CATALOG` | How the catalog is sent to the model: `index` (default), `compact` or `full` |
+| `URBANTRACE_COLLECTIONS_DIR` | Where collections are saved (default `data/collections`) |
+| `URBANTRACE_PLAN_CACHE` | Where plan runs and manifests are kept (default `data/plan_cache`) |
 
-Tests use small synthetic datasets, so they need no LFS data:
-
-```bash
-pip install -r requirements-dev.txt
-python -m pytest -q
-```
-
-The copilot needs a model that supports tool calling. With the default `index` catalog, each request carries one line per dataset (about 5k tokens for the 121 datasets), and the model reads the full description and columns of the datasets it is considering through a `get_dataset_details` tool. `compact` sends every dataset's description and columns tersely (about 42k tokens), and `full` sends the complete metadata (about 86k tokens, which needs a context window well above that). The formats are defined in `backend/catalog_format.py`; the dataset-discovery benchmark can compare them with `--ablation catalog_compact` or `--ablation catalog_index`.
+The copilot needs a model that supports tool calling. With the default `index` catalog, each request
+carries one line per dataset (about 5k tokens for 121 datasets) and the model reads a dataset's full
+description through a `get_dataset_details` tool; `compact` (about 42k tokens) and `full` (about 86k)
+send more up front (`backend/catalog_format.py`).
 
 ### Frontend
 ```bash
@@ -198,9 +273,23 @@ npm install
 npm run dev
 ```
 
-The app runs at **http://localhost:5173**. It expects the backend at `http://localhost:8000`; set `VITE_API_BASE_URL` (for example in `frontend/.env.local`) to use another address.
+The app runs at **http://localhost:5173** and expects the backend at `http://localhost:8000`; set
+`VITE_API_BASE_URL` (for example in `frontend/.env.local`) to use another address.
 
-The maps use Autark's `autk-map`. On this branch it is linked from a local Autark checkout (`file:../../autark/autk-map` in `frontend/package.json`), because the tile basemap is not yet in the npm release; clone and build Autark next to this repository, or switch the dependency to a published version that includes tile layers.
+The maps use Autark's `autk-map`, linked from a local Autark checkout (`file:../../autark/autk-map` in
+`frontend/package.json`) until a release includes what UrbanTrace uses (tile basemaps, `fitBounds`,
+hover and tooltips, pointer positions under CSS transforms). Clone and build Autark next to this
+repository.
+
+### Tests
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
+
+The tests use small synthetic datasets, so they need no LFS data; the data-check tests run when
+atlas-clean is installed.
 
 ---
 
@@ -208,46 +297,65 @@ The maps use Autark's `autk-map`. On this branch it is linked from a local Autar
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/datasets` | Catalog: datasets with their metadata |
-| GET | `/dataset/{name}?simplify=` | A dataset as GeoJSON (WGS84), optionally simplified |
+| GET | `/datasets`, `/datasets/{id}/details`, `/dataset/{name}?simplify=` | The catalog; a dataset's metadata; a dataset as GeoJSON (with its saved corrections) |
 | POST | `/datasets/upload` | Upload and profile a GeoJSON file |
-| GET | `/api/operators` | Operators from urbanweave's registry, with descriptions |
-| POST | `/api/integrate_multivariate` | Run a multivariate integration (classic node) |
+| GET | `/datasets/{id}/origin`, `/api/datasets/{id}/value-kinds` | Where a dataset came from; suggested value kinds |
+| GET/POST | `/api/catalog/index`, `/api/catalog/in-area` | Search filters; each dataset's share of a study area |
+| GET/POST | `/api/study-area/options/{id}`, `/api/study-area/resolve`, `/api/coverage`, `/api/collections/check` | Study area, coverage, checks |
+| GET | `/api/operators` | Methods and reductions from urbanweave's registry |
 | POST | `/api/plan/validate`, `/api/plan/run`, `/api/plan/replay` | Check, run (results in columns) and replay an urbanweave plan |
-| GET | `/api/datasets/{id}/value-kinds`, `/datasets/{id}/origin` | Suggested value kinds; where a dataset came from |
-| GET/POST/PUT/DELETE | `/api/collections[/{id}]` | Collections |
-| POST | `/api/collections/{id}/export`, `/api/collections/import` | Export a collection as a zip; import one |
-| POST | `/api/results/export` | One result map as a zip with its provenance |
-| GET/POST | `/api/catalog/index`, `/api/coverage`, `/api/study-area/*`, `/api/collections/check` | Search filters, coverage, study area, checks |
 | POST | `/api/analysis/sweep`, `/api/analysis/validate`, `/api/analysis/dasymetric` | Sensitivity sweeps, validation against outcomes, dasymetric disaggregation |
+| POST/GET/DELETE | `/api/datasets/{id}/check`, `/api/datasets/{id}/recipe` | Data checks with atlas-clean; saved corrections |
+| GET/POST/PUT/DELETE | `/api/collections[/{id}]` | Collections |
+| POST | `/api/collections/{id}/export`, `/api/collections/import`, `/api/results/export` | Export a collection or one result as a zip; import a package |
 | GET | `/api/collections/{id}/report` | The collection as a printable HTML report |
-| POST | `/api/copilot/chat` | Copilot chat with the current canvas as context |
-| POST | `/api/v1/copilot/recommend-operators` | Zoning operator recommendations |
-| POST | `/api/v1/copilot/synthesize-hotspot` | Hotspot direction per variable |
+| POST | `/api/copilot/chat`, `/api/copilot/suggest-step`, `/api/v1/copilot/synthesize-hotspot` | Copilot chat with the canvas as context; a step's method and reductions; hotspot directions |
 
 ---
 
 ## 📦 Data
 
-The data lake covers 121 profiled NYC datasets, including demographics, income and poverty, housing, air quality and heat vulnerability, crime and collisions, pedestrian and bicycle counts, schools, libraries, street trees and taxi trips, plus reporting zones (NTAs, MODZCTA ZIP areas, community districts and council districts).
+The data lake covers 121 profiled NYC datasets, including demographics, income and poverty, housing,
+air quality and heat vulnerability, crime and collisions, pedestrian and bicycle counts, schools,
+libraries, street trees and taxi trips, plus reporting zones (NTAs, MODZCTA ZIP areas, community
+districts and council districts).
 
 | Path | Contents |
 |---|---|
 | `data/geojson/` | Datasets used by the app, by name |
-| `data/metadata/` | Metadata profile for each dataset |
-| `data/geojson_raw/`, `data/metadata_raw/` | The same datasets by their NYC Open Data IDs, used by the discovery benchmark |
-| `data/descriptions_ddg.csv` | AutoDDG descriptions, generated from the profiles |
-| `data/descriptions_origin.csv` | Original source-catalog descriptions |
+| `data/metadata_v2/` | atlas-profiler profiles: columns, value statistics, where and when each dataset has data |
+| `data/metadata/` | The original profiles (read by the copilot and the benchmark) |
+| `data/origins.json` | Where each dataset came from: publisher, source URL, license when recorded |
+| `data/recipes/` | atlas-clean corrections accepted for a dataset, replayed when it loads |
+| `data/geojson_raw/`, `data/metadata_raw/` | The datasets by their NYC Open Data IDs, for the discovery benchmark |
+| `data/descriptions_ddg.csv`, `data/descriptions_origin.csv` | AutoDDG and source-catalog descriptions |
 
-Some source datasets contain bad geocodes outside NYC; map previews frame the area where most features are.
+Some source datasets contain bad coordinates (swapped latitude and longitude, a mislabelled
+coordinate system, stray points far from NYC); **Check data** finds them, and map previews frame the
+area where most features are.
 
 ---
 
-## 🔬 Benchmark and case study
+## 🔬 Benchmark and case study (paper)
 
-- [`benchmark/`](benchmark/README.md): the dataset discovery ablation (28 scenarios, five metadata conditions, two LLM backbones) and the operator selection study, with scripts and results.
+- [`benchmark/`](benchmark/README.md): the dataset discovery ablation (28 scenarios, five metadata
+  conditions, two LLM backbones) and the operator selection study, with scripts and results. The
+  operator selection study scores answers in the paper's operator vocabulary; run it against
+  `vis2026-camera-ready`.
 - [`notebook/case_study_1/`](notebook/case_study_1/): validation notebook for the NYC after-school case study.
 
 ---
 
-*Last updated: November 2026*
+## 🙏 Acknowledgements
+
+Developed by the OSCUR team at [VIDA-NYU](https://github.com/VIDA-NYU).
+
+UrbanTrace is part of [OSCUR](https://oscur.org/), the Open-Source Cyberinfrastructure for Urban
+Computing project, supported by the National Science Foundation under Awards
+[#2411221](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2411221),
+[#2411222](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2411222) and
+[#2411223](https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2411223). Any opinions, findings, and
+conclusions or recommendations expressed in this material are those of the authors and do not
+necessarily reflect the views of the National Science Foundation.
+
+<a href="https://oscur.org/"><img src="docs/images/oscur-logo-gray.png" alt="OSCUR: Open-Source Cyberinfrastructure for Urban Computing" width="220"></a>

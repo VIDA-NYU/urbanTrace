@@ -135,14 +135,20 @@ shaded by how many of the three datasets have data there. Hover a square to see 
 | NYC_libraries | ~82% · 68 points |
 | NYC_Schools | ~90% · 1,104 points |
 
+![Coverage of the datasets over Brooklyn](screenshots/coverage.png)
+
 For the point datasets the share is how far the points spread across Brooklyn, not how many squares
 they fill: 68 libraries spread across the borough are full coverage, even though they occupy a few
 percent of its squares. The point counts come from the profiles' density grids, so they are
 approximate near the edge.
 
-> **Data quality aside.** Avoid `2018_2019_school_locations`: its latitude and longitude are
-> swapped in the source file, so it appears to be in the Southern Ocean and is excluded from every
-> study area. Problems like this are what atlas-clean's spatial checks are for.
+> **Data quality aside.** `2018_2019_school_locations` has its latitude and longitude swapped in the
+> source file, so it appears to be in the Southern Ocean and is excluded from every study area. Drag it
+> onto the canvas and click **Check data** (the shield on the node): atlas-clean finds the swap and
+> proposes the fix; **Apply** saves it, and from then on the dataset is used corrected, and the node
+> says **Corrected**. Use `NYC_Schools` for this walkthrough either way.
+>
+> <img src="screenshots/check_data.png" alt="Check data on the swapped school dataset" width="560">
 
 ## Part 3: Turn datasets into numbers per neighborhood
 
@@ -179,6 +185,8 @@ library count. In its corner:
 and on the step's report card (*What happened*):
 
 > 68 of 253 in study area · 68/68 matched · 44/69 targets
+
+![The libraries step, with a suggestion by rules and its report, next to its result map](screenshots/step.png)
 
 That is: of the city's 253 libraries, 68 are in Brooklyn; all 68 fell inside a neighborhood; 44
 neighborhoods have at least one, 25 have none. Open the card for the details: the method, how
@@ -234,6 +242,8 @@ some depend on the choice.
 
 > **6** of 69 units are in the top under every variant; **23** only under some.
 
+<img src="screenshots/sweep.png" alt="The sweep and the share of variants in which each neighborhood is in the top" width="560">
+
 Spearman correlations between the variants are 0.74–0.81 (1 would be the same ranking). The six
 robust ones: Bay Ridge, Bedford-Stuyvesant (West), Carroll Gardens–Cobble Hill–Gowanus–Red Hook,
 Downtown Brooklyn–DUMBO–Boerum Hill, Gravesend (East)–Homecrest, and Sheepshead Bay–Manhattan
@@ -273,6 +283,8 @@ stand-in: do youth and community programs already sit where schools outnumber li
 | top 40% (29) | 67% | 42% | 1.60 |
 | top 30% (21) | 51% | 30% | 1.69 |
 
+<img src="screenshots/validate.png" alt="The Validate node's table" width="300">
+
 The baseline is a little above 50%, 40% and 30% because several neighborhoods share the threshold
 value; when ties push it far off, a note says so.
 
@@ -299,6 +311,8 @@ the work.
 Click **Report**. A printable page opens: goal, study area, datasets with their sources, a map and
 summary for each step, the derived variable, the sweep and validation tables, and caveats (such as
 datasets whose origin or license is unknown).
+
+<img src="screenshots/report.jpg" alt="The report" width="560">
 
 ### The export
 

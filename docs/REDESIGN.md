@@ -1,5 +1,12 @@
 # UrbanTrace redesign: collections, export and urbanweave
 
+> **Status (2026-11-22).** Phases 0–5 are built, and the release work went further than section 5
+> planned: the legacy engine, the classic Integration node and `weave_engine.py` are gone (Step nodes
+> do everything, with the copilot's suggestions checked against the registry), maps let Autark project
+> and pick, and atlas-clean's checks correct datasets on load. What is done and what is left are
+> tracked in [PLAN.md](../PLAN.md); the tool is described in the [README](../README.md) and
+> [walkthrough](WALKTHROUGH.md). This document keeps the reasoning.
+
 Status: draft for discussion (2026-11-20). Author: Claudio Silva, with Claude.
 
 ## Summary
