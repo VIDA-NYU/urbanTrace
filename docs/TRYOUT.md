@@ -76,8 +76,9 @@ compared and combined; the rest of the tryout builds on them.
 - [ ] **Aggregate**: click **+ add**; a row appears with `count`. Rename the output (e.g.
   `libraries`) and leave "0 when empty" ticked, so neighborhoods with no library show 0, not missing
 - [ ] **Run step**: a result map opens and a report card appears on the Step
-- [ ] Check: only Brooklyn's neighborhoods, coloured by count; about 60 libraries in total (Brooklyn's
-  branches), not 253 (citywide); the report card says how many matched and how many were left out, and why
+- [ ] Check: Brooklyn's 69 neighborhoods, coloured by count; the summary on the map says 68 libraries
+  in total (not 253, the citywide count), 0–3 per neighborhood, 25 with none; the report card says
+  "68 of 253 in study area · 68/68 matched · 44/69 targets"; hovering a neighborhood shows its name
 - [ ] Repeat with `NYC_Schools` as source and the same NTA target, output `schools`
 - [ ] Optional: **Combine & Calculate** with both steps, e.g. `schools / (libraries + 1)`
 
