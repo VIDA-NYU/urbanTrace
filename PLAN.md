@@ -134,7 +134,7 @@ Work:
 
 ## Tryout fixes
 
-Found while using the tool (started 2026-11-22).
+Found while using the tool (started 2026-11-22). The tryout became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md).
 
 - [x] Collection bar squeezed its labels ("A" for the goal, "No study area" on three lines, buttons past the edge): items no longer shrink, the bar sits right of Link Maps and wraps on narrow canvases
 - [x] "In study area" couldn't judge 35 polygon and line datasets (their profiles have no extent or grid), so it always showed them: a coverage grid is now computed once from the data and cached (`scope.dataset_cells`, `data/.extent_cache.json`); the coverage view uses it too
@@ -155,6 +155,7 @@ Found while using the tool (started 2026-11-22).
 - [x] Couldn't connect to Combine & Calculate: it took only Step nodes and refused anything else silently, while the visible end of a chain is the step's Result Map. A Result Map now stands for the Step (or Calculate) that made it, for Calculate, Sweep and Validate; refused connections say why in the collection bar
 - [x] Map tooltips (and the feature they name) were off whenever the canvas was zoomed: React Flow scales nodes with a CSS transform, and pointer offsets were used unscaled. `pointerInElement` in `autarkMap.js`, used by the result, dataset and coverage maps
 - [x] `dycd_program_sites` preview was blank: one site geocoded to Los Angeles, and when the densest area held over 95% of the points the frame took every feature, strays included. It now frames the central 99.6% (`framingBounds` in `autarkMap.js`); affects every Autark map's first view
+- [ ] Export file names use internal node ids (`plan-node-1795370671161_output`, `sweep-7016_analysis`); name them after the output or analysis (`schools_per_library`, `sweep_libraries`)
 
 ---
 

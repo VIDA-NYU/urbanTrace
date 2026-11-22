@@ -38,6 +38,8 @@ If you use UrbanTrace, please cite:
 
 ---
 
+**New to UrbanTrace?** [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) takes one question (which Brooklyn neighborhoods have many schools but few libraries) through every part of the tool, explaining the concepts as it goes.
+
 ## ✨ Features
 
 ### 🗂️ Data library (left sidebar)
