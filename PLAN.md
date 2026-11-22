@@ -43,9 +43,9 @@ Still open: see [Open questions](#open-questions) at the end.
 - [x] Legacy fixes, named in `weave_engine.CHANGES`: `grid_covers_sources`, `own_zoning_mapping`, `own_cells_only`
 - [x] Invalid polygons repaired with `make_valid` and reported, not excluded
 - [x] Refusals (corrupt coordinates) shown with their reason, not as a generic 500
-- [ ] Run the 38 large corpus cases before deleting the legacy engine — *skipped: no testing on the large catalog*
-- [ ] *(in Release)* Delete the legacy engine and `URBANTRACE_ENGINE` after one cycle
-- [ ] *(in Release)* Delete `OperationNode` and `/run-operation` (REDESIGN §6 proposes deleting them; nothing on the canvas creates the node)
+- [ ] Run the 38 large corpus cases before deleting the legacy engine — *not run (no testing on the large catalog); the engine was removed without them, by decision*
+- [x] *(in Release)* Delete the legacy engine and `URBANTRACE_ENGINE` after one cycle
+- [x] *(in Release)* Delete `OperationNode` and `/run-operation` (REDESIGN §6 proposes deleting them; nothing on the canvas creates the node)
 
 ## Phase 1 — Catalog and collections
 
@@ -177,8 +177,8 @@ One push, as a major release, when everything below is done (decided 2026-11-22)
 by the user; in order:
 
 1. Clean-ups
-   - [ ] Delete `OperationNode` and `/run-operation`
-   - [ ] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`)
+   - [x] Delete `OperationNode` and `/run-operation`
+   - [x] Remove the legacy engine and `URBANTRACE_ENGINE` (without the 38 large corpus cases; the paper's results stay reproducible from `vis2026-camera-ready`): `integration_engine.py`, `h3_engine.py`, `operators/`, `grids/` and two commented-out endpoints are gone
    - [ ] Show each dataset's share inside the study area on its card, and sort by it
 2. - [ ] Autark does the projection (`sourceCrs: 'EPSG:4326'`); remove UrbanTrace's Web Mercator code from `autarkMap.js`
 3. - [ ] The copilot's method suggestions on Step nodes; then retire the classic Integration node

@@ -104,7 +104,6 @@ def test_geoparquet_copy_is_preferred(client, catalog, monkeypatch):
     convert(catalog / "geojson" / "test_points.geojson", catalog / "geoparquet" / "test_points.parquet")
     assert cat.dataset_path(catalog, "test_points").suffix == ".parquet"
     assert list(cat.load(catalog, "test_points", ["count"]).columns) == ["count", "geometry"]
-    monkeypatch.setattr(main, "ENGINE", "urbanweave")
     body = {"variables": [{"dataset_path": "test_points.geojson", "target_column": "count", "output_name": "c",
                            "allocation_operator": "BinaryContainment", "grid_aggregation_operator": "SumAggregation"}],
             "resolution": 9}

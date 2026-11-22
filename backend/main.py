@@ -40,31 +40,6 @@ import scope
 import plans
 import analysis
 from fastapi.responses import HTMLResponse
-from integration_engine import IntegrationPipeline, ZonedIntegrationPipeline, MultivariateIntegrationPipeline, VariableTrackConfig
-from grids.h3_grid import H3GridSystem
-
-from operators.allocation.binary import BinaryContainment, BinaryCentroidContainment, NearestAssignment
-from operators.allocation.proportional import ProportionalAreaWeighted, ProportionalLengthWeighted
-from operators.allocation.kernel import GaussianKernel
-
-from operators.aggregation.aggregators import (
-    SumAggregation, MeanAggregation, WeightedMeanAggregation, DensityAggregation,
-    MajorityAggregation, MaxAggregation, MinAggregation, LengthWeightedAggregation
-)
-
-from operators.zoning.mapping import (
-    CentroidZoning,
-    AreaWeightedZoning,
-    LengthWeightedZoning as LengthWeightedZoningMapping,
-)
-from operators.zoning.aggregators import (
-    SumZoning, WeightedMeanZoning, DensityZoning,
-    MajorityZoning, MaxZoning, MinZoning,
-    LengthWeightedZoning as LengthWeightedZoningAggregation,
-)
-
-# --- Imports for Map Algebra Engine ---
-from h3_engine import rasterize_geojson_to_h3 
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
 
@@ -86,11 +61,6 @@ app.add_middleware(
 # Directory pointing to the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
-# Integration engine: "urbanweave" (the default) or "legacy" (the original operators, kept for one
-# cycle while the switch is verified; see docs/REDESIGN.md, phase 0).
-ENGINE = os.getenv("URBANTRACE_ENGINE", "urbanweave").strip().lower()
-if ENGINE not in ("urbanweave", "legacy"):
-    raise RuntimeError(f"URBANTRACE_ENGINE must be 'urbanweave' or 'legacy', not {ENGINE!r}")
 _COPILOT_AGENT: UrbanTraceCopilot | None = None
 
 
@@ -123,87 +93,10 @@ def _metadata_path_for_dataset(dataset_name: str | None) -> str:
     stem = _normalize_dataset_stem(dataset_name)
     return os.path.join(DATA_DIR, "metadata", f"{stem}.json")
 
-# Operator Registries for Formal Integration
-ALLOCATION_REGISTRY = {
-    "BinaryContainment": BinaryContainment,
-    "BinaryCentroidContainment": BinaryCentroidContainment,
-    "ProportionalAreaWeighted": ProportionalAreaWeighted,
-    "ProportionalLengthWeighted": ProportionalLengthWeighted,
-    "NearestAssignment": NearestAssignment,
-    "GaussianKernel": GaussianKernel
-}
-
-AGGREGATION_REGISTRY = {
-    # Mathematical operators (continuous/additive data)
-    "SumAggregation": SumAggregation,
-    "MeanAggregation": MeanAggregation,
-    "WeightedMeanAggregation": WeightedMeanAggregation,
-    "DensityAggregation": DensityAggregation,
-    # Discrete selection operators (categorical/index data)
-    "MajorityAggregation": MajorityAggregation,
-    "MaxAggregation": MaxAggregation,
-    "MinAggregation": MinAggregation,
-    # Line network operators (street/transit geometries)
-    "LengthWeightedAggregation": LengthWeightedAggregation
-}
-
-# Zoning Operator Registries
-ZONING_MAPPING_REGISTRY = {
-    "CentroidZoning": CentroidZoning,
-    "AreaWeightedZoning": AreaWeightedZoning,
-    "LengthWeightedZoning": LengthWeightedZoningMapping
-}
-
-ZONING_AGGREGATION_REGISTRY = {
-    # Mathematical operators (for continuous/additive data)
-    "SumZoning": SumZoning,
-    "WeightedMeanZoning": WeightedMeanZoning,
-    "DensityZoning": DensityZoning,
-    # Discrete selection operators (for categorical/index data)
-    "MajorityZoning": MajorityZoning,
-    "MaxZoning": MaxZoning,
-    "MinZoning": MinZoning,
-    # Line network operators (for street/transit geometries)
-    "LengthWeightedZoning": LengthWeightedZoningAggregation
-}
-
-# Geometry constraints for valid operator selection
-GEOMETRY_CONSTRAINTS = {
-    "Point": ["BinaryContainment", "BinaryCentroidContainment", "NearestAssignment", "GaussianKernel"],
-    "MultiPoint": ["BinaryContainment", "BinaryCentroidContainment", "NearestAssignment", "GaussianKernel"],
-    "LineString": ["ProportionalLengthWeighted", "GaussianKernel"],
-    "MultiLineString": ["ProportionalLengthWeighted", "GaussianKernel"],
-    "Polygon": ["ProportionalAreaWeighted", "BinaryCentroidContainment"],
-    "MultiPolygon": ["ProportionalAreaWeighted", "BinaryCentroidContainment"]
-}
 
 # ==========================================
 # 2. PYDANTIC REQUEST MODELS
 # ==========================================
-
-class IntegrationRequest(BaseModel):
-    """Payload for the formal mathematical spatial integration (I = A_1 ∘ R)."""
-    dataset_path: str        
-    target_column: str       
-    allocation_operator: str 
-    aggregation_operator: str 
-    resolution: int          
-
-class ZonedIntegrationRequest(BaseModel):
-    """
-    Payload for full zoned integration pipeline: I = A_2 ∘ Z_map ∘ A_1 ∘ R
-    Transforms source data through grid to reporting zones.
-    """
-    dataset_path: str              # Source dataset filename
-    target_column: str             # Attribute column to integrate
-    allocation_operator: str       # R: spatial allocation method
-    grid_aggregation_operator: str # A_1: cell-level aggregation
-    zoning_mapping_operator: str   # Z_map: cell-to-zone mapping
-    zoning_aggregation_operator: str  # A_2: zone-level aggregation
-    zones_path: str                # Reporting zones dataset filename
-    resolution: int = 9            # H3 grid resolution
-    output_mode: str = "zones"     # "grid" | "zones" | "both"
-
 
 class VariableConfigRequest(BaseModel):
     """Configuration for a single variable in multivariate analysis."""
@@ -431,7 +324,7 @@ async def get_geojson(filename: str, simplify: bool = False):
 
 
 # ==========================================
-# 7. MULTIVARIATE INTEGRATION ENDPOINT (Parallel Tracks + Dual-Merge)
+# 4. MULTIVARIATE INTEGRATION ENDPOINT (Parallel Tracks + Dual-Merge)
 # ==========================================
 
 def _load_catalog_geojson(name: str, label: str) -> gpd.GeoDataFrame:
@@ -489,7 +382,7 @@ def _multivariate_response(request: "MultivariateIntegrationRequest", result: Di
     response = {
         "status": "success",
         "operation": "multivariate_integration",
-        "engine": ENGINE,
+        "engine": "urbanweave",
         "resolution": request.resolution,
         "variables": [v.output_name or v.target_column for v in request.variables]
     }
@@ -548,97 +441,9 @@ async def integrate_multivariate(request: MultivariateIntegrationRequest):
         if not request.variables:
             raise HTTPException(status_code=400, detail="At least one variable is required")
         
-        if ENGINE != "legacy":
-            result = _integrate_with_urbanweave(request)
-            return _multivariate_response(request, result)
-
-        # Build track configurations (legacy engine)
-        tracks = []
-
-        for var in request.variables:
-            # Validate operators
-            if var.allocation_operator not in ALLOCATION_REGISTRY:
-                raise HTTPException(status_code=400, detail=f"Unknown allocation operator: {var.allocation_operator}")
-            if var.grid_aggregation_operator not in AGGREGATION_REGISTRY:
-                raise HTTPException(status_code=400, detail=f"Unknown grid aggregation operator: {var.grid_aggregation_operator}")
-            
-            # Load source dataset
-            source_path = os.path.join(
-                DATA_DIR,
-                "geojson",
-                _geojson_filename(var.dataset_path),
-            )
-            try:
-                source_gdf = gpd.read_file(source_path)
-            except Exception as e:
-                raise HTTPException(status_code=404, detail=f"Could not load {var.dataset_path}: {str(e)}")
-            
-            # Validate allocation operator against geometry
-            geom_types = source_gdf.geometry.geom_type.unique()
-            for geom_type in geom_types:
-                if geom_type in GEOMETRY_CONSTRAINTS:
-                    allowed = GEOMETRY_CONSTRAINTS[geom_type]
-                    if var.allocation_operator not in allowed:
-                        raise HTTPException(
-                            status_code=400,
-                            detail=f"Operator '{var.allocation_operator}' not valid for {geom_type} in {var.dataset_path}"
-                        )
-            
-            # Build operators
-            allocator = ALLOCATION_REGISTRY[var.allocation_operator]()
-            grid_aggregator = AGGREGATION_REGISTRY[var.grid_aggregation_operator]()
-            
-            # Optional zoning operators
-            zoning_mapper = None
-            zoning_aggregator = None
-            
-            if var.zoning_mapping_operator and var.zoning_aggregation_operator:
-                if var.zoning_mapping_operator not in ZONING_MAPPING_REGISTRY:
-                    raise HTTPException(status_code=400, detail=f"Unknown zoning mapping operator: {var.zoning_mapping_operator}")
-                if var.zoning_aggregation_operator not in ZONING_AGGREGATION_REGISTRY:
-                    raise HTTPException(status_code=400, detail=f"Unknown zoning aggregation operator: {var.zoning_aggregation_operator}")
-                
-                zoning_mapper = ZONING_MAPPING_REGISTRY[var.zoning_mapping_operator]()
-                zoning_aggregator = ZONING_AGGREGATION_REGISTRY[var.zoning_aggregation_operator]()
-            
-            # Create track config (default output_name to target_column)
-            track = VariableTrackConfig(
-                source_gdf=source_gdf,
-                target_column=var.target_column,
-                output_name=var.output_name or var.target_column,
-                allocator=allocator,
-                grid_aggregator=grid_aggregator,
-                zoning_mapper=zoning_mapper,
-                zoning_aggregator=zoning_aggregator
-            )
-            tracks.append(track)
-        
-        # Load zones if provided
-        zones_gdf = None
-        if request.zones_path:
-            zones_path = os.path.join(
-                DATA_DIR,
-                "geojson",
-                _geojson_filename(request.zones_path),
-            )
-            try:
-                zones_gdf = gpd.read_file(zones_path)
-            except Exception as e:
-                raise HTTPException(status_code=404, detail=f"Could not load zones: {str(e)}")
-        
-        # Execute multivariate pipeline
-        grid = H3GridSystem()
-        pipeline = MultivariateIntegrationPipeline(grid_system=grid)
-        
-        result = pipeline.run(
-            tracks=tracks,
-            resolution=request.resolution,
-            zones_gdf=zones_gdf,
-            output_mode=request.output_mode
-        )
-        
+        result = _integrate_with_urbanweave(request)
         return _multivariate_response(request, result)
-        
+
     except HTTPException:
         raise
     except ValueError as ve:
@@ -653,17 +458,9 @@ async def get_available_operators():
     Returns all available operators and geometry constraints for the frontend.
     Under urbanweave they are generated from its registry, which is included.
     """
-    if ENGINE != "legacy":
-        payload = uw_legacy.operators_payload()
-        payload["legacy"] = weave_engine.describe_operators()
-        return payload
-    return {
-        "allocation": list(ALLOCATION_REGISTRY.keys()),
-        "grid_aggregation": list(AGGREGATION_REGISTRY.keys()),
-        "zoning_mapping": list(ZONING_MAPPING_REGISTRY.keys()),
-        "zoning_aggregation": list(ZONING_AGGREGATION_REGISTRY.keys()),
-        "geometry_constraints": GEOMETRY_CONSTRAINTS
-    }
+    payload = uw_legacy.operators_payload()
+    payload["legacy"] = weave_engine.describe_operators()
+    return payload
 
 
 def _extract_sample_values(sample_csv: Optional[str], target_column: str, max_rows: int = 20) -> List[Any]:
@@ -965,11 +762,11 @@ async def recommend_operators(request: CopilotRecommendRequest):
 
     zone_geometry = request.target_zoning.geometry_type or "Polygon"
     # Only the mappings urbanweave's registry accepts for H3 cells -> these zones (redesign phase 3)
-    available_mapping_operators = [m for m in ZONING_MAPPING_REGISTRY
+    available_mapping_operators = [m for m in uw_legacy.ZONING_MAPPING
                                    if not weave_engine.zoning_problems(m, None, zone_geometry)]
     if not available_mapping_operators:
         raise HTTPException(status_code=400, detail=f"No zoning mapping supports {zone_geometry} zones")
-    available_aggregation_operators = list(ZONING_AGGREGATION_REGISTRY.keys())
+    available_aggregation_operators = list(uw_legacy.ZONING_AGGREGATION)
     descriptions = weave_engine.describe_operators()
 
     source_payload: List[Dict[str, Any]] = []
@@ -1096,141 +893,6 @@ async def recommend_operators(request: CopilotRecommendRequest):
 
 
 # ==========================================
-# 6. ZONED INTEGRATION ENDPOINT (I = A_2 ∘ Z_map ∘ A_1 ∘ R)
-# ==========================================
-
-# @app.post("/api/integrate_zoned")
-# async def integrate_to_zones(request: ZonedIntegrationRequest):
-#     """
-#     Executes the full zoned integration pipeline.
-#     Transforms source data through a common H3 grid to reporting zones.
-    
-#     Pipeline: D^(k) → R → x_j (grid) → Z → y_ℓ (zones)
-#     """
-#     try:
-#         # Validate operator selections
-#         if request.allocation_operator not in ALLOCATION_REGISTRY:
-#             raise HTTPException(status_code=400, detail=f"Unknown allocation operator: {request.allocation_operator}")
-#         if request.grid_aggregation_operator not in AGGREGATION_REGISTRY:
-#             raise HTTPException(status_code=400, detail=f"Unknown grid aggregation operator: {request.grid_aggregation_operator}")
-#         if request.zoning_mapping_operator not in ZONING_MAPPING_REGISTRY:
-#             raise HTTPException(status_code=400, detail=f"Unknown zoning mapping operator: {request.zoning_mapping_operator}")
-#         if request.zoning_aggregation_operator not in ZONING_AGGREGATION_REGISTRY:
-#             raise HTTPException(status_code=400, detail=f"Unknown zoning aggregation operator: {request.zoning_aggregation_operator}")
-
-#         # Instantiate operators via dependency injection
-#         allocator = ALLOCATION_REGISTRY[request.allocation_operator]()
-#         grid_aggregator = AGGREGATION_REGISTRY[request.grid_aggregation_operator]()
-#         zoning_mapper = ZONING_MAPPING_REGISTRY[request.zoning_mapping_operator]()
-#         zoning_aggregator = ZONING_AGGREGATION_REGISTRY[request.zoning_aggregation_operator]()
-#         grid = H3GridSystem()
-
-#         # Load source dataset
-#         source_path = os.path.join(
-#             DATA_DIR,
-#             "geojson",
-#             _geojson_filename(request.dataset_path),
-#         )
-#         try:
-#             source_gdf = gpd.read_file(source_path)
-#         except Exception as e:
-#             raise HTTPException(status_code=404, detail=f"Could not load source dataset: {str(e)}")
-
-#         # Load zones dataset  
-#         zones_path = os.path.join(
-#             DATA_DIR,
-#             "geojson",
-#             _geojson_filename(request.zones_path),
-#         )
-#         try:
-#             zones_gdf = gpd.read_file(zones_path)
-#         except Exception as e:
-#             raise HTTPException(status_code=404, detail=f"Could not load zones dataset: {str(e)}")
-
-#         # Validate allocation operator against geometry type
-#         geom_types = source_gdf.geometry.geom_type.unique()
-#         for geom_type in geom_types:
-#             if geom_type in GEOMETRY_CONSTRAINTS:
-#                 allowed = GEOMETRY_CONSTRAINTS[geom_type]
-#                 if request.allocation_operator not in allowed:
-#                     raise HTTPException(
-#                         status_code=400, 
-#                         detail=f"Operator '{request.allocation_operator}' not valid for {geom_type}. Allowed: {allowed}"
-#                     )
-
-#         # Build and execute the zoned integration pipeline
-#         pipeline = ZonedIntegrationPipeline(
-#             grid_system=grid,
-#             allocator=allocator,
-#             grid_aggregator=grid_aggregator,
-#             zoning_mapper=zoning_mapper,
-#             zoning_aggregator=zoning_aggregator
-#         )
-        
-#         # Determine output mode
-#         output_mode = getattr(request, 'output_mode', 'zones')
-        
-#         response = {
-#             "status": "success",
-#             "operation": "zoned_integration",
-#             "resolution": request.resolution,
-#         }
-        
-#         # Generate grid data if needed (for "grid" or "both" modes)
-#         if output_mode in ["grid", "both"]:
-#             # Use run_grid_with_zone_values to paint zone-aggregated values back to cells
-#             # This ensures cells within a zone all show the same aggregated value
-#             grid_result_gdf = pipeline.run_grid_with_zone_values(
-#                 source_gdf=source_gdf,
-#                 target_column=request.target_column,
-#                 resolution=request.resolution,
-#                 zones_gdf=zones_gdf
-#             )
-            
-#             # Convert grid GeoDataFrame to H3 hex dictionary format
-#             df_no_geom = grid_result_gdf.drop(columns=['geometry'])
-#             final_hex_data = {}
-            
-#             for _, row in df_no_geom.iterrows():
-#                 row_dict = row.to_dict()
-#                 cell_id = row_dict.pop('cell_id', None)
-#                 if not cell_id:
-#                     continue
-                    
-#                 # Use the zone_aggregated_value as the primary value
-#                 primary_value = row_dict.get('zone_aggregated_value', 1)
-                
-#                 final_hex_data[cell_id] = {
-#                     "count": primary_value,
-#                     "sample_props": row_dict
-#                 }
-            
-#             response["data"] = final_hex_data
-#             response["hex_count"] = len(final_hex_data)
-        
-#         # Generate zone data if needed (for "zones" or "both" modes)
-#         if output_mode in ["zones", "both"]:
-#             zone_result_gdf = pipeline.run(
-#                 source_gdf=source_gdf,
-#                 target_column=request.target_column,
-#                 resolution=request.resolution,
-#                 zones_gdf=zones_gdf
-#             )
-#             response["geojson"] = json.loads(zone_result_gdf.to_json())
-#             response["zone_count"] = len(zone_result_gdf)
-        
-#         return response
-
-#     except ValueError as ve:
-#         raise HTTPException(status_code=400, detail=str(ve))
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Zoned integration failed: {str(e)}")
-
-
-
-
-
-# ==========================================
 # COLLECTIONS AND EXPORT (docs/REDESIGN.md, section 2)
 # ==========================================
 
@@ -1314,7 +976,7 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
     except scope.ScopeError as e:
         raise HTTPException(status_code=400, detail=str(e))
     extras = {"area": area if options.clip else None, "warnings": scope.checks(DATA_DIR, doc)}
-    if options.include_results and ENGINE != "legacy":
+    if options.include_results:
         extras["results"] = _rerun_integrations(doc)
     files = {"collection.json": json.dumps({k: v for k, v in doc.items() if k != "runs"}, indent=1, default=str).encode()}
     if options.include_results and doc.get("plan") and doc["plan"].get("steps"):
@@ -1899,7 +1561,7 @@ def collection_report(cid: str):
     return HTMLResponse(_collection_report(_get_collection(cid)))
 
 # ==========================================
-# 7. LLM COPILOT ENDPOINTS
+# 5. LLM COPILOT ENDPOINTS
 # ==========================================
 
 @app.post("/api/copilot/chat")

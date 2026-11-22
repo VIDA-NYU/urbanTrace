@@ -87,7 +87,7 @@ Operator recommendation and hotspot synthesis fall back to built-in heuristics w
 
 ## 🧮 Integration model
 
-An integration composes four operator families (`backend/integration_engine.py`), written as **I = A₂ ∘ Z_map ∘ A₁ ∘ R**:
+An integration composes four operator families, written as **I = A₂ ∘ Z_map ∘ A₁ ∘ R**:
 
 | Step | Role | Operators |
 |---|---|---|
@@ -98,7 +98,7 @@ An integration composes four operator families (`backend/integration_engine.py`)
 
 Each allocation operator declares the geometry types it supports. Multivariate integrations run one track per variable and then merge them on the shared grid or zones.
 
-The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original engine is kept for now and selected with `URBANTRACE_ENGINE=legacy`; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md), with progress in [PLAN.md](PLAN.md).
+The operators run on [urbanweave](https://github.com/VIDA-NYU/urbanweave), which measures in the local UTM zone, keeps missing values missing, and reports what each step matched and left out (`backend/weave_engine.py`; the reports are returned under `reports`). Each difference from the original operators has a name, listed in `weave_engine.CHANGES`. The original operators were removed; the paper's results correspond to the tag `vis2026-camera-ready`. The plan for the next version is in [docs/REDESIGN.md](docs/REDESIGN.md), with progress in [PLAN.md](PLAN.md).
 
 ---
 
@@ -122,10 +122,6 @@ urbantrace/
 ├── backend/
 │   ├── main.py                  # FastAPI app and endpoints
 │   ├── weave_engine.py          # Integrations on urbanweave (the default engine)
-│   ├── integration_engine.py    # Original integration pipelines (URBANTRACE_ENGINE=legacy)
-│   ├── operators/               # allocation/, aggregation/, zoning/
-│   ├── grids/h3_grid.py         # H3 grid system
-│   ├── h3_engine.py             # Quick H3 rasterization for previews
 │   ├── llm_agent.py, tool.py    # Copilot (LLM agent and its tools)
 │   ├── upload_new_data.py       # Upload, profiling and metadata generation
 │   └── requirements.txt
@@ -184,7 +180,6 @@ The backend loads `backend/.env` automatically. The copilot is optional; without
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to turn off every LLM call |
-| `URBANTRACE_ENGINE` | `urbanweave` (default) or `legacy`, the original operators |
 | `COPILOT_CATALOG` | How the dataset catalog is sent to the model: `index` (default), `compact` or `full` |
 
 Tests use small synthetic datasets, so they need no LFS data:

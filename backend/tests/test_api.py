@@ -16,16 +16,14 @@ def _integrate(client, variables, **kw):
     return client.post("/api/integrate_multivariate", json=body)
 
 
-@pytest.fixture(params=["urbanweave", "legacy"])
-def engine(request, monkeypatch):
-    """Both engines, for behaviour they share (validation, errors)."""
-    monkeypatch.setattr(main, "ENGINE", request.param)
-    return request.param
+@pytest.fixture()
+def engine():
+    """urbanweave, the only engine since the legacy operators were removed."""
+    return "urbanweave"
 
 
 @pytest.fixture()
 def urbanweave_engine(monkeypatch):
-    monkeypatch.setattr(main, "ENGINE", "urbanweave")
     return "urbanweave"
 
 
@@ -35,7 +33,6 @@ def test_datasets_lists_the_catalog(client, catalog):
 
 
 def test_operators_come_from_the_registry(client, monkeypatch):
-    monkeypatch.setattr(main, "ENGINE", "urbanweave")
     body = client.get("/api/operators").json()
     assert body["registry"]["package"] == "urbanweave"
     assert "BinaryContainment" in body["geometry_constraints"]["Point"]
@@ -91,29 +88,3 @@ def test_reports_and_repairs_are_returned(client, catalog, urbanweave_engine):
     assert report["repaired_geometries"]["count"] == 1   # the bowtie
     assert report["allocation"]["match"]["sources"]["matched"] == 2
     assert "own_zoning_mapping" in r.json()["changes"]
-
-
-def test_engines_agree_on_the_synthetic_catalog(client, catalog, monkeypatch):
-    variables = [
-        _variable("test_points", "count", "BinaryContainment", "SumAggregation", "AreaWeightedZoning", "SumZoning"),
-        _variable("test_rates", "rate", "ProportionalAreaWeighted", "WeightedMeanAggregation",
-                  "AreaWeightedZoning", "WeightedMeanZoning"),
-    ]
-    out = {}
-    for engine in ("legacy", "urbanweave"):
-        monkeypatch.setattr(main, "ENGINE", engine)
-        r = _integrate(client, variables, zones_path="test_zones.geojson", output_mode="both")
-        assert r.status_code == 200, r.text
-        out[engine] = r.json()
-    old, new = out["legacy"]["data"], out["urbanweave"]["data"]
-    # urbanweave keeps every legacy cell, plus the edge cells the legacy grid dropped.
-    assert set(old) <= set(new)
-    for cell in old:
-        assert new[cell]["variables"]["test_points__count"] == old[cell]["variables"]["test_points__count"]
-    recovered = sum(new[c]["variables"]["test_points__count"] for c in set(new) - set(old))
-    assert sum(v["variables"]["test_points__count"] for v in old.values()) + recovered == pytest.approx(22)
-    # Rates in the cells both engines have agree up to UTM vs Web Mercator weights.
-    for cell in old:
-        if old[cell]["variables"]["test_rates__rate"]:
-            assert new[cell]["variables"]["test_rates__rate"] == pytest.approx(
-                old[cell]["variables"]["test_rates__rate"], rel=1e-3)

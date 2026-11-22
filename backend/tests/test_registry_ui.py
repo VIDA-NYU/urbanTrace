@@ -12,7 +12,6 @@ import weave_engine
 
 @pytest.fixture(autouse=True)
 def setup(monkeypatch, tmp_path):
-    monkeypatch.setattr(main, "ENGINE", "urbanweave")
     monkeypatch.setenv("URBANTRACE_COLLECTIONS_DIR", str(tmp_path / "collections"))
 
 

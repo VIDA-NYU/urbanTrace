@@ -13,7 +13,6 @@ WEST = {"kind": "zones", "dataset": "test_zones", "column": "zone", "values": ["
 
 @pytest.fixture(autouse=True)
 def urbanweave_engine(monkeypatch, tmp_path):
-    monkeypatch.setattr(main, "ENGINE", "urbanweave")
     monkeypatch.setenv("URBANTRACE_COLLECTIONS_DIR", str(tmp_path / "collections"))
 
 
