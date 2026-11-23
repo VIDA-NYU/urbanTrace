@@ -119,3 +119,14 @@ def test_unnamed_analyses_are_named_after_their_kind_and_column():
     assert main._analysis_name({"kind": "sweep", "name": "sweep 7016", "config": {"column": "libraries"}}) == "sweep_libraries"
     assert main._analysis_name({"kind": "validation", "config": {"column": "schools_per_library"}}) == "validation_schools_per_library"
     assert main._analysis_name({"kind": "sweep", "name": "Resolution sweep", "config": {"column": "x"}}) == "Resolution sweep"
+
+
+def test_priority_leaves_out_undecided_directions():
+    import analysis
+    cols = {"a": [1, 2, 3], "b": [3, 2, 1]}
+    only_a = analysis.priority(cols, [{"column": "a", "weight": 1, "direction": "normal"},
+                                      {"column": "b", "weight": 1, "direction": "unknown"}])
+    assert only_a == [0.0, 0.5, 1.0]
+    import pytest
+    with pytest.raises(analysis.AnalysisError):
+        analysis.priority(cols, [{"column": "b", "weight": 1, "direction": "unknown"}])

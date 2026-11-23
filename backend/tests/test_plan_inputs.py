@@ -136,3 +136,18 @@ def test_hotspot_synthesis_takes_plan_outputs(client, catalog):
     bad = client.post("/api/v1/copilot/synthesize-hotspot", json={"source_variables": [
         {"dataset_name": "test_points", "column_name": "nope"}]})
     assert bad.status_code == 400
+
+
+def test_rule_based_hotspot_directions_say_when_they_do_not_know(client, catalog):
+    # Without an LLM, keyword rules: facilities are resources, a ratio or an unknown word is not guessed
+    r = client.post("/api/v1/copilot/synthesize-hotspot", json={"source_variables": [
+        {"dataset_name": "test_points", "column_name": "libraries", "aggregation": "count"},
+        {"dataset_name": "test_points", "column_name": "crashes", "aggregation": "count"},
+        {"dataset_name": "test_points", "column_name": "schools", "aggregation": "count"},
+        {"dataset_name": "derived", "column_name": "schools_per_library", "source_column": "schools / libraries",
+         "aggregation": "expression"}]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["engine"] == "heuristic"
+    got = {v["column_name"]: v["direction"] for v in body["variables"]}
+    assert got == {"libraries": "inverted", "crashes": "normal", "schools": "unknown", "schools_per_library": "unknown"}

@@ -247,16 +247,22 @@ pip install openai                         # optional: the OpenAI or Hugging Fac
 uvicorn main:app --reload --port 8000
 ```
 
-The backend loads `backend/.env`. The copilot is optional; without it, step suggestions and hotspot
-synthesis use rules.
+The backend loads `backend/.env`. The copilot's LLM is optional; without it, the copilot works by
+rules (step suggestions from urbanweave's registry, priority-map directions from keyword lists, and
+it asks the analyst when no rule applies). The **LLM** chip in the copilot bar turns it on or off and
+chooses the provider and model; keys stay in `backend/.env` (or the backend's environment) and are
+never entered in the interface. A **local model** needs no key: run any OpenAI-compatible server
+(Ollama, LM Studio, llama.cpp's `llama-server`, vLLM) and choose "Local model".
 
 | Variable | Purpose |
 |---|---|
-| `LLM_PROVIDER` | `openai`, `huggingface` or `portkey` (default `portkey`) |
+| `LLM_PROVIDER` | `openai`, `huggingface`, `portkey` or `local` (default `portkey`); the interface's choice overrides it |
+| `LOCAL_LLM_BASE_URL`, `LOCAL_LLM_MODEL` | A local OpenAI-compatible server (default `http://localhost:11434/v1`, Ollama) and its model; `LOCAL_LLM_TIMEOUT` in seconds (default 300) |
 | `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI credentials and model (default `gpt-5-mini`) |
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
-| `COPILOT_DISABLED` | Set to `1` to turn off every LLM call |
+| `COPILOT_DISABLED` | Set to `1` to start with the LLM off (rules only) until it is turned on in the interface |
+| `URBANTRACE_GEOCODER` | `off` turns off locating rows from their addresses (NYC GeoSearch, only on an analyst's request) |
 | `COPILOT_CATALOG` | How the catalog is sent to the model: `index` (default), `compact` or `full` |
 | `URBANTRACE_COLLECTIONS_DIR` | Where collections are saved (default `data/collections`) |
 | `URBANTRACE_PLAN_CACHE` | Where plan runs and manifests are kept (default `data/plan_cache`) |

@@ -51,7 +51,7 @@ DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions_ddg.csv"
 class UrbanTraceCopilot:
     """Very small helper around Portkey/OpenAI/Hugging Face chat.completions for UrbanTrace."""
 
-    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai", "huggingface"}
+    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai", "huggingface", "local"}
     _DEFAULT_PORTKEY_MODEL = "@vertexai/gemini-3-pro-preview"
     _DEFAULT_OPENAI_MODEL = "gpt-5-mini"
     # Hugging Face Inference Providers: an OpenAI-compatible router in front of many open models.
@@ -62,6 +62,11 @@ class UrbanTraceCopilot:
     _DEFAULT_HUGGINGFACE_BASE_URL = "https://router.huggingface.co/v1"
     _DEFAULT_PORTKEY_BASE_URL = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1/"
     _REQUEST_TIMEOUT_SECONDS = 60
+    # A model on this machine behind an OpenAI-compatible server: Ollama (the default address),
+    # LM Studio (http://localhost:1234/v1), llama.cpp's llama-server, vLLM. No key is needed; the
+    # model must support tool calling for dataset discovery. Local models answer more slowly.
+    _DEFAULT_LOCAL_BASE_URL = "http://localhost:11434/v1"
+    _LOCAL_TIMEOUT_SECONDS = 300
 
     def __init__(
         self,
@@ -70,7 +75,9 @@ class UrbanTraceCopilot:
         metadata_dir: str | Path = DEFAULT_METADATA_DIR,
         descriptions_csv: str | Path = DEFAULT_DESCRIPTIONS_CSV,
         catalog_mode: str | None = None,
+        local_base_url: str | None = None,
     ) -> None:
+        self._local_base_url = local_base_url
         self.provider = self._normalize_provider(
             llm_provider or os.getenv("LLM_PROVIDER") or "portkey"
         )
@@ -82,7 +89,10 @@ class UrbanTraceCopilot:
         self.huggingface_api_key = os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
         self.request_timeout = self._REQUEST_TIMEOUT_SECONDS
 
-        if self.provider == "portkey":
+        if self.provider == "local":
+            self.model = llm_model or os.getenv("LOCAL_LLM_MODEL") or ""
+            self.request_timeout = int(os.getenv("LOCAL_LLM_TIMEOUT") or self._LOCAL_TIMEOUT_SECONDS)
+        elif self.provider == "portkey":
             self.model = llm_model or os.getenv("PORTKEY_MODEL") or self._DEFAULT_PORTKEY_MODEL
         elif self.provider == "huggingface":
             self.model = llm_model or os.getenv("HF_MODEL") or self._DEFAULT_HUGGINGFACE_MODEL
@@ -92,6 +102,7 @@ class UrbanTraceCopilot:
         self.portkey: Any | None = None
         self.openai: Any | None = None
         self.huggingface: Any | None = None
+        self.local: Any | None = None
         self._ensure_provider_client()
 
         # How the dataset catalog is written into the prompt: full, compact or index (catalog_format.py)
@@ -178,7 +189,24 @@ class UrbanTraceCopilot:
         )
         return self.huggingface
 
+    def _get_local_client(self) -> Any:
+        if self.local is not None:
+            return self.local
+        if OpenAI is None:
+            raise ImportError("The local provider talks to an OpenAI-compatible server; install `openai`.")
+        if not self.model:
+            raise ValueError("Set LOCAL_LLM_MODEL to the model your local server runs (e.g. qwen3:14b in Ollama).")
+        self.local = OpenAI(base_url=self._local_base_url or self.local_base_url(), api_key=os.getenv("LOCAL_LLM_API_KEY") or "local",
+                            timeout=self.request_timeout)
+        return self.local
+
+    @classmethod
+    def local_base_url(cls) -> str:
+        return os.getenv("LOCAL_LLM_BASE_URL") or cls._DEFAULT_LOCAL_BASE_URL
+
     def _ensure_provider_client(self) -> Any:
+        if self.provider == "local":
+            return self._get_local_client()
         if self.provider == "portkey":
             return self._get_portkey_client()
         if self.provider == "openai":
@@ -359,11 +387,9 @@ class UrbanTraceCopilot:
                         **payload,
                         timeout=self.request_timeout * 1000,
                     )
-                if self.provider in ("openai", "huggingface"):
-                    client = (
-                        self._get_openai_client() if self.provider == "openai"
-                        else self._get_huggingface_client()
-                    )
+                if self.provider in ("openai", "huggingface", "local"):
+                    client = {"openai": self._get_openai_client, "huggingface": self._get_huggingface_client,
+                              "local": self._get_local_client}[self.provider]()
                     # The OpenAI SDK takes seconds (Portkey above takes milliseconds).
                     return client.chat.completions.create(
                         **payload,

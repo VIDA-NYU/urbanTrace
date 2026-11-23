@@ -359,10 +359,11 @@ def dasymetric(data_dir, study_area_spec, cache_root, *, zones: dict, target: di
 def priority(columns: dict, variables: list[dict]) -> list:
     """The Result Map's priority index over units: min-max normalized variables, inverted where the
     direction is 'inverted', weighted (weights rescaled to sum to 1) and summed; 0 where no variable
-    has a nonzero value."""
+    has a nonzero value. A variable whose direction is 'unknown' (nobody decided it) is left out."""
+    variables = [v for v in variables if str(v.get("direction", "")).lower() != "unknown"]
     names = [v["column"] for v in variables if v.get("column") in columns]
     if not names:
-        raise AnalysisError("None of the priority variables is an output of this result.")
+        raise AnalysisError("None of the priority variables is an output of this result with a direction set.")
     frame = pd.DataFrame({n: pd.to_numeric(pd.Series(columns[n]), errors="coerce") for n in names})
     total_w = sum(float(v.get("weight") or 0) for v in variables if v.get("column") in names) or 1.0
     score = pd.Series(0.0, index=frame.index)

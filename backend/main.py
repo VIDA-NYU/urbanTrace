@@ -43,6 +43,7 @@ import analysis
 import suggest
 import cleaning
 import geocode
+import copilot_settings
 from fastapi.responses import HTMLResponse
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
@@ -66,6 +67,7 @@ app.add_middleware(
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 _COPILOT_AGENT: UrbanTraceCopilot | None = None
+_COPILOT_KEY: tuple | None = None
 
 
 def _strip_dataset_suffixes(name: str | None) -> str:
@@ -113,18 +115,77 @@ class CopilotChatRequest(BaseModel):
 
 
 def copilot_disabled() -> bool:
-    """COPILOT_DISABLED=1 (in .env) turns off every LLM call; endpoints with heuristics fall back to them."""
-    return os.getenv("COPILOT_DISABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+    """Rules only, no LLM calls: chosen in the interface (copilot_settings.py), else COPILOT_DISABLED=1
+    in backend/.env. Endpoints with rules fall back to them."""
+    return not copilot_settings.effective(DATA_DIR)["enabled"]
 
 
 def get_copilot_agent() -> UrbanTraceCopilot:
-    """Lazy singleton so missing API keys do not crash app startup."""
+    """Lazy singleton so missing API keys do not crash app startup; rebuilt when the settings change."""
     if copilot_disabled():
-        raise RuntimeError("Copilot is disabled (COPILOT_DISABLED is set)")
-    global _COPILOT_AGENT
-    if _COPILOT_AGENT is None:
-        _COPILOT_AGENT = UrbanTraceCopilot()
+        raise RuntimeError("The copilot's LLM is turned off (rules only)")
+    global _COPILOT_AGENT, _COPILOT_KEY
+    eff = copilot_settings.effective(DATA_DIR)
+    key = (eff["provider"], eff["model"], eff["local_base_url"])
+    if _COPILOT_AGENT is None or _COPILOT_KEY != key:
+        _COPILOT_AGENT = UrbanTraceCopilot(llm_provider=eff["provider"], llm_model=eff["model"] or None,
+                                           local_base_url=eff["local_base_url"])
+        _COPILOT_KEY = key
     return _COPILOT_AGENT
+
+
+class CopilotSettingsBody(BaseModel):
+    enabled: Optional[bool] = None
+    provider: Optional[str] = None
+    model: Optional[str] = None
+    local_base_url: Optional[str] = None
+
+
+def _copilot_status() -> Dict[str, Any]:
+    eff = copilot_settings.effective(DATA_DIR)
+    return {"settings": eff, "providers": copilot_settings.providers(DATA_DIR)}
+
+
+@app.get("/api/copilot/settings")
+async def get_copilot_settings():
+    """Whether the copilot uses an LLM, which one, and which providers this server can use."""
+    return await asyncio.to_thread(_copilot_status)
+
+
+@app.post("/api/copilot/settings")
+async def set_copilot_settings(body: CopilotSettingsBody):
+    """Turn the LLM on or off and choose it. Keys are not taken here: they stay in backend/.env."""
+    try:
+        copilot_settings.save(DATA_DIR, body.model_dump(exclude_none=True))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return await asyncio.to_thread(_copilot_status)
+
+
+@app.delete("/api/copilot/settings")
+async def reset_copilot_settings():
+    """Back to the environment's settings (backend/.env)."""
+    copilot_settings.reset(DATA_DIR)
+    return await asyncio.to_thread(_copilot_status)
+
+
+@app.post("/api/copilot/test")
+async def test_copilot():
+    """Send one short request to the configured LLM: does it answer, and how fast."""
+    import time as _time
+    if copilot_disabled():
+        raise HTTPException(status_code=400, detail="The LLM is turned off.")
+    t0 = _time.perf_counter()
+    try:
+        agent = await asyncio.to_thread(get_copilot_agent)
+        resp = await asyncio.to_thread(agent._create_completion,
+                                       {"model": agent.model, "stream": False,
+                                        "messages": [{"role": "user", "content": "Reply with the single word OK."}]}, 0)
+        text = (resp.choices[0].message.content or "").strip()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"{type(e).__name__}: {str(e)[:300]}")
+    return {"ok": True, "reply": text[:80], "seconds": round(_time.perf_counter() - t0, 1),
+            "provider": agent.provider, "model": agent.model}
 
 
 class HotspotVariableRequest(BaseModel):
@@ -332,8 +393,11 @@ def _extract_sample_values(sample_csv: Optional[str], target_column: str, max_ro
 def _infer_hotspot_direction(dataset_name: str, column_name: str, sample_data: List[Any]) -> str:
     label = f"{dataset_name} {column_name}".lower()
 
+    # Facilities and services: more of them means less need
     inverted_keywords = [
         "income", "wealth", "salary", "resource", "access", "coverage",
+        "library", "libraries", "park", "clinic", "hospital", "station", "center", "centre",
+        "program", "slot", "seat", "facility", "facilities", "hotspot", "wi-fi", "wifi", "tree", "garden",
         "bike lane", "bike lanes", "infrastructure", "service", "capacity",
         "safety score", "score", "rating", "index (good)", "quality"
     ]
@@ -355,10 +419,14 @@ def _infer_hotspot_direction(dataset_name: str, column_name: str, sample_data: L
         if avg >= 85 and any(k in label for k in ["score", "rate", "index"]):
             return "inverted"
 
-    return "normal"
+    # No rule applies: say so rather than guess. The analyst sets the direction on the map.
+    return "unknown"
 
 
 def _hotspot_reasoning(direction: str, dataset_name: str, column_name: str) -> str:
+    if direction == "unknown":
+        return (f"No rule says whether more {column_name} ({dataset_name}) means more or less need, and no LLM is "
+                f"configured to judge it from the goal. Choose a direction; until then it is left out of the score.")
     if direction == "inverted":
         return f"Lower values in {column_name} ({dataset_name}) indicate higher unmet need, so scale is inverted for hotspot priority."
     return f"Higher values in {column_name} ({dataset_name}) directly indicate higher risk/need, so scale is used as-is."
@@ -369,7 +437,9 @@ def _build_heuristic_hotspot_audits(
 ) -> List[Dict[str, Any]]:
     audits: List[Dict[str, Any]] = []
     for var in source_payload:
-        direction = _infer_hotspot_direction(
+        # A ratio or a formula mixes two things (schools per library): its words do not tell the direction
+        mixed = str(var.get("computed_as", "")).startswith("expression") or re.search(r"(^|_)per(_|$)", var["column_name"].lower())
+        direction = "unknown" if mixed else _infer_hotspot_direction(
             var["dataset_name"],
             var["column_name"],
             var["sample_data"],
@@ -471,7 +541,7 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
             continue
 
         direction_raw = str(audit.get("direction", "normal")).lower()
-        direction = "inverted" if direction_raw == "inverted" else "normal"
+        direction = direction_raw if direction_raw in ("inverted", "unknown") else "normal"
         weight = audit.get("weight", 0.0)
         try:
             weight = float(weight)
@@ -509,6 +579,7 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
     return {
         "analysisType": "hotspot_priority",
         "scoreRange": [0.0, 1.0],
+        "engine": engine_used,                 # "heuristic": directions from keyword rules, to be checked
         "variables": normalized_audits,
         "summary": "Priority score is synthesized as a weighted normalized blend where 1.0 always means highest need."
     }
@@ -1244,7 +1315,10 @@ def _analysis_readme(analyses: List[Dict[str, Any]]) -> List[str]:
             if agree:
                 lines.append(f"Spearman correlation between variants: {min(agree):.2f} to {max(agree):.2f}.")
         if a["kind"] == "priority":
-            vars_ = a["config"].get("variables") or []
+            undecided = [v.get("column") for v in a["config"].get("variables") or [] if v.get("direction") == "unknown"]
+            vars_ = [v for v in a["config"].get("variables") or [] if v.get("direction") != "unknown"]
+            if undecided:
+                lines.append("Left out (no direction chosen): " + ", ".join(f"`{c}`" for c in undecided) + ".")
             lines.append("Priority = " + " + ".join(f"{v.get('weight')}×{'(1−' if v.get('direction') == 'inverted' else ''}"
                                                      f"norm({v.get('column')}){')' if v.get('direction') == 'inverted' else ''}" for v in vars_)
                          + " (weights rescaled to sum to 1; each variable min-max normalized over the units).")
@@ -1318,7 +1392,7 @@ async def copilot_chat(request: CopilotChatRequest):
         raise HTTPException(status_code=400, detail="`message` cannot be empty")
 
     if copilot_disabled():
-        raise HTTPException(status_code=503, detail="Copilot is disabled (COPILOT_DISABLED is set in backend/.env).")
+        raise HTTPException(status_code=503, detail="The copilot's LLM is turned off; turn it on in the copilot settings.")
 
     try:
         copilot = get_copilot_agent()

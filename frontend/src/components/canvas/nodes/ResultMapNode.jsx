@@ -280,9 +280,10 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [id, onPriorityChange, priorityRecord]);
 
   const hotspotHexData = useMemo(() => {
-    if (!isHotspotCandidate || !resultMapData || !auditMappings.length) return null;
-
-    const audits = auditMappings;
+    // A variable whose direction nobody has decided (no rule, no LLM, not set by the analyst) is
+    // left out of the score; with none decided there is no priority map yet
+    const audits = auditMappings.filter((v) => v.direction !== 'unknown');
+    if (!isHotspotCandidate || !resultMapData || !audits.length) return null;
     const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
@@ -357,9 +358,8 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [isHotspotCandidate, resultMapData, auditMappings, provenance]);
 
   const hotspotZoneGeoJson = useMemo(() => {
-    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !auditMappings.length) return null;
-
-    const audits = auditMappings;
+    const audits = auditMappings.filter((v) => v.direction !== 'unknown');
+    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !audits.length) return null;
     const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
@@ -720,14 +720,15 @@ const ResultMapNode = memo(({ id, data }) => {
               </button> */}
             </div>
             {(tweakAudits || hotspotAudit.variables).map((v, idx) => {
-              const totalW = (tweakAudits || hotspotAudit.variables).reduce((s, a) => s + (a.weight || 0), 0) || 1;
+              const totalW = (tweakAudits || hotspotAudit.variables).filter((a) => a.direction !== 'unknown').reduce((s, a) => s + (a.weight || 0), 0) || 1;
               const dispPct = Math.round((v.weight / totalW) * 100);
               const displayLabel = getAuditDisplayLabel(v);
               const fullDataset = getDatasetDisplayName(v?.dataset_name);
               return (
                 <div key={`card-${v.column_name}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: '4px', marginBottom: '4px', alignItems: 'center' }}>
-                  <span style={{ color: v.direction === 'inverted' ? '#b45309' : '#047857' }}>
-                    {v.direction === 'inverted' ? '↓' : '↑'}
+                  <span style={{ color: v.direction === 'inverted' ? '#b45309' : v.direction === 'unknown' ? '#c2410c' : '#047857', fontWeight: 700 }}
+                    title={v.direction === 'unknown' ? 'Direction not decided: left out of the score' : v.engine === 'heuristic' ? 'Set by a keyword rule' : undefined}>
+                    {v.direction === 'inverted' ? '↓' : v.direction === 'unknown' ? '?' : '↑'}
                   </span>
                   <span
                     style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -735,10 +736,32 @@ const ResultMapNode = memo(({ id, data }) => {
                   >
                     {displayLabel}
                   </span>
-                  <span style={{ fontWeight: 600 }}>{dispPct}%</span>
+                  {v.direction === 'unknown' ? (
+                    <span style={{ display: 'flex', gap: '2px' }}>
+                      {[['normal', '↑', 'More of it means more need'], ['inverted', '↓', 'More of it means less need']].map(([dir, glyph, tip]) => (
+                        <button key={dir} className="nodrag" title={tip}
+                          onClick={() => setTweakAudits((prev) => (prev || hotspotAudit.variables).map((a, i) => (i === idx ? { ...a, direction: dir, engine: 'analyst' } : a)))}
+                          style={{ font: 'inherit', fontSize: '8px', padding: '0 4px', border: '1px solid #fdba74', borderRadius: '3px', background: '#fff7ed', color: '#c2410c', cursor: 'pointer' }}>
+                          {glyph}
+                        </button>
+                      ))}
+                    </span>
+                  ) : <span style={{ fontWeight: 600 }}>{dispPct}%</span>}
                 </div>
               );
             })}
+            {(() => {
+              const vars = tweakAudits || hotspotAudit.variables;
+              const unknown = vars.filter((v) => v.direction === 'unknown').length;
+              const ruled = vars.some((v) => v.engine === 'heuristic');
+              if (!unknown && !ruled) return null;
+              return (
+                <div style={{ fontSize: '8px', color: '#9a3412', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '4px', padding: '3px 5px', marginBottom: '4px', lineHeight: 1.35 }}>
+                  {unknown ? `${unknown} variable(s) without a direction are left out of the score: choose ↑ (more means more need) or ↓. ` : ''}
+                  {ruled ? 'Directions were set by keyword rules, not judged against the goal (no LLM configured): check them.' : ''}
+                </div>
+              );
+            })()}
             {/* Legend bar + action buttons */}
             <div style={{ marginTop: '6px', borderTop: '1px solid #fee2e2', paddingTop: '5px' }}>
               <div style={{ fontSize: '8px', color: '#7f1d1d', marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -841,10 +864,10 @@ const ResultMapNode = memo(({ id, data }) => {
                   />
                   <button
                     className="nodrag"
-                    onClick={() => setTweakAudits(prev => prev.map((a, i) => i === idx ? { ...a, direction: a.direction === 'inverted' ? 'normal' : 'inverted' } : a))}
-                    style={{ font: 'inherit', fontSize: '8px', padding: '2px 7px', borderRadius: '4px', border: '1px solid #e5e7eb', background: v.direction === 'inverted' ? '#fef3c7' : '#f0fdf4', cursor: 'pointer', color: v.direction === 'inverted' ? '#b45309' : '#047857', fontWeight: 600 }}
+                    onClick={() => setTweakAudits(prev => prev.map((a, i) => i === idx ? { ...a, direction: a.direction === 'normal' ? 'inverted' : 'normal', engine: 'analyst' } : a))}
+                    style={{ font: 'inherit', fontSize: '8px', padding: '2px 7px', borderRadius: '4px', border: '1px solid #e5e7eb', background: v.direction === 'inverted' ? '#fef3c7' : v.direction === 'unknown' ? '#fff7ed' : '#f0fdf4', cursor: 'pointer', color: v.direction === 'inverted' ? '#b45309' : v.direction === 'unknown' ? '#c2410c' : '#047857', fontWeight: 600 }}
                   >
-                    {v.direction === 'inverted' ? '↓ Inverted' : '↑ Normal'}
+                    {v.direction === 'inverted' ? '↓ Inverted' : v.direction === 'unknown' ? '? Choose' : '↑ Normal'}
                   </button>
                 </div>
               );
