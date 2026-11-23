@@ -1,12 +1,13 @@
 # UrbanTrace — Implementation Plan
 
-**Progress (2026-11-22):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
-real task (Brooklyn schools and libraries) that found and fixed 17 problems, listed under
-[Tryout fixes](#tryout-fixes); it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). Release work:
-items 1–5 of [Release](#release) done (clean-ups, Autark doing the maps, the copilot on Step nodes
-with the classic node retired, atlas-clean's checks, dasymetric on urbanweave 0.1.0a2); next are a
-second real task, the documentation and the release itself. 40 commits are not pushed (one push at
-release). Backend tests pass, none skipped; all use synthetic data.
+**Progress (2026-11-23):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
+real task (Brooklyn schools and libraries) whose fixes are listed under [Tryout fixes](#tryout-fixes);
+it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). Release work: items 1–5 and 7 of
+[Release](#release) done, and the whole-catalog run of item 6; next are the second real task and the
+release itself. Phase 6 under way: joins on a key, geocoding (NYC GeoSearch) and the copilot's LLM
+switch (with local models) done; OSM streets next. The paper's provenance graph and priority map work
+again on plan results. 57 commits are not pushed (one push at release). Backend tests pass, none
+skipped; all use synthetic data.
 
 Design doc: [docs/REDESIGN.md](docs/REDESIGN.md). It says why; this file tracks what is done.
 
@@ -21,9 +22,9 @@ be tried on real tasks and the remaining phases reordered by what that shows.
 
 | Question | Decision |
 | --- | --- |
-| Engine | urbanweave 0.1.0a1, pinned; `URBANTRACE_ENGINE=legacy` keeps the original operators for one cycle |
+| Engine | urbanweave 0.1.0a2, pinned; the original operators were removed with the classic Integration node |
 | Paper reproducibility | Tag `vis2026-camera-ready` (existing tag, used instead of a new `vis2026`) |
-| Conventions | Legacy conventions on the classic Integration node; urbanweave's defaults (per km², overlap weighting, missing stays missing) on plan steps |
+| Conventions | urbanweave's defaults (per km², overlap weighting, missing stays missing) |
 | Plan schema | urbanweave's plan JSON (`"version": 1`) unchanged inside the collection, which holds UrbanTrace's own data beside it |
 | Package standard | Frictionless Data Package v2; RO-Crate only when someone deposits a package |
 | Redistribution | Embed only with a recorded license and ≤ 50 MB; otherwise reference the source URL |
