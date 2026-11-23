@@ -17,7 +17,7 @@ function ValueSummary({ spatialData }) {
   if (!column || !Array.isArray(values)) return null;
   const nums = values.filter((v) => typeof v === 'number' && Number.isFinite(v));
   if (!nums.length) return null;
-  const unit = spatialData.isZoned ? 'zones' : 'cells';
+  const unit = { osm_streets: 'segments', osm_intersections: 'intersections' }[spatialData.targetKind] || (spatialData.isZoned ? 'zones' : 'cells');
   const reduction = spatialData.provenance?.variables?.find((v) => v.outputName === column)?.aggregation;
   const additive = ['count', 'sum'].includes(reduction) || spatialData.kinds?.[column] === 'extensive';
   const total = nums.reduce((a, b) => a + b, 0);
@@ -453,12 +453,14 @@ const ResultMapNode = memo(({ id, data }) => {
 
   // Determine node title
   const nodeTitle = useMemo(() => {
+    if (data?.spatialData?.targetKind === 'osm_streets') return 'Street segments result';
+    if (data?.spatialData?.targetKind === 'osm_intersections') return 'Intersections result';
     if (isZoned) {
       if (outputMode === 'both') return 'H3 + Zones Result';
       if (outputMode === 'zones') return 'Zoned Result';
     }
     return data.name || 'H3 Integration Result';
-  }, [isZoned, outputMode, data.name]);
+  }, [isZoned, outputMode, data.name, data?.spatialData?.targetKind]);
 
   // Determine header icon
   const HeaderIcon = showZones && !showHex ? MapPin : Hexagon;

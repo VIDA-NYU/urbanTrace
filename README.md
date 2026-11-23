@@ -262,6 +262,7 @@ never entered in the interface. At startup the backend checks which providers wo
 | `HF_TOKEN`, `HF_MODEL` | Hugging Face token and model, served through [Inference Providers](https://huggingface.co/docs/inference-providers) (default `openai/gpt-oss-120b`; append `:<provider>` to pin a provider) |
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to start with the LLM off (rules only) until it is turned on in the interface |
+| `URBANTRACE_OSM_MAX_KM2` | Largest study area whose street network is downloaded from OpenStreetMap (default 1000 km²) |
 | `URBANTRACE_GEOCODER` | `off` turns off locating rows from their addresses (NYC GeoSearch, only on an analyst's request) |
 | `URBANTRACE_LLM_CHECK` | `off` skips the providers check at startup (no requests to providers) |
 | `COPILOT_CATALOG` | How the catalog is sent to the model: `index` (default), `compact` or `full` |

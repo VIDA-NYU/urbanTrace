@@ -29,3 +29,5 @@ data/.extent_cache.json
 data/plan_cache/
 data/geocoded/_cache.jsonl
 data/copilot_settings.json
+data/osm/
+backend/cache/

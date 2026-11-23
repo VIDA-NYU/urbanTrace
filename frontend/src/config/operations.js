@@ -1,5 +1,5 @@
 // The toolbox: nodes that can be dragged onto the canvas (OperationsSidebar maps each type to a node).
-import { Calculator, Hexagon, Layers3, Map, Shuffle, Target, Workflow } from 'lucide-react';
+import { Calculator, Hexagon, Layers3, Map, Route, Shuffle, Target, Workflow } from 'lucide-react';
 
 export const OPERATION_CATEGORIES = [
   {
@@ -9,6 +9,7 @@ export const OPERATION_CATEGORIES = [
     items: [
       { type: 'step', label: 'Step', icon: Workflow, desc: 'Match a source onto a target and aggregate' },
       { type: 'grid', label: 'H3 Grid', icon: Hexagon, desc: 'A grid target at a chosen resolution' },
+      { type: 'streets', label: 'Streets (OSM)', icon: Route, desc: "The study area's street segments or intersections as a target" },
       { type: 'calculate', label: 'Combine & Calculate', icon: Calculator, desc: 'Join steps on a target; derive a variable' },
     ],
   },

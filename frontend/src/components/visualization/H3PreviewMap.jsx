@@ -4,8 +4,12 @@ import { cellToBoundary, cellToLatLng } from 'h3-js';
 import { MapEvent } from '@urban-toolkit/autk-map';
 import {
   BASEMAP_SOURCE, SCHEMES, SOURCE_CRS, applyViewState, cameraToViewState, colorMapFor, fitMercBounds,
-  lonLatToMerc, mercToScreen, prepareCollection, schemeForColor, schemeForPalette, useAutarkMap,
+  layerTypeFor, lonLatToMerc, mercToScreen, metresPerPixel, prepareCollection, schemeForColor, schemeForPalette, useAutarkMap,
 } from './autark/autarkMap';
+
+// Street results are lines (segments) or points (intersections), sized in screen pixels
+const ZONE_LINE_WIDTH_PX = 2.5;
+const ZONE_POINT_RADIUS_PX = 3;
 import { MapError } from './VectorPreviewMap';
 
 const HEX_LAYER = 'h3-hexagon-layer';
@@ -155,8 +159,18 @@ const H3PreviewMap = ({
     syncRef.current = { isMapSyncEnabled, onGlobalViewStateChange, globalViewState };
   });
 
+  const zoneTypeRef = useRef('polygons');
+  // Autark sizes lines and points in map metres: rescale them on every camera change
+  const sizeZoneMarks = useCallback((map) => {
+    if (!map || zoneTypeRef.current === 'polygons') return;
+    const mpp = metresPerPixel(map);
+    if (zoneTypeRef.current === 'polylines') map.updateRenderInfo(ZONE_LAYER, { polylinesWidth: ZONE_LINE_WIDTH_PX * mpp });
+    if (zoneTypeRef.current === 'points') map.updateRenderInfo(ZONE_LAYER, { pointSize: ZONE_POINT_RADIUS_PX * mpp });
+  }, []);
+
   const handleCameraChange = useCallback((map) => {
     drawSymbolsRef.current();
+    sizeZoneMarks(map);
     const { isMapSyncEnabled: sync, onGlobalViewStateChange: emit } = syncRef.current;
     if (applyingViewRef.current || !sync || !emit || !loadedRef.current || emitFrameRef.current) return;
     emitFrameRef.current = requestAnimationFrame(() => {
@@ -166,7 +180,7 @@ const H3PreviewMap = ({
       lastEmittedRef.current = viewState;
       syncRef.current.onGlobalViewStateChange?.(viewState);
     });
-  }, []);
+  }, [sizeZoneMarks]);
 
   // Until the user pans or zooms, keep the data framed when the node is laid out or resized.
   const userMovedRef = useRef(false);
@@ -260,13 +274,18 @@ const H3PreviewMap = ({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map || !zoneProjected) return undefined;
-    map.loadCollection(ZONE_LAYER, { collection: zoneProjected.collection, sourceCrs: SOURCE_CRS, type: 'polygons', property: `properties.${VALUE_KEY}` });
-    map.updateRenderInfo(ZONE_LAYER, { opacity: 0.75, isColorMap: true, strokeColor: { r: 15, g: 118, b: 110, alpha: 0.8 } });
+    const type = layerTypeFor(zoneProjected.collection);      // zones, or street segments / intersections
+    zoneTypeRef.current = type;
+    map.loadCollection(ZONE_LAYER, { collection: zoneProjected.collection, sourceCrs: SOURCE_CRS, type, property: `properties.${VALUE_KEY}` });
+    map.updateRenderInfo(ZONE_LAYER, type === 'polygons'
+      ? { opacity: 0.75, isColorMap: true, strokeColor: { r: 15, g: 118, b: 110, alpha: 0.8 } }
+      : { opacity: 0.95, isColorMap: true });
+    sizeZoneMarks(map);
     loadedRef.current = true;
     return () => {
       if (mapRef.current === map) map.removeLayer(ZONE_LAYER);
     };
-  }, [ready, zoneProjected, mapRef]);
+  }, [ready, zoneProjected, mapRef, sizeZoneMarks]);
 
   // Basemap, once there is a data layer to set the map origin.
   const hasData = Boolean(hexProjected || zoneProjected);

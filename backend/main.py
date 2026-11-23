@@ -44,6 +44,7 @@ import suggest
 import cleaning
 import geocode
 import copilot_settings
+import osm
 from fastapi.responses import HTMLResponse
 from llm_agent import UrbanTraceCopilot
 from tool import COPILOT_FRONTEND_TOOLS
@@ -763,6 +764,11 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
                        f"{g.get('service')} on {str(g.get('saved', ''))[:10]} (columns {', '.join(f'{k}: `{v}`' for k, v in (g.get('spec') or {}).items())}); "
                        f"not located: {rs.get('different', 0):,} answered with a different address, {rs.get('not_found', 0):,} not found, "
                        f"{rs.get('without_house_number', 0):,} without a house number (`data/geocoded/{stem}.json`)")
+    # Street networks from OpenStreetMap: the license asks for attribution
+    if any((tg or {}).get("kind") in plans.OSM_KINDS for tg in ((doc.get("plan") or {}).get("targets") or {}).values()):
+        extras["readme_sections"] = list(extras["readme_sections"]) + [
+            "## Street networks", "",
+            f"Street segments and intersections were downloaded for the study area from OpenStreetMap. {osm.ATTRIBUTION}.", ""]
     if located:
         extras["readme_sections"] = list(extras["readme_sections"]) + [
             "## Rows located from addresses", "",
@@ -1041,6 +1047,49 @@ async def geocode_delete(dataset_id: str):
     found = geocode.delete(DATA_DIR, _dataset_stem(dataset_id))
     _corrections_changed()
     return {"deleted": found}
+
+
+class OsmNetworkBody(BaseModel):
+    study_area: Optional[Dict[str, Any]] = None
+    network_type: str = "drive"
+
+
+def _osm_area(body: OsmNetworkBody):
+    if not body.study_area:
+        raise HTTPException(status_code=400, detail="Street networks are downloaded for the study area; choose one first.")
+    try:
+        area = scope.study_area_geometry(DATA_DIR, body.study_area)
+    except scope.ScopeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if area is None:
+        raise HTTPException(status_code=400, detail="Street networks are downloaded for the study area; choose one first.")
+    return area
+
+
+@app.post("/api/osm/network")
+async def osm_network(body: OsmNetworkBody):
+    """Whether the study area's street network is downloaded, and any download under way."""
+    area = await asyncio.to_thread(_osm_area, body)
+    try:
+        out = await asyncio.to_thread(osm.info, DATA_DIR, area, body.network_type)
+    except osm.OsmError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {**out, "job": osm.status(DATA_DIR, area, body.network_type), "max_km2": osm.MAX_KM2}
+
+
+@app.post("/api/osm/network/download")
+async def osm_network_download(body: OsmNetworkBody):
+    """Download the study area's street network from OpenStreetMap (in the background)."""
+    area = await asyncio.to_thread(_osm_area, body)
+    if not osm.available():
+        raise HTTPException(status_code=501, detail="Street networks need OSMnx: pip install 'urbanweave[osm]'.")
+    km2 = await asyncio.to_thread(osm.area_km2, area)
+    if km2 > osm.MAX_KM2:
+        raise HTTPException(status_code=400, detail=f"The study area is {km2:,.0f} km²; street networks are downloaded for at most {osm.MAX_KM2:,.0f} km².")
+    try:
+        return {"job": osm.start(DATA_DIR, area, body.network_type)}
+    except osm.OsmError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 _IN_AREA_CACHE: Dict[str, Any] = {}

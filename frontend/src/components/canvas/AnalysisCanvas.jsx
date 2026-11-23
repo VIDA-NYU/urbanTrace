@@ -19,7 +19,7 @@ import {
   serializeCanvas, collectionDatasets, downloadBlob,
 } from '../../lib/collections';
 import { checkCollection, resolveStudyArea } from '../../lib/scope';
-import { GridNode, StepNode, CalculateNode } from './nodes/PlanNodes';
+import { GridNode, StreetsNode, StepNode, CalculateNode } from './nodes/PlanNodes';
 import { SweepNode, ValidateNode, DasymetricNode } from './nodes/AnalysisNodes';
 import { runSweep, runValidation, runDasymetric, reportUrl, METHODS_FOR } from '../../lib/analysis';
 import {
@@ -109,7 +109,7 @@ const writeLastCollectionId = (id) => {
   try { if (id) localStorage.setItem(LAST_KEY, id); else localStorage.removeItem(LAST_KEY); } catch { /* blocked */ }
 };
 
-const NODE_NAMES = { stepNode: 'a Step', calculateNode: 'a Combine & Calculate', datasetNode: 'a dataset', gridNode: 'an H3 Grid' };
+const NODE_NAMES = { stepNode: 'a Step', calculateNode: 'a Combine & Calculate', datasetNode: 'a dataset', gridNode: 'an H3 Grid', streetsNode: 'a Streets node' };
 
 const EMPTY_COLLECTION = {
   id: null, name: 'Untitled collection', goal: '', notes: '', study_area: null, analyses: [],
@@ -333,6 +333,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     resultMapNode: ResultMapNode,
     compareMapNode: CompareMapNode,
     gridNode: GridNode,
+    streetsNode: StreetsNode,
     stepNode: StepNode,
     calculateNode: CalculateNode,
     sweepNode: SweepNode,
@@ -672,11 +673,11 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const handle = params.targetHandle;
       let ok = false;
       if (targetNode.type === 'stepNode' && handle === 'source') ok = ['datasetNode', 'stepNode'].includes(sourceNode?.type) && sourceNode.id !== targetNode.id;
-      if (targetNode.type === 'stepNode' && handle === 'target') ok = ['datasetNode', 'gridNode'].includes(sourceNode?.type);
+      if (targetNode.type === 'stepNode' && handle === 'target') ok = ['datasetNode', 'gridNode', 'streetsNode'].includes(sourceNode?.type);
       if (targetNode.type === 'calculateNode') ok = sourceNode?.type === 'stepNode';
       if (!ok) {
         refuse(targetNode.type === 'calculateNode' ? 'Combine & Calculate takes Steps (or their result maps).'
-          : handle === 'source' ? 'A Step\'s source is a dataset or another Step.' : 'A Step\'s target is a zones dataset or an H3 Grid.');
+          : handle === 'source' ? 'A Step\'s source is a dataset or another Step.' : 'A Step\'s target is a zones dataset, an H3 Grid or Streets.');
         return;
       }
       setEdges((eds) => {
@@ -912,7 +913,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       next.onChange = handlePlanNodeChange;
       next.onRun = (nodeId) => runAnalysisNodeRef.current?.(nodeId);
       next.onDeleteNode = handleDeleteNode;
-    } else if (type === 'stepNode' || type === 'calculateNode' || type === 'gridNode') {
+    } else if (type === 'stepNode' || type === 'calculateNode' || type === 'gridNode' || type === 'streetsNode') {
       next.onChange = handlePlanNodeChange;
       next.onRun = type === 'calculateNode' ? (nodeId) => runPlanNodeRef.current?.(nodeId, 'calculate')
         : (nodeId) => runPlanNodeRef.current?.(nodeId, 'step');
@@ -924,6 +925,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         next.reductions = next.reductions || [{ method: 'count', column: '', as: 'count', fillEmpty: true }];
       }
       if (type === 'gridNode' && !next.resolution) next.resolution = 9;
+      if (type === 'streetsNode') { next.network = next.network || 'drive'; next.kind = next.kind || 'osm_streets'; }
       if (type === 'calculateNode') { next.as = next.as || 'derived'; next.kind = next.kind || 'intensive'; }
     } else if (type === 'datasetNode') {
       next.onShowInfo = handleShowInfo;
@@ -1149,6 +1151,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     const describeTarget = (t) => {
       if (!t) return null;
       if (t.type === 'gridNode') return { kind: 'h3', label: `H3 grid, resolution ${t.data?.resolution || 9}`, geometry: 'Polygon', resolution: Number(t.data?.resolution || 9) };
+      if (t.type === 'streetsNode') {
+        const inter = t.data?.kind === 'osm_intersections';
+        return { kind: t.data?.kind || 'osm_streets', label: `${inter ? 'Intersections' : 'Street segments'} (${t.data?.network || 'drive'}, OSM)`, geometry: inter ? 'Point' : 'LineString' };
+      }
       return { kind: 'zones', label: t.data?.metadata?.name || t.data?.name || t.data?.id, geometry: t.data?.metadata?.geometricType || 'Polygon',
         dataset: normalizeDatasetId(t.data?.id || t.data?.filename),
         columns: (t.data?.metadata?.columns || []).map((c) => c.name).filter(Boolean) };
@@ -1171,6 +1177,9 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         }
         const sid = stepIdOf(n);
         contexts[n.id] = { source: src, target: describeTarget(target), problems: [...(localProblems[sid] || []), ...(planProblems[sid] || [])] };
+      } else if (n.type === 'streetsNode') {
+        // The network is downloaded for the collection's study area
+        contexts[n.id] = { studyArea: collection.study_area || null };
       } else if (n.type === 'calculateNode') {
         const { inputs } = inputsOf(n.id, nodes, edges);
         const steps = inputs.filter((i) => i.type === 'stepNode');
@@ -1234,7 +1243,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       });
       return changed ? next : nds;
     });
-  }, [nodes, edges, planProblems, availableDatasets, normalizeDatasetId]);
+  }, [nodes, edges, planProblems, availableDatasets, normalizeDatasetId, collection.study_area]);
 
   // RUNNING a step or a calculation: results in columns, shown in a Result Map connected to the node
   const showPlanResult = useCallback((nodeId, spatialData, name) => {

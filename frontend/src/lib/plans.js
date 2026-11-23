@@ -90,7 +90,13 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     const memo = idColumn ? `${tNode.id}#${idColumn}` : tNode.id;
     if (targetNameOf.has(memo)) return targetNameOf.get(memo);
     let name;
-    if (tNode.type === 'gridNode') {
+    if (tNode.type === 'streetsNode') {
+      // The study area's street network from OpenStreetMap (backend/osm.py), streets or intersections
+      const kind = tNode.data?.kind === 'osm_intersections' ? 'osm_intersections' : 'osm_streets';
+      const network = tNode.data?.network || 'drive';
+      name = safeName(`${kind === 'osm_streets' ? 'streets' : 'intersections'}_${network}`);
+      targets[name] = { kind, urbantrace: { network_type: network, node: tNode.id } };
+    } else if (tNode.type === 'gridNode') {
       name = safeName(`h3_${tNode.data?.resolution || 9}_${tNode.id.slice(-4)}`);
       targets[name] = { kind: 'h3', resolution: Number(tNode.data?.resolution || 9) };
     } else {
@@ -130,11 +136,11 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     if (source.type === 'stepNode') sourceRef = `@${stepIdOf(source)}`;
     else if (source.type === 'datasetNode') sourceRef = nameForSource(source);
     else { problems[sid] = ['The source must be a dataset or a step.']; continue; }
-    if (!['datasetNode', 'gridNode'].includes(target.type)) { problems[sid] = ['The target must be zones or an H3 grid.']; continue; }
+    if (!['datasetNode', 'gridNode', 'streetsNode'].includes(target.type)) { problems[sid] = ['The target must be zones, an H3 grid or streets.']; continue; }
     if (d.mode === 'key') {
       const p = [];
       if (source.type !== 'datasetNode') p.push('A join on a key reads a dataset, not a step.');
-      if (target.type !== 'datasetNode') p.push('A join on a key needs zones, not an H3 grid.');
+      if (target.type !== 'datasetNode') p.push('A join on a key needs zones, not an H3 grid or streets.');
       if (!d.keyBy) p.push('Choose the source column that holds the key.');
       if (!d.keyIdColumn) p.push('Choose the zones column that holds the same key.');
       if (p.length) { problems[sid] = p; continue; }
@@ -197,7 +203,8 @@ export function buildDerived(nodes, edges) {
 export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, methodLabel, reductionsByColumn = {}, sourceColumns = {}, datasetsByColumn = {}, methodsByColumn = {}, rationalesByColumn = {}, expressionsByColumn = {}, durationMs, displayColumn, multivariate = true }) {
   const columns = Object.keys(payload.columns || {});
   const primary = displayColumn && columns.includes(displayColumn) ? displayColumn : columns[columns.length - 1];
-  const isZoned = payload.target?.kind === 'zones';
+  // Zones and street targets come back with their geometry (GeoJSON); H3 cells are drawn from their IDs
+  const isZoned = ['zones', 'osm_streets', 'osm_intersections'].includes(payload.target?.kind);
   const variables = columns.map((c) => ({
     dataset: datasetsByColumn[c] || (expressionsByColumn[c] ? 'derived' : sourceLabel || stepId), targetColumn: c, outputName: c,
     allocation: methodsByColumn[c] || methodLabel,
@@ -212,11 +219,12 @@ export function toSpatialData(payload, { stepId, plan, reports, sourceLabel, met
   const provenance = {
     timestamp: new Date().toISOString(), durationMs, isMultivariate: multivariate && columns.length > 1,
     resolution: payload.target?.resolution || null, zoningEnabled: isZoned,
-    targetZones: isZoned ? payload.target?.dataset : null, outputMode: isZoned ? 'zones' : 'grid', variables,
+    targetZones: isZoned ? (payload.target?.dataset || (payload.target?.network_type ? `OSM ${payload.target.kind === 'osm_intersections' ? 'intersections' : 'streets'} (${payload.target.network_type})` : null)) : null, outputMode: isZoned ? 'zones' : 'grid', variables,
     planStep: stepId,
   };
   const base = {
     status: 'success', engine: 'urbanweave-plan', isMultivariate: multivariate && columns.length > 1, isZoned,
+    targetKind: payload.target?.kind || null,
     outputMode: isZoned ? 'zones' : 'grid', provenance, columns: payload.columns, kinds: payload.kinds,
     targetIds: payload.target_ids, primaryColumn: primary,
     reports: reports ? { [stepId]: { allocation: reports } } : null,

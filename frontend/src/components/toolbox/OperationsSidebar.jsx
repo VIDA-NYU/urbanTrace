@@ -12,6 +12,7 @@ const OperationsSidebar = () => {
     const NODE_TYPES = {
       compare: 'compareMapNode',
       grid: 'gridNode',             // plan nodes (redesign phase 4)
+      streets: 'streetsNode',       // OpenStreetMap street networks (phase 6)
       step: 'stepNode',
       calculate: 'calculateNode',
       sweep: 'sweepNode',           // analysis nodes (redesign phase 5)

@@ -1,13 +1,14 @@
 // Plan nodes (docs/REDESIGN.md, phase 4): H3 Grid (a target), Step (match + aggregate), Calculate
 // (derived variables). The canvas gives each node its context (what is connected, value kinds,
 // validation problems) in data.context and handles changes and runs through callbacks.
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Hexagon, Workflow, Calculator, Play, Loader2, X, Plus, Trash2, AlertCircle, Filter, Sparkles } from 'lucide-react';
+import { Hexagon, Route, Download, Workflow, Calculator, Play, Loader2, X, Plus, Trash2, AlertCircle, Filter, Sparkles } from 'lucide-react';
 import { getHexagonEdgeLengthAvg } from 'h3-js';
 import OperatorSelect, { ParamForm } from '../../methods/OperatorSelect';
 import ReportCard from '../../methods/ReportCard';
 import { KINDS, KIND_COLORS, KEY_REDUCTIONS, keyReductionName } from '../../../lib/plans';
+import { networkStatus, downloadNetwork } from '../../../lib/osm';
 
 const shell = (accent, width) => ({
   width, background: '#fff', borderRadius: 8, border: `1px solid ${accent}55`, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
@@ -75,6 +76,102 @@ export const GridNode = memo(({ id, data }) => {
           Cells about {edgeKm < 1 ? `${Math.round(edgeKm * 1000)} m` : `${edgeKm.toFixed(1)} km`} across an edge
           ({(2.598 * edgeKm * edgeKm).toFixed(edgeKm < 1 ? 2 : 1)} km²). The grid covers the study area, or the sources it receives.
         </div>
+      </div>
+      <Handle type="source" position={Position.Right} style={{ background: '#0ea5e9', width: 8, height: 8, border: '2px solid #fff' }} />
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------------------------
+
+// A street network target (backend/osm.py): the study area's street segments or intersections from
+// OpenStreetMap, downloaded once per area and network type and kept for later runs.
+// Seconds since a download started, stamped when its status arrives
+const withElapsed = (s) => ({ ...s, elapsed: s?.job?.started ? Math.round(Date.now() / 1000 - s.job.started) : 0 });
+const NETWORKS = [['drive', 'Drivable streets'], ['walk', 'Walkable paths'], ['bike', 'Bikeable'], ['all', 'All ways']];
+
+export const StreetsNode = memo(({ id, data }) => {
+  const ctx = data.context || {};
+  const network = data.network || 'drive';
+  const kind = data.kind || 'osm_streets';
+  const [status, setStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const timer = useRef(null);
+  const areaKey = JSON.stringify(ctx.studyArea || null);
+
+  useEffect(() => {
+    let alive = true;
+    clearTimeout(timer.current);
+    if (!ctx.studyArea) return undefined;          // nothing to look up; the node says to choose one
+    const look = async () => {
+      try {
+        const s = await networkStatus(ctx.studyArea, network);
+        if (!alive) return;
+        setStatus(withElapsed(s));
+        setError(null);
+        if (s.job?.state === 'running') timer.current = setTimeout(look, 2000);
+        else if (s.job?.state === 'failed') setError(s.job.error);
+      } catch (e) { if (alive) setError(e.message); }
+    };
+    look();
+    return () => { alive = false; clearTimeout(timer.current); };
+  }, [areaKey, network]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const download = async () => {
+    setError(null);
+    try {
+      const { job } = await downloadNetwork(ctx.studyArea, network);
+      setStatus((s) => ({ ...(s || {}), job }));
+      const poll = async () => {
+        const s = await networkStatus(ctx.studyArea, network);
+        setStatus(withElapsed(s));
+        if (s.job?.state === 'running') timer.current = setTimeout(poll, 2000);
+        else if (s.job?.state === 'failed') setError(s.job.error);
+      };
+      timer.current = setTimeout(poll, 2000);
+    } catch (e) { setError(e.message); }
+  };
+
+  const running = status?.job?.state === 'running';
+  const elapsed = status?.elapsed || 0;
+  return (
+    <div style={shell('#0ea5e9', 220)}>
+      <div style={header('#f0f9ff', '#0369a1')}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Route size={13} /> Streets (OSM)</span>
+        <DeleteButton id={id} data={data} />
+      </div>
+      <div style={{ padding: 10, display: 'grid', gap: 6 }}>
+        <div style={{ display: 'flex', border: '1px solid #bae6fd', borderRadius: 6, overflow: 'hidden', fontSize: 10 }}>
+          {[['osm_streets', 'Segments'], ['osm_intersections', 'Intersections']].map(([k, label]) => (
+            <button key={k} type="button" className="nodrag" onClick={() => data.onChange?.(id, { kind: k })}
+              style={{ flex: 1, border: 'none', padding: '3px 0', cursor: 'pointer', fontWeight: 600,
+                background: kind === k ? '#0284c7' : '#fff', color: kind === k ? '#fff' : '#0369a1' }}>{label}</button>
+          ))}
+        </div>
+        <label style={small}>
+          Network
+          <select className="nodrag" style={input} value={network} onChange={(e) => data.onChange?.(id, { network: e.target.value })}>
+            {NETWORKS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+          </select>
+        </label>
+        {!ctx.studyArea && <div style={{ fontSize: 9, color: '#b45309' }}>Choose a study area: the street network is downloaded for it.</div>}
+        {ctx.studyArea && status && !running && (status.downloaded
+          ? <div style={{ fontSize: 9, color: '#0f766e' }}>
+              Downloaded {String(status.downloaded_at || '').slice(0, 10)}: {(status.edges || 0).toLocaleString()} edges, {(status.nodes || 0).toLocaleString()} nodes ({status.km2} km²).
+            </div>
+          : <div style={{ fontSize: 9, color: '#475569' }}>
+              Not downloaded yet ({status.km2} km²). Downloads from OpenStreetMap can take a few minutes for a borough.
+            </div>)}
+        {running && <div style={{ fontSize: 9, color: '#0369a1', display: 'flex', gap: 4, alignItems: 'center' }}><Loader2 size={10} className="spin" /> Downloading from OpenStreetMap… {elapsed}s</div>}
+        {ctx.studyArea && status && !running && (
+          <button className="nodrag" onClick={download} disabled={status.km2 > (status.max_km2 || Infinity)}
+            title={status.downloaded ? 'Download the network again (OpenStreetMap changes)' : "Download the study area's street network"}
+            style={{ ...iconBtn, justifySelf: 'start', gap: 4, fontSize: 10, color: '#0369a1', border: '1px solid #bae6fd', background: '#f0f9ff', padding: '3px 8px', borderRadius: 6 }}>
+            <Download size={11} /> {status.downloaded ? 'Download again' : 'Download'}
+          </button>
+        )}
+        {error && <Problems problems={[error]} />}
+        <div style={{ fontSize: 8, color: '#94a3b8' }}>© OpenStreetMap contributors (ODbL)</div>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: '#0ea5e9', width: 8, height: 8, border: '2px solid #fff' }} />
     </div>

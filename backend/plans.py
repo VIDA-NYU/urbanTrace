@@ -263,6 +263,41 @@ def _columns_needed(spec: dict) -> dict[str, set[str]]:
     return need
 
 
+OSM_KINDS = ("osm_streets", "osm_intersections")
+_OSM_FRAMES: dict = {}
+
+
+def _osm_target(data_dir, name: str, tspec: dict, area):
+    """A Streets node's target: the study area's street network (osm.py), downloaded once and handed
+    to urbanweave as a GraphML file. Returns the segments (or intersections) for the result map."""
+    import osm
+    kind = tspec["kind"]
+    network = ((tspec.get("urbantrace") or {}).get("network_type")) or "drive"
+    if area is None:
+        raise PlanInputError(f"target {name!r}: street networks are downloaded for the study area; choose one first.")
+    try:
+        path = osm.graph_path(data_dir, area, network)
+        if not path.exists():
+            osm.download(data_dir, area, network)          # usually done beforehand from the Streets node
+    except osm.OsmError as e:
+        raise PlanInputError(f"target {name!r}: {e}")
+    tspec["graphml"] = str(path)
+    key = (str(path), path.stat().st_mtime, kind)
+    if key not in _OSM_FRAMES:
+        from urbanweave import streets as S
+        frame = S.osm_streets(graphml=path) if kind == "osm_streets" else S.osm_intersections(graphml=path)
+        keep = [c for c in ("target_id", "name", "highway", "length_m", "degree") if c in frame.columns]
+        frame = frame[keep + [frame.geometry.name]].to_crs(_WGS84)
+        frame["target_id"] = frame["target_id"].astype(str)
+        if len(_OSM_FRAMES) > 4:
+            _OSM_FRAMES.clear()
+        _OSM_FRAMES[key] = frame
+    frame = _OSM_FRAMES[key]
+    meta = osm.info(data_dir, area, network)
+    return frame, {"kind": kind, "network_type": network, "count": int(len(frame)),
+                   "downloaded_at": meta.get("downloaded_at"), "attribution": osm.ATTRIBUTION}
+
+
 def prepare(data_dir, plan_spec: dict, study_area_spec, cache_root):
     """Bind sources and resolve targets; return (uw.Plan, sources, info)."""
     if not isinstance(plan_spec, dict):
@@ -291,6 +326,10 @@ def prepare(data_dir, plan_spec: dict, study_area_spec, cache_root):
             tspec["path"] = str(path)
             zones_frames[name] = frame
             info["targets"][name] = {"kind": "zones", **tinfo}
+        elif kind in OSM_KINDS:
+            frame, tinfo = _osm_target(data_dir, name, tspec, area)
+            zones_frames[name] = frame
+            info["targets"][name] = tinfo
         elif kind == "h3":
             res = int(tspec.get("resolution", 9))
             pad_m = 1.5 * h3.average_hexagon_edge_length(res, unit="m")
@@ -361,6 +400,10 @@ def validate(data_dir, plan_spec: dict, study_area_spec, cache_root) -> dict:
     for name, tspec in (spec.get("targets") or {}).items():
         ut = (tspec or {}).get("urbantrace") or {}
         stem = catalog.stem_of(ut.get("dataset"))
+        if (tspec or {}).get("kind") in OSM_KINDS and study_area_spec is None:
+            add(_owner(f"target '{name}'", spec), "Street networks are downloaded for the study area; choose one first.")
+        if (tspec or {}).get("kind") in OSM_KINDS and not tspec.get("graphml"):
+            tspec["graphml"] = "pending.graphml"                   # resolved when the plan runs (prepare)
         if (tspec or {}).get("kind") == "zones" and stem and catalog.dataset_path(data_dir, stem) is None:
             add(_owner(f"target '{name}'", spec), f"Zones dataset {stem} is not in the catalog.")
         elif ut.get("id_column") and stem:
@@ -487,9 +530,13 @@ def _columns_payload(frame: pd.DataFrame, columns: list[str], kinds: dict, targe
     payload = {"target": target_info, "target_ids": ids,
                "columns": {c: _plain_values(frame[c]) for c in columns},
                "kinds": {c: kinds.get(c) for c in columns}}
-    if target_info.get("kind") == "zones" and zones_frame is not None:
+    if target_info.get("kind") in ("zones", *OSM_KINDS) and zones_frame is not None:
         z = zones_frame.set_index("target_id")
         geo = gpd.GeoDataFrame(z.loc[[i for i in ids if i in z.index]], geometry=z.geometry.name, crs=_WGS84).reset_index()
+        if target_info.get("kind") in OSM_KINDS:                 # thousands of segments: about a metre is enough
+            import shapely
+            geo = geo.set_geometry(shapely.set_precision(geo.geometry.to_numpy(), 1e-5, mode="pointwise"))
+            label = "name" if "name" in geo.columns else None
         props = pd.DataFrame({"zone_id": ids, **{c: payload["columns"][c] for c in columns}}).set_index("zone_id")
         if label and label in geo.columns:
             props["label"] = geo.set_index("target_id")[label].reindex(props.index).tolist()
@@ -512,6 +559,7 @@ def run(data_dir, plan_spec: dict, study_area_spec, cache_root, *, outputs=None,
     declared = {n: (d or {}).get("columns", {}) for n, d in (plan.spec.get("sources") or {}).items()}
     zones_frames = info.pop("zones_frames")
     labels = {n: t.get("label") for n, t in info["targets"].items() if t.get("kind") == "zones"}
+    labels.update({n: "name" for n, t in info["targets"].items() if t.get("kind") == "osm_streets"})
 
     def target_of(step_id):
         step = steps[step_id]
