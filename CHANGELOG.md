@@ -78,6 +78,8 @@ To reproduce the paper, check out `vis2026-camera-ready` (1.0).
 
 - Maps drawn with [Autark](https://autarkjs.org/) (WebGPU), with a basemap, picking and tooltips.
 - A canvas that zooms out to fit large workflows and places new results in free space.
+- Autark's map packages are bundled (`frontend/vendor/`) until a release includes the hover, tooltip
+  and pointer changes UrbanTrace needs (urban-toolkit/autark#141, #148); CI lints and builds the frontend.
 
 ### Removed
 

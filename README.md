@@ -342,10 +342,9 @@ npm run dev
 The app runs at **http://localhost:5173** and expects the backend at `http://localhost:8000`; set
 `VITE_API_BASE_URL` (for example in `frontend/.env.local`) to use another address.
 
-The maps use Autark's `autk-map`, linked from a local Autark checkout (`file:../../autark/autk-map` in
-`frontend/package.json`) until a release includes what UrbanTrace uses (tile basemaps, `fitBounds`,
-hover and tooltips, pointer positions under CSS transforms). Clone and build Autark next to this
-repository.
+The maps use Autark's `autk-map` and `autk-core`, bundled in [`frontend/vendor/`](frontend/vendor/README.md)
+until a release of Autark includes what UrbanTrace uses (hover and tooltips, pointer positions under
+CSS transforms; both are open pull requests upstream). No Autark checkout is needed.
 
 ### Tests
 ```bash
