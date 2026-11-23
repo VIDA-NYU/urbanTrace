@@ -78,6 +78,24 @@ function analysisConfig(node, nodes, edges) {
   return null;
 }
 
+// Where a new result map goes: right of the node that produced it, moved down past any node it
+// would cover (sizes as React Flow measured them), so running several steps does not pile maps up.
+function freeSpot(nodes, src, size) {
+  // A node not measured yet (a result map placed a moment ago) counts at its usual size
+  const usual = (n) => (n.type === 'resultMapNode' || n.type === 'compareMapNode' ? size : { width: 300, height: 200 });
+  const rect = (n) => ({ x: n.position.x, y: n.position.y, w: n.measured?.width || n.width || usual(n).width, h: n.measured?.height || n.height || usual(n).height });
+  const s = rect(src);
+  const pos = { x: s.x + s.w + 60, y: s.y };
+  const others = nodes.filter((n) => n.id !== src.id).map(rect);
+  const blocking = (p) => others.filter((o) => p.x < o.x + o.w + 20 && p.x + size.width + 20 > o.x && p.y < o.y + o.h + 20 && p.y + size.height + 20 > o.y);
+  for (let i = 0; i < 200; i++) {                     // jump below whatever is in the way
+    const b = blocking(pos);
+    if (!b.length) break;
+    pos.y = Math.max(...b.map((o) => o.y + o.h)) + 30;
+  }
+  return pos;
+}
+
 // The analyses of the canvas: analysis nodes, and priority indexes set on plan results
 function collectionAnalyses(nodes, edges) {
   const out = [];
@@ -546,7 +564,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
     setNodes(nds => hydrateCompareNodes(nds, edges));
   }, [edges, hydrateCompareNodes]);
 
-  // CROSS-CANVAS CONNECTION: Push highlightedLogTs, focusedLogTs, and onTraceLineage to all ResultMapNodes
+  // CROSS-CANVAS CONNECTION: Push highlightedLogTs, focusedLogTs, and onTraceLineage to all ResultMapNodes.
+  // Also whenever result nodes appear (a run, an opened collection): without their callbacks they
+  // never send their scores to a Spatial Delta Map.
+  const resultNodeIds = nodes.filter((n) => n.type === 'resultMapNode').map((n) => n.id).join(',');
   useEffect(() => {
     setNodes(nds => nds.map(node => {
       if (node.type === 'resultMapNode') {
@@ -562,13 +583,14 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             onCompareDataReady: handleCompareDataReady,
             onPriorityChange: handlePriorityChange,
             onSetPriorityOn: (nid, on) => handlePlanNodeChange(nid, { priorityOn: on }),
+            collectionGoal: collection.goal || null,       // what the priority score means (the copilot reads it)
             onDeleteNode: handleDeleteNode
           }
         };
       }
       return node;
     }));
-  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType, handleDeleteNode, handlePriorityChange]);
+  }, [highlightedLogTs, focusedLogTs, onTraceLineage, hoveredCompareFeatureId, hoveredCompareFeatureType, handleDeleteNode, handlePriorityChange, resultNodeIds, collection.goal]);
 
   const handleCompareDataReady = useCallback((nodeId, comparePayload) => {
     setNodes(nds => {
@@ -1251,7 +1273,8 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   const resultCallbacks = useMemo(() => ({
     onPriorityChange: handlePriorityChange,
     onSetPriorityOn: (nid, on) => handlePlanNodeChange(nid, { priorityOn: on }),
-  }), [handlePriorityChange, handlePlanNodeChange]);
+    collectionGoal: collection.goal || null,
+  }), [handlePriorityChange, handlePlanNodeChange, collection.goal]);
   const showPlanResult = useCallback((nodeId, spatialData, name) => {
     const resultEdge = getEdges().find((e) => e.source === nodeId && getNodes().find((n) => n.id === e.target)?.type === 'resultMapNode');
     if (resultEdge) {
@@ -1263,7 +1286,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       const src = nds.find((n) => n.id === nodeId);
       if (!src) return nds;
       return [...nds, {
-        id: resultNodeId, type: 'resultMapNode', position: { x: src.position.x + 360, y: src.position.y },
+        id: resultNodeId, type: 'resultMapNode', position: freeSpot(nds, src, { width: 550, height: 550 }),
         data: { name, isResult: true, spatialData, isMapSyncEnabled, globalViewState, onGlobalViewStateChange: setGlobalViewState, onDeleteNode: handleDeleteNode, ...resultCallbacks },
       }];
     });

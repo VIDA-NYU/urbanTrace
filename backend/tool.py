@@ -90,9 +90,17 @@ HOTSPOT_SYNTHESIS_PROMPT = """
 You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
 
 The payload may include an optional "goal" field describing what "Priority" means in this context
-(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
-If present, use it to inform both direction and relative weight for each variable.
+(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden", or an opportunity
+such as "good schools, low crime and affordable rent").
+If present, a score of 1.0 means "most of what the goal looks for": the most need or risk for a goal
+about need or risk, the best opportunity for a goal about opportunity. Set every direction that way.
 If absent, infer the most semantically coherent goal from the variable names and metadata.
+
+Some variables are computed from others ("computed_as": "expression: all_crime - property_crime").
+Do not count the same thing twice. When a computed variable splits a total into parts (here
+violent_crime = all_crime - property_crime, so all_crime = violent_crime + property_crime), weight
+the parts (violent_crime, property_crime) and give the total (all_crime) weight 0, saying so in its
+reasoning. A part that is an indicator in its own right keeps its weight.
 
 For each source variable, infer:
 - direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)

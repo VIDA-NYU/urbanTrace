@@ -640,7 +640,8 @@ async def synthesize_hotspot(request: HotspotSynthesisRequest):
         "scoreRange": [0.0, 1.0],
         "engine": engine_used,                 # "heuristic": directions from keyword rules, to be checked
         "variables": normalized_audits,
-        "summary": "Priority score is synthesized as a weighted normalized blend where 1.0 always means highest need."
+        "summary": ("Priority score is a weighted blend of normalized variables; 1.0 means the most of what the goal "
+                    "looks for" + (f" ({request.goal.strip()})." if request.goal and request.goal.strip() else " (highest need when no goal is given)."))
     }
 
 

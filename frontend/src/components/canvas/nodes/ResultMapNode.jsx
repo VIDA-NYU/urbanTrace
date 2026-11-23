@@ -214,7 +214,8 @@ const ResultMapNode = memo(({ id, data }) => {
             column_name: v.targetColumn,
             source_column: v.sourceColumn || null,
             aggregation: v.aggregation || null,
-          }))
+          })),
+          ...(data?.collectionGoal ? { goal: data.collectionGoal } : {}),
         };
 
         const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
@@ -235,7 +236,7 @@ const ResultMapNode = memo(({ id, data }) => {
 
     loadAudit();
     return () => { cancelled = true; };
-  }, [isHotspotCandidate, provenance]);
+  }, [isHotspotCandidate, provenance, data?.collectionGoal]);
 
   // Sync tweakAudits whenever a fresh audit arrives (also resets any manual edits)
   useEffect(() => {
@@ -257,7 +258,7 @@ const ResultMapNode = memo(({ id, data }) => {
           source_column: v.sourceColumn || null,
           aggregation: v.aggregation || null,
         })),
-        ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : {})
+        ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : data?.collectionGoal ? { goal: data.collectionGoal } : {})
       };
       const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
         method: 'POST',

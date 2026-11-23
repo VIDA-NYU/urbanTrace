@@ -1,13 +1,14 @@
 # UrbanTrace — Implementation Plan
 
-**Progress (2026-11-23):** Phases 0–5 built on the `autark-map` branch, followed by a tryout on one
-real task (Brooklyn schools and libraries) whose fixes are listed under [Tryout fixes](#tryout-fixes);
-it became [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md). Release work: items 1–5 and 7 of
-[Release](#release) done, and the whole-catalog run of item 6; next are the second real task and the
-release itself. Phase 6 under way: joins on a key, geocoding (NYC GeoSearch) and the copilot's LLM
-switch (with local models) done; OSM streets next. The paper's provenance graph and priority map work
-again on plan results. 57 commits are not pushed (one push at release). Backend tests pass, none
-skipped; all use synthetic data.
+**Progress (2026-11-23):** Phases 0–5 built on the `autark-map` branch, then two real tasks through
+the tool: Brooklyn schools and libraries (the tryout, [Tryout fixes](#tryout-fixes),
+[docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)) and the paper's case study 2, Opportunity Bargains
+(`notebook/case_study_2/`). Release items 1–7 done; next is item 8, the release itself. Phase 6:
+joins on a key, geocoding, the copilot's LLM switch (with local models), OSM streets and
+intersections, rasters with tree canopy (6-inch), and fetching whole NYC Open Data datasets are done;
+catalog growth from inside the app and Auctus remain. The paper's provenance graph, priority map
+(now opt-in) and Spatial Delta Map work on plan results. 71 commits are not pushed (one push at
+release). Backend tests pass, none skipped; all use synthetic data.
 
 Design doc: [docs/REDESIGN.md](docs/REDESIGN.md). It says why; this file tracks what is done.
 
@@ -207,7 +208,7 @@ by the user; in order:
 5. - [x] Dasymetric working: urbanweave 0.1.0a2 published to PyPI on 2026-11-22 (with the user's uncommitted dasymetric work committed into it: per-target priors, several totals, the 2016–2025 taxi notebook) and pinned; UrbanTrace's dasymetric test runs; checked on Brooklyn (2023 population over 351 H3 cells with schools as prior, total kept)
 6. Whole-catalog run, then a second real task
    - [x] Run all 121 datasets through every stage (2026-11-22; `benchmark/results/corpus_check/summary.md`). Fixed from it: steps without a study area are bounded by the catalog's region (every yellow-taxi year failed on a few thousand 0,0 rows); map previews sent every feature with every column (up to 856 MB; now geometry, the coloring column and at most 50,000 features, 3.6–6.5 MB on the largest); GeoJSON reads only the columns asked for; Check data pre-ticks only coordinate and geometry fixes (32 datasets have placeholder values flagged as errors, whose fixes change attributes). Left: the three datasets with broken coordinates fail until corrected (Check data fixes them); the largest datasets take 10–25 s per stage, mostly parsing GeoJSON (the GeoParquet conversion would cut it)
-   - [ ] A second real task, one of the paper's case studies, through the tool; fix what it finds
+   - [x] A second real task, one of the paper's case studies, through the tool; fix what it finds — *the paper's case study 2, Opportunity Bargains (`notebook/case_study_2/`): six 2017 indicators from Community Districts and Sub-Borough Areas onto the 197 residential NTAs, violent crime derived, a priority score with and without rent, and the Spatial Delta Map. The notebook runs on the current code in 7 s and reproduces its numbers (107 NTAs up, 90 down; Brownsville +0.25, West Village −0.25). On the canvas (headless): every step matched 59/59 or 55/55 source areas onto 197/197 NTAs. Found and fixed: (1) the Spatial Delta Map never received scores from results created by a run or an opened collection (their callbacks were attached only when an unrelated input changed): it showed "Waiting for inputs"; (2) the priority map never sent the collection's goal to the copilot, so every score meant "need": for this opportunity question it inverted math, poverty, crime and rent. It now sends the goal and the score means what the goal looks for; (3) the copilot counted crime twice (all crimes, property, and violent = all − property); told to weight the parts and not the total, it now proposes math 28 %, English 28 %, poverty 19 %, violent 15 %, property 10 % (the paper's figure: 28/26/25/12/10) and rent 18 %; (4) result maps of successive steps were placed on top of other nodes: now in the nearest free space. Delta map: 193–197 NTAs changed*
 7. - [x] Documentation (section above): README, docs, screenshots, supplementary material (2026-11-22)
 8. Release mechanics
    - [ ] Version and CHANGELOG
