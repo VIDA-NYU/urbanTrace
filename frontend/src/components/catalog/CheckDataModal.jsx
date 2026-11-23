@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Loader2, ShieldCheck } from 'lucide-react';
 import { checkDataset, saveRecipe, deleteRecipe } from '../../lib/cleaning';
+import LocateFromAddresses from './LocateFromAddresses';
 
 const GEOMETRY_FIXES = new Set(['swap_xy', 'set_crs', 'make_valid']);
 const SEVERITY = { error: ['#b91c1c', '#fef2f2'], warning: ['#b45309', '#fffbeb'], info: ['#475569', '#f8fafc'] };
@@ -82,6 +83,7 @@ export default function CheckDataModal({ datasetId, name, onClose, onChanged }) 
             </div>
           );
         })}
+        <LocateFromAddresses datasetId={datasetId} onChanged={onChanged} />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
           <span>{out?.recipe && <button disabled={saving} onClick={remove} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #fecaca', background: '#fff', color: '#b91c1c', cursor: 'pointer' }}>Remove saved corrections</button>}</span>
           <span style={{ display: 'flex', gap: 8 }}>

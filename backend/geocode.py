@@ -127,7 +127,9 @@ _STREET_TYPES = {"STREET", "AVENUE", "PLACE", "ROAD", "DRIVE", "LANE", "COURT", 
 
 
 def query_of(addr: dict) -> str:
-    return ", ".join(p for p in (f"{addr['house']} {addr['street']}".strip(), addr["borough"], addr["zip"]) if p)
+    """The text sent to GeoSearch. The street goes in normalised ("E42nd Street" as "EAST 42 STREET"):
+    GeoSearch reads the long form reliably and guessed another street for the short one."""
+    return ", ".join(p for p in (f"{addr['house']} {norm_street(addr['street'])}".strip(), addr["borough"], addr["zip"]) if p)
 
 
 # --- checking an answer --------------------------------------------------------------------------

@@ -23,3 +23,12 @@ const refreshed = async (promise) => {
 };
 export const saveRecipe = (id, accept) => refreshed(call('POST', `/api/datasets/${enc(id)}/recipe`, { accept }));
 export const deleteRecipe = (id) => refreshed(call('DELETE', `/api/datasets/${enc(id)}/recipe`));
+
+// Locating rows from their addresses (backend/geocode.py). The preview sends nothing; starting
+// sends the addresses to NYC GeoSearch and runs in the background, polled with getGeocode.
+export const geocodePreview = (id, spec = {}) => call('POST', `/api/datasets/${enc(id)}/geocode/preview`, { spec });
+export const startGeocode = (id, spec) => call('POST', `/api/datasets/${enc(id)}/geocode`, { spec });
+export const getGeocode = (id) => call('GET', `/api/datasets/${enc(id)}/geocode`);
+export const deleteGeocode = (id) => refreshed(call('DELETE', `/api/datasets/${enc(id)}/geocode`));
+// After a run finishes, the dataset's locations changed: refresh what is cached
+export const geocodeFinished = () => refreshed(Promise.resolve(null));

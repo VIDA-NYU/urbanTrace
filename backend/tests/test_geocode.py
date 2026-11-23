@@ -11,11 +11,11 @@ import geocode
 # GeoSearch's answers in the fake, by query. Like the real service, it answers a made-up address
 # with some other building rather than nothing.
 ANSWERS = {
-    "350 5th Ave, Manhattan": {"lon": -73.9857, "lat": 40.7545, "label": "350 5 AVENUE", "housenumber": "350",
+    "350 5 AVENUE, Manhattan": {"lon": -73.9857, "lat": 40.7545, "label": "350 5 AVENUE", "housenumber": "350",
                                "street": "5 AVENUE", "borough": "Manhattan", "postalcode": "10118"},
-    "1 Nowhere Ln, Queens": {"lon": -73.91, "lat": 40.72, "label": "1 49 LANE", "housenumber": "1",
+    "1 NOWHERE LANE, Queens": {"lon": -73.91, "lat": 40.72, "label": "1 49 LANE", "housenumber": "1",
                              "street": "49 LANE", "borough": "Queens", "postalcode": "11378"},
-    "20 W 34 St, Brooklyn": {"lon": -73.9860, "lat": 40.7486, "label": "20 WEST 34 STREET", "housenumber": "20",
+    "20 WEST 34 STREET, Brooklyn": {"lon": -73.9860, "lat": 40.7486, "label": "20 WEST 34 STREET", "housenumber": "20",
                              "street": "WEST 34 STREET", "borough": "Manhattan", "postalcode": "10001"},
 }
 
@@ -55,9 +55,9 @@ def test_suggested_columns():
 
 def test_answers_are_checked_against_the_address_sent():
     addr = {"house": "350", "street": "5th Ave", "borough": "Manhattan", "zip": ""}
-    assert geocode.verdict(addr, ANSWERS["350 5th Ave, Manhattan"])[0] == "matched"     # 5TH AVE = 5 AVENUE
+    assert geocode.verdict(addr, ANSWERS["350 5 AVENUE, Manhattan"])[0] == "matched"     # 5TH AVE = 5 AVENUE
     assert geocode.verdict({**addr, "house": "1", "street": "Nowhere Ln", "borough": "Queens"},
-                           ANSWERS["1 Nowhere Ln, Queens"])[0] == "different"
+                           ANSWERS["1 NOWHERE LANE, Queens"])[0] == "different"
     assert geocode.verdict(addr, None)[0] == "not_found"
     rear = {"house": "255", "street": "REAR BENEDICT ROAD", "borough": "Staten Island", "zip": ""}
     assert geocode.verdict(rear, {"housenumber": "255 REAR", "street": "BENEDICT ROAD", "borough": "Staten Island"})[0] == "matched"
@@ -89,7 +89,7 @@ def test_locating_rows_and_using_them(client, addresses):
     assert out["located"] == 1                                       # only 350 5th Ave checks out
     assert out["rows_by_status"] == {"matched": 1, "different": 2, "not_found": 0, "outside_region": 0,
                                      "without_house_number": 1}
-    assert sorted(addresses) == sorted(["350 5th Ave, Manhattan", "1 Nowhere Ln, Queens", "20 W 34 St, Brooklyn"])
+    assert sorted(addresses) == sorted(["350 5 AVENUE, Manhattan", "1 NOWHERE LANE, Queens", "20 WEST 34 STREET, Brooklyn"])
     gdf = cat.load(_dir(), "test_sites")
     assert gdf.geometry.iloc[0].x == pytest.approx(-73.9857)          # filled
     assert gdf.geometry.iloc[1] is None                              # not used: a different address

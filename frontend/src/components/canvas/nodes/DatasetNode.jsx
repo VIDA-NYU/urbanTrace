@@ -49,9 +49,10 @@ const DatasetNode = memo(({ id, data }) => {
   const [checking, setChecking] = useState(false);
   const [rev, setRev] = useState(0);
   const [corrected, setCorrected] = useState(false);
+  const [located, setLocated] = useState(false);
   useEffect(() => {
     let alive = true;
-    getCatalogIndex().then((idx) => { if (alive) setCorrected(Boolean(idx[datasetId]?.corrected)); });
+    getCatalogIndex().then((idx) => { if (alive) { setCorrected(Boolean(idx[datasetId]?.corrected)); setLocated(Boolean(idx[datasetId]?.located)); } });
     return () => { alive = false; };
   }, [datasetId, rev]);
   
@@ -156,11 +157,11 @@ const DatasetNode = memo(({ id, data }) => {
           <button
             className="nodrag"
             onClick={(e) => { e.stopPropagation(); setChecking(true); }}
-            title={corrected ? 'Corrections saved (atlas-clean); check again or remove them' : 'Check this dataset for data-quality problems (atlas-clean)'}
-            style={{ background: corrected ? '#ccfbf1' : 'none', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex',
-              alignItems: 'center', gap: 2, color: corrected ? '#0f766e' : '#64748b', borderRadius: '4px', fontSize: 9, fontWeight: 600 }}
+            title={corrected || located ? `${[corrected && 'Corrections saved (atlas-clean)', located && 'rows located from their addresses'].filter(Boolean).join('; ')}: check again or remove them` : 'Check this dataset for data-quality problems (atlas-clean) and locate rows from their addresses'}
+            style={{ background: corrected || located ? '#ccfbf1' : 'none', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex',
+              alignItems: 'center', gap: 2, color: corrected || located ? '#0f766e' : '#64748b', borderRadius: '4px', fontSize: 9, fontWeight: 600 }}
           >
-            <ShieldCheck size={12} />{corrected ? 'Corrected' : ''}
+            <ShieldCheck size={12} />{[corrected && 'Corrected', located && 'Located'].filter(Boolean).join(' · ')}
           </button>
 
           <button
