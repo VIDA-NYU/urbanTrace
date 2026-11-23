@@ -1181,7 +1181,7 @@
   "license": null,
   "source_updated_at": "2026-11-04T14:36:42+00:00",
   "catalog_added_at": "2026-03-17",
-  "retrieved_at": null,
+  "retrieved_at": "2026-11-23T01:33:18+00:00",
   "derived_from": {
    "raw_file": "data/geojson_raw/hn5i-inap.geojson"
   },
@@ -1191,7 +1191,9 @@
    "retrieval date not recorded; catalog_added_at is when the file entered this repository"
   ],
   "title": "Forestry Tree Points",
-  "category": "Environment"
+  "category": "Environment",
+  "rows": 1125266,
+  "retrieved_with": "tools/fetch_open_data.py (all rows)"
  },
  "forestry_work_orders": {
   "portal": "NYC Open Data",

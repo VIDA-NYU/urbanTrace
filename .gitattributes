@@ -1,3 +1,6 @@
 data/descriptions_origin.csv text eol=crlf whitespace=cr-at-eol
 data/geojson/*.geojson filter=lfs diff=lfs merge=lfs -text
 data/geojson_raw/*.geojson filter=lfs diff=lfs merge=lfs -text
+data/metadata_v2/*.json filter=lfs diff=lfs merge=lfs -text
+data/geoparquet/*.parquet filter=lfs diff=lfs merge=lfs -text
+data/raster/*.tif filter=lfs diff=lfs merge=lfs -text

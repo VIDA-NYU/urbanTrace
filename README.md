@@ -359,6 +359,12 @@ area where most features are.
 
 ---
 
+## License
+
+UrbanTrace's code is released under the [MIT License](LICENSE). The datasets in `data/` keep their own terms, recorded in `data/origins.json` and in each raster's sidecar (for example, the 6-inch tree canopy is CC BY-NC-SA 4.0); exports carry them.
+
+---
+
 ## 🙏 Acknowledgements
 
 Developed by the OSCUR team at [VIDA-NYU](https://github.com/VIDA-NYU).
