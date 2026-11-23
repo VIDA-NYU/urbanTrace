@@ -1,6 +1,6 @@
-import React, { memo, useMemo, useEffect, useState } from 'react';
+import React, { memo, useMemo, useEffect, useRef, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
-import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
+import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X, Target } from 'lucide-react';
 import H3PreviewMap from '../../visualization/H3PreviewMap'; 
 import { API_BASE } from '../../../config/api';
 import { cellToBoundary } from 'h3-js';
@@ -190,9 +190,16 @@ const ResultMapNode = memo(({ id, data }) => {
     });
   }, [auditMappings, id, provenance]);
 
-  const isHotspotCandidate = useMemo(() => {
-    return !!(provenance?.isMultivariate && provenance?.variables?.length > 1);
-  }, [provenance]);
+  // The priority map combines several variables into one score. It is opt-in: on by default only for
+  // a Combine & Calculate result, a header button for any result with two or more columns.
+  const canPriority = !!(provenance?.isMultivariate && provenance?.variables?.length > 1);
+  const priorityOn = data?.priorityOn ?? !!data?.spatialData?.priorityDefault;
+  const isHotspotCandidate = canPriority && priorityOn;
+  const onPriorityChangeRef = useRef(data?.onPriorityChange);
+  useEffect(() => { onPriorityChangeRef.current = data?.onPriorityChange; });
+  useEffect(() => {                 // turned off: the priority analysis leaves the report and the export
+    if (!isHotspotCandidate) onPriorityChangeRef.current?.(id, null);
+  }, [isHotspotCandidate, id]);
 
   useEffect(() => {
     if (!isHotspotCandidate || !provenance?.variables?.length) return;
@@ -276,8 +283,8 @@ const ResultMapNode = memo(({ id, data }) => {
     goal: tweakGoal || null,
   } : null), [auditMappings, tweakGoal]);
   useEffect(() => {
-    if (onPriorityChange && priorityRecord) onPriorityChange(id, priorityRecord);
-  }, [id, onPriorityChange, priorityRecord]);
+    if (onPriorityChange && priorityRecord && isHotspotCandidate) onPriorityChange(id, priorityRecord);
+  }, [id, onPriorityChange, priorityRecord, isHotspotCandidate]);
 
   const hotspotHexData = useMemo(() => {
     // A variable whose direction nobody has decided (no rule, no LLM, not set by the analyst) is
@@ -581,6 +588,21 @@ const ResultMapNode = memo(({ id, data }) => {
             <div style={{ fontSize: '9px', backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
               {outputMode}
             </div>
+          )}
+
+          {canPriority && data?.onSetPriorityOn && (
+            <button
+              onClick={(e) => { e.stopPropagation(); data.onSetPriorityOn(id, !priorityOn); }}
+              className="nodrag"
+              style={{
+                background: priorityOn ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: priorityOn ? colorHex : '#fff',
+                border: 'none', borderRadius: '4px', padding: '2px 5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3,
+                fontSize: 9, fontWeight: 700,
+              }}
+              title={priorityOn ? 'Show the result\'s own values instead of the priority score' : 'Combine these columns into a priority score (weights and directions on the card)'}
+            >
+              <Target size={11} /> Priority
+            </button>
           )}
 
           {/* --- NEW: DOWNLOAD BUTTON --- */}

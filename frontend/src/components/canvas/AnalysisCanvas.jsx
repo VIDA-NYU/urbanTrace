@@ -561,6 +561,7 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
             hoveredCompareFeatureType,
             onCompareDataReady: handleCompareDataReady,
             onPriorityChange: handlePriorityChange,
+            onSetPriorityOn: (nid, on) => handlePlanNodeChange(nid, { priorityOn: on }),
             onDeleteNode: handleDeleteNode
           }
         };
@@ -1246,10 +1247,15 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
   }, [nodes, edges, planProblems, availableDatasets, normalizeDatasetId, collection.study_area]);
 
   // RUNNING a step or a calculation: results in columns, shown in a Result Map connected to the node
+  // A new result node gets its callbacks at once (the effect that refreshes them runs on other changes)
+  const resultCallbacks = useMemo(() => ({
+    onPriorityChange: handlePriorityChange,
+    onSetPriorityOn: (nid, on) => handlePlanNodeChange(nid, { priorityOn: on }),
+  }), [handlePriorityChange, handlePlanNodeChange]);
   const showPlanResult = useCallback((nodeId, spatialData, name) => {
     const resultEdge = getEdges().find((e) => e.source === nodeId && getNodes().find((n) => n.id === e.target)?.type === 'resultMapNode');
     if (resultEdge) {
-      setNodes((nds) => nds.map((n) => (n.id === resultEdge.target ? { ...n, data: { ...n.data, name, spatialData } } : n)));
+      setNodes((nds) => nds.map((n) => (n.id === resultEdge.target ? { ...n, data: { ...n.data, name, spatialData, ...resultCallbacks } } : n)));
       return;
     }
     const resultNodeId = `result_${(crypto.randomUUID?.() || String(Date.now())).slice(0, 8)}`;
@@ -1258,12 +1264,12 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       if (!src) return nds;
       return [...nds, {
         id: resultNodeId, type: 'resultMapNode', position: { x: src.position.x + 360, y: src.position.y },
-        data: { name, isResult: true, spatialData, isMapSyncEnabled, globalViewState, onGlobalViewStateChange: setGlobalViewState, onDeleteNode: handleDeleteNode },
+        data: { name, isResult: true, spatialData, isMapSyncEnabled, globalViewState, onGlobalViewStateChange: setGlobalViewState, onDeleteNode: handleDeleteNode, ...resultCallbacks },
       }];
     });
     setEdges((eds) => [...eds, { id: `e-${nodeId}-${resultNodeId}`, source: nodeId, target: resultNodeId, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }]);
     revealNodes([nodeId, resultNodeId]);
-  }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled, revealNodes]);
+  }, [getEdges, getNodes, globalViewState, handleDeleteNode, isMapSyncEnabled, revealNodes, resultCallbacks]);
 
   // The copilot's suggestion for a step: method and reductions in urbanweave's vocabulary, checked
   // against its registry, with a rationale kept on the node (and so in the collection and export).
@@ -1347,7 +1353,10 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
         ...(srcInfo?.study_area ? { study_area: srcInfo.study_area } : {}), ...(srcInfo?.repaired_geometries ? { repaired_geometries: srcInfo.repaired_geometries } : {}),
         ...(srcInfo?.outside_region ? { outside_region: srcInfo.outside_region } : {}), ...(srcInfo?.cleaning ? { cleaning: srcInfo.cleaning } : {}) } } : null;
       setRun({ running: false, reports, durationMs: spatialData.provenance.durationMs });
-      showPlanResult(nodeId, { ...spatialData, reports: reports || spatialData.reports }, mode === 'step' ? `Step ${key}` : `Derived: ${derived[0].as}`);
+      // A Combine & Calculate result opens as a priority map (combining variables is its point); a
+      // step's result opens as an ordinary map, with the priority map one click away
+      showPlanResult(nodeId, { ...spatialData, reports: reports || spatialData.reports, priorityDefault: mode === 'calculate' },
+        mode === 'step' ? `Step ${key}` : `Derived: ${derived[0].as}`);
       onLogActivity?.({ status: 'success', ...spatialData.provenance, reports: reports || spatialData.reports });
     } catch (error) {
       setRun({ running: false, error: error.message });
