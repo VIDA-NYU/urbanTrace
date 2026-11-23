@@ -197,7 +197,9 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
                     "urbantrace:selection": {"added_by": entry.get("added_by", "user"),
                                              "rationale": entry.get("rationale")},
                     "urbantrace:served_file": {"name": path.name, "sha256": served_hash}}
-            embedded, why = _embed_decision(embed, origin, path.stat().st_size)
+            # With a study area the data is clipped first, so its size is judged after clipping
+            # (below): a large citywide file can still be embedded for one neighborhood
+            embedded, why = _embed_decision(embed, origin, 0 if area is not None else path.stat().st_size)
             row = {"name": stem, "rows": (prof or {}).get("nb_rows"), "geometry": (prof or {}).get("geometricType"),
                    "columns": columns, "origin": origin, "status": why, "rationale": entry.get("rationale")}
             rows.append(row)
@@ -214,12 +216,24 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
                 gdf = _clean(gdf)
                 row["rows"] = len(gdf)
                 schema = _schema(gdf, value_kinds)
-                for fmt in formats:
-                    rel = f"data/sources/{stem}.{FORMATS[fmt][0]}"
-                    _write(gdf, root / rel, fmt)
-                    name = stem.lower() if fmt == formats[0] else f"{stem.lower()}-{fmt}"
-                    resources.append(_resource(re.sub(r"[^a-z0-9._-]", "-", name), rel, fmt, root / rel, schema, info))
-            elif origin.get("source_url"):
+                first = root / f"data/sources/{stem}.{FORMATS[formats[0]][0]}"
+                _write(gdf, first, formats[0])
+                if embed == "auto" and first.stat().st_size > EMBED_LIMIT_BYTES:
+                    first.unlink()                          # too large even after clipping: reference it
+                    embedded = False
+                    why = "referenced: larger than the embedding limit after clipping" if origin.get("source_url") \
+                        else "not included: too large after clipping and origin unknown"
+                    row["status"] = why
+                else:
+                    for fmt in formats:
+                        rel = f"data/sources/{stem}.{FORMATS[fmt][0]}"
+                        if fmt != formats[0]:
+                            _write(gdf, root / rel, fmt)
+                        name = stem.lower() if fmt == formats[0] else f"{stem.lower()}-{fmt}"
+                        resources.append(_resource(re.sub(r"[^a-z0-9._-]", "-", name), rel, fmt, root / rel, schema, info))
+            if embedded:
+                continue
+            if origin.get("source_url"):
                 references.append({"name": stem, "url": origin["source_url"], "reason": why, **info})
             else:
                 not_included.append({"name": stem, "reason": why, **info})

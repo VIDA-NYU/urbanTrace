@@ -1,0 +1,57 @@
+{
+  "format_version": 1,
+  "tool_version": "0.1.0.dev0",
+  "created": "2026-11-23T03:07:42.010782+00:00",
+  "dataset": {
+    "name": "street_closures_due_to_construction_activities_by_intersection",
+    "columns": [
+      "the_geom",
+      "nodeid",
+      "oft",
+      "onstreetname",
+      "fromstreetname",
+      "borough_code",
+      "work_start_date",
+      "work_end_date",
+      "purpose"
+    ],
+    "nb_rows": 105,
+    "value_snapshots": {},
+    "geometry": {
+      "column": "geometry",
+      "crs": "EPSG:4326"
+    }
+  },
+  "expectations": [
+    {
+      "column": "*",
+      "kind": "extent",
+      "spec": {
+        "bbox": [
+          -74.28335365085375,
+          40.475961353,
+          -73.6601644211951,
+          40.944425116999994
+        ]
+      },
+      "source": "user",
+      "rationale": ""
+    }
+  ],
+  "fixes": [
+    {
+      "id": "fix-d4dc51bf6e",
+      "issue_id": "iss-7ce60eb633",
+      "action": "set_crs",
+      "params": {
+        "column": "geometry",
+        "crs": "EPSG:2263"
+      },
+      "rationale": "Declare EPSG:2263 (NAD83 / New York Long Island (ftUS)) (100% of locations land in the extent); coordinates are not changed.",
+      "source": "rule",
+      "status": "accepted",
+      "confidence": 0.9,
+      "grounded": true
+    }
+  ]
+}

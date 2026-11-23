@@ -1,0 +1,120 @@
+{
+  "format_version": 1,
+  "tool_version": "0.1.0.dev0",
+  "created": "2026-11-23T03:07:41.769643+00:00",
+  "dataset": {
+    "name": "2018_2019_school_locations",
+    "columns": [
+      "fiscal_year",
+      "system_code",
+      "location_code",
+      "location_name",
+      "beds_number",
+      "managed_by_name",
+      "location_type_description",
+      "location_category_description",
+      "grades_text",
+      "grades_final_text",
+      "open_date",
+      "status_descriptions",
+      "primary_building_code",
+      "primary_address_line_1",
+      "state_code",
+      "x_coordinate",
+      "y_coordinate",
+      "longitude",
+      "latitude",
+      "community_district",
+      "council_district",
+      "census_tract",
+      "borough_block_lot",
+      "nta",
+      "nta_name",
+      "principal_name",
+      "principal_title",
+      "principal_phone_number",
+      "fax_number",
+      "geographical_district_code",
+      "admin_district_location_code",
+      "administrative_district_name",
+      "community_school_sup_name",
+      "field_support_center_name",
+      "field_support_center_leader",
+      "school_support_team_name",
+      "school_support_team_leader",
+      "highschool_network_location",
+      "highschool_network_name",
+      "highschool_network",
+      "geocoded_column"
+    ],
+    "nb_rows": 1941,
+    "value_snapshots": {},
+    "geometry": {
+      "column": "geometry",
+      "crs": "EPSG:4326"
+    }
+  },
+  "expectations": [
+    {
+      "column": "*",
+      "kind": "extent",
+      "spec": {
+        "bbox": [
+          -74.28335365085375,
+          40.475961353,
+          -73.6601644211951,
+          40.944425116999994
+        ]
+      },
+      "source": "user",
+      "rationale": ""
+    }
+  ],
+  "fixes": [
+    {
+      "id": "fix-cc493007e0",
+      "issue_id": "iss-a06aad5c5c",
+      "action": "swap_xy",
+      "params": {
+        "columns": [
+          "latitude",
+          "longitude"
+        ],
+        "extent": {
+          "bbox": [
+            -74.28335365085375,
+            40.475961353,
+            -73.6601644211951,
+            40.944425116999994
+          ]
+        }
+      },
+      "rationale": "Exchange x and y for every location: only locations outside the extent that land inside it once exchanged are changed, so replaying the recipe is safe.",
+      "source": "rule",
+      "status": "accepted",
+      "confidence": 0.95,
+      "grounded": true
+    },
+    {
+      "id": "fix-7d810302d4",
+      "issue_id": "iss-c40140e8b6",
+      "action": "swap_xy",
+      "params": {
+        "column": "geometry",
+        "extent": {
+          "bbox": [
+            -74.28335365085375,
+            40.475961353,
+            -73.6601644211951,
+            40.944425116999994
+          ]
+        }
+      },
+      "rationale": "Exchange x and y for every location: only locations outside the extent that land inside it once exchanged are changed, so replaying the recipe is safe.",
+      "source": "rule",
+      "status": "accepted",
+      "confidence": 0.95,
+      "grounded": true
+    }
+  ]
+}

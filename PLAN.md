@@ -212,10 +212,10 @@ by the user; in order:
 7. - [x] Documentation (section above): README, docs, screenshots, supplementary material (2026-11-22); brought up to date with phase 6 on 2026-11-23: README sections on streets, rasters, joins, geocoding, the copilot's LLM, priority maps and the Delta Map; the walkthrough corrected (Combine & Calculate opens as a priority map) and pointing to the new features; `docs/CASE_STUDY_2.md`, the opportunity-bargains case study on the canvas; seven new screenshots
 8. Release mechanics
    - [x] Version and CHANGELOG — *2.0.0-alpha.1 (user, 2026-11-23; `2.0.0a1` in Python, tag `v2.0.0-alpha.1`; the paper's version is 1.0, `vis2026-camera-ready`): `backend/version.py`, recorded in the API, saved collections (`saved_with`) and exports (`urbantrace:software`, with urbanweave's version); `frontend/package.json`; `CHANGELOG.md`, dated when the release is pushed*
-   - [ ] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6)
+   - [x] Settle the size threshold for embedding and whether clipping to the study area is the default (REDESIGN §6) — *clipping stays the default (user, 2026-11-23); the 50 MB limit is now judged after clipping, so a large citywide file can be embedded for one neighborhood; a license must still be recorded*
    - [ ] Autark: release `fix/pointer-css-scale` (and `fitBounds`, newer than the build UrbanTrace had) with the rest of Autark; UrbanTrace links Autark from a local checkout, so a fresh clone needs it published or vendored
    - [ ] atlas-clean: release `feat/spatial` (spatial checks, light install); then pin `atlas-clean[geo]` in `backend/requirements.txt` (optional and unpinned until then; its tests skip without it)
-   - [ ] Decide which catalog corrections to keep: check the three broken datasets (school locations, raised crosswalks, street closures) and commit their recipes in `data/recipes/`
+   - [x] Decide which catalog corrections to keep: check the three broken datasets (school locations, raised crosswalks, street closures) and commit their recipes in `data/recipes/` — *accepted (user, 2026-11-23): coordinate fixes only (swap of latitude and longitude for the school locations, EPSG:2263 for the two State Plane datasets; the street closures' placeholder borough code is left as it is). All three now pass every stage of the whole-catalog check*
    - [ ] Push `autark-map`, open the PR to `main`, tag `v2.0.0-alpha.1`
 
 After the release: phase 6, licenses, the GeoParquet conversion, the benchmark's scoring rule in

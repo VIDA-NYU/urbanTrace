@@ -405,7 +405,10 @@ districts and council districts).
 
 Some source datasets contain bad coordinates (swapped latitude and longitude, a mislabelled
 coordinate system, stray points far from NYC); **Check data** finds them, and map previews frame the
-area where most features are.
+area where most features are. Three are corrected in the repository (`data/recipes/`):
+`2018_2019_school_locations` (latitude and longitude swapped), `raised_crosswalk_locations` and
+`street_closures_due_to_construction_activities_by_intersection` (NY State Plane feet labelled as
+degrees).
 
 ---
 

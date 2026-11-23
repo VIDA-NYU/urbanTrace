@@ -1,0 +1,24 @@
+{
+ "dataset": "2018_2019_school_locations",
+ "saved": "2026-11-23T03:07:41+00:00",
+ "extent": [
+  -74.28335365085375,
+  40.475961353,
+  -73.6601644211951,
+  40.944425116999994
+ ],
+ "fixes": [
+  {
+   "id": "fix-cc493007e0",
+   "action": "swap_xy",
+   "rationale": "Exchange x and y for every location: only locations outside the extent that land inside it once exchanged are changed, so replaying the recipe is safe.",
+   "issue": "latitude/longitude: all 1,940 locations lie outside the expected extent but inside it with x and y exchanged (stored as latitude, longitude)"
+  },
+  {
+   "id": "fix-7d810302d4",
+   "action": "swap_xy",
+   "rationale": "Exchange x and y for every location: only locations outside the extent that land inside it once exchanged are changed, so replaying the recipe is safe.",
+   "issue": "geometry: all 1,940 locations lie outside the expected extent but inside it with x and y exchanged (stored as latitude, longitude)"
+  }
+ ]
+}
