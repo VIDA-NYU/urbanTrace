@@ -62,7 +62,9 @@ async def _lifespan(_app):
     yield
 
 
-app = FastAPI(title="UrbanTrace Spatial API", lifespan=_lifespan)
+from version import VERSION
+
+app = FastAPI(title="UrbanTrace Spatial API", version=VERSION, lifespan=_lifespan)
 
 # Allow the React frontend to communicate with this API
 app.add_middleware(

@@ -93,6 +93,13 @@ def _file_sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def _software() -> dict:
+    """What made the package: UrbanTrace's and urbanweave's versions."""
+    import urbanweave
+    from version import VERSION
+    return {"urbantrace": VERSION, "urbanweave": urbanweave.__version__}
+
+
 def _resource(name: str, rel: str, fmt: str, file: Path, schema: dict, extra: dict) -> dict:
     ext, mediatype = FORMATS[fmt]
     return {"name": name, "path": rel, "format": ext, "mediatype": mediatype,
@@ -250,6 +257,7 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
             "urbantrace:references": references,
             "urbantrace:not_included": not_included,
             "urbantrace:export": {"embed": embed, "formats": list(formats), "clipped": area is not None},
+            "urbantrace:software": _software(),
             "urbantrace:warnings": warnings or [],
         }
         (root / "datapackage.json").write_text(json.dumps(package, indent=1, default=str))

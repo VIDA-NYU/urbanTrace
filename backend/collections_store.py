@@ -18,7 +18,7 @@ A collection is a JSON document stored as ``<collections dir>/<id>.json``:
       "runs": [{"manifest_path", "created"}]
     }
 
-The server owns ``schema``, ``id``, ``created_at`` and ``updated_at``; everything else is what the
+The server owns ``schema``, ``id``, ``created_at``, ``updated_at`` and ``saved_with``; everything else is what the
 interface sends. Writes are atomic.
 """
 from __future__ import annotations
@@ -84,7 +84,9 @@ class Store:
 
     def create(self, fields: dict | None = None) -> dict:
         now = _now()
-        doc = {"schema": SCHEMA, "id": f"c_{uuid.uuid4().hex[:12]}", "created_at": now, "updated_at": now}
+        from version import VERSION
+        doc = {"schema": SCHEMA, "id": f"c_{uuid.uuid4().hex[:12]}", "created_at": now, "updated_at": now,
+               "saved_with": f"UrbanTrace {VERSION}"}
         doc.update({k: json.loads(json.dumps(v)) for k, v in _DEFAULTS.items()})
         doc.update({k: v for k, v in (fields or {}).items() if k in _FIELDS})
         self._write(doc)
@@ -94,6 +96,8 @@ class Store:
         doc = self.get(cid)
         doc.update({k: v for k, v in fields.items() if k in _FIELDS})
         doc["updated_at"] = _now()
+        from version import VERSION
+        doc["saved_with"] = f"UrbanTrace {VERSION}"
         self._write(doc)
         return doc
 

@@ -9,6 +9,7 @@ result as a collection that other tools can open and rerun. You build the analys
 workflow on a canvas, with an LLM copilot that suggests datasets and methods, and every
 integration runs on [urbanweave](https://github.com/VIDA-NYU/urbanweave).
 
+![Version](https://img.shields.io/badge/version-2.0.0--alpha.1-orange)
 ![Status](https://img.shields.io/badge/status-research_prototype-yellow)
 ![Stack](https://img.shields.io/badge/stack-React%20%2B%20FastAPI%20%2B%20Autark%20(WebGPU)-blue)
 
@@ -36,8 +37,9 @@ offline profiler extracts semantic and geometric metadata from each dataset, whi
 when they discover datasets and recommend integration operators. The evaluation covers 28 urban
 scenarios; the dataset discovery and operator selection studies are in [`benchmark/`](benchmark/README.md).
 
-The paper describes an earlier version of UrbanTrace, before it ran on urbanweave; see
-[`paper/`](paper/README.md). To reproduce its results, check out the tag `vis2026-camera-ready`.
+The paper describes UrbanTrace 1.0, before it ran on urbanweave; see [`paper/`](paper/README.md).
+To reproduce its results, check out the tag `vis2026-camera-ready`. What changed in 2.0 (now in
+alpha) is in [CHANGELOG.md](CHANGELOG.md).
 
 If you use UrbanTrace, please cite:
 
