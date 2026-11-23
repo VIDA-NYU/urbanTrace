@@ -303,8 +303,13 @@ const H3PreviewMap = ({
     const map = mapRef.current;
     if (!ready || !map) return;
     if (hexProjected) map.updateColorMap(HEX_LAYER, { colorMap: colorMapFor(hexScheme) });
-    if (zoneProjected) map.updateColorMap(ZONE_LAYER, { colorMap: colorMapFor(zoneScheme) });
-  }, [ready, mapRef, hexProjected, zoneProjected, hexScheme, zoneScheme]);
+    // Street lines and intersection points are thin marks on a light basemap: a scheme whose low end
+    // is dark (viridis), over the 2nd-98th percentile so a few busy segments do not wash out the rest
+    const marks = zoneProjected && zoneTypeRef.current !== 'polygons' && !useHotspotPalette;
+    if (zoneProjected) map.updateColorMap(ZONE_LAYER, { colorMap: marks
+      ? { interpolator: 'interpolateViridis', domainSpec: { type: 'percentile', params: [2, 98] } }
+      : colorMapFor(zoneScheme) });
+  }, [ready, mapRef, hexProjected, zoneProjected, hexScheme, zoneScheme, useHotspotPalette]);
 
   // Highlights driven by the parent (linked hover across nodes).
   useEffect(() => {

@@ -4,7 +4,7 @@
 
 UrbanTrace helps an analyst answer an urban question with data that was never meant to be used
 together. You search a catalog of profiled datasets, bring them onto shared units (neighborhoods, an
-H3 grid) with documented methods, test how much the answer depends on those choices, and export the
+H3 grid, street segments) with documented methods, test how much the answer depends on those choices, and export the
 result as a collection that other tools can open and rerun. You build the analysis as a node-based
 workflow on a canvas, with an LLM copilot that suggests datasets and methods, and every
 integration runs on [urbanweave](https://github.com/VIDA-NYU/urbanweave).
@@ -16,7 +16,9 @@ integration runs on [urbanweave](https://github.com/VIDA-NYU/urbanweave).
 
 **New to UrbanTrace?** [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) takes one question (which Brooklyn
 neighborhoods have many schools but few libraries?) through every part of the tool, explaining the
-concepts as it goes.
+concepts as it goes. [docs/CASE_STUDY_2.md](docs/CASE_STUDY_2.md) then does the paper's second case
+study (opportunity bargains: how rent changes which neighborhoods rank highest) on the canvas, with
+priority maps and the Spatial Delta Map.
 
 ---
 
@@ -62,7 +64,8 @@ If you use UrbanTrace, please cite:
 
 - 121 profiled NYC datasets, each with its geometry, row count, columns and a profile (**Info**): column
   types and statistics, where and when it has data, and where it came from (publisher, source URL,
-  license when known).
+  license when known). Rasters are listed alongside: tree canopy from NYC's 6-inch land cover and
+  from NLCD.
 - Search by name; filter to datasets with data **in the study area** (sorted by how much of it they
   reach) and to a range of **years**.
 - Drag a dataset onto the canvas to use it; upload your own GeoJSON (with its source and license).
@@ -97,10 +100,31 @@ a **value kind** (extensive, intensive, categorical), which decides how it may b
   reason shown.
 - After a run, the step reports what matched and what was left out and why, and the result map shows
   totals, ranges and units with nothing.
+- **Join on a key**, the Step's second mode, adds rows to the zone whose code matches (ZIP, BBL,
+  district) instead of matching by location, with sums and ratios of sums; keys that match no zone are
+  reported.
 - **Combine & Calculate** derives a variable from steps that share a target (`schools / (libraries + 1)`).
 - The steps form an **urbanweave plan**; a run can be recorded and replayed.
 
 ![A step with the copilot's suggestion and its report, next to its result map](docs/screenshots/step.png)
+
+### 🛣️ Streets, rasters and more kinds of data
+
+- **Streets (OSM)**: a node that makes the study area's street segments, or its intersections, a
+  Step's target: trees per block, the nearest street of each school, crashes per km of street
+  (`density`). The network is downloaded from OpenStreetMap (OSMnx) for the study area, once, and
+  kept, so runs are fast and replayable; results are drawn as lines or points.
+- **Rasters**: a Step with a raster source does **zonal statistics**, each cell weighted by the share
+  of it inside each neighborhood or H3 cell (exactextract). The catalog has tree canopy from NYC's
+  2021 6-inch land cover (`tools/fetch_tnc_canopy.py`, percent canopy per 30 ft cell) and from NLCD
+  (30 m, any year 2011–2021; it misses most street trees in dense neighborhoods).
+- **Whole datasets**: `tools/fetch_open_data.py <dataset>` fetches every row of an NYC Open Data
+  dataset as GeoParquet and profiles it again (the catalog's copies were capped at 500,000 rows; the
+  street-tree inventory now has all 1,125,266 trees).
+
+![Street trees per street segment in Greenpoint, from the study area's OpenStreetMap network](docs/screenshots/streets.jpg)
+
+<img src="docs/screenshots/join_key.jpg" alt="A Step joining program sites onto ZIP code areas by their zipcode" width="420"> <img src="docs/screenshots/canopy.jpg" alt="Tree canopy per Brooklyn neighborhood from the 6-inch land cover" width="420">
 
 ### 🔍 Check it: data quality with atlas-clean
 
@@ -111,6 +135,13 @@ dataset is used; steps, reports and exports say what was corrected.
 
 <img src="docs/screenshots/check_data.png" alt="Check data: swapped coordinates found in a school dataset, with proposed fixes" width="560">
 
+The same dialog **locates rows from their addresses** when they have none: the addresses go to
+[NYC GeoSearch](https://geosearch.planninglabs.nyc/) only when you ask, each answer is checked against
+the address sent (house number, street, borough), and the locations that check out are used whenever
+the dataset loads.
+
+<img src="docs/screenshots/locate.png" alt="Locate rows from their addresses: 4 of 17 located, with what was not used and why" width="480">
+
 ### 📊 Question it: analyses
 
 | Node | What it answers |
@@ -118,12 +149,19 @@ dataset is used; steps, reports and exports say what was corrected.
 | **Sensitivity Sweep** | Would the ranking change with other reasonable choices? Reruns a step through other H3 resolutions, zone systems or methods, brings each variant back to the step's units, and maps how often each unit is in the top. |
 | **Validate** | Does the ranking line up with something observed? Coverage, baseline and lift of outcome points in the top units, per quantile. |
 | **Dasymetric** | Spreads zone totals over finer units in proportion to point priors, keeping each zone's total. |
-| **Compare Maps** | Where values went up or down between two result maps. |
+| **Compare Maps** | The **Spatial Delta Map**: where the priority score went up or down between two result maps, per unit. |
 
 <img src="docs/screenshots/sweep.png" alt="A sensitivity sweep and the share of variants in which each neighborhood ranks in the top" width="480"> <img src="docs/screenshots/validate.png" alt="Validation table: coverage, baseline and lift" width="270">
 
-On a result map, several variables can be weighted into a **priority index**, recorded with the
-collection.
+A result with several columns can be a **priority map**: one 0–1 score from its normalized columns,
+each with a direction and a weight (the paper's Multivariate Priority Map). A Combine & Calculate
+result opens as one; any other has a **Priority** button. The copilot proposes directions and weights
+from the collection's goal, so a high score means what the goal looks for (need, risk, or
+opportunity), and it does not count a total and its parts twice; without an LLM, keyword rules do,
+and ask about the variables they cannot judge. **Tweak Weights** changes them; the index is recorded
+with the collection. [docs/CASE_STUDY_2.md](docs/CASE_STUDY_2.md) uses both.
+
+![Two scenarios as priority maps and the Spatial Delta Map between them](docs/screenshots/case_study_2.jpg)
 
 ### 📤 Share it: report and export
 
@@ -139,8 +177,21 @@ collection.
 
 ### 🧭 Provenance (right sidebar)
 
-Logs each run: which datasets, methods and parameters produced each result, so every number on a map
-can be traced back to its inputs and choices.
+The **Integration Provenance Graph** logs each run: datasets as cards, matching methods as triangles
+and aggregations as circles, and, on hover, why each was chosen (the copilot's reasoning, or what the
+step's report says it did). Every number on a map can be traced back to its inputs and choices.
+
+### 🤖 The copilot
+
+The copilot suggests datasets for a goal, methods for a step, and the priority map's directions and
+weights; every suggestion is checked (methods against urbanweave's registry) and nothing changes
+until you accept it. It works without an LLM, by rules. The **LLM** chip in the copilot bar says what
+it runs on and turns an LLM on or off: at startup the backend checks which providers work (keys
+already in its environment or `backend/.env`, verified with a free request; nothing is entered in the
+interface), and the chip offers to turn one on. A **local model** (Ollama, LM Studio, llama.cpp,
+vLLM) keeps everything on the machine.
+
+<img src="docs/screenshots/copilot_llm.png" alt="The copilot's LLM settings: providers found, model, test" width="420">
 
 ---
 
@@ -173,11 +224,12 @@ The redesign that moved UrbanTrace onto urbanweave, and what changed from the pa
 | Maps | [Autark](https://autarkjs.org/) `autk-map` (WebGPU): projection, picking and tooltips, over an Esri light-gray basemap; `h3-js` |
 | Backend | Python, FastAPI, GeoPandas, Shapely, H3 |
 | Integration | [urbanweave](https://github.com/VIDA-NYU/urbanweave) (`0.1.0a2`) |
-| Data quality | [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) (optional) |
+| Data quality | [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) (optional); geocoding with [NYC GeoSearch](https://geosearch.planninglabs.nyc/) |
+| Streets and rasters | OSMnx (OpenStreetMap networks), rasterio and exactextract (zonal statistics), through urbanweave's `osm` and `raster` extras |
 | Profiling | [atlas-profiler](https://github.com/VIDA-NYU/atlas-profiler) profiles; AutoDDG dataset descriptions |
 | Export | Frictionless Data Package; GeoParquet, GeoPackage, GeoJSON |
-| LLM | OpenAI, Hugging Face Inference Providers, or a Portkey gateway (configurable) |
-| Data | GeoJSON, stored with Git LFS |
+| LLM | OpenAI, Hugging Face Inference Providers, a Portkey gateway, or a local OpenAI-compatible server; optional |
+| Data | GeoJSON and GeoParquet, GeoTIFF rasters, stored with Git LFS |
 
 ---
 
@@ -192,7 +244,11 @@ urbantrace/
 │   ├── scope.py                 # Study area, coverage, time, checks
 │   ├── catalog.py               # Datasets, profiles, origins, hashes
 │   ├── cleaning.py              # Data checks and corrections with atlas-clean
+│   ├── geocode.py               # Locating rows from their addresses (NYC GeoSearch)
+│   ├── osm.py                   # OpenStreetMap street networks for the study area
+│   ├── rasters.py               # Raster datasets, previews, zonal statistics sources
 │   ├── suggest.py               # The copilot's step suggestions, checked against the registry
+│   ├── copilot_settings.py      # The copilot's LLM: providers found, on/off, model
 │   ├── collections_store.py     # Saved collections
 │   ├── export.py                # Data packages
 │   ├── geometry.py              # Geometry repair
@@ -210,11 +266,11 @@ urbantrace/
 │   │   └── copilot/, toolbox/
 │   └── lib/                     # Plans, collections, scope, analyses, cleaning, registry
 ├── data/                        # Dataset lake (Git LFS), profiles, origins, recipes
-├── docs/                        # WALKTHROUGH.md, REDESIGN.md, screenshots
+├── docs/                        # WALKTHROUGH.md, CASE_STUDY_2.md, REDESIGN.md, screenshots
 ├── paper/                       # The VIS 2026 paper's supplementary material
 ├── benchmark/                   # Discovery and operator-selection studies (paper)
 ├── notebook/                    # Case study notebooks (after-school and opportunity bargains)
-└── tools/                       # Origins, GeoParquet conversion, method figures
+└── tools/                       # Whole-catalog run, fetching datasets and rasters, GeoParquet, origins
 ```
 
 ---
@@ -228,12 +284,12 @@ urbantrace/
 - A browser with **WebGPU** for the maps: a recent Chrome or Edge
 
 ### Data
-The datasets are stored with Git LFS, about 17.7 GB in total. After cloning:
+The datasets are stored with Git LFS, about 18 GB in total. After cloning:
 
 ```bash
 git lfs install
-git lfs pull                                   # or only the app's datasets (about 8.8 GB):
-git lfs pull --include="data/geojson/*"
+git lfs pull                                   # or only what the app uses (about 9 GB):
+git lfs pull --include="data/geojson/*,data/geoparquet/*,data/raster/*,data/metadata_v2/*"
 ```
 
 ### Backend
@@ -249,12 +305,8 @@ pip install openai                         # optional: the OpenAI or Hugging Fac
 uvicorn main:app --reload --port 8000
 ```
 
-The backend loads `backend/.env`. The copilot's LLM is optional; without it, the copilot works by
-rules (step suggestions from urbanweave's registry, priority-map directions from keyword lists, and
-it asks the analyst when no rule applies). The **LLM** chip in the copilot bar turns it on or off and
-chooses the provider and model; keys stay in `backend/.env` (or the backend's environment) and are
-never entered in the interface. At startup the backend checks which providers work (keys in its environment, the shell's or `.env`, are verified with their provider by a free request) and the chip offers to turn the copilot on. A **local model** needs no key: run any OpenAI-compatible server
-(Ollama, LM Studio, llama.cpp's `llama-server`, vLLM) and choose "Local model".
+The backend loads `backend/.env`. The copilot's LLM is optional and chosen in the interface (see
+[The copilot](#-the-copilot)); the variables below set the defaults and the providers' keys.
 
 | Variable | Purpose |
 |---|---|
@@ -321,7 +373,11 @@ atlas-clean is installed.
 | GET/POST/PUT/DELETE | `/api/collections[/{id}]` | Collections |
 | POST | `/api/collections/{id}/export`, `/api/collections/import`, `/api/results/export` | Export a collection or one result as a zip; import a package |
 | GET | `/api/collections/{id}/report` | The collection as a printable HTML report |
-| POST | `/api/copilot/chat`, `/api/copilot/suggest-step`, `/api/v1/copilot/synthesize-hotspot` | Copilot chat with the canvas as context; a step's method and reductions; hotspot directions |
+| POST/GET/DELETE | `/api/datasets/{id}/geocode`, `/api/datasets/{id}/geocode/preview` | Locate rows from their addresses (preview sends nothing); saved locations |
+| POST | `/api/osm/network`, `/api/osm/network/download` | Whether the study area's street network is downloaded; download it |
+| GET | `/api/rasters/{id}`, `/api/rasters/{id}/preview.png` | A raster dataset's description and preview |
+| POST | `/api/copilot/chat`, `/api/copilot/suggest-step`, `/api/v1/copilot/synthesize-hotspot` | Copilot chat with the canvas as context; a step's method and reductions; the priority map's directions and weights |
+| GET/POST/DELETE | `/api/copilot/settings`, `/api/copilot/check`, `/api/copilot/test` | The copilot's LLM: providers found, on/off and model, a test request |
 
 ---
 
@@ -335,10 +391,13 @@ districts and council districts).
 | Path | Contents |
 |---|---|
 | `data/geojson/` | Datasets used by the app, by name |
+| `data/geoparquet/` | Whole datasets fetched again (`tools/fetch_open_data.py`); preferred to the GeoJSON |
+| `data/raster/` | Raster datasets (GeoTIFF) with a sidecar JSON: band, units, value kind, source, license |
 | `data/metadata_v2/` | atlas-profiler profiles: columns, value statistics, where and when each dataset has data |
 | `data/metadata/` | The original profiles (read by the copilot and the benchmark) |
 | `data/origins.json` | Where each dataset came from: publisher, source URL, license when recorded |
 | `data/recipes/` | atlas-clean corrections accepted for a dataset, replayed when it loads |
+| `data/geocoded/`, `data/osm/` | Rows located from addresses; downloaded street networks (local, not committed) |
 | `data/geojson_raw/`, `data/metadata_raw/` | The datasets by their NYC Open Data IDs, for the discovery benchmark |
 | `data/descriptions_ddg.csv`, `data/descriptions_origin.csv` | AutoDDG and source-catalog descriptions |
 
@@ -355,7 +414,9 @@ area where most features are.
   operator selection study scores answers in the paper's operator vocabulary; run it against
   `vis2026-camera-ready`.
 - [`notebook/case_study_1/`](notebook/case_study_1/): validation notebook for the NYC after-school case study.
-- [Case Study 2](notebook/case_study_2/Case_Study_2-NYC_Opportunity_Bargains.ipynb) recreates the 2017 opportunity and rent comparison.
+- Case study 2, opportunity bargains: [the notebook](notebook/case_study_2/Case_Study_2-NYC_Opportunity_Bargains.ipynb)
+  recreates the 2017 opportunity and rent comparison with UrbanTrace's plan runner, and
+  [docs/CASE_STUDY_2.md](docs/CASE_STUDY_2.md) does it on the canvas.
 
 ---
 

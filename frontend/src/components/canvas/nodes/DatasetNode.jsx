@@ -220,7 +220,7 @@ const DatasetNode = memo(({ id, data }) => {
 
       {/* 3. Controls: column picker, then geometry type and row count, on one row */}
       <div style={{ padding: '4px 8px', backgroundColor: '#fff', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <Palette size={10} color="#64748b" style={{ flexShrink: 0 }} aria-label="Color by column" />
+        {meta.geometricType !== 'Raster' && <><Palette size={10} color="#64748b" style={{ flexShrink: 0 }} aria-label="Color by column" />
         <select
           value={selectedColumn}
           onChange={(e) => handleColumnChange(e.target.value)}
@@ -246,7 +246,7 @@ const DatasetNode = memo(({ id, data }) => {
               {col.name}
             </option>
           ))}
-        </select>
+        </select></>}
         <div
           title={`${meta.geometricType || 'Unknown'} · ${meta.nb_rows?.toLocaleString() || 0} ${meta.geometricType === 'Raster' ? 'cells' : 'rows'}`}
           style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#94a3b8', fontSize: '9px', whiteSpace: 'nowrap', flexShrink: 0 }}

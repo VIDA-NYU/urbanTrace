@@ -22,7 +22,7 @@ function Summary({ r }) {
       <div><b>{(r.located || 0).toLocaleString()}</b> of {(r.missing || 0).toLocaleString()} rows without a location were located
         {r.saved ? ` (${r.service}, ${String(r.saved).slice(0, 10)})` : ''}.</div>
       {Object.entries(STATUS).filter(([k]) => rs[k]).map(([k, label]) => (
-        <div key={k} style={{ color: '#92400e' }}>{rs[k].toLocaleString()} rows {label}</div>
+        <div key={k} style={{ color: '#92400e' }}>{rs[k].toLocaleString()} {rs[k] === 1 ? 'row' : 'rows'} {label}</div>
       ))}
       {(r.examples || []).length > 0 && (
         <details style={{ marginTop: 2 }}>

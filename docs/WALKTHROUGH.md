@@ -69,6 +69,11 @@ cd frontend && npm run dev
 Open `http://localhost:5173`. Maps need a browser with WebGPU (recent Chrome or Edge). After
 pulling new backend code, restart the backend: it does not reload by itself.
 
+The copilot works without an LLM, by rules. To let it use one, click the **LLM** chip in the copilot
+bar at the bottom: at startup the backend checks which providers it can use (keys already in its
+environment or `backend/.env`, or a model server running on this machine), and the chip reads
+*LLM available · turn on* when one works. This walkthrough's numbers do not depend on it.
+
 ## A tour of the screen
 
 - **Left sidebar: the catalog.** Search by name; filter to datasets with data in the study area and
@@ -91,8 +96,11 @@ pulling new backend code, restart the backend: it does not reload by itself.
   | **Report** | The printable page. |
   | **Export** | The zip. |
 
-- **Right sidebar: the toolbox** (nodes to drag onto the canvas: *Plan (urbanweave)* and
-  *Analysis*) and the **provenance panel**, which logs each run with what it did.
+- **Right sidebar: the toolbox** (nodes to drag onto the canvas: *Plan (urbanweave)*, with Step,
+  H3 Grid, Streets (OSM) and Combine & Calculate, and *Analysis*) and the **provenance panel**,
+  which logs each run: the datasets as cards, the matching methods as triangles and the
+  aggregations as circles; hover one for the reason it was chosen.
+- **Bottom: the copilot bar.** Ask the copilot in words; the **LLM** chip says what it runs on.
 
 Unsaved changes are kept in the browser and restored after a reload, and the browser asks before
 leaving with unsaved changes. The last saved collection reopens on its own.
@@ -171,8 +179,8 @@ belongs to) and one or more **aggregations** (what to compute per neighborhood).
 3. **Matching**: open the picker and hover the options; each has a figure and a short explanation.
    Methods that don't fit points into polygons are greyed out with the reason. Keep `contain`.
    Or click **Suggest**: the copilot proposes a method and reductions for this step and the
-   collection's goal, explains why, and urbanweave's registry checks the answer (without an LLM
-   configured, rules make the suggestion).
+   collection's goal, explains why, and urbanweave's registry checks the answer (with the LLM off,
+   rules make the suggestion).
 4. **Aggregate**: click **+ add**. A row appears with `count`. Rename its output to `libraries`, and
    keep **0 if none** ticked so neighborhoods with no library show 0 rather than missing.
 5. Click **Run step**.
@@ -212,10 +220,16 @@ number per unit computed from their outputs.
    across neighborhoods.
 4. Click **Run**.
 
-**What you should see.** A map darkest where there are many schools per library. The highest values:
-Borough Park (40.5), Bensonhurst (31), Bedford-Stuyvesant East (22), South Williamsburg (21.5),
-East New York North (20), Williamsburg (18). The summary shows a range but no total, because the
-value is intensive.
+**What you should see.** The result opens as a **priority map** (red header): a Combine & Calculate
+result combines all its columns (`libraries`, `schools`, `schools_per_library`) into one 0–1 score,
+with directions and weights on its *Hotspot Priority* card. That is the subject of
+[CASE_STUDY_2.md](CASE_STUDY_2.md); here we want the ratio itself, so click **Priority** in the
+map's header to turn it off.
+
+The map now shows `schools_per_library`, darkest where there are many schools per library. The
+highest values: Borough Park (40.5), Bensonhurst (31), Bedford-Stuyvesant East (22), South
+Williamsburg (21.5), East New York North (20), Williamsburg (18). The summary shows a range but no
+total, because the value is intensive.
 
 Expressions may use the inputs' output names, numbers, `+ - * / ** % //` and parentheses; nothing
 else. They are recorded with the collection and listed in the export's README.
@@ -357,8 +371,17 @@ run = plan.run({"NYC_libraries": gpd.read_parquet("data/sources/NYC_libraries.pa
   when datasets' periods don't overlap.
 - Use **where** filters on an aggregation (the funnel icon) to count only some features, e.g.
   public schools only.
-- On a result map, weight several variables into a **priority index**; it is recorded with the
-  collection and recomputed in exports.
+- Weight several variables into a **priority index** and compare two scenarios with the **Spatial
+  Delta Map**: [CASE_STUDY_2.md](CASE_STUDY_2.md), the paper's opportunity-bargains case study on
+  the canvas.
+- **Join on a key** (the Step node's second mode): add rows to zones by a shared code instead of by
+  location, e.g. program participants by ZIP code onto MODZCTA areas.
+- **Streets (OSM)**: count features per street segment or intersection of the study area, e.g.
+  street trees per block; the network is downloaded from OpenStreetMap once.
+- **Rasters**: summarise a raster per neighborhood or H3 cell, e.g. tree canopy from NYC's 6-inch
+  land cover (`tnc_tree_canopy_2021`).
+- **Locate rows from addresses**: in **Check data**, rows with an address but no location can be
+  located with NYC GeoSearch.
 
 ## Troubleshooting
 
@@ -369,4 +392,5 @@ run = plan.run({"NYC_libraries": gpd.read_parquet("data/sources/NYC_libraries.pa
 | Maps are blank or say WebGPU is missing | Use a browser with WebGPU (recent Chrome or Edge). |
 | A connection won't attach | Read the collection bar: it says what that input accepts. |
 | A result opened off-screen | Use *fit view* in the canvas controls (bottom left). |
+| The Combine & Calculate map shows a 0–1 score, not your expression | It opened as a priority map: click **Priority** in its header to see the values. |
 | Numbers differ slightly from this page | The catalog or the code changed; the counts here were produced on 2026-11-22. |

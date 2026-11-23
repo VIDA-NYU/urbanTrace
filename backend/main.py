@@ -266,6 +266,11 @@ async def list_datasets():
             if os.path.exists(meta_path):
                 with open(meta_path, 'r') as meta_file:
                     dataset_info["metadata"] = json.load(meta_file)
+                # The row count from the current profile (metadata_v2), which a refetch updates
+                # (tools/fetch_open_data.py); the original profiles keep the copy they were made from
+                current = catalog.profile(DATA_DIR, base_name)
+                if current and current.get("nb_rows") is not None:
+                    dataset_info["metadata"]["nb_rows"] = current["nb_rows"]
             
             datasets.append(dataset_info)
 
