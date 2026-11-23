@@ -60,7 +60,9 @@ def fetch(data_dir: Path, year: int) -> Path:
         "title": f"Tree canopy cover {year} (NLCD, 30 m)",
         "description": (f"Percent of each 30 m cell covered by tree canopy in {year}, from the USFS/USGS National Land Cover "
                         "Database Tree Canopy Cover product (v2021-4), cut to the catalog's region. Covers all trees seen from "
-                        "above (streets, parks, yards), unlike the street-tree inventory."),
+                        "above (streets, parks, yards), unlike the street-tree inventory. At 30 m it misses most street "
+                        "trees in dense neighborhoods (e.g. 0.8 % on the Upper East Side, which has ~2,800 street trees per km²); "
+                        "for neighborhood canopy in NYC use the 6-inch-derived tnc_tree_canopy_2021."),
         "band": "tree_canopy_pct", "units": "percent", "value_kind": "intensive", "nodata": 255, "year": year,
         "display_range": [0, 100], "resolution_m": 30, "crs": crs.to_string(),
         "bounds_wgs84": [round(v, 5) for v in transform_bounds(crs, "EPSG:4326", *bounds)],

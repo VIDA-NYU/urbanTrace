@@ -31,3 +31,4 @@ data/geocoded/_cache.jsonl
 data/copilot_settings.json
 data/osm/
 backend/cache/
+data/raster/source/

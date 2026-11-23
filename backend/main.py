@@ -788,6 +788,20 @@ def _export_extras(doc: Dict[str, Any], options: ExportOptions) -> Dict[str, Any
                        f"{g.get('service')} on {str(g.get('saved', ''))[:10]} (columns {', '.join(f'{k}: `{v}`' for k, v in (g.get('spec') or {}).items())}); "
                        f"not located: {rs.get('different', 0):,} answered with a different address, {rs.get('not_found', 0):,} not found, "
                        f"{rs.get('without_house_number', 0):,} without a house number (`data/geocoded/{stem}.json`)")
+    # Raster datasets: their citation and license terms (e.g. CC BY-NC-SA asks for attribution,
+    # non-commercial use and results shared alike)
+    import rasters
+    raster_lines = []
+    for d in doc.get("datasets", []):
+        stem = catalog.stem_of(d.get("id"))
+        if catalog.valid_stem(stem) and rasters.is_raster(DATA_DIR, stem):
+            side = rasters.sidecar(DATA_DIR, stem)
+            raster_lines.append(f"- `{stem}`: {side.get('citation') or side.get('source_url') or ''} License: {side.get('license') or 'not recorded'}."
+                                + (f" {side['license_note']}" if side.get("license_note") else ""))
+    if raster_lines:
+        extras["readme_sections"] = list(extras["readme_sections"]) + [
+            "## Raster sources and their licenses", "",
+            "Results computed from these rasters carry their terms.", "", *raster_lines, ""]
     # Street networks from OpenStreetMap: the license asks for attribution
     if any((tg or {}).get("kind") in plans.OSM_KINDS for tg in ((doc.get("plan") or {}).get("targets") or {}).values()):
         extras["readme_sections"] = list(extras["readme_sections"]) + [
