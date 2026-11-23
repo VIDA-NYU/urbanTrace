@@ -66,8 +66,7 @@ If you use UrbanTrace, please cite:
 
 - 121 profiled NYC datasets, each with its geometry, row count, columns and a profile (**Info**): column
   types and statistics, where and when it has data, and where it came from (publisher, source URL,
-  license when known). Rasters are listed alongside: tree canopy from NYC's 6-inch land cover and
-  from NLCD.
+  license when known). Rasters are listed alongside (tree canopy, made by the fetch tools below).
 - Search by name; filter to datasets with data **in the study area** (sorted by how much of it they
   reach) and to a range of **years**.
 - Drag a dataset onto the canvas to use it; upload your own GeoJSON (with its source and license).
@@ -117,12 +116,13 @@ a **value kind** (extensive, intensive, categorical), which decides how it may b
   (`density`). The network is downloaded from OpenStreetMap (OSMnx) for the study area, once, and
   kept, so runs are fast and replayable; results are drawn as lines or points.
 - **Rasters**: a Step with a raster source does **zonal statistics**, each cell weighted by the share
-  of it inside each neighborhood or H3 cell (exactextract). The catalog has tree canopy from NYC's
-  2021 6-inch land cover (`tools/fetch_tnc_canopy.py`, percent canopy per 30 ft cell) and from NLCD
-  (30 m, any year 2011–2021; it misses most street trees in dense neighborhoods).
+  of it inside each neighborhood or H3 cell (exactextract). Two tools add tree canopy to the catalog:
+  from NYC's 2021 6-inch land cover (`tools/fetch_tnc_canopy.py`, percent canopy per 30 ft cell) and
+  from NLCD (`tools/fetch_nlcd_canopy.py`, 30 m, any year 2011–2021; it misses most street trees in
+  dense neighborhoods).
 - **Whole datasets**: `tools/fetch_open_data.py <dataset>` fetches every row of an NYC Open Data
-  dataset as GeoParquet and profiles it again (the catalog's copies were capped at 500,000 rows; the
-  street-tree inventory now has all 1,125,266 trees).
+  dataset as GeoParquet and profiles it again (the catalog's copies were capped at 500,000 rows;
+  `forestry_tree_points` has 1,125,266 trees in full).
 
 ![Street trees per street segment in Greenpoint, from the study area's OpenStreetMap network](docs/screenshots/streets.jpg)
 
@@ -226,7 +226,7 @@ The redesign that moved UrbanTrace onto urbanweave, and what changed from the pa
 | Maps | [Autark](https://autarkjs.org/) `autk-map` (WebGPU): projection, picking and tooltips, over an Esri light-gray basemap; `h3-js` |
 | Backend | Python, FastAPI, GeoPandas, Shapely, H3 |
 | Integration | [urbanweave](https://github.com/VIDA-NYU/urbanweave) (`0.1.0a2`) |
-| Data quality | [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) (optional); geocoding with [NYC GeoSearch](https://geosearch.planninglabs.nyc/) |
+| Data quality | [atlas-clean](https://github.com/VIDA-NYU/atlas-clean) (`0.1.0a1`); geocoding with [NYC GeoSearch](https://geosearch.planninglabs.nyc/) |
 | Streets and rasters | OSMnx (OpenStreetMap networks), rasterio and exactextract (zonal statistics), through urbanweave's `osm` and `raster` extras |
 | Profiling | [atlas-profiler](https://github.com/VIDA-NYU/atlas-profiler) profiles; AutoDDG dataset descriptions |
 | Export | Frictionless Data Package; GeoParquet, GeoPackage, GeoJSON |
@@ -291,8 +291,16 @@ The datasets are stored with Git LFS, about 18 GB in total. After cloning:
 ```bash
 git lfs install
 git lfs pull                                   # or only what the app uses (about 9 GB):
-git lfs pull --include="data/geojson/*,data/geoparquet/*,data/raster/*,data/metadata_v2/*"
+git lfs pull --include="data/geojson/*"
 ```
+
+Not in the repository yet, because the repository's Git LFS budget is used up:
+
+- `data/metadata_v2/`, the atlas-profiler profiles (45 MB). Coverage, value-kind suggestions, data
+  checks and study-area shares read them; without them those features fall back or are missing.
+  Ask the maintainers for a copy until they can be committed.
+- The tree canopy rasters and the full street-tree inventory: run `tools/fetch_tnc_canopy.py`,
+  `tools/fetch_nlcd_canopy.py` and `tools/fetch_open_data.py forestry_tree_points` (see Backend).
 
 ### Backend
 ```bash
@@ -300,7 +308,6 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-pip install -e "../../atlas-clean[geo]"   # optional: data checks (a checkout of atlas-clean next to this repository)
 python ../tools/fetch_tnc_canopy.py    # optional: tree canopy from NYC's 6-inch 2021 land cover (1.74 GB download, ~5 min) into data/raster/
 python ../tools/fetch_nlcd_canopy.py   # optional: NLCD tree canopy (30 m, any year 2011-2021; misses street trees in dense areas)
 pip install openai                         # optional: the OpenAI or Hugging Face copilot (portkey-ai for Portkey)
@@ -353,8 +360,7 @@ pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-The tests use small synthetic datasets, so they need no LFS data; the data-check tests run when
-atlas-clean is installed.
+The tests use small synthetic datasets, so they need no LFS data.
 
 ---
 

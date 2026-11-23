@@ -379,7 +379,7 @@ run = plan.run({"NYC_libraries": gpd.read_parquet("data/sources/NYC_libraries.pa
 - **Streets (OSM)**: count features per street segment or intersection of the study area, e.g.
   street trees per block; the network is downloaded from OpenStreetMap once.
 - **Rasters**: summarise a raster per neighborhood or H3 cell, e.g. tree canopy from NYC's 6-inch
-  land cover (`tnc_tree_canopy_2021`).
+  land cover (`tnc_tree_canopy_2021`, made by `tools/fetch_tnc_canopy.py`).
 - **Locate rows from addresses**: in **Check data**, rows with an address but no location can be
   located with NYC GeoSearch.
 

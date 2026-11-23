@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0-alpha.1 — unreleased
+## 2.0.0-alpha.1 — 2026-11-23
 
 The first alpha of 2.0: the interface, the collection format and exports may still change before
 2.0.0. A redesign. UrbanTrace 1.0 (the version in the VIS 2026 paper) integrated datasets through its own
@@ -48,11 +48,11 @@ To reproduce the paper, check out `vis2026-camera-ready` (1.0).
 
 ### Data quality
 
-- **Check data** (atlas-clean): swapped coordinates, wrong coordinate systems, invalid or empty
+- **Check data** ([atlas-clean](https://github.com/VIDA-NYU/atlas-clean) 0.1.0a1, now required): swapped coordinates, wrong coordinate systems, invalid or empty
   geometry, duplicates, ...; accepted fixes saved as recipes and replayed whenever a dataset loads.
 - **Locate rows from their addresses** with NYC GeoSearch, on request, each answer checked.
 - Whole NYC Open Data datasets fetched again without the old 500,000-row cap
-  (`tools/fetch_open_data.py`); the street-tree inventory now has all 1,125,266 trees.
+  (`tools/fetch_open_data.py`; the street-tree inventory has 1,125,266 trees in full).
 
 ### Analyses
 

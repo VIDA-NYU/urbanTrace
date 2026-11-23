@@ -23,5 +23,6 @@ datamart-profiler
 # portkey-ai
 # pydantic
 
-# Data checks and corrections (backend/cleaning.py) use atlas-clean[geo]. Optional until its spatial
-# checks are released: install a local checkout with  pip install -e "../../atlas-clean[geo]"
+# Data checks and corrections (backend/cleaning.py): atlas-clean 0.1.0a1, released on GitHub
+# (not on PyPI yet)
+atlas-clean[geo] @ git+https://github.com/VIDA-NYU/atlas-clean@v0.1.0a1
