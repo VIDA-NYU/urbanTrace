@@ -269,8 +269,10 @@ never entered in the interface. At startup the backend checks which providers wo
 | `URBANTRACE_PLAN_CACHE` | Where plan runs and manifests are kept (default `data/plan_cache`) |
 
 The copilot needs a model that supports tool calling. With the default `index` catalog, each request
-carries one line per dataset (about 5k tokens for 121 datasets) and the model reads a dataset's full
-description through a `get_dataset_details` tool; `compact` (about 42k tokens) and `full` (about 86k)
+carries one line per dataset (about 5.5k tokens for 121 datasets) and the model reads a dataset's full
+description through a `get_dataset_details` tool. A polygon dataset's line ends with its number of
+polygons and the columns that identify one (`[262 polygons, keys nta2020/ntaname/ntaabbrev]`), so the
+model can tell neighborhoods from sub-borough areas or ZIP codes without asking; `compact` (about 42k tokens) and `full` (about 86k)
 send more up front (`backend/catalog_format.py`).
 
 ### Frontend
