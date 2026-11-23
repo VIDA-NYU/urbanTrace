@@ -1,7 +1,38 @@
-import React, { memo, useMemo, useEffect, useState } from 'react';
+import React, { memo, useMemo, useEffect, useRef, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
-import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X } from 'lucide-react';
-import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL'; 
+import { Map as MapIcon, Download, Hexagon, MapPin, Info, ChevronDown, ChevronUp, Crosshair, X, Target } from 'lucide-react';
+import H3PreviewMap from '../../visualization/H3PreviewMap'; 
+import { API_BASE } from '../../../config/api';
+import { cellToBoundary } from 'h3-js';
+import { exportResult } from '../../../lib/collections';
+import ReportCard from '../../methods/ReportCard';
+
+const fmtNumber = (v) => (Number.isInteger(v) ? v.toLocaleString() : v.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+
+// The shown column in numbers (plan results): its total when totals mean something (counts and
+// sums of extensive values), its range per unit, and how many units have nothing.
+function ValueSummary({ spatialData }) {
+  const column = spatialData?.primaryColumn;
+  const values = spatialData?.columns?.[column];
+  if (!column || !Array.isArray(values)) return null;
+  const nums = values.filter((v) => typeof v === 'number' && Number.isFinite(v));
+  if (!nums.length) return null;
+  const unit = { osm_streets: 'segments', osm_intersections: 'intersections' }[spatialData.targetKind] || (spatialData.isZoned ? 'zones' : 'cells');
+  const reduction = spatialData.provenance?.variables?.find((v) => v.outputName === column)?.aggregation;
+  const additive = ['count', 'sum'].includes(reduction) || spatialData.kinds?.[column] === 'extensive';
+  const total = nums.reduce((a, b) => a + b, 0);
+  const zeros = nums.filter((v) => v === 0).length;
+  const missing = values.length - nums.length;
+  return (
+    <div className="nodrag" style={{ fontSize: 10, color: '#334155', background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 8px', lineHeight: 1.4 }}>
+      <div><b>{column}</b>{reduction ? ` (${reduction})` : ''}{additive ? <>: <b>{fmtNumber(total)}</b> in total</> : ''}</div>
+      <div style={{ color: '#475569' }}>
+        {fmtNumber(Math.min(...nums))}–{fmtNumber(Math.max(...nums))} per {unit.slice(0, -1)} · {values.length} {unit}
+        {zeros ? ` · ${zeros} with 0` : ''}{missing ? ` · ${missing} missing` : ''}
+      </div>
+    </div>
+  );
+}
 
 const HOTSPOT_PALETTES = [
   { name: 'Fire',   emoji: '🔥', low: [253, 224,  71], high: [153,  27,  27] },
@@ -137,7 +168,7 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [activeAuditVars, provenance]);
 
   useEffect(() => {
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return;
+    if (import.meta.env.PROD) return;
     if (!auditMappings.length) return;
 
     const unresolved = auditMappings.filter(item => item.resolution === 'unresolved');
@@ -159,9 +190,16 @@ const ResultMapNode = memo(({ id, data }) => {
     });
   }, [auditMappings, id, provenance]);
 
-  const isHotspotCandidate = useMemo(() => {
-    return !!(provenance?.isMultivariate && provenance?.variables?.length > 1);
-  }, [provenance]);
+  // The priority map combines several variables into one score. It is opt-in: on by default only for
+  // a Combine & Calculate result, a header button for any result with two or more columns.
+  const canPriority = !!(provenance?.isMultivariate && provenance?.variables?.length > 1);
+  const priorityOn = data?.priorityOn ?? !!data?.spatialData?.priorityDefault;
+  const isHotspotCandidate = canPriority && priorityOn;
+  const onPriorityChangeRef = useRef(data?.onPriorityChange);
+  useEffect(() => { onPriorityChangeRef.current = data?.onPriorityChange; });
+  useEffect(() => {                 // turned off: the priority analysis leaves the report and the export
+    if (!isHotspotCandidate) onPriorityChangeRef.current?.(id, null);
+  }, [isHotspotCandidate, id]);
 
   useEffect(() => {
     if (!isHotspotCandidate || !provenance?.variables?.length) return;
@@ -173,11 +211,14 @@ const ResultMapNode = memo(({ id, data }) => {
         const payload = {
           source_variables: provenance.variables.map(v => ({
             dataset_name: v.dataset,
-            column_name: v.targetColumn
-          }))
+            column_name: v.targetColumn,
+            source_column: v.sourceColumn || null,
+            aggregation: v.aggregation || null,
+          })),
+          ...(data?.collectionGoal ? { goal: data.collectionGoal } : {}),
         };
 
-        const response = await fetch('http://localhost:8000/api/v1/copilot/synthesize-hotspot', {
+        const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -195,7 +236,7 @@ const ResultMapNode = memo(({ id, data }) => {
 
     loadAudit();
     return () => { cancelled = true; };
-  }, [isHotspotCandidate, provenance]);
+  }, [isHotspotCandidate, provenance, data?.collectionGoal]);
 
   // Sync tweakAudits whenever a fresh audit arrives (also resets any manual edits)
   useEffect(() => {
@@ -213,11 +254,13 @@ const ResultMapNode = memo(({ id, data }) => {
       const payload = {
         source_variables: provenance.variables.map(v => ({
           dataset_name: v.dataset,
-          column_name: v.targetColumn
+          column_name: v.targetColumn,
+          source_column: v.sourceColumn || null,
+          aggregation: v.aggregation || null,
         })),
-        ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : {})
+        ...(tweakGoal.trim() ? { goal: tweakGoal.trim() } : data?.collectionGoal ? { goal: data.collectionGoal } : {})
       };
-      const response = await fetch('http://localhost:8000/api/v1/copilot/synthesize-hotspot', {
+      const response = await fetch(`${API_BASE}/api/v1/copilot/synthesize-hotspot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -233,10 +276,22 @@ const ResultMapNode = memo(({ id, data }) => {
     }
   };
 
-  const hotspotHexData = useMemo(() => {
-    if (!isHotspotCandidate || !resultMapData || !auditMappings.length) return null;
+  // Record the priority index on the canvas so the collection keeps it as an analysis (redesign phase 5)
+  const onPriorityChange = data?.onPriorityChange;
+  const priorityRecord = useMemo(() => (auditMappings.length ? {
+    variables: auditMappings.map((v) => ({ column: v.valueKey, weight: Number(v.weight) || 0,
+      direction: (v.direction || 'normal').toLowerCase(), rationale: v.reasoning || null })),
+    goal: tweakGoal || null,
+  } : null), [auditMappings, tweakGoal]);
+  useEffect(() => {
+    if (onPriorityChange && priorityRecord && isHotspotCandidate) onPriorityChange(id, priorityRecord);
+  }, [id, onPriorityChange, priorityRecord, isHotspotCandidate]);
 
-    const audits = auditMappings;
+  const hotspotHexData = useMemo(() => {
+    // A variable whose direction nobody has decided (no rule, no LLM, not set by the analyst) is
+    // left out of the score; with none decided there is no priority map yet
+    const audits = auditMappings.filter((v) => v.direction !== 'unknown');
+    if (!isHotspotCandidate || !resultMapData || !audits.length) return null;
     const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
@@ -311,9 +366,8 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [isHotspotCandidate, resultMapData, auditMappings, provenance]);
 
   const hotspotZoneGeoJson = useMemo(() => {
-    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !auditMappings.length) return null;
-
-    const audits = auditMappings;
+    const audits = auditMappings.filter((v) => v.direction !== 'unknown');
+    if (!isHotspotCandidate || !zoneGeoJson?.features?.length || !audits.length) return null;
     const varNames = audits.map(v => v.valueKey);
 
     const stats = {};
@@ -407,12 +461,14 @@ const ResultMapNode = memo(({ id, data }) => {
 
   // Determine node title
   const nodeTitle = useMemo(() => {
+    if (data?.spatialData?.targetKind === 'osm_streets') return 'Street segments result';
+    if (data?.spatialData?.targetKind === 'osm_intersections') return 'Intersections result';
     if (isZoned) {
       if (outputMode === 'both') return 'H3 + Zones Result';
       if (outputMode === 'zones') return 'Zoned Result';
     }
     return data.name || 'H3 Integration Result';
-  }, [isZoned, outputMode, data.name]);
+  }, [isZoned, outputMode, data.name, data?.spatialData?.targetKind]);
 
   // Determine header icon
   const HeaderIcon = showZones && !showHex ? MapPin : Hexagon;
@@ -446,44 +502,54 @@ const ResultMapNode = memo(({ id, data }) => {
   }, [id, comparePayload, data?.onCompareDataReady]);
 
   // ==========================================================================
-  // GEOJSON EXPORT LOGIC
+  // EXPORT: the shown result (zones, or grid cells) with its provenance, as GeoParquet,
+  // GeoPackage and GeoJSON in one zip (redesign section 2.3)
   // ==========================================================================
-  const handleDownloadGeoJson = (e) => {
+  const [downloading, setDownloading] = useState(false);
+  const buildExportGeoJson = () => {
+    if (showZones && (zoneGeoJson || hotspotZoneGeoJson)) {
+      return (usingHotspot && hotspotZoneGeoJson) ? hotspotZoneGeoJson : zoneGeoJson;
+    }
+    if (resultMapData && Object.keys(resultMapData).length > 0) {
+      return {
+        type: 'FeatureCollection',
+        features: Object.entries(resultMapData).map(([cellId, cell]) => ({
+          type: 'Feature',
+          properties: { cell_id: cellId, ...(cell?.variables || {}) },
+          geometry: { type: 'Polygon', coordinates: [cellToBoundary(cellId, true)] },
+        })),
+      };
+    }
+    return null;
+  };
+
+  const handleDownloadGeoJson = async (e) => {
     e.stopPropagation(); // Prevent React Flow from dragging the node
-
-    // Export the hotspot version if active, otherwise fallback to the raw zoned output
-    const geoDataToDownload = (usingHotspot && hotspotZoneGeoJson) 
-      ? hotspotZoneGeoJson 
-      : zoneGeoJson;
-
-    if (!geoDataToDownload) {
-      console.warn('No GeoJSON data available to download.');
+    const geojson = buildExportGeoJson();
+    if (!geojson) {
+      console.warn('No result data available to download.');
       return;
     }
-
-    // 1. Convert the GeoJSON object to a string
-    const dataStr = JSON.stringify(geoDataToDownload, null, 2);
-    
-    // 2. Create a Blob from the string
-    const blob = new Blob([dataStr], { type: 'application/geo+json' });
-    
-    // 3. Create a temporary object URL
-    const url = URL.createObjectURL(blob);
-    
-    // 4. Create a hidden <a> tag, click it, and remove it
-    const link = document.createElement('a');
-    link.href = url;
-    
-    // Create a clean filename based on the node title
-    const cleanName = nodeTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    link.download = `${cleanName}_export.geojson`;
-    
-    document.body.appendChild(link);
-    link.click();
-    
-    // 5. Clean up the URL to prevent memory leaks
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    setDownloading(true);
+    try {
+      await exportResult({
+        name: nodeTitle,
+        geojson,
+        provenance: {
+          ...(provenance || {}),
+          request: data?.spatialData?.request || null,
+          reports: data?.spatialData?.reports || null,
+          changes: data?.spatialData?.changes || null,
+          engine: data?.spatialData?.engine || null,
+          hotspot: usingHotspot ? (hotspotAudit || null) : null,
+        },
+      });
+    } catch (error) {
+      console.error('Result export failed:', error);
+      alert(`Export failed: ${error.message}`);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -525,17 +591,33 @@ const ResultMapNode = memo(({ id, data }) => {
             </div>
           )}
 
+          {canPriority && data?.onSetPriorityOn && (
+            <button
+              onClick={(e) => { e.stopPropagation(); data.onSetPriorityOn(id, !priorityOn); }}
+              className="nodrag"
+              style={{
+                background: priorityOn ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: priorityOn ? colorHex : '#fff',
+                border: 'none', borderRadius: '4px', padding: '2px 5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3,
+                fontSize: 9, fontWeight: 700,
+              }}
+              title={priorityOn ? 'Show the result\'s own values instead of the priority score' : 'Combine these columns into a priority score (weights and directions on the card)'}
+            >
+              <Target size={11} /> Priority
+            </button>
+          )}
+
           {/* --- NEW: DOWNLOAD BUTTON --- */}
-          {(showZones && (zoneGeoJson || hotspotZoneGeoJson)) && (
+          {((showZones && (zoneGeoJson || hotspotZoneGeoJson)) || (resultMapData && Object.keys(resultMapData).length > 0)) && (
             <button
               onClick={handleDownloadGeoJson}
+              disabled={downloading}
               className="nodrag"
               style={{
                 background: 'rgba(255,255,255,0.2)',
                 border: 'none', borderRadius: '4px', padding: '2px 4px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', transition: 'background 0.15s ease'
               }}
-              title="Download GeoJSON mapping"
+              title="Download this result with its provenance (GeoParquet, GeoPackage, GeoJSON)"
             >
               <Download size={12} />
             </button>
@@ -605,7 +687,7 @@ const ResultMapNode = memo(({ id, data }) => {
       }}>
         {(resultMapData || zoneGeoJson) && (
           <div style={{ position: 'absolute', inset: 0, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
-            <H3PreviewDeckGL 
+            <H3PreviewMap 
               hexData={showHex ? (hotspotHexData || resultMapData) : null} 
               geojsonData={showZones ? (hotspotZoneGeoJson || zoneGeoJson) : null}
               color={rgbColor}
@@ -619,6 +701,14 @@ const ResultMapNode = memo(({ id, data }) => {
               globalViewState={globalViewState}
               onGlobalViewStateChange={onGlobalViewStateChange}
             />
+          </div>
+        )}
+
+        {/* What each step did (urbanweave's reports) and the shown column's numbers, top-left over the map */}
+        {(data?.spatialData?.reports || data?.spatialData?.columns) && (
+          <div style={{ position: 'absolute', top: 8, left: 8, width: 240, maxHeight: '60%', overflowY: 'auto', zIndex: 5, display: 'grid', gap: 4 }}>
+            <ValueSummary spatialData={data.spatialData} />
+            {data.spatialData.reports && <ReportCard reports={data.spatialData.reports} />}
           </div>
         )}
 
@@ -655,14 +745,15 @@ const ResultMapNode = memo(({ id, data }) => {
               </button> */}
             </div>
             {(tweakAudits || hotspotAudit.variables).map((v, idx) => {
-              const totalW = (tweakAudits || hotspotAudit.variables).reduce((s, a) => s + (a.weight || 0), 0) || 1;
+              const totalW = (tweakAudits || hotspotAudit.variables).filter((a) => a.direction !== 'unknown').reduce((s, a) => s + (a.weight || 0), 0) || 1;
               const dispPct = Math.round((v.weight / totalW) * 100);
               const displayLabel = getAuditDisplayLabel(v);
               const fullDataset = getDatasetDisplayName(v?.dataset_name);
               return (
                 <div key={`card-${v.column_name}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: '4px', marginBottom: '4px', alignItems: 'center' }}>
-                  <span style={{ color: v.direction === 'inverted' ? '#b45309' : '#047857' }}>
-                    {v.direction === 'inverted' ? '↓' : '↑'}
+                  <span style={{ color: v.direction === 'inverted' ? '#b45309' : v.direction === 'unknown' ? '#c2410c' : '#047857', fontWeight: 700 }}
+                    title={v.direction === 'unknown' ? 'Direction not decided: left out of the score' : v.engine === 'heuristic' ? 'Set by a keyword rule' : undefined}>
+                    {v.direction === 'inverted' ? '↓' : v.direction === 'unknown' ? '?' : '↑'}
                   </span>
                   <span
                     style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -670,10 +761,32 @@ const ResultMapNode = memo(({ id, data }) => {
                   >
                     {displayLabel}
                   </span>
-                  <span style={{ fontWeight: 600 }}>{dispPct}%</span>
+                  {v.direction === 'unknown' ? (
+                    <span style={{ display: 'flex', gap: '2px' }}>
+                      {[['normal', '↑', 'More of it means more need'], ['inverted', '↓', 'More of it means less need']].map(([dir, glyph, tip]) => (
+                        <button key={dir} className="nodrag" title={tip}
+                          onClick={() => setTweakAudits((prev) => (prev || hotspotAudit.variables).map((a, i) => (i === idx ? { ...a, direction: dir, engine: 'analyst' } : a)))}
+                          style={{ font: 'inherit', fontSize: '8px', padding: '0 4px', border: '1px solid #fdba74', borderRadius: '3px', background: '#fff7ed', color: '#c2410c', cursor: 'pointer' }}>
+                          {glyph}
+                        </button>
+                      ))}
+                    </span>
+                  ) : <span style={{ fontWeight: 600 }}>{dispPct}%</span>}
                 </div>
               );
             })}
+            {(() => {
+              const vars = tweakAudits || hotspotAudit.variables;
+              const unknown = vars.filter((v) => v.direction === 'unknown').length;
+              const ruled = vars.some((v) => v.engine === 'heuristic');
+              if (!unknown && !ruled) return null;
+              return (
+                <div style={{ fontSize: '8px', color: '#9a3412', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '4px', padding: '3px 5px', marginBottom: '4px', lineHeight: 1.35 }}>
+                  {unknown ? `${unknown} variable(s) without a direction are left out of the score: choose ↑ (more means more need) or ↓. ` : ''}
+                  {ruled ? 'Directions were set by keyword rules, not judged against the goal (no LLM configured): check them.' : ''}
+                </div>
+              );
+            })()}
             {/* Legend bar + action buttons */}
             <div style={{ marginTop: '6px', borderTop: '1px solid #fee2e2', paddingTop: '5px' }}>
               <div style={{ fontSize: '8px', color: '#7f1d1d', marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -776,10 +889,10 @@ const ResultMapNode = memo(({ id, data }) => {
                   />
                   <button
                     className="nodrag"
-                    onClick={() => setTweakAudits(prev => prev.map((a, i) => i === idx ? { ...a, direction: a.direction === 'inverted' ? 'normal' : 'inverted' } : a))}
-                    style={{ font: 'inherit', fontSize: '8px', padding: '2px 7px', borderRadius: '4px', border: '1px solid #e5e7eb', background: v.direction === 'inverted' ? '#fef3c7' : '#f0fdf4', cursor: 'pointer', color: v.direction === 'inverted' ? '#b45309' : '#047857', fontWeight: 600 }}
+                    onClick={() => setTweakAudits(prev => prev.map((a, i) => i === idx ? { ...a, direction: a.direction === 'normal' ? 'inverted' : 'normal', engine: 'analyst' } : a))}
+                    style={{ font: 'inherit', fontSize: '8px', padding: '2px 7px', borderRadius: '4px', border: '1px solid #e5e7eb', background: v.direction === 'inverted' ? '#fef3c7' : v.direction === 'unknown' ? '#fff7ed' : '#f0fdf4', cursor: 'pointer', color: v.direction === 'inverted' ? '#b45309' : v.direction === 'unknown' ? '#c2410c' : '#047857', fontWeight: 600 }}
                   >
-                    {v.direction === 'inverted' ? '↓ Inverted' : '↑ Normal'}
+                    {v.direction === 'inverted' ? '↓ Inverted' : v.direction === 'unknown' ? '? Choose' : '↑ Normal'}
                   </button>
                 </div>
               );
@@ -850,7 +963,7 @@ const ResultMapNode = memo(({ id, data }) => {
               </span>
               {provenance.zoningEnabled && provenance.targetZones && (
                 <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: '600' }}>
-                  Zones: {provenance.targetZones.replace(/^.*[\/]/, '')}
+                  Zones: {provenance.targetZones.replace(/^.*[/]/, '')}
                 </span>
               )}
             </div>
@@ -865,7 +978,7 @@ const ResultMapNode = memo(({ id, data }) => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '10px' }}>{v.targetColumn}</span>
                     <span style={{ fontSize: '8px', color: '#64748b', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.dataset}>
-                      {v.dataset?.replace(/^.*[\/]/, '')}
+                      {v.dataset?.replace(/^.*[/]/, '')}
                     </span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>

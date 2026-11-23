@@ -19,11 +19,17 @@ try:
 except ImportError:  # pragma: no cover
     Portkey = None
 
+from catalog_format import (
+    CATALOG_MODES,
+    GET_DATASET_DETAILS_TOOL,
+    dataset_details,
+    render_catalog,
+)
 from tool import (
     HOTSPOT_SYNTHESIS_FIELDS,
     HOTSPOT_SYNTHESIS_PROMPT,
-    ZONING_OPERATOR_RECOMMENDATION_FIELDS,
-    ZONING_OPERATOR_RECOMMENDATION_PROMPT,
+    STEP_SUGGESTION_FIELDS,
+    STEP_SUGGESTION_PROMPT,
     build_suggestions_from_tool_calls,
     build_tool_responses_from_tool_calls,
     get_dashboard_snapshot_json,
@@ -43,13 +49,24 @@ DEFAULT_DESCRIPTIONS_CSV = PROJECT_ROOT / "data" / "descriptions_ddg.csv"
 
 
 class UrbanTraceCopilot:
-    """Very small helper around Portkey/OpenAI chat.completions for UrbanTrace."""
+    """Very small helper around Portkey/OpenAI/Hugging Face chat.completions for UrbanTrace."""
 
-    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai"}
+    _SUPPORTED_LLM_PROVIDERS = {"portkey", "openai", "huggingface", "local"}
     _DEFAULT_PORTKEY_MODEL = "@vertexai/gemini-3-pro-preview"
     _DEFAULT_OPENAI_MODEL = "gpt-5-mini"
+    # Hugging Face Inference Providers: an OpenAI-compatible router in front of many open models.
+    # The model must support tool calling. With COPILOT_CATALOG=full, every request carries the
+    # whole catalog (~86k tokens), so it also needs a context window above ~100k tokens.
+    # Append ":<provider>" to pin an inference provider.
+    _DEFAULT_HUGGINGFACE_MODEL = "openai/gpt-oss-120b"
+    _DEFAULT_HUGGINGFACE_BASE_URL = "https://router.huggingface.co/v1"
     _DEFAULT_PORTKEY_BASE_URL = "https://ai-gateway.apps.cloud.rt.nyu.edu/v1/"
     _REQUEST_TIMEOUT_SECONDS = 60
+    # A model on this machine behind an OpenAI-compatible server: Ollama (the default address),
+    # LM Studio (http://localhost:1234/v1), llama.cpp's llama-server, vLLM. No key is needed; the
+    # model must support tool calling for dataset discovery. Local models answer more slowly.
+    _DEFAULT_LOCAL_BASE_URL = "http://localhost:11434/v1"
+    _LOCAL_TIMEOUT_SECONDS = 300
 
     def __init__(
         self,
@@ -57,7 +74,10 @@ class UrbanTraceCopilot:
         llm_model: str | None = None,
         metadata_dir: str | Path = DEFAULT_METADATA_DIR,
         descriptions_csv: str | Path = DEFAULT_DESCRIPTIONS_CSV,
+        catalog_mode: str | None = None,
+        local_base_url: str | None = None,
     ) -> None:
+        self._local_base_url = local_base_url
         self.provider = self._normalize_provider(
             llm_provider or os.getenv("LLM_PROVIDER") or "portkey"
         )
@@ -66,16 +86,30 @@ class UrbanTraceCopilot:
 
         self.portkey_api_key = os.getenv("PORTKEY_API_KEY")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.huggingface_api_key = os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
         self.request_timeout = self._REQUEST_TIMEOUT_SECONDS
 
-        if self.provider == "portkey":
+        if self.provider == "local":
+            self.model = llm_model or os.getenv("LOCAL_LLM_MODEL") or ""
+            self.request_timeout = int(os.getenv("LOCAL_LLM_TIMEOUT") or self._LOCAL_TIMEOUT_SECONDS)
+        elif self.provider == "portkey":
             self.model = llm_model or os.getenv("PORTKEY_MODEL") or self._DEFAULT_PORTKEY_MODEL
+        elif self.provider == "huggingface":
+            self.model = llm_model or os.getenv("HF_MODEL") or self._DEFAULT_HUGGINGFACE_MODEL
         else:
             self.model = llm_model or os.getenv("OPENAI_MODEL") or self._DEFAULT_OPENAI_MODEL
 
         self.portkey: Any | None = None
         self.openai: Any | None = None
+        self.huggingface: Any | None = None
+        self.local: Any | None = None
         self._ensure_provider_client()
+
+        # How the dataset catalog is written into the prompt: full, compact or index (catalog_format.py)
+        self.catalog_mode = (catalog_mode or os.getenv("COPILOT_CATALOG") or "index").strip().lower()
+        if self.catalog_mode not in CATALOG_MODES:
+            raise ValueError(f"Unknown catalog mode '{self.catalog_mode}'. Choose one of: {', '.join(CATALOG_MODES)}.")
+        self.catalog: dict[str, dict[str, Any]] = {}
 
         self.metadata_dir = Path(metadata_dir)
         self.descriptions_csv = Path(descriptions_csv)
@@ -136,11 +170,49 @@ class UrbanTraceCopilot:
         self.openai = OpenAI(**client_kwargs)
         return self.openai
 
+    def _get_huggingface_client(self) -> Any:
+        if self.huggingface is not None:
+            return self.huggingface
+
+        if OpenAI is None:
+            raise ImportError(
+                "Hugging Face provider requested but 'openai' is not installed "
+                "(the Hugging Face router is OpenAI-compatible). Install it with `pip install openai`."
+            )
+        if not self.huggingface_api_key:
+            raise ValueError("Missing Hugging Face token. Set HF_TOKEN.")
+
+        self.huggingface = OpenAI(
+            base_url=os.getenv("HF_BASE_URL") or self._DEFAULT_HUGGINGFACE_BASE_URL,
+            api_key=self.huggingface_api_key,
+            timeout=self.request_timeout,
+        )
+        return self.huggingface
+
+    def _get_local_client(self) -> Any:
+        if self.local is not None:
+            return self.local
+        if OpenAI is None:
+            raise ImportError("The local provider talks to an OpenAI-compatible server; install `openai`.")
+        if not self.model:
+            raise ValueError("Set LOCAL_LLM_MODEL to the model your local server runs (e.g. qwen3:14b in Ollama).")
+        self.local = OpenAI(base_url=self._local_base_url or self.local_base_url(), api_key=os.getenv("LOCAL_LLM_API_KEY") or "local",
+                            timeout=self.request_timeout)
+        return self.local
+
+    @classmethod
+    def local_base_url(cls) -> str:
+        return os.getenv("LOCAL_LLM_BASE_URL") or cls._DEFAULT_LOCAL_BASE_URL
+
     def _ensure_provider_client(self) -> Any:
+        if self.provider == "local":
+            return self._get_local_client()
         if self.provider == "portkey":
             return self._get_portkey_client()
         if self.provider == "openai":
             return self._get_openai_client()
+        if self.provider == "huggingface":
+            return self._get_huggingface_client()
         raise ValueError(f"Unsupported llm provider '{self.provider}'.")
 
     @staticmethod
@@ -212,6 +284,13 @@ class UrbanTraceCopilot:
 
         if not dataset_ids:
             return "No dataset descriptions or metadata were found."
+
+        self.catalog = {
+            dataset_id: {"meta": metadata.get(dataset_id, {}), "description": descriptions.get(dataset_id, "")}
+            for dataset_id in dataset_ids
+        }
+        if self.catalog_mode != "full":
+            return render_catalog(self.catalog_mode, self.catalog)
 
         max_chars_per_entry: int = (
             (self._TOKEN_LIMIT - self._OVERHEAD_TOKENS) * self._CHARS_PER_TOKEN
@@ -308,11 +387,13 @@ class UrbanTraceCopilot:
                         **payload,
                         timeout=self.request_timeout * 1000,
                     )
-                if self.provider == "openai":
-                    client = self._get_openai_client()
+                if self.provider in ("openai", "huggingface", "local"):
+                    client = {"openai": self._get_openai_client, "huggingface": self._get_huggingface_client,
+                              "local": self._get_local_client}[self.provider]()
+                    # The OpenAI SDK takes seconds (Portkey above takes milliseconds).
                     return client.chat.completions.create(
                         **payload,
-                        timeout=self.request_timeout * 1000,
+                        timeout=self.request_timeout,
                     )
                 raise ValueError(f"Unsupported llm provider '{self.provider}'.")
             except Exception as exc:
@@ -451,18 +532,16 @@ class UrbanTraceCopilot:
 
         return results or None
 
-    def recommend_zoning_operators(
-        self,
-        recommendation_payload: dict[str, Any],
-        retries: int = 2,
-    ) -> list[dict[str, Any]] | None:
-        return self._run_structured_json_list_task(
-            task_label="Structured zoning recommendation",
-            system_prompt=ZONING_OPERATOR_RECOMMENDATION_PROMPT,
-            response_fields=ZONING_OPERATOR_RECOMMENDATION_FIELDS,
-            task_payload=recommendation_payload,
+    def suggest_step(self, step_payload: dict[str, Any], retries: int = 2) -> dict[str, Any] | None:
+        """A matching method, reductions and a rationale for one plan step, or None."""
+        out = self._run_structured_json_list_task(
+            task_label="Structured step suggestion",
+            system_prompt=STEP_SUGGESTION_PROMPT,
+            response_fields=STEP_SUGGESTION_FIELDS,
+            task_payload=step_payload,
             retries=retries,
         )
+        return out[0] if out else None
 
     def synthesize_hotspot_semantics(
         self,
@@ -653,6 +732,10 @@ class UrbanTraceCopilot:
         )
 
         effective_round_limit = max(1, max_tool_rounds)
+        if self.catalog_mode == "index" and tools:
+            # The model reads dataset details first, which takes one more round
+            tools = list(tools) + [GET_DATASET_DETAILS_TOOL]
+            effective_round_limit += 1
         all_tool_calls: list[dict[str, Any]] = []
         all_tool_responses: list[dict[str, Any]] = []
         all_suggestions: list[dict[str, Any]] = []
@@ -685,6 +768,10 @@ class UrbanTraceCopilot:
             all_tool_calls.extend(round_tool_calls)
 
             round_tool_responses = build_tool_responses_from_tool_calls(round_tool_calls)
+            for call, item in zip(round_tool_calls, round_tool_responses):
+                if call.get("name") == "get_dataset_details":   # answered here, not by the frontend
+                    args = call.get("arguments") if isinstance(call.get("arguments"), dict) else {}
+                    item["response"] = dataset_details(self.catalog, args.get("dataset_ids"))
             all_tool_responses.extend(round_tool_responses)
 
             round_suggestions = build_suggestions_from_tool_calls(round_tool_calls)

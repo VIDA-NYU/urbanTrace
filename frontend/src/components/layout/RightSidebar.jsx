@@ -3,8 +3,11 @@ import React from 'react';
 import OperationsSidebar from '../toolbox/OperationsSidebar'; // Re-using the component we made
 import IntegrationTopologyPanel from './IntegrationTopologyPanel';
 import { Trash2 } from 'lucide-react'; // <-- Import the icon
+import ReportCard from '../methods/ReportCard';
 
-const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs, onCleanUp }) => {
+// App also passes onCleanUp, for the clean-up button that is commented out below.
+const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs }) => {
+  const reportLogs = activityLogs.filter((log) => log.status === 'success' && log.reports);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#fff' }}>
       
@@ -82,6 +85,17 @@ const RightSidebar = ({ activityLogs = [], onHoverLog, focusedLogTs, onCleanUp }
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <IntegrationTopologyPanel logs={activityLogs} onHoverLog={onHoverLog} focusedLogTs={focusedLogTs} />
         </div>
+        {/* What each integration did, from urbanweave's reports (redesign section 3.4) */}
+        {reportLogs.length > 0 && (
+          <div style={{ maxHeight: '40%', overflowY: 'auto', borderTop: '1px solid #e5e7eb', padding: '8px', display: 'grid', gap: '6px' }}>
+            {reportLogs.map((log) => (
+              <div key={log.timestamp} onMouseEnter={() => onHoverLog?.(log.timestamp)} onMouseLeave={() => onHoverLog?.(null)}>
+                <ReportCard reports={log.reports} defaultOpen={log.timestamp === focusedLogTs}
+                  title={`Reports · ${new Date(log.timestamp).toLocaleTimeString()}`} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
     </div>

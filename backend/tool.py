@@ -52,40 +52,31 @@ SUPPORTED_DATASET_SUGGESTION_TOOL_NAMES = {
     "add_dataset_node",
 }
 
-ZONING_OPERATOR_RECOMMENDATION_FIELDS = (
-    "dataset_name",
-    "column_name",
-    "classification",
-    "zoningMapping",
-    "zoningAggregation",
-    "reasoning",
-)
+STEP_SUGGESTION_FIELDS = ("method", "reductions", "reasoning")
 
-ZONING_OPERATOR_RECOMMENDATION_PROMPT = """
-You are an expert Spatial Data Scientist and GIS Architect. Your task is to select the
-optimal Zoning Mapping and Zoning Aggregation operators from the provided lists.
+STEP_SUGGESTION_PROMPT = """
+You are an expert spatial data scientist. An analyst is building one integration step: a source
+dataset is matched onto target units (zones, or an H3 grid) and aggregated per unit. Suggest how.
 
-Step 1: Analyze the Context & Metadata
-Review dataset_name and column_metadata.name together. If the column name is generic
-(e.g., value, count, total, metric), you MUST rely on dataset_name to determine the meaning.
-Then review num_distinct_values, distribution (mean, coverage), and sample_data.
+You get: the analyst's goal; the source (name, description, geometry, row count, and columns with a
+suggested value kind and statistics); the target; available_methods (matching methods that fit these
+geometries, each with a summary and how it assigns sources); and available_reductions (each with a
+summary, the value kinds it suits, and whether it needs a column).
 
-Step 2: Classify the Data Type
-- Extensive (Count/Total): high num_distinct_values, larger means, values scale with area
-- Intensive (Rate/Density): decimals/floats, keywords like rate/avg/median/density
-- Categorical/Ordinal (Index): low num_distinct_values (often 1-10), integer classes, index-like labels
+Choose:
+1. method: one name from available_methods.
+2. reductions: one to three, each {"method": <name from available_reductions>, "column": <a source
+   column, or null when the reduction needs no column>, "as": <a short snake_case output name that
+   says what it measures, e.g. "libraries" for a count of libraries>, "kind": <"extensive",
+   "intensive" or "categorical", the column's value kind>}. Prefer what the goal needs: often a
+   count, or a sum of an extensive column, or a mean of an intensive one; a categorical column takes
+   "majority" or "shares". Match each reduction to its column's value kind.
+3. reasoning: two or three plain sentences an analyst can check: why this method for these
+   geometries, and why these reductions for the goal.
 
-Step 3: Geospatial Reasoning & Operator Selection
-You are provided target_geometry and valid arrays: available_mapping_operators and available_aggregation_operators.
-- If target is Point/MultiPoint, area-weighted mapping is invalid. Choose point-safe mapping.
-- Extensive -> aggregation should preserve totals (typically Sum)
-- Intensive -> aggregation should avoid absurd accumulation (typically WeightedMean/Mean/Density)
-- Categorical/Ordinal -> use discrete grouping (typically Majority)
-
-Return ONLY a valid JSON array with one object per source variable, each containing:
-dataset_name, column_name, classification, zoningMapping, zoningAggregation, reasoning.
-Never invent operators not present in provided arrays.
-""".strip()
+Your answer is checked against urbanweave's registry afterwards; choices that do not fit are
+replaced. Return ONLY a JSON array with one object: {"method": ..., "reductions": [...], "reasoning": ...}.
+"""
 
 HOTSPOT_SYNTHESIS_FIELDS = (
     "dataset_name",
@@ -99,9 +90,17 @@ HOTSPOT_SYNTHESIS_PROMPT = """
 You are an expert urban analytics copilot. Your task is to synthesize hotspot-priority semantics.
 
 The payload may include an optional "goal" field describing what "Priority" means in this context
-(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden").
-If present, use it to inform both direction and relative weight for each variable.
+(e.g. "pedestrian safety risk", "economic vulnerability", "environmental burden", or an opportunity
+such as "good schools, low crime and affordable rent").
+If present, a score of 1.0 means "most of what the goal looks for": the most need or risk for a goal
+about need or risk, the best opportunity for a goal about opportunity. Set every direction that way.
 If absent, infer the most semantically coherent goal from the variable names and metadata.
+
+Some variables are computed from others ("computed_as": "expression: all_crime - property_crime").
+Do not count the same thing twice. When a computed variable splits a total into parts (here
+violent_crime = all_crime - property_crime, so all_crime = violent_crime + property_crime), weight
+the parts (violent_crime, property_crime) and give the total (all_crime) weight 0, saying so in its
+reasoning. A part that is an indicator in its own right keeps its weight.
 
 For each source variable, infer:
 - direction: "normal" (higher raw value = higher priority) OR "inverted" (lower raw value = higher priority)

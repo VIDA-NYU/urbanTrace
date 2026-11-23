@@ -3,8 +3,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { RefreshCw, Map, Search, Upload, X } from 'lucide-react'; // Added X here
 import DatasetCard from '../catalog/DatasetCard'; 
+import { API_BASE } from '../../config/api';
+import { getCatalogIndex, getCatalogInArea, bboxIntersects, overlapsPeriod } from '../../lib/scope';
 
-const DatasetSidebar = () => {
+const DatasetSidebar = ({ studyArea = null }) => {
   const [datasets, setDatasets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,11 +15,29 @@ const DatasetSidebar = () => {
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  // Where the uploaded data came from, recorded in the catalog's origin record (redesign section 2.2)
+  const [uploadOrigin, setUploadOrigin] = useState({ source_url: '', license: '', publisher: '' });
   const uploadInputRef = useRef(null);
+  // Search filters (redesign phase 2): datasets that reach the study area, or cover a period
+  const [catalogIndex, setCatalogIndex] = useState({});
+  const [inStudyArea, setInStudyArea] = useState(false);
+  const [fromYear, setFromYear] = useState('');
+  const [toYear, setToYear] = useState('');
+  useEffect(() => { getCatalogIndex().then(setCatalogIndex); }, []);
+  // How much of each dataset is in the study area, kept with the spec it belongs to.
+  const [inArea, setInArea] = useState({ key: null, value: null });
+  const areaKey = studyArea?.spec ? JSON.stringify(studyArea.spec) : null;
+  useEffect(() => {
+    if (!areaKey) return undefined;
+    let alive = true;
+    getCatalogInArea(JSON.parse(areaKey)).then((value) => alive && setInArea({ key: areaKey, value })).catch(() => {});
+    return () => { alive = false; };
+  }, [areaKey]);
+  const areaShares = areaKey && inArea.key === areaKey ? inArea.value : null;
 
   const fetchDatasets = () => {
     setLoading(true);
-    axios.get('http://localhost:8000/datasets')
+    axios.get(`${API_BASE}/datasets`)
       .then(res => {
         setDatasets(res.data.datasets);
         setLoading(false);
@@ -76,8 +96,11 @@ const DatasetSidebar = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedUploadFile);
+      Object.entries(uploadOrigin).forEach(([key, value]) => {
+        if (value.trim()) formData.append(key, value.trim());
+      });
 
-      const response = await axios.post('http://localhost:8000/datasets/upload', formData, {
+      const response = await axios.post(`${API_BASE}/datasets/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -85,6 +108,7 @@ const DatasetSidebar = () => {
       const geoType = response?.data?.geometricType || 'Unknown';
       setUploadSuccess(`Uploaded ${uploadedName} (geometricType: ${geoType})`);
       setSelectedUploadFile(null);
+      setUploadOrigin({ source_url: '', license: '', publisher: '' });
       if (uploadInputRef.current) {
         uploadInputRef.current.value = '';
       }
@@ -97,10 +121,21 @@ const DatasetSidebar = () => {
     }
   };
 
+  // "In study area" keeps the datasets with data inside it, most of it first; until the shares
+  // arrive, the bounding boxes stand in.
+  const shareOf = (ds) => areaShares?.[ds.id]?.share_of_area;
   const filteredDatasets = datasets.filter(ds => {
     const name = ds.metadata?.name || ds.name || "";
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    const info = catalogIndex[ds.id];
+    if (inStudyArea && studyArea) {
+      if (areaShares && areaShares[ds.id] && !(shareOf(ds) > 0)) return false;
+      if (!areaShares && info?.bbox && !bboxIntersects(info.bbox, studyArea.bbox)) return false;
+    }
+    if ((fromYear || toYear) && !overlapsPeriod(info?.time, fromYear, toYear)) return false;
+    return true;
   });
+  if (inStudyArea && areaShares) filteredDatasets.sort((a, b) => (shareOf(b) ?? -1) - (shareOf(a) ?? -1));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#f9fafb' }}>
@@ -208,6 +243,22 @@ const DatasetSidebar = () => {
           )}
         </div>
 
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginTop: '8px', fontSize: '0.75rem', color: '#4b5563' }}>
+          <label title={studyArea ? 'Only datasets whose extent reaches the study area' : 'Set a study area in the collection bar first'}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: studyArea ? 'pointer' : 'not-allowed', opacity: studyArea ? 1 : 0.5 }}>
+            <input type="checkbox" disabled={!studyArea} checked={inStudyArea && !!studyArea} onChange={(e) => setInStudyArea(e.target.checked)} />
+            In study area
+          </label>
+          <span title="Only datasets with data in these years (datasets without dates are kept)" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            Years
+            <input value={fromYear} onChange={(e) => setFromYear(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="from"
+              style={{ width: '42px', fontSize: '0.75rem', padding: '2px 4px', border: '1px solid #e5e7eb', borderRadius: '4px' }} />
+            –
+            <input value={toYear} onChange={(e) => setToYear(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="to"
+              style={{ width: '42px', fontSize: '0.75rem', padding: '2px 4px', border: '1px solid #e5e7eb', borderRadius: '4px' }} />
+          </span>
+        </div>
+
         {/* Upload controls moved to modal — keeps sidebar clean */}
       </div>
 
@@ -225,6 +276,7 @@ const DatasetSidebar = () => {
           <DatasetCard 
             key={ds.id || ds.filename} 
             dataset={ds} 
+            inArea={areaShares ? areaShares[ds.id] || null : undefined}
             onDragStart={handleDragStart} 
           />
         ))}
@@ -270,6 +322,24 @@ const DatasetSidebar = () => {
             >
               <Upload size={24} />
               <div style={{ fontSize: '0.9rem', marginTop: '8px' }}>{selectedUploadFile ? selectedUploadFile.name : 'Click or drop a .geojson file here'}</div>
+            </div>
+
+            <div style={{ fontSize: '0.8rem', color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Where does this data come from?</div>
+            {[
+              ['source_url', 'Source URL (dataset page or download link)'],
+              ['publisher', 'Publisher (e.g. NYC Department of Education)'],
+              ['license', 'License or terms (e.g. CC-BY-4.0)'],
+            ].map(([key, placeholder]) => (
+              <input
+                key={key}
+                value={uploadOrigin[key]}
+                onChange={(e) => setUploadOrigin((o) => ({ ...o, [key]: e.target.value }))}
+                placeholder={placeholder}
+                style={{ width: '100%', boxSizing: 'border-box', marginBottom: '6px', padding: '6px 8px', fontSize: '0.8rem', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+              />
+            ))}
+            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '12px' }}>
+              Recorded with the dataset and included in exports. Without a source, the dataset is exported as of unknown origin.
             </div>
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>

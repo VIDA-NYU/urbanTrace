@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useCallback, useState } from 'react';
 import { Handle, Position, NodeResizeControl } from '@xyflow/react';
 import { GitCompareArrows, ArrowDown, ArrowUp, Minus, Eye, EyeOff, X } from 'lucide-react';
-import H3PreviewDeckGL from '../../visualization/H3PreviewDeckGL';
+import H3PreviewMap from '../../visualization/H3PreviewMap';
 
 const COMPARE_PALETTE = {
   low: [248, 250, 252],
@@ -336,7 +336,7 @@ const CompareMapNode = memo(({ id, data }) => {
         {comparison.status === 'ready' ? (
           <>
             <div style={{ position: 'absolute', inset: 0, borderRadius: '0 0 8px 8px', overflow: 'hidden' }}>
-              <H3PreviewDeckGL
+              <H3PreviewMap
                 hexData={comparison.kind === 'hex' ? comparison.hexData : null}
                 geojsonData={comparison.kind === 'zones' ? comparison.geojson : null}
                 color={[75, 85, 99]}

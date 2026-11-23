@@ -275,6 +275,10 @@ ABLATION_LEVELS = [
     "no_profile",
     "name_only",
 ]
+# Prompt-format conditions: the "full" information (AutoDDG descriptions plus profile metadata)
+# written in the copilot's compact or index catalog format (backend/catalog_format.py). Not part
+# of "all"; run them by name.
+CATALOG_FORMAT_LEVELS = ["catalog_compact", "catalog_index"]
 ABLATION_ALIASES = {
     # Paper-facing condition names alias onto the runner ids.
     "source_description_only": "no_profile",
@@ -282,7 +286,7 @@ ABLATION_ALIASES = {
     "profile_only": "no_description",
     "autoddg_description_only": "profiled_description",
 }
-DDG_DESCRIPTION_ABLATIONS = {"full", "profiled_description"}
+DDG_DESCRIPTION_ABLATIONS = {"full", "profiled_description", *CATALOG_FORMAT_LEVELS}
 ORIGIN_DESCRIPTION_ABLATIONS = {"no_profile"}
 
 
@@ -303,7 +307,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--ablation",
-        choices=ABLATION_LEVELS + sorted(ABLATION_ALIASES) + ["all"],
+        choices=ABLATION_LEVELS + CATALOG_FORMAT_LEVELS + sorted(ABLATION_ALIASES) + ["all"],
         default="full",
         help=(
             "Metadata ablation condition (paper name -> runner id): "
@@ -347,6 +351,7 @@ def main() -> None:
     sys.path.insert(0, str(backend_dir))
     from llm_agent import UrbanTraceCopilot  # type: ignore
     from tool import COPILOT_FRONTEND_TOOLS  # type: ignore
+    from catalog_format import render_catalog  # type: ignore
 
     benchmark_path = (repo_root / args.benchmark).resolve()
     out_path = (repo_root / args.output).resolve()
@@ -395,13 +400,36 @@ def main() -> None:
 
     copilot = UrbanTraceCopilot(llm_model=args.llm_model)
 
+    # Count the tokens of every request, to compare prompt formats and estimate cost
+    usage = {"calls": 0, "prompt_tokens": 0, "cached_tokens": 0, "completion_tokens": 0}
+    complete = copilot._complete_messages
+
+    def counting_complete(*a, **kw):
+        response = complete(*a, **kw)
+        u = getattr(response, "usage", None)
+        if u is not None:
+            usage["calls"] += 1
+            usage["prompt_tokens"] += getattr(u, "prompt_tokens", 0) or 0
+            usage["completion_tokens"] += getattr(u, "completion_tokens", 0) or 0
+            details = getattr(u, "prompt_tokens_details", None)
+            usage["cached_tokens"] += (getattr(details, "cached_tokens", 0) or 0) if details else 0
+        return response
+
+    copilot._complete_messages = counting_complete
+
     fieldnames = [
         "llm_model", "ablation", "case_id", "slug", "run",
         "expected_datasets", "predicted_datasets", "predicted_distractors",
         "precision", "recall", "f1",
         "assistant_message",
+        "llm_calls", "prompt_tokens", "cached_tokens", "completion_tokens",
     ]
     write_header = not out_path.exists()
+    if not write_header:
+        with open(out_path, encoding="utf-8", newline="") as f:
+            existing = next(csv.reader(f), [])
+        if existing != fieldnames:
+            raise SystemExit(f"{out_path} has different columns; pass a new --output file.")
     csv_file = open(out_path, "a", encoding="utf-8", newline="")  # noqa: SIM115
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     if write_header:
@@ -425,12 +453,25 @@ def main() -> None:
         # system-message section.
         copilot.dataset_descriptions = descriptions
         # Inject the ablated catalog into the system message; dashboard stays empty.
-        copilot.dataset_context = _build_context_for_ablation(
-            base_nodes,
-            ablation,
-            descriptions,
-            rawid_to_stem,
-        )
+        if ablation in CATALOG_FORMAT_LEVELS:
+            mode = ablation.removeprefix("catalog_")
+            copilot.catalog = {
+                (node["data"].get("id") or node["id"]): {
+                    "meta": node["data"].get("metadata") or {},
+                    "description": _lookup_description(descriptions, node["data"].get("id") or node["id"], rawid_to_stem),
+                }
+                for node in base_nodes
+            }
+            copilot.catalog_mode = mode   # "index" also offers the get_dataset_details tool
+            copilot.dataset_context = render_catalog(mode, copilot.catalog)
+        else:
+            copilot.catalog_mode = "full"
+            copilot.dataset_context = _build_context_for_ablation(
+                base_nodes,
+                ablation,
+                descriptions,
+                rawid_to_stem,
+            )
         print(f"\n=== Ablation: {ablation} | descriptions: {description_source} ===")
 
         for case in cases:
@@ -444,6 +485,8 @@ def main() -> None:
             last_message = ""
 
             for run_idx in range(1, args.runs + 1):
+                for k in usage:
+                    usage[k] = 0
                 result = copilot.run_copilot_turn(
                     user_message=query,
                     thinking_budget_tokens=None,
@@ -476,6 +519,10 @@ def main() -> None:
                         "recall": r,
                         "f1": f1,
                         "assistant_message": last_message,
+                        "llm_calls": usage["calls"],
+                        "prompt_tokens": usage["prompt_tokens"],
+                        "cached_tokens": usage["cached_tokens"],
+                        "completion_tokens": usage["completion_tokens"],
                     }
                 )
                 writer.writerow(rows_for_summary[-1])

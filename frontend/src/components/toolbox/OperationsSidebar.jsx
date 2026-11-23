@@ -7,13 +7,20 @@ const OperationsSidebar = () => {
   
   const onDragStart = (event, opType, opLabel) => {
     // 1. Route the tool to the correct custom React Flow node component
-    let reactFlowType = 'operationNode'; // Default for generic tools
+    // Every tool has its own node type; an unknown one is not dragged.
     
-    if (opType === 'integrate') {
-      reactFlowType = 'integrationNode'; // Trigger our custom Integration Engine UI
-    } else if (opType === 'compare') {
-      reactFlowType = 'compareMapNode';
-    }
+    const NODE_TYPES = {
+      compare: 'compareMapNode',
+      grid: 'gridNode',             // plan nodes (redesign phase 4)
+      streets: 'streetsNode',       // OpenStreetMap street networks (phase 6)
+      step: 'stepNode',
+      calculate: 'calculateNode',
+      sweep: 'sweepNode',           // analysis nodes (redesign phase 5)
+      validate: 'validateNode',
+      dasymetric: 'dasymetricNode',
+    };
+    const reactFlowType = NODE_TYPES[opType];
+    if (!reactFlowType) return;
 
     // 2. Set the payload
     const nodeData = {

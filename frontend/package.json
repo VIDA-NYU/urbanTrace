@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0-alpha.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,17 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deck.gl/core": "^9.2.9",
-    "@deck.gl/geo-layers": "^9.2.10",
-    "@deck.gl/layers": "^9.2.9",
-    "@deck.gl/react": "^9.2.9",
+    "@urban-toolkit/autk-map": "file:vendor/urban-toolkit-autk-map-4.1.1-67763d9.tgz",
     "@xyflow/react": "^12.10.1",
     "axios": "^1.13.6",
     "d3-geo": "^3.1.1",
-    "d3-scale": "^4.0.2",
     "h3-js": "^4.4.0",
     "lucide-react": "^0.575.0",
-    "maplibre-gl": "^5.19.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -34,5 +29,8 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "vite": "^7.3.1"
+  },
+  "overrides": {
+    "@urban-toolkit/autk-core": "file:vendor/urban-toolkit-autk-core-4.1.1-67763d9.tgz"
   }
 }

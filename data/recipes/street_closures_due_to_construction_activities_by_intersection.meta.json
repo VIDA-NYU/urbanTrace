@@ -1,0 +1,18 @@
+{
+ "dataset": "street_closures_due_to_construction_activities_by_intersection",
+ "saved": "2026-11-23T03:07:42+00:00",
+ "extent": [
+  -74.28335365085375,
+  40.475961353,
+  -73.6601644211951,
+  40.944425116999994
+ ],
+ "fixes": [
+  {
+   "id": "fix-d4dc51bf6e",
+   "action": "set_crs",
+   "rationale": "Declare EPSG:2263 (NAD83 / New York Long Island (ftUS)) (100% of locations land in the extent); coordinates are not changed.",
+   "issue": "geometry: declared EPSG:4326 but 100% of values are not degrees; best fit EPSG:2263 (NAD83 / New York Long Island (ftUS))"
+  }
+ ]
+}

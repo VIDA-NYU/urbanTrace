@@ -12,6 +12,9 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { API_BASE } from '../../config/api';
+import CopilotSettings, { CopilotLlmChip } from './CopilotSettings';
+import { getCopilotSettings } from '../../lib/copilot';
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const TOOL_EVENT_DELAY_MS = 140;
@@ -36,6 +39,10 @@ const FloatingCopilotInput = ({
   });
   const [traceLogs, setTraceLogs] = useState([]);
   const [traceMinimized, setTraceMinimized] = useState(true);
+  // What the copilot runs on (an LLM, or rules); the chip opens the settings
+  const [llmStatus, setLlmStatus] = useState(null);
+  const [llmOpen, setLlmOpen] = useState(false);
+  useEffect(() => { getCopilotSettings().then(setLlmStatus).catch(() => {}); }, []);
   const [suggestionsMinimized, setSuggestionsMinimized] = useState(false);
   const [resolvingSuggestionId, setResolvingSuggestionId] = useState('');
   const [pendingAutoRequests, setPendingAutoRequests] = useState([]);
@@ -176,7 +183,7 @@ const FloatingCopilotInput = ({
     setIsSending(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/copilot/chat', {
+      const response = await fetch(`${API_BASE}/api/copilot/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -636,6 +643,7 @@ const FloatingCopilotInput = ({
               Agent Trace
             </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <CopilotLlmChip status={llmStatus} onClick={() => setLlmOpen(true)} />
             <button
               onClick={handleToggleAutoSuggest}
               style={{
@@ -792,6 +800,7 @@ const FloatingCopilotInput = ({
           `}</style>
         </div>
       </div>
+      <CopilotSettings open={llmOpen} onClose={() => setLlmOpen(false)} onChanged={setLlmStatus} />
     </>
   );
 };

@@ -7,6 +7,8 @@ import RightSidebar from './components/layout/RightSidebar';
 
 function App() {
   const [leftOpen, setLeftOpen] = useState(true);
+  // The collection's study area, resolved (bbox, area), for the search filter in the sidebar
+  const [studyArea, setStudyArea] = useState(null);
   
   // GLOBAL ACTIVITY LOG: Track all pipeline executions for audit trail
   const [activityLogs, setActivityLogs] = useState([]);
@@ -27,7 +29,9 @@ function App() {
     const prevActiveSet = prevActiveLogSetRef.current;
     const removedTimestamps = [...prevActiveSet].filter(ts => !currentActiveSet.has(ts));
 
+    // Logs follow the canvas: when results are removed there, their entries go here.
     if (removedTimestamps.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActivityLogs(prevLogs => prevLogs.filter(log => currentActiveSet.has(log.timestamp)));
       setHighlightedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));
       setFocusedLogTs(prev => (prev && !currentActiveSet.has(prev) ? null : prev));
@@ -69,7 +73,7 @@ function App() {
             pointerEvents: leftOpen ? 'auto' : 'none', // CRITICAL: Disable interactions when collapsed
             transition: 'opacity 0.2s'
         }}>
-           <DatasetSidebar />
+           <DatasetSidebar studyArea={studyArea} />
         </div>
 
         {/* Toggle Button */}
@@ -110,6 +114,7 @@ function App() {
           focusedLogTs={focusedLogTs}
           onTraceLineage={setFocusedLogTs}
           onActiveLogTimestampsChange={setActiveLogTimestamps}
+          onStudyAreaResolved={setStudyArea}
         />
       </main>
 

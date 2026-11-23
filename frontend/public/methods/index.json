@@ -1,0 +1,56 @@
+{
+ "figures": {
+  "contain": {
+   "file": "contain.svg",
+   "title": ""
+  },
+  "centroid_and_representative_point": {
+   "file": "centroid_and_representative_point.svg",
+   "title": "One point per polygon"
+  },
+  "area_overlap": {
+   "file": "area_overlap.svg",
+   "title": "Splitting a polygon by area"
+  },
+  "nearest_and_within_distance": {
+   "file": "nearest_and_within_distance.svg",
+   "title": "Distance-based matching"
+  },
+  "gaussian": {
+   "file": "gaussian.svg",
+   "title": "Smoothing with a Gaussian kernel"
+  },
+  "grid_to_targets": {
+   "file": "grid_to_targets.svg",
+   "title": "From a grid to other targets"
+  },
+  "along_lines_and_split": {
+   "file": "along_lines_and_split.svg",
+   "title": "Raster values along streets"
+  },
+  "match_and_aggregate": {
+   "file": "match_and_aggregate.svg",
+   "title": "match, then aggregate"
+  },
+  "value_kinds": {
+   "file": "value_kinds.svg",
+   "title": "Three kinds of value, three ways to move them"
+  }
+ },
+ "methods": {
+  "contain": "contain",
+  "centroid": "centroid_and_representative_point",
+  "representative_point": "centroid_and_representative_point",
+  "area_overlap": "area_overlap",
+  "largest_overlap": "area_overlap",
+  "nearest": "nearest_and_within_distance",
+  "nearest_segment": "nearest_and_within_distance",
+  "nearest_node": "nearest_and_within_distance",
+  "within_distance": "nearest_and_within_distance",
+  "gaussian": "gaussian",
+  "sample": "grid_to_targets",
+  "polygon_to_lines": "grid_to_targets",
+  "length_weighted": "along_lines_and_split"
+ },
+ "source": "urbanweave tutorials/diagrams.py"
+}

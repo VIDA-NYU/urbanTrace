@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Layers, Database, ChevronDown, ChevronUp, Eye, Info } from 'lucide-react';
 import DatasetDetailsModal from './DatasetDetailsModal';
 
-const DatasetCard = ({ dataset, onDragStart }) => {
+const DatasetCard = ({ dataset, onDragStart, inArea }) => {
   const [expanded, setExpanded] = useState(false);
   const [showModal, setShowModal] = useState(false);
   
@@ -87,6 +87,17 @@ const DatasetCard = ({ dataset, onDragStart }) => {
           </div>
           <div>{rowCount.toLocaleString()} rows</div>
         </div>
+        {inArea !== undefined && (
+          <div style={{ fontSize: '0.72rem', marginTop: '-6px', marginBottom: '8px',
+            color: !inArea ? '#94a3b8' : inArea.share_of_area === 0 ? '#b45309' : '#0f766e' }}
+            title={!inArea ? 'Where this dataset has data is not known'
+              : inArea.measure === 'spread' ? 'Points: how far they spread across the study area, and how many fall inside it'
+                : "Share of the study area's 500 m cells where the dataset has data"}>
+            {!inArea ? 'Study area: unknown'
+              : inArea.share_of_area === 0 ? 'No data in the study area'
+                : `Study area: ${Math.round(inArea.share_of_area * 100)}%${inArea.measure === 'spread' ? ` · ${inArea.points_inside.toLocaleString()} points` : ''}`}
+          </div>
+        )}
 
         {/* Columns Tags */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>

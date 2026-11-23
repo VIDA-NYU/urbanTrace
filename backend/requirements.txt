@@ -4,12 +4,16 @@ uvicorn
 python-dotenv
 python-multipart
 
+# Spatial integration (prerelease; see docs/REDESIGN.md, phase 0)
+urbanweave[osm,raster]==0.1.0a2
+
 # Geo stack
 geopandas
 shapely
 h3
 pandas
 numpy
+pyarrow
 
 # Profiling
 datamart-profiler
@@ -18,3 +22,7 @@ datamart-profiler
 # openai
 # portkey-ai
 # pydantic
+
+# Data checks and corrections (backend/cleaning.py): atlas-clean 0.1.0a1, released on GitHub
+# (not on PyPI yet)
+atlas-clean[geo] @ git+https://github.com/VIDA-NYU/atlas-clean@v0.1.0a1
