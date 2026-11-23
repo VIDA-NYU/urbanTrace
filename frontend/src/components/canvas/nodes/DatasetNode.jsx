@@ -4,6 +4,7 @@ import { Handle, Position } from '@xyflow/react';
 import { Database, Layers, Palette, Info, X, Clock, ShieldCheck } from 'lucide-react';
 import CheckDataModal from '../../catalog/CheckDataModal';
 import VectorPreviewMap from '../../visualization/VectorPreviewMap';
+import { API_BASE } from '../../../config/api';
 import { getCatalogIndex } from '../../../lib/scope';
 
 // Time window on the source (redesign section 4.1): integrations use only rows in [start, end].
@@ -154,7 +155,7 @@ const DatasetNode = memo(({ id, data }) => {
             <Info size={12} />
           </button>
 
-          <button
+          {meta.geometricType !== 'Raster' && <button
             className="nodrag"
             onClick={(e) => { e.stopPropagation(); setChecking(true); }}
             title={corrected || located ? `${[corrected && 'Corrections saved (atlas-clean)', located && 'rows located from their addresses'].filter(Boolean).join('; ')}: check again or remove them` : 'Check this dataset for data-quality problems (atlas-clean) and locate rows from their addresses'}
@@ -162,7 +163,7 @@ const DatasetNode = memo(({ id, data }) => {
               alignItems: 'center', gap: 2, color: corrected || located ? '#0f766e' : '#64748b', borderRadius: '4px', fontSize: 9, fontWeight: 600 }}
           >
             <ShieldCheck size={12} />{[corrected && 'Corrected', located && 'Located'].filter(Boolean).join(' · ')}
-          </button>
+          </button>}
 
           <button
             className="nodrag"
@@ -196,6 +197,16 @@ const DatasetNode = memo(({ id, data }) => {
         <CheckDataModal datasetId={datasetId} name={name} onClose={() => setChecking(false)}
           onChanged={() => { setRev((r) => r + 1); data.onCorrected?.(id); }} />
       )}
+      {meta.geometricType === 'Raster' ? (
+        // A raster dataset (backend/rasters.py): a picture of it, values light to dark green
+        <div style={{ height: 150, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <img src={`${API_BASE}/api/rasters/${encodeURIComponent(datasetId)}/preview.png`} alt={name}
+            style={{ maxWidth: '100%', maxHeight: '100%', imageRendering: 'pixelated' }} />
+          <span style={{ position: 'absolute', bottom: 3, left: 6, fontSize: 9, color: '#475569', background: 'rgba(255,255,255,0.85)', padding: '0 4px', borderRadius: 3 }}>
+            {meta.raster?.units ? `${meta.columns?.[0]?.name} (${meta.raster.units})` : meta.columns?.[0]?.name} · {meta.raster?.resolution_m ? `${meta.raster.resolution_m} m cells` : ''}
+          </span>
+        </div>
+      ) : (
       <VectorPreviewMap
         height={150}
         filename={filename}
@@ -205,6 +216,7 @@ const DatasetNode = memo(({ id, data }) => {
         globalViewState={globalViewState}
         onGlobalViewStateChange={onGlobalViewStateChange}
       />
+      )}
 
       {/* 3. Controls: column picker, then geometry type and row count, on one row */}
       <div style={{ padding: '4px 8px', backgroundColor: '#fff', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -236,7 +248,7 @@ const DatasetNode = memo(({ id, data }) => {
           ))}
         </select>
         <div
-          title={`${meta.geometricType || 'Unknown'} · ${meta.nb_rows?.toLocaleString() || 0} rows`}
+          title={`${meta.geometricType || 'Unknown'} · ${meta.nb_rows?.toLocaleString() || 0} ${meta.geometricType === 'Raster' ? 'cells' : 'rows'}`}
           style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#94a3b8', fontSize: '9px', whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           <Layers size={9} /> {meta.geometricType || 'Unknown'} · {meta.nb_rows?.toLocaleString() || 0}

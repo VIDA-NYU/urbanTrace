@@ -68,6 +68,9 @@ export function keyReductions(reductions = []) {
     : { method: 'sum', column: r.column, as: safeName(keyReductionName(r)) }));
 }
 
+export const isRasterNode = (node) => node?.data?.metadata?.geometricType === 'Raster';
+export const RASTER_REDUCTIONS = ['weighted_mean', 'mean', 'sum', 'min', 'max', 'count', 'majority', 'shares'];
+
 // Build the plan for the whole canvas, or only for *onlyStepIds* and the steps they depend on.
 export function buildPlan(nodes, edges, onlyStepIds = null) {
   const stepNodes = nodes.filter((n) => n.type === 'stepNode');
@@ -83,6 +86,10 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     let name = safeName(stem);
     while (sources[name] && sources[name].urbantrace?.node !== dsNode.id) name = `${name}_2`;
     sourceNameOf.set(dsNode.id, name);
+    if (isRasterNode(dsNode)) {                 // a raster (backend/rasters.py): summarized with zonal statistics
+      sources[name] = { kind: 'raster', urbantrace: { dataset: stem, node: dsNode.id } };
+      return name;
+    }
     sources[name] = { kind: 'vector', columns: {}, urbantrace: { dataset: stem, node: dsNode.id, ...(dsNode.data?.timeWindow ? { time_window: dsNode.data.timeWindow } : {}) } };
     return name;
   };
@@ -137,6 +144,17 @@ export function buildPlan(nodes, edges, onlyStepIds = null) {
     else if (source.type === 'datasetNode') sourceRef = nameForSource(source);
     else { problems[sid] = ['The source must be a dataset or a step.']; continue; }
     if (!['datasetNode', 'gridNode', 'streetsNode'].includes(target.type)) { problems[sid] = ['The target must be zones, an H3 grid or streets.']; continue; }
+    if (source.type === 'datasetNode' && isRasterNode(source)) {
+      // Zonal statistics: the raster's cells under each zone or H3 cell, weighted by exact coverage
+      if (target.type === 'streetsNode') { problems[sid] = ['A raster is summarized onto zones or an H3 grid, not streets.']; continue; }
+      const band = source.data?.metadata?.columns?.[0]?.name;
+      const aggregate = (d.reductions || []).filter((r) => RASTER_REDUCTIONS.includes(r.method)).map((r) => ({
+        method: r.method, column: r.column || band, as: safeName(r.as || `${r.method}_${band}`),
+      }));
+      if (!aggregate.length) { problems[sid] = ['Add a summary (e.g. weighted mean) of the raster.']; continue; }
+      steps.push({ id: sid, source: sourceRef, convert: { method: 'zonal_stats', target: nameForTarget(target), aggregate } });
+      continue;
+    }
     if (d.mode === 'key') {
       const p = [];
       if (source.type !== 'datasetNode') p.push('A join on a key reads a dataset, not a step.');

@@ -213,7 +213,7 @@ urbantrace/
 ├── docs/                        # WALKTHROUGH.md, REDESIGN.md, screenshots
 ├── paper/                       # The VIS 2026 paper's supplementary material
 ├── benchmark/                   # Discovery and operator-selection studies (paper)
-├── notebook/case_study_1/       # Case study validation notebook (paper)
+├── notebook/                    # Case study notebooks (after-school and opportunity bargains)
 └── tools/                       # Origins, GeoParquet conversion, method figures
 ```
 
@@ -243,6 +243,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pip install -e "../../atlas-clean[geo]"   # optional: data checks (a checkout of atlas-clean next to this repository)
+python ../tools/fetch_nlcd_canopy.py   # optional: the tree canopy raster (NLCD 2021, 30 m) into data/raster/
 pip install openai                         # optional: the OpenAI or Hugging Face copilot (portkey-ai for Portkey)
 uvicorn main:app --reload --port 8000
 ```
@@ -346,13 +347,14 @@ area where most features are.
 
 ---
 
-## 🔬 Benchmark and case study (paper)
+## 🔬 Benchmark and case studies (paper)
 
 - [`benchmark/`](benchmark/README.md): the dataset discovery ablation (28 scenarios, five metadata
   conditions, two LLM backbones) and the operator selection study, with scripts and results. The
   operator selection study scores answers in the paper's operator vocabulary; run it against
   `vis2026-camera-ready`.
 - [`notebook/case_study_1/`](notebook/case_study_1/): validation notebook for the NYC after-school case study.
+- [Case Study 2](notebook/case_study_2/Case_Study_2-NYC_Opportunity_Bargains.ipynb) recreates the 2017 opportunity and rent comparison.
 
 ---
 

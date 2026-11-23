@@ -268,8 +268,32 @@ async def list_datasets():
                     dataset_info["metadata"] = json.load(meta_file)
             
             datasets.append(dataset_info)
-            
+
+    # Raster datasets (rasters.py): listed alongside, with geometricType "Raster"
+    import rasters
+    for stem in rasters.list_stems(DATA_DIR):
+        datasets.append({"id": stem, "name": stem.replace("_", " "), "filename": f"{stem}.tif",
+                         "metadata": rasters.profile(DATA_DIR, stem)})
     return {"datasets": datasets}
+
+
+@app.get("/api/rasters/{stem}/preview.png")
+async def raster_preview(stem: str):
+    """A small picture of a raster dataset for its node (transparent where there is no data)."""
+    import rasters
+    from fastapi.responses import Response
+    if not catalog.valid_stem(stem) or not rasters.is_raster(DATA_DIR, stem):
+        raise HTTPException(status_code=404, detail="Raster not found")
+    png = await asyncio.to_thread(rasters.preview_png, DATA_DIR, stem)
+    return Response(content=png, media_type="image/png", headers={"Cache-Control": "max-age=3600"})
+
+
+@app.get("/api/rasters/{stem}")
+async def raster_info(stem: str):
+    import rasters
+    if not catalog.valid_stem(stem) or not rasters.is_raster(DATA_DIR, stem):
+        raise HTTPException(status_code=404, detail="Raster not found")
+    return rasters.profile(DATA_DIR, stem)
 
 
 @app.post("/datasets/upload")

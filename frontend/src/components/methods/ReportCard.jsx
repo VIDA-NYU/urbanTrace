@@ -71,8 +71,28 @@ function KeyJoin({ report }) {
   );
 }
 
+// Zonal statistics of a raster: how the cells were weighted, and zones the raster missed
+function Zonal({ report }) {
+  if (report?.conversion !== 'zonal_stats') return null;
+  const z = report.zones || {};
+  const gaps = [['outside_raster', 'outside the raster'], ['no_cells', 'reached no cell'], ['cells_without_valid_values', 'only over cells with no data']]
+    .filter(([k]) => z[k]?.count);
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div>Zonal statistics, <b>{report.method === 'cell_coverage' ? 'exact cell coverage' : 'cell centres'}</b>: {z.total} units,
+        {' '}{(report.reads?.cells || 0).toLocaleString()} cells of {report.measurement?.cell_area_m2 || '?'} m² read</div>
+      {gaps.map(([k, label]) => <div key={k} style={{ color: '#b45309' }}>{z[k].count} unit(s) {label}</div>)}
+    </div>
+  );
+}
+
 // One line that is visible while the card is closed: what went in and what it reached.
 function summary(rep) {
+  if (rep?.allocation?.conversion === 'zonal_stats') {
+    const z = rep.allocation.zones || {};
+    const gaps = ['outside_raster', 'no_cells', 'cells_without_valid_values'].reduce((s, k) => s + (z[k]?.count || 0), 0);
+    return [rep.study_area ? `study area` : null, `zonal statistics onto ${z.total} units`, gaps ? `${gaps} without data` : null].filter(Boolean).join(' · ');
+  }
   if (rep?.allocation?.conversion === 'reduce') {
     const a = rep.allocation;
     return [`joined on ${a.by}: ${a.groups} key(s)`, a.unknown_keys?.count ? `${a.unknown_keys.count} match no zone` : null].filter(Boolean).join(' · ');
@@ -120,6 +140,7 @@ export default function ReportCard({ reports, defaultOpen = false, title = 'What
           {rep?.cleaning?.fixes?.length > 0 && <div>Corrected on load: {rep.cleaning.fixes.map((f) => `${f.action} (${f.rows} rows)`).join(', ')}</div>}
           {rep?.repaired_geometries && <div style={{ color: '#b45309' }}>{rep.repaired_geometries.count} invalid geometries repaired</div>}
           <KeyJoin report={rep?.allocation} />
+          <Zonal report={rep?.allocation} />
           <Step label={rep?.zoning ? 'To grid' : 'Matched'} report={rep?.allocation} />
           <Step label="To zones" report={rep?.zoning} />
         </div>

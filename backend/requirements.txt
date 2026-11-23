@@ -5,7 +5,7 @@ python-dotenv
 python-multipart
 
 # Spatial integration (prerelease; see docs/REDESIGN.md, phase 0)
-urbanweave[osm]==0.1.0a2
+urbanweave[osm,raster]==0.1.0a2
 
 # Geo stack
 geopandas

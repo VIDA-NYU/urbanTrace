@@ -35,7 +35,8 @@ import catalog
 EMBED_LIMIT_BYTES = 50 * 1024 * 1024
 FORMATS = {"parquet": ("parquet", "application/vnd.apache.parquet"),
            "gpkg": ("gpkg", "application/geopackage+sqlite3"),
-           "geojson": ("geojson", "application/geo+json")}
+           "geojson": ("geojson", "application/geo+json"),
+           "geotiff": ("tif", "image/tiff")}            # raster datasets only, copied as they are
 
 
 def _slug(text: str, fallback: str = "collection") -> str:
@@ -99,6 +100,29 @@ def _resource(name: str, rel: str, fmt: str, file: Path, schema: dict, extra: di
             "schema": schema, **extra}
 
 
+def _add_raster(data_dir, stem: str, root: Path, resources: list, references: list, rows: list, embed: str):
+    """A raster dataset (rasters.py): its GeoTIFF as it is in the catalog, with what the sidecar says."""
+    import shutil
+    import rasters
+    side = rasters.sidecar(data_dir, stem)
+    src = rasters.path(data_dir, stem)
+    origin = {"source_url": side.get("source_url"), "publisher": side.get("publisher"), "license": side.get("license"),
+              "retrieved_at": side.get("retrieved_at")}
+    embedded, why = _embed_decision(embed, origin, src.stat().st_size)
+    rows.append({"name": stem, "rows": (side.get("stats") or {}).get("valid_cells"), "geometry": "Raster",
+                 "columns": [side.get("band")], "origin": origin, "status": why, "rationale": None})
+    info = {"description": side.get("description"), "urbantrace:origin": origin,
+            "urbantrace:raster": {k: side.get(k) for k in ("band", "units", "value_kind", "nodata", "resolution_m", "crs", "year", "citation")}}
+    if not embedded:
+        references.append({"name": stem, "url": side.get("source_url"), "reason": why, **info})
+        return
+    rel = f"data/sources/{stem}.tif"
+    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, root / rel)
+    schema = {"fields": [{"name": side.get("band") or "band_1", "type": "number", "unit": side.get("units")}]}
+    resources.append(_resource(stem.lower(), rel, "geotiff", root / rel, schema, info))
+
+
 def _embed_decision(mode: str, origin: dict, size: int) -> tuple[bool, str]:
     referenceable = bool(origin.get("source_url"))
     if mode == "always":
@@ -137,7 +161,7 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
     """
     if embed not in ("auto", "always", "never"):
         raise ValueError("embed must be 'auto', 'always' or 'never'")
-    formats = tuple(f for f in formats if f in FORMATS) or ("parquet",)
+    formats = tuple(f for f in formats if f in FORMATS and f != "geotiff") or ("parquet",)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     resources, references, not_included, rows = [], [], [], []
 
@@ -146,6 +170,10 @@ def build(data_dir, collection: dict, out_path: Path, *, embed: str = "auto",
         for entry in collection.get("datasets", []):
             stem = catalog.stem_of(entry.get("id"))
             if not catalog.valid_stem(stem):
+                continue
+            import rasters
+            if rasters.is_raster(data_dir, stem):
+                _add_raster(data_dir, stem, root, resources, references, rows, embed)
                 continue
             path = catalog.dataset_path(data_dir, stem)
             origin = catalog.origin(data_dir, stem)

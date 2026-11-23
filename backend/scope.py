@@ -371,6 +371,12 @@ def catalog_in_area(data_dir, area) -> dict:
             keys = {(int(np.floor((c[0] + c[2]) / 2 / step)), int(np.floor((c[1] + c[3]) / 2 / step))) for c in cells}
             share = len(keys & area_keys) / len(area_keys) if area_keys else 0.0
             out[stem] = {"measure": "cells", "share_of_area": round(min(1.0, share), 3)}
+    import rasters
+    for stem in rasters.list_stems(data_dir):              # a raster covers its box (no data inside is rare)
+        b = rasters.sidecar(data_dir, stem).get("bounds_wgs84")
+        if b:
+            share = shapely.area(shapely.intersection(area, shapely.box(*b))) / (shapely.area(area) or 1)
+            out[stem] = {"measure": "cells", "share_of_area": round(min(1.0, float(share)), 3)}
     return out
 
 
@@ -409,6 +415,11 @@ def catalog_index(data_dir) -> list[dict]:
                     "geometry": (prof or {}).get("geometricType"), "rows": (prof or {}).get("nb_rows"),
                     "corrected": cleaning.has_recipe(data_dir, stem),
                     "located": geocode.has_result(data_dir, stem)})
+    import rasters
+    for stem in rasters.list_stems(data_dir):                # rasters: their box, for the study-area filter
+        side = rasters.sidecar(data_dir, stem)
+        out.append({"id": stem, "bbox": side.get("bounds_wgs84"), "time": None, "geometry": "Raster",
+                    "rows": (side.get("stats") or {}).get("valid_cells"), "corrected": False, "located": False})
     return out
 
 

@@ -7,7 +7,7 @@ import { Hexagon, Route, Download, Workflow, Calculator, Play, Loader2, X, Plus,
 import { getHexagonEdgeLengthAvg } from 'h3-js';
 import OperatorSelect, { ParamForm } from '../../methods/OperatorSelect';
 import ReportCard from '../../methods/ReportCard';
-import { KINDS, KIND_COLORS, KEY_REDUCTIONS, keyReductionName } from '../../../lib/plans';
+import { KINDS, KIND_COLORS, KEY_REDUCTIONS, keyReductionName, RASTER_REDUCTIONS } from '../../../lib/plans';
 import { networkStatus, downloadNetwork } from '../../../lib/osm';
 
 const shell = (accent, width) => ({
@@ -232,6 +232,23 @@ function ReductionRow({ r, ctx, method, onPatch, onRemove, onKind }) {
   );
 }
 
+// One summary of a raster under each zone or cell (zonal statistics)
+const RASTER_LABELS = { weighted_mean: 'mean, by area covered', mean: 'mean of cells', sum: 'sum, by area covered', min: 'min', max: 'max',
+  count: 'number of cells', majority: 'most common value', shares: 'share of each value' };
+function RasterReductionRow({ r, band, onPatch, onRemove }) {
+  return (
+    <div style={{ border: '1px solid #e2e8f0', borderRadius: 6, padding: 6, display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 4, background: '#f8fafc', alignItems: 'center' }}>
+      <select className="nodrag" style={{ ...input, height: 20 }} value={r.method}
+        onChange={(e) => onPatch({ method: e.target.value, column: band, as: r.asEdited ? r.as : `${e.target.value}_${band}` })}>
+        {RASTER_REDUCTIONS.map((m) => <option key={m} value={m}>{RASTER_LABELS[m] || m}</option>)}
+      </select>
+      <input className="nodrag" style={{ ...input, height: 20 }} value={r.as || ''} placeholder={`${r.method}_${band}`} title="Output column name"
+        onChange={(e) => onPatch({ as: e.target.value.replace(/[^A-Za-z0-9_]/g, '_'), asEdited: true })} />
+      <button className="nodrag" style={{ ...iconBtn, color: '#94a3b8' }} title="Remove" onClick={onRemove}><Trash2 size={11} /></button>
+    </div>
+  );
+}
+
 // One reduction of a join on a key: a sum of a column, or a ratio of two sums.
 function KeyReductionRow({ r, columns, onPatch, onRemove }) {
   const colSelect = (field, placeholder) => (
@@ -282,10 +299,17 @@ export const StepNode = memo(({ id, data }) => {
   const reductions = data.reductions || [];
   const set = (patch) => data.onChange?.(id, patch);
   const patchReduction = (i, patch) => set({ reductions: reductions.map((r, j) => (j === i ? { ...r, ...patch } : r)) });
-  const keyMode = data.mode === 'key';
+  const rasterMode = ctx.source?.geometry === 'Raster';
+  const band = ctx.source?.columns?.[0]?.name || 'band_1';
+  const keyMode = !rasterMode && data.mode === 'key';
   const keyReady = keyMode && data.keyBy && data.keyIdColumn
     && reductions.some((r) => (r.method === 'ratio_of_sums' ? r.numerator && r.denominator : r.method === 'sum' && r.column));
-  const ready = ctx.source && ctx.target && (keyMode ? keyReady : reductions.some((r) => r.method));
+  const ready = ctx.source && ctx.target && (keyMode ? keyReady : rasterMode ? reductions.some((r) => RASTER_REDUCTIONS.includes(r.method)) : reductions.some((r) => r.method));
+  // A raster source starts with the usual summary of a percentage or rate: its mean, by area covered
+  const defaultCount = reductions.length === 1 && reductions[0].method === 'count' && !reductions[0].column && !reductions[0].asEdited;
+  useEffect(() => {
+    if (rasterMode && defaultCount) set({ reductions: [{ method: 'weighted_mean', column: band, as: `weighted_mean_${band}` }] });
+  }, [rasterMode, defaultCount, band]); // eslint-disable-line react-hooks/exhaustive-deps
   const sourceColumns = ctx.source?.columns || [];
   const targetColumns = ctx.target?.columns || [];
   // Switching modes starts the reductions afresh: the two modes offer different ones. A key column
@@ -323,6 +347,12 @@ export const StepNode = memo(({ id, data }) => {
             {ctx.target ? ctx.target.label : 'connect zones or an H3 grid'}
           </span>
         </div>
+        {rasterMode ? (
+          <div style={{ fontSize: 9, color: '#475569', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 6, padding: '4px 6px', lineHeight: 1.4 }}>
+            <b style={{ color: '#166534' }}>Zonal statistics.</b> The raster&apos;s cells under each zone or H3 cell, each weighted by the share of it
+            inside (exact coverage). Targets: zones or an H3 grid.
+          </div>
+        ) : (<>
         <div style={{ display: 'flex', border: '1px solid #c7d2fe', borderRadius: 6, overflow: 'hidden', fontSize: 10 }}>
           {[['location', 'Match by location'], ['key', 'Join on a key']].map(([m, label]) => (
             <button key={m} type="button" className="nodrag" onClick={() => setMode(m)}
@@ -372,19 +402,25 @@ export const StepNode = memo(({ id, data }) => {
         </label>
         <ParamForm method={method} values={data.params || {}} onChange={(params) => set({ params })} />
         </>)}
+        </>)}
         <div style={{ ...small, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
           Aggregate
           <button className="nodrag" style={{ ...iconBtn, color: '#4338ca', fontSize: 9, gap: 2 }}
-            onClick={() => set({ reductions: [...reductions, keyMode ? { method: 'sum', column: '', as: '' } : { method: 'count', column: '', as: 'count', fillEmpty: true }] })}>
+            onClick={() => set({ reductions: [...reductions, rasterMode ? { method: 'max', column: band, as: `max_${band}` } : keyMode ? { method: 'sum', column: '', as: '' } : { method: 'count', column: '', as: 'count', fillEmpty: true }] })}>
             <Plus size={11} /> add
           </button>
         </div>
+        {rasterMode && reductions.map((r, i) => (
+          <RasterReductionRow key={i} r={r} band={band}
+            onPatch={(patch) => patchReduction(i, patch)}
+            onRemove={() => set({ reductions: reductions.filter((_, j) => j !== i) })} />
+        ))}
         {keyMode && reductions.map((r, i) => (
           <KeyReductionRow key={i} r={r} columns={sourceColumns}
             onPatch={(patch) => patchReduction(i, patch)}
             onRemove={() => set({ reductions: reductions.filter((_, j) => j !== i) })} />
         ))}
-        {!keyMode && reductions.map((r, i) => (
+        {!keyMode && !rasterMode && reductions.map((r, i) => (
           <ReductionRow key={i} r={r} ctx={ctx} method={method}
             onPatch={(patch) => patchReduction(i, patch)}
             onRemove={() => set({ reductions: reductions.filter((_, j) => j !== i) })}

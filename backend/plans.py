@@ -98,6 +98,25 @@ def _cache_dir(cache_root) -> Path:
     return p
 
 
+def _bind_raster(data_dir, name: str, spec: dict, area):
+    """A raster source (rasters.py), read over the study area when there is one."""
+    import rasters
+    stem = catalog.stem_of(((spec.get("urbantrace") or {}).get("dataset")))
+    if not catalog.valid_stem(stem) or not rasters.is_raster(data_dir, stem):
+        raise PlanInputError(f"source {name!r}: raster {stem!r} is not in the catalog.")
+    side = rasters.sidecar(data_dir, stem)
+    window = list(area.bounds) if area is not None else None
+    try:
+        raster = rasters.read(data_dir, stem, window_wgs84=window)
+    except Exception as e:
+        raise PlanInputError(f"source {name!r}: {e}")
+    bounds = window or side.get("bounds_wgs84")
+    return raster, {"dataset": stem, "kind": "raster", "band": side.get("band"), "units": side.get("units"),
+                    "value_kind": side.get("value_kind"), "resolution_m": side.get("resolution_m"), "year": side.get("year"),
+                    "bounds_wgs84": [float(v) for v in bounds], "license": side.get("license"),
+                    "cells": int(raster.width * raster.height)}
+
+
 def _bind_source(data_dir, name: str, spec: dict, area, columns_needed: set[str]):
     ut = spec.get("urbantrace") or {}
     stem = catalog.stem_of(ut.get("dataset"))
@@ -312,6 +331,9 @@ def prepare(data_dir, plan_spec: dict, study_area_spec, cache_root):
     need = _columns_needed(spec)
     sources, info = {}, {"sources": {}, "targets": {}, "study_area": study_area_spec}
     for name, sspec in (spec.get("sources") or {}).items():
+        if (sspec or {}).get("kind") == "raster":
+            sources[name], info["sources"][name] = _bind_raster(data_dir, name, sspec, area)
+            continue
         sources[name], info["sources"][name] = _bind_source(data_dir, name, sspec, area, need.get(name, set()))
     # Joins on a key: keys compared as text, so 11211, "11211" and 11211.0 meet (zones' IDs, likewise)
     for step in spec.get("steps") or []:
@@ -336,7 +358,8 @@ def prepare(data_dir, plan_spec: dict, study_area_spec, cache_root):
             if area is not None:
                 ext = scope.padded_area(area, pad_m).bounds
             elif sources:
-                b = np.array([g.total_bounds for g in sources.values()])
+                b = np.array([info["sources"][n]["bounds_wgs84"] if info["sources"][n].get("kind") == "raster" else g.total_bounds
+                              for n, g in sources.items()])
                 lat = max(abs(b[:, 1].min()), abs(b[:, 3].max()))
                 dlat, dlon = pad_m / 111_320.0, pad_m / (111_320.0 * max(math.cos(math.radians(lat)), 1e-6))
                 ext = (b[:, 0].min() - dlon, b[:, 1].min() - dlat, b[:, 2].max() + dlon, b[:, 3].max() + dlat)
@@ -380,8 +403,13 @@ def validate(data_dir, plan_spec: dict, study_area_spec, cache_root) -> dict:
         by_step.setdefault(owner, []).append(msg)
 
     need = _columns_needed(spec)
+    import rasters
     for name, sspec in (spec.get("sources") or {}).items():
         stem = catalog.stem_of(((sspec or {}).get("urbantrace") or {}).get("dataset"))
+        if (sspec or {}).get("kind") == "raster":
+            if not catalog.valid_stem(stem) or not rasters.is_raster(data_dir, stem):
+                add(_owner(f"source '{name}'", spec), f"Raster {stem or '?'} is not in the catalog.")
+            continue
         if not catalog.valid_stem(stem) or catalog.dataset_path(data_dir, stem) is None:
             add(_owner(f"source '{name}'", spec), f"Dataset {stem or '?'} is not in the catalog.")
             continue
@@ -459,7 +487,8 @@ def _step_columns(frame, kinds: dict) -> tuple[list[str], dict]:
 
 def _kinds_of(step: dict, declared: dict) -> dict:
     out = {}
-    for r in (step.get("aggregate") or (step.get("reduce") or {}).get("aggregate") or []):
+    for r in (step.get("aggregate") or (step.get("reduce") or {}).get("aggregate")
+              or (step.get("convert") or {}).get("aggregate") or []):
         alias = Reduction.from_dict(dict(r)).alias
         if r.get("method") == "shares":
             out[alias] = "shares"                       # expanded per category by _step_columns
@@ -557,13 +586,16 @@ def run(data_dir, plan_spec: dict, study_area_spec, cache_root, *, outputs=None,
         raise PlanInputError(str(e))
     steps = {s["id"]: s for s in plan.spec["steps"]}
     declared = {n: (d or {}).get("columns", {}) for n, d in (plan.spec.get("sources") or {}).items()}
+    for n, s in info["sources"].items():                     # a raster's band: its sidecar says the value kind
+        if s.get("kind") == "raster" and s.get("value_kind"):
+            declared[n] = {"None": {"kind": s["value_kind"]}, str(s.get("band")): {"kind": s["value_kind"]}}
     zones_frames = info.pop("zones_frames")
     labels = {n: t.get("label") for n, t in info["targets"].items() if t.get("kind") == "zones"}
     labels.update({n: "name" for n, t in info["targets"].items() if t.get("kind") == "osm_streets"})
 
     def target_of(step_id):
         step = steps[step_id]
-        tgt = (step.get("match") or step.get("reduce") or {}).get("target")
+        tgt = (step.get("match") or step.get("reduce") or step.get("convert") or {}).get("target")
         return tgt, info["targets"].get(tgt, {"kind": "other"})
 
     out = {"steps": {}, "reports": {sid: result.reports.get(sid) for sid in steps},

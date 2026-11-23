@@ -1330,15 +1330,15 @@ const CanvasInner = ({ sidebarCollapsed, onLogActivity, highlightedLogTs, focuse
       // Each output column and the step (and its reduction) that made it: one step, or a
       // Calculate node's input steps
       const columnSteps = plan.steps.filter((s) => (mode === 'step' ? s.id === key : derived[0].inputs.includes(s.id)))
-        .flatMap((s) => (s.aggregate || s.reduce?.aggregate || []).map((r) => ({ r, s })));
+        .flatMap((s) => (s.aggregate || s.reduce?.aggregate || s.convert?.aggregate || []).map((r) => ({ r, s })));
       const spatialData = toSpatialData(payload, {
         stepId: key, plan, reports: out.reports?.[key] || null,
         sourceLabel: srcInfo?.dataset || (mode === 'calculate' ? `derived from ${derived[0].inputs.join(', ')}` : key),
-        methodLabel: step?.match?.method || (step?.reduce ? `join on ${step.reduce.by}` : 'combine'),
+        methodLabel: step?.match?.method || (step?.reduce ? `join on ${step.reduce.by}` : step?.convert?.method || 'combine'),
         reductionsByColumn: Object.fromEntries(columnSteps.map(({ r }) => [r.as, r.method])),
         sourceColumns: Object.fromEntries(columnSteps.map(({ r }) => [r.as, r.column || r.numerator || null])),
         datasetsByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, out.inputs?.[s.source]?.dataset || null])),
-        methodsByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, s.match?.method || (s.reduce ? `join on ${s.reduce.by}` : null)])),
+        methodsByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, s.match?.method || (s.reduce ? `join on ${s.reduce.by}` : s.convert?.method || null)])),
         rationalesByColumn: Object.fromEntries(columnSteps.map(({ r, s }) => [r.as, stepRationale(all.find((n) => byStepNode[n.id] === s.id), s, out.reports?.[s.id])])),
         expressionsByColumn: derived?.[0]?.expression ? { [derived[0].as]: derived[0].expression } : {},
         durationMs: Math.round(performance.now() - started),
