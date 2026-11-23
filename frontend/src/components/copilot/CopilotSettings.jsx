@@ -14,12 +14,15 @@ const call = copilotCall;
 export function CopilotLlmChip({ status, onClick }) {
   const s = status?.settings;
   const on = s?.enabled;
-  const label = !s ? 'LLM …' : on ? `LLM: ${s.provider === 'local' ? 'local' : s.provider}${s.model ? ` · ${s.model.replace(/^@[^/]+\//, '')}` : ''}` : 'LLM off · rules';
+  const offer = !on && (status?.available || []).length > 0;     // a key or local server works: offer it
+  const label = !s ? 'LLM …' : on ? `LLM: ${s.provider === 'local' ? 'local' : s.provider}${s.model ? ` · ${s.model.replace(/^@[^/]+\//, '')}` : ''}`
+    : offer ? 'LLM available · turn on' : 'LLM off · rules';
   return (
     <button type="button" onClick={onClick} title="Choose whether the copilot uses an LLM, and which"
       style={{ border: 'none', borderRadius: 999, padding: '4px 10px', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
         display: 'flex', alignItems: 'center', gap: 4, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis',
-        background: on ? '#ede9fe' : '#fff7ed', color: on ? '#5b21b6' : '#9a3412' }}>
+        background: on ? '#ede9fe' : offer ? '#dbeafe' : '#fff7ed', color: on ? '#5b21b6' : offer ? '#1d4ed8' : '#9a3412',
+        boxShadow: offer ? '0 0 0 1px #93c5fd' : 'none' }}>
       <Cpu size={11} /> {label}
     </button>
   );
@@ -40,7 +43,13 @@ export default function CopilotSettings({ open, onClose, onChanged }) {
       setDraft({ ...st.settings });
     } catch (e) { setError(e.message); }
   }, []);
+  // Opening the settings to turn the LLM on: start with it ticked when a provider works
   useEffect(() => { if (open) { setTest(null); load(); } }, [open, load]);
+  useEffect(() => {
+    if (open && status && draft && !status.settings.enabled && (status.available || []).length && draft.enabled === false && !draft.touched) {
+      setDraft((d) => ({ ...d, enabled: true, touched: true }));
+    }
+  }, [open, status, draft]);
   if (!open) return null;
 
   const providers = status?.providers || [];
@@ -50,7 +59,8 @@ export default function CopilotSettings({ open, onClose, onChanged }) {
   const save = async (body) => {
     setBusy(true); setError(null); setTest(null);
     try {
-      const st = await call('POST', '/api/copilot/settings', body);
+      const { touched, source, ...clean } = body; void touched; void source;
+      const st = await call('POST', '/api/copilot/settings', clean);
       setStatus(st); setDraft({ ...st.settings }); onChanged?.(st);
       return st;
     } catch (e) { setError(e.message); return null; } finally { setBusy(false); }
@@ -62,10 +72,15 @@ export default function CopilotSettings({ open, onClose, onChanged }) {
     try { setTest({ ok: true, ...(await call('POST', '/api/copilot/test')) }); } catch (e) { setTest({ ok: false, error: e.message }); }
     finally { setBusy(false); }
   };
-  const recheckLocal = async () => { await save({ local_base_url: draft.local_base_url }); };
+  const recheckLocal = async () => { await save({ local_base_url: draft.local_base_url }); await recheck(); };
+  const recheck = async () => {
+    setBusy(true); setError(null);
+    try { const st = await call('POST', '/api/copilot/check'); setStatus(st); onChanged?.(st); } catch (e) { setError(e.message); }
+    finally { setBusy(false); }
+  };
 
   const row = { display: 'grid', gap: 4, fontSize: 11 };
-  const input = { height: 26, border: '1px solid #cbd5e1', borderRadius: 6, padding: '0 8px', fontSize: 12, color: '#0f172a', background: '#fff' };
+  const input = { height: 26, border: '1px solid #cbd5e1', borderRadius: 6, padding: '0 8px', fontSize: 12, color: '#0f172a', background: '#fff', whiteSpace: 'nowrap' };
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onMouseDown={onClose}>
@@ -93,7 +108,7 @@ export default function CopilotSettings({ open, onClose, onChanged }) {
                     onChange={() => set({ provider: p.id, model: p.id === draft.provider ? draft.model : (p.models?.[0] || p.default_model) })} />
                   <span>
                     <b>{p.label}</b>{' '}
-                    {p.ready ? <span style={{ color: '#15803d' }}>available</span> : <span style={{ color: '#b45309' }}>not available</span>}
+                    {p.ready ? <span style={{ color: '#15803d' }}>{p.verified ? 'available (key checked)' : 'available'}</span> : <span style={{ color: '#b45309' }}>not available</span>}
                     {!p.ready && p.why && <div style={{ fontSize: 10, color: '#64748b' }}>{p.why}</div>}
                   </span>
                 </label>
@@ -130,8 +145,10 @@ export default function CopilotSettings({ open, onClose, onChanged }) {
               ? <div style={{ color: '#15803d', display: 'flex', gap: 4 }}><CheckCircle2 size={13} /> {test.provider} · {test.model} answered in {test.seconds} s.</div>
               : <div style={{ color: '#b91c1c', display: 'flex', gap: 4 }}><AlertCircle size={13} /> {test.error}</div>)}
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: 10, color: '#64748b' }}>
-                {status?.settings?.source === 'interface' ? 'Chosen here; ' : 'From backend/.env; '}keys stay in backend/.env.
+              <span style={{ fontSize: 10, color: '#64748b', display: 'flex', gap: 6, alignItems: 'center' }}>
+                <span>Keys come from the backend&apos;s environment (shell or backend/.env); none is entered here.</span>
+                <button type="button" onClick={recheck} disabled={busy} title="After adding a key or starting a local server"
+                  style={{ border: 'none', background: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: 10, padding: 0, whiteSpace: 'nowrap' }}>Check again</button>
               </span>
               <span style={{ display: 'flex', gap: 6 }}>
                 {draft.enabled && <button type="button" onClick={runTest} disabled={busy} style={{ ...input, cursor: 'pointer' }}>Save and test</button>}

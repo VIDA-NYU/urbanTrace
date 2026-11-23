@@ -251,7 +251,7 @@ The backend loads `backend/.env`. The copilot's LLM is optional; without it, the
 rules (step suggestions from urbanweave's registry, priority-map directions from keyword lists, and
 it asks the analyst when no rule applies). The **LLM** chip in the copilot bar turns it on or off and
 chooses the provider and model; keys stay in `backend/.env` (or the backend's environment) and are
-never entered in the interface. A **local model** needs no key: run any OpenAI-compatible server
+never entered in the interface. At startup the backend checks which providers work (keys in its environment, the shell's or `.env`, are verified with their provider by a free request) and the chip offers to turn the copilot on. A **local model** needs no key: run any OpenAI-compatible server
 (Ollama, LM Studio, llama.cpp's `llama-server`, vLLM) and choose "Local model".
 
 | Variable | Purpose |
@@ -263,6 +263,7 @@ never entered in the interface. A **local model** needs no key: run any OpenAI-c
 | `PORTKEY_API_KEY`, `PORTKEY_MODEL` | Portkey gateway credentials and model |
 | `COPILOT_DISABLED` | Set to `1` to start with the LLM off (rules only) until it is turned on in the interface |
 | `URBANTRACE_GEOCODER` | `off` turns off locating rows from their addresses (NYC GeoSearch, only on an analyst's request) |
+| `URBANTRACE_LLM_CHECK` | `off` skips the providers check at startup (no requests to providers) |
 | `COPILOT_CATALOG` | How the catalog is sent to the model: `index` (default), `compact` or `full` |
 | `URBANTRACE_COLLECTIONS_DIR` | Where collections are saved (default `data/collections`) |
 | `URBANTRACE_PLAN_CACHE` | Where plan runs and manifests are kept (default `data/plan_cache`) |

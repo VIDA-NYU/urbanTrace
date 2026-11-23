@@ -52,7 +52,16 @@ from tool import COPILOT_FRONTEND_TOOLS
 # 1. APP SETUP & CONSTANTS
 # ==========================================
 
-app = FastAPI(title="UrbanTrace Spatial API")
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def _lifespan(_app):
+    _check_llm_providers()          # in the background: startup does not wait for it
+    yield
+
+
+app = FastAPI(title="UrbanTrace Spatial API", lifespan=_lifespan)
 
 # Allow the React frontend to communicate with this API
 app.add_middleware(
@@ -142,8 +151,33 @@ class CopilotSettingsBody(BaseModel):
 
 
 def _copilot_status() -> Dict[str, Any]:
-    eff = copilot_settings.effective(DATA_DIR)
-    return {"settings": eff, "providers": copilot_settings.providers(DATA_DIR)}
+    provs = copilot_settings.providers(DATA_DIR)
+    return {"settings": copilot_settings.effective(DATA_DIR), "providers": provs,
+            "available": [p["id"] for p in provs if p.get("ready")]}
+
+
+def _check_llm_providers():
+    """Which LLM providers work, checked once in the background at startup: keys found in the
+    environment (the shell's or backend/.env) are verified with their provider by a free request,
+    and a local server is asked for its models. The interface offers to turn the copilot on."""
+    if not copilot_settings.checks_enabled():
+        return
+    import threading
+
+    def run():
+        try:
+            copilot_settings.check_all(DATA_DIR)
+            print(copilot_settings.summary(DATA_DIR), flush=True)
+        except Exception as exc:  # never stops the backend
+            print(f"Copilot provider check failed: {exc}", flush=True)
+    threading.Thread(target=run, daemon=True).start()
+
+
+@app.post("/api/copilot/check")
+async def recheck_copilot():
+    """Check the providers again (after adding a key or starting a local server)."""
+    await asyncio.to_thread(copilot_settings.check_all, DATA_DIR)
+    return await asyncio.to_thread(_copilot_status)
 
 
 @app.get("/api/copilot/settings")

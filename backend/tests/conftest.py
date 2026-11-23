@@ -9,6 +9,7 @@ import pytest
 BACKEND = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND))
 os.environ.setdefault("COPILOT_DISABLED", "1")
+os.environ["URBANTRACE_LLM_CHECK"] = "off"     # no provider checks over the network in tests
 
 REPO_DATA = BACKEND.parent / "data" / "geojson"
 
