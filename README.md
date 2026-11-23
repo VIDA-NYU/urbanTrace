@@ -243,7 +243,8 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pip install -e "../../atlas-clean[geo]"   # optional: data checks (a checkout of atlas-clean next to this repository)
-python ../tools/fetch_nlcd_canopy.py   # optional: the tree canopy raster (NLCD 2021, 30 m) into data/raster/
+python ../tools/fetch_tnc_canopy.py    # optional: tree canopy from NYC's 6-inch 2021 land cover (1.74 GB download, ~5 min) into data/raster/
+python ../tools/fetch_nlcd_canopy.py   # optional: NLCD tree canopy (30 m, any year 2011-2021; misses street trees in dense areas)
 pip install openai                         # optional: the OpenAI or Hugging Face copilot (portkey-ai for Portkey)
 uvicorn main:app --reload --port 8000
 ```

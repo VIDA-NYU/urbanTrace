@@ -5,7 +5,8 @@ The land cover (Zenodo 10.5281/zenodo.14053441, CC BY-NC-SA 4.0) classifies ever
 city from 2021 LiDAR and aerial imagery; class 1 is tree canopy (crowns over 8 ft). At 10^11 pixels
 it is too large to summarize zone by zone, and its overviews sample classes rather than average
 them, so this tool derives the share of canopy in each 30 ft (9.1 m) cell: 60 x 60 source pixels,
-canopy pixels over valid pixels (no-data, class 0, left out). Street trees survive at that size,
+canopy pixels over land pixels (no-data, class 0, and water, class 4, left out; a cell
+that is all water has no value). Street trees survive at that size,
 unlike in 30 m national products, which miss most of them in dense neighborhoods.
 
 The source file (1.74 GB) is downloaded once to ``data/raster/source/`` (not committed; resumed if
@@ -32,6 +33,7 @@ SIZE = 1_742_000_000                         # about; checked against the server
 FACTOR = 60                                  # 60 x 6 in = 30 ft
 TILE = 64                                    # output cells per tile side
 CANOPY = 1
+WATER = 4                                    # canopy is a share of land: water is left out like no-data
 
 
 def download(dest: Path):
@@ -75,7 +77,7 @@ def aggregate(src_path: Path, out_path: Path) -> dict:
                 h, w = min(TILE, H - oy), min(TILE, W - ox)
                 a = src.read(1, window=Window(ox * FACTOR, oy * FACTOR, w * FACTOR, h * FACTOR))
                 a = a.reshape(h, FACTOR, w, FACTOR)
-                valid = (a != 0).sum(axis=(1, 3))
+                valid = ((a != 0) & (a != WATER)).sum(axis=(1, 3))
                 canopy = (a == CANOPY).sum(axis=(1, 3))
                 pct = np.where(valid > 0, np.rint(100.0 * canopy / np.maximum(valid, 1)), 255).astype("uint8")
                 out[oy:oy + h, ox:ox + w] = pct
@@ -107,7 +109,7 @@ def main():
         "title": "Tree canopy 2021 (6-inch land cover, 30 ft cells)",
         "description": ("Percent of each 30 ft (9.1 m) cell covered by tree canopy (crowns over 8 ft) in 2021, derived from The Nature "
                         "Conservancy's 6-inch land cover of New York City (LiDAR and aerial imagery): the share of the cell's 3,600 "
-                        "six-inch pixels classed as tree canopy, over its pixels with data. Street trees, parks and yards alike."),
+                        "six-inch pixels classed as tree canopy, over its land pixels (water left out). Street trees, parks and yards alike."),
         "band": "tree_canopy_pct", "units": "percent", "value_kind": "intensive", "nodata": 255, "year": 2021,
         "display_range": [0, 100], "resolution_m": round(30 * 0.3048, 2), "crs": info["crs"].to_string(),
         "bounds_wgs84": [round(v, 5) for v in transform_bounds(info["crs"], "EPSG:4326", *info["bounds"])],
@@ -115,7 +117,7 @@ def main():
         "license_note": "Non-commercial use; results derived from it are shared under the same license, with attribution.",
         "source_url": "https://doi.org/10.5281/zenodo.14053441",
         "citation": "The Nature Conservancy (2024). New York City Land Cover, Tree Canopy Change, and Estimated Tree Location Data, 2021. Zenodo. https://doi.org/10.5281/zenodo.14053441",
-        "derived_from": {"file": SOURCE_NAME, "class": "1 (tree canopy)", "method": f"share of {FACTOR}x{FACTOR} six-inch pixels"},
+        "derived_from": {"file": SOURCE_NAME, "class": "1 (tree canopy)", "method": f"share of the land pixels among {FACTOR}x{FACTOR} six-inch pixels (water and no-data left out)"},
         "retrieved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "stats": {"valid_cells": info["valid_cells"], "mean": info["mean"], "min": 0, "max": info["max"]},
     }
